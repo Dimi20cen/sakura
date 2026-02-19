@@ -113,6 +113,8 @@ export function handleResponse(msg: WsResponse) {
                 gs.NeedDice && gs.CurrentPlayerOrder == getThisPlayerOrder(),
             );
             state.renderGameState(gs, commandHub);
+            // Ensure HUD-dependent dice positioning is corrected after state panel renders.
+            dice.relayout();
             board.setRobberTile(gs.Robber.Tile);
             board.setMerchantTile(gs.Merchant);
             return;

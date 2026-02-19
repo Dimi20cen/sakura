@@ -5,6 +5,7 @@ import * as state from "./state";
 import * as actions from "./actions";
 import * as buttons from "./buttons";
 import * as canvas from "./canvas";
+import { computeDicePosition } from "./hudLayout";
 import { sound } from "@pixi/sound";
 import { DieRollState } from "../tsg";
 import { getCommandHub } from "./ws";
@@ -18,6 +19,41 @@ let eventDiceInner: PIXI.Sprite;
 let diceContainer: PIXI.Container;
 
 let stopFlashTimer: number = 0;
+
+function updateDicePosition() {
+    if (!diceContainer || diceContainer.destroyed) {
+        return;
+    }
+
+    const diceWidth = (whiteDiceSprite?.x || 74) + (whiteDiceInner?.width || 64);
+    const eventHeight =
+        eventDiceInner && !eventDiceInner.destroyed
+            ? (eventDiceInner.height || 42) + 10
+            : 0;
+    const diceHeight = (whiteDiceInner?.height || 64) + eventHeight;
+    const actionBarTop =
+        buttons.container && !buttons.container.destroyed
+            ? buttons.container.y
+            : canvas.getHeight() - 120;
+
+    const pos = computeDicePosition({
+        canvasWidth: canvas.getWidth(),
+        canvasHeight: canvas.getHeight(),
+        diceWidth,
+        diceHeight,
+        actionBarTop,
+        playerPanel: state.getPlayerPanelBounds(),
+    });
+
+    // Container uses pivot, so convert desired top-left coords to pivot coords.
+    diceContainer.x = pos.x + diceContainer.pivot.x;
+    diceContainer.y = pos.y + diceContainer.pivot.y;
+}
+
+export function relayout() {
+    updateDicePosition();
+    canvas.app.markDirty();
+}
 
 /**
  * Get a border for the dice
@@ -57,8 +93,8 @@ export async function render(
 
     if (!diceContainer || diceContainer.destroyed) {
         diceContainer = new PIXI.Container();
-        diceContainer.x = canvas.getWidth() - 108;
-        diceContainer.y = canvas.getHeight() - 174;
+        diceContainer.x = canvas.getWidth() - 230;
+        diceContainer.y = canvas.getHeight() - 180;
         diceContainer.zIndex = 1100;
         canvas.app.stage.addChild(diceContainer);
 
@@ -100,6 +136,8 @@ export async function render(
         eventDiceSprite.addChild(eventDiceInner);
         eventDiceSprite.addChild(getBorder((SIZE * 2) / 3));
     }
+
+    updateDicePosition();
 
     assets.assignTexture(redDiceInner, assets.diceRed[redRoll]);
     assets.assignTexture(whiteDiceInner, assets.diceWhite[whiteRoll]);

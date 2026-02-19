@@ -77,6 +77,13 @@ export function setSettings(s: GameSettings) {
     settings = s;
 }
 
+export function getPlayerPanelBounds() {
+    if (!container || container.destroyed) {
+        return null;
+    }
+    return container.getBounds();
+}
+
 const profileAvatarByUsername: Record<string, string> = {
     jethro7194: "/assets/profile-icons/jethro.png",
     kopstiklapsa: "/assets/profile-icons/kopsetinklapsa.png",
@@ -99,7 +106,10 @@ function intialize(commandHub: CommandHub) {
 
     container = new PIXI.Container();
     container.x = canvas.getWidth() - WINDOW_WIDTH * WINDOW_SCALE - 20;
-    container.y = 20;
+    container.y = Math.max(
+        20,
+        canvas.getHeight() - WINDOW_HEIGHT * WINDOW_SCALE - 125,
+    );
     container.cacheAsBitmapResolution = 2;
     container.cacheAsBitmapMultisample = PIXI.MSAA_QUALITY.HIGH;
     canvas.app.stage.addChild(container);
@@ -127,7 +137,6 @@ function intialize(commandHub: CommandHub) {
 
     pendingActionContainer.addChild(windows.getWindowSprite(450, 40));
     pendingActionContainer.addChild(pendingActionText);
-    canvas.app.stage.addChild(pendingActionContainer);
 
     pendingActionCancel = buttons.getButtonSprite(buttons.ButtonType.No, 38);
     pendingActionCancel.x = pendingActionContainer.width - 40;
@@ -154,7 +163,7 @@ function intialize(commandHub: CommandHub) {
     bankSprite.x = 45;
     bankSprite.y = 45;
     bankContainer.x = canvas.getWidth() - 20 - 90;
-    bankContainer.y = WINDOW_HEIGHT * WINDOW_SCALE + container.y + 20;
+    bankContainer.y = Math.max(10, container.y - 95);
     bankContainer.zIndex = 900;
     bankContainer.addChild(bankSprite);
     canvas.app.stage.addChild(bankContainer);
@@ -478,9 +487,6 @@ export function renderGameState(gs: GameState, commandHub: CommandHub) {
  */
 export function showPendingAction(action?: Partial<PlayerAction>) {
     canvas.app.markDirty();
-    pendingActionText.text = action?.Message || "";
-    pendingActionContainer.visible = Boolean(action?.Message);
-    pendingActionCancel.visible = Boolean(action?.CanCancel);
 
     if (
         action &&

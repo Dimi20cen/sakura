@@ -105,16 +105,22 @@ func (s *Server) NewWsHub(id string) *WsHub {
 		return nil
 	}
 
+	if err := hub.persistPresence(); err != nil {
+		log.Println(id, err)
+	}
+
 	return hub
 }
 
 func (h *WsHub) Tick(tickerPeriod int) bool {
+	changedToBot := false
 	defer h.Game.Unlock()
 	if h.Game.Lock() {
 		for _, p := range append(h.Game.Players, h.Game.Spectators...) {
 			val := atomic.AddInt32(&p.InactiveSeconds, int32(tickerPeriod))
 			if val > MAX_INACTIVE_PLAYER_SEC && !p.GetIsBot() {
 				p.SetIsBot(true)
+				changedToBot = true
 				if p.IsSpectator {
 					h.Game.RemoveSpectator(p)
 				}
@@ -145,6 +151,12 @@ func (h *WsHub) Tick(tickerPeriod int) bool {
 		(!hasHuman && h.inactiveSeconds >= MAX_INACTIVE_HUB_NOHUMAN_SEC) {
 		h.Terminate()
 		return false
+	}
+
+	if changedToBot {
+		if err := h.persistPresence(); err != nil {
+			log.Println(h.Game.ID, err)
+		}
 	}
 
 	return true
@@ -193,9 +205,8 @@ func (h *WsHub) Register(client *WsClient) {
 	h.Clients.Store(client, true)
 	atomic.AddInt32(&h.NumClients, 1)
 
-	if !client.Hub.Game.Initialized {
-		numPlayers := atomic.LoadInt32(&h.NumClients)
-		go h.Game.Store.WriteGameActivePlayers(h.Game.ID, numPlayers, h.GetHostUsername())
+	if err := h.persistPresence(); err != nil {
+		log.Println(h.Game.ID, err)
 	}
 }
 
@@ -244,9 +255,8 @@ func (h *WsHub) Unregister(client *WsClient) {
 		h.BroadcastLobbyMessage(h.GetLobbyPlayersMessage())
 	}
 
-	if !client.Hub.Game.Initialized {
-		numPlayers := atomic.LoadInt32(&h.NumClients)
-		go h.Game.Store.WriteGameActivePlayers(h.Game.ID, numPlayers, h.GetHostUsername())
+	if err := h.persistPresence(); err != nil {
+		log.Println(h.Game.ID, err)
 	}
 }
 
@@ -308,4 +318,53 @@ func (h *WsHub) StoreSettings() {
 			log.Println(h.Game.ID, err)
 		}
 	}
+}
+
+func (h *WsHub) getPresenceSnapshot() (int32, int32, string, string) {
+	connectedPlayers := int32(0)
+	connectedHumans := int32(0)
+	host := ""
+	hostId := ""
+
+	h.Clients.Range(func(key interface{}, value interface{}) bool {
+		client := key.(*WsClient)
+		if client.Player == nil || client.Player.IsSpectator {
+			return true
+		}
+
+		connectedPlayers++
+		if !client.Player.GetIsBot() {
+			connectedHumans++
+		}
+
+		if !h.Game.Initialized && client.Player.Order == 0 {
+			host = client.Player.Username
+			hostId = client.Player.Id
+		}
+		return true
+	})
+
+	if host == "" {
+		host = h.GetHostUsername()
+	}
+
+	return connectedPlayers, connectedHumans, host, hostId
+}
+
+func (h *WsHub) persistPresence() error {
+	connectedPlayers, connectedHumans, host, hostId := h.getPresenceSnapshot()
+	var lastHumanSeenAt *time.Time
+	if connectedHumans > 0 {
+		now := time.Now()
+		lastHumanSeenAt = &now
+	}
+
+	return h.Game.Store.WriteGamePresence(
+		h.Game.ID,
+		connectedPlayers,
+		connectedHumans,
+		host,
+		hostId,
+		lastHumanSeenAt,
+	)
 }

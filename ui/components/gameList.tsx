@@ -3,8 +3,8 @@ import { decode } from "@msgpack/msgpack";
 import { useRouter } from "next/router";
 import useSWR from "swr";
 import Error from "next/error";
-import { useState } from "react";
-import { basicFetcher } from "../utils";
+import { useEffect, useState } from "react";
+import { basicFetcher, getIdFromToken } from "../utils";
 import { classNames } from "../utils/styles";
 import { useAnonymousAuth } from "../hooks/auth";
 import { createGame } from "../utils/game";
@@ -12,42 +12,34 @@ import { white as spinner } from "./spinner";
 import Header from "./header";
 import { GameSettings } from "../tsg";
 import { DISPLAY_GAME_MODE, GAME_MODE } from "../src/lobby";
-import dynamic from "next/dynamic";
-
-const AdUnit = dynamic(() => import("./adunit-lobby"), {
-    ssr: false,
-});
 
 const textClass = classNames(
     `px-2 sm:px-6 py-3 tracking-wider text-center text-sm sm:text-lg font-medium`,
     "text-white",
 );
 
+type LobbyGame = {
+    id: string;
+    private: boolean;
+    server: string;
+    stage: number;
+    active_players: number;
+    players: number;
+    host: string;
+    settings: string;
+    reconnectable?: boolean;
+};
+
 const renderGame = (
-    games: {
-        id: string;
-        private: boolean;
-        server: string;
-        stage: number;
-        active_players: number;
-        players: number;
-        host: string;
-        settings: any;
-    }[],
+    games: LobbyGame[],
     selectedGameId: string,
     handleRowClick: (gameId: string) => () => void,
 ) => {
-    return games.map(
-        (game: {
-            id: string;
-            private: boolean;
-            server: string;
-            stage: number;
-            active_players: number;
-            players: number;
-            settings: string;
-            host: string;
-        }) => {
+    return games.map((game: LobbyGame) => {
+        if (!game.settings) {
+            return null;
+        }
+        try {
             const { id, settings } = game;
             const gameSettings = new GameSettings(
                 decode(Buffer.from(settings, "base64")),
@@ -63,13 +55,13 @@ const renderGame = (
                             : "bg-black bg-opacity-50",
                     )}
                 >
-                    <td className="px-6 py-4 whitespace-nowrap text-center text-lg text-white bg-clip-text">
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-center text-base sm:text-lg text-white bg-clip-text">
                         {DISPLAY_GAME_MODE[gameSettings.Mode as GAME_MODE]}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-center text-lg text-white bg-clip-text">
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-center text-base sm:text-lg text-white bg-clip-text">
                         {game.host}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-center text-lg text-white bg-clip-text">
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-center text-base sm:text-lg text-white bg-clip-text">
                         {[...Array(gameSettings.MaxPlayers)].map(
                             (_, i: number) => (
                                 <span
@@ -86,47 +78,101 @@ const renderGame = (
                             ),
                         )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-center text-lg text-white bg-clip-text">
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-center text-base sm:text-lg text-white bg-clip-text">
                         {gameSettings.MapName}
                     </td>
                 </tr>
             );
-        },
-    );
+        } catch {
+            return null;
+        }
+    });
 };
 
 const GameList: FunctionComponent = () => {
     const [token] = useAnonymousAuth();
     const { data, error } = useSWR(["/api/games", token ?? null], basicFetcher);
+    const { data: sData, error: sError } = useSWR(
+        ["/api/games?stage=playing", token ?? null],
+        basicFetcher,
+    );
     const [selectedGameId, setSelectedGameId] = useState("");
+    const [lastGameId, setLastGameId] = useState("");
+    const [lastGameProfileId, setLastGameProfileId] = useState("");
+    const [currentProfileId, setCurrentProfileId] = useState("");
 
     const router = useRouter();
+
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            setLastGameId(localStorage.getItem("lastGameId") || "");
+            setLastGameProfileId(
+                localStorage.getItem("lastGameProfileId") || "",
+            );
+            setCurrentProfileId(getIdFromToken(localStorage.getItem("auth")) || "");
+        }
+    }, [token]);
 
     const handleRowClick = (gameId: string) => () => {
         setSelectedGameId(gameId);
     };
 
-    const handleJoinGame = () => {
+    const allGames: LobbyGame[] = (() => {
+        const map = new Map<string, LobbyGame>();
+        (data?.games || []).forEach((g: LobbyGame) => map.set(g.id, g));
+        (sData?.games || []).forEach((g: LobbyGame) => map.set(g.id, g));
+        return Array.from(map.values());
+    })();
+
+    const selectedGame = allGames.find((g) => g.id === selectedGameId);
+
+    const canReconnect = (game?: LobbyGame) => {
+        if (!game) {
+            return false;
+        }
+        if (game.reconnectable) {
+            return true;
+        }
+        return Boolean(
+            game.id === lastGameId &&
+                currentProfileId &&
+                lastGameProfileId === currentProfileId,
+        );
+    };
+
+    const getActionLabel = () => {
+        if (!selectedGame) {
+            return "";
+        }
+        if (canReconnect(selectedGame)) {
+            return "Reconnect";
+        }
+        return selectedGame.stage === 0 ? "Join" : "Spectate";
+    };
+
+    const handleGameAction = () => {
         if (!selectedGameId) {
-            alert("Select a game to join first.");
+            alert("Select a game first.");
             return;
         }
         router.push(`/${selectedGameId}`);
     };
 
     const handleHostGame = async () => {
-        const [data, _] = await createGame(token!);
-        if (!data) {
+        const [createData, _] = await createGame(token!);
+        if (!createData) {
             return;
-        } else if (data.error) {
-            console.error(data.error);
-        } else {
-            router.push(`/${data.id}`);
         }
+        if (createData.error) {
+            console.error(createData.error);
+            return;
+        }
+        router.push(`/${createData.id}`);
     };
 
-    if (error) {
+    if (error || sError) {
         console.error(error);
+        console.error(sError);
         return (
             <>
                 <Header />
@@ -135,7 +181,7 @@ const GameList: FunctionComponent = () => {
         );
     }
     if (data && data.error) return <Error statusCode={data.status} />;
-    if (!data)
+    if (!data || !sData)
         return (
             <>
                 <Header />
@@ -149,11 +195,11 @@ const GameList: FunctionComponent = () => {
         <>
             <Header />
             <div className="max-w-7xl min-h-screen mx-auto my-2 sm:my-4 py-2 sm:py-4 px-3 sm:px-6 lg:px-8">
-                <div className="flex flex-col lg:flex-row gap-4">
-                    <div className="-my-2 overflow-x-auto basis-full lg:basis-3/4">
+                <div className="flex flex-col gap-4">
+                    <div className="-my-2 overflow-x-auto basis-full">
                         <div className="py-2 align-middle inline-block min-w-full sm:px-4 lg:px-6">
                             <div className="flex flex-col border-0 border-blue-500 min-h-[10vh] max-h-[80vh]">
-                                <div className="flex-grow overflow-auto">
+                                <div className="flex-grow overflow-auto max-h-[250px] sm:max-h-[270px]">
                                     <table
                                         className="relative min-w-full divide-y-4 divide-transparent border-separate table-auto"
                                         style={{
@@ -169,7 +215,7 @@ const GameList: FunctionComponent = () => {
                                                         "sticky top-0 w-1/4",
                                                     )}
                                                 >
-                                                    Complexity
+                                                    Mode
                                                 </th>
                                                 <th
                                                     scope="col"
@@ -201,9 +247,9 @@ const GameList: FunctionComponent = () => {
                                             </tr>
                                         </thead>
                                         <tbody className="">
-                                            {data && data.games.length > 0 ? (
+                                            {allGames.length > 0 ? (
                                                 renderGame(
-                                                    data.games,
+                                                    allGames,
                                                     selectedGameId,
                                                     handleRowClick,
                                                 )
@@ -213,9 +259,7 @@ const GameList: FunctionComponent = () => {
                                                         colSpan={4}
                                                         className="px-4 py-8 text-center text-white text-base"
                                                     >
-                                                        No active games yet.
-                                                        Click Host Game to start
-                                                        one.
+                                                        No active games found.
                                                     </td>
                                                 </tr>
                                             )}
@@ -225,27 +269,29 @@ const GameList: FunctionComponent = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="basis-full lg:basis-1/4">
+                    {selectedGame ? (
+                        <div className="w-full max-w-xs sm:max-w-sm mx-auto">
+                            <button
+                                className={classNames(
+                                    "h-12 w-full text-lg sm:text-xl rounded-xl",
+                                    "bg-green-700 hover:bg-green-900 text-white",
+                                )}
+                                onClick={handleGameAction}
+                            >
+                                {getActionLabel()}
+                            </button>
+                        </div>
+                    ) : null}
+                    <div className="w-full max-w-xs sm:max-w-sm mx-auto">
                         <button
                             className={classNames(
-                                "my-3 sm:my-6 mx-auto h-12 w-full text-lg sm:text-xl rounded-xl",
-                                "bg-green-700 hover:bg-green-900 text-white",
-                            )}
-                            onClick={handleJoinGame}
-                        >
-                            Join Game
-                        </button>
-                        <button
-                            className={classNames(
-                                "mb-4 sm:mb-8 mx-auto h-12 w-full text-lg sm:text-xl rounded-xl",
+                                "h-12 w-full text-lg sm:text-xl rounded-xl",
                                 "bg-indigo-700 hover:bg-indigo-900 text-white",
                             )}
                             onClick={handleHostGame}
                         >
                             Host Game
                         </button>
-
-                        <AdUnit />
                     </div>
                 </div>
             </div>

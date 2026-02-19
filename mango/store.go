@@ -34,15 +34,21 @@ func (ds *MangoStore) CreateGameIfNotExists(id string) error {
 		bson.D{primitive.E{
 			Key: "$setOnInsert",
 			Value: bson.M{
-				"id":             id,
-				"createdAt":      time.Now(),
-				"stage":          0,
-				"players":        0,
-				"active_players": 0,
-				"server":         os.Getenv("SERVER_URL"),
-				"journal":        bson.A{},
-				"private":        false,
-				"updatedAt":      time.Now(),
+				"id":                      id,
+				"createdAt":               time.Now(),
+				"stage":                   0,
+				"players":                 0,
+				"active_players":          0,
+				"connected_players":       0,
+				"connected_humans":        0,
+				"last_human_seen_at":      nil,
+				"last_presence_update_at": time.Now(),
+				"server":                  os.Getenv("SERVER_URL"),
+				"host_id":                 "",
+				"participant_ids":         bson.A{},
+				"journal":                 bson.A{},
+				"private":                 false,
+				"updatedAt":               time.Now(),
 			}}},
 		&options.UpdateOptions{
 			Upsert: &upsert,
@@ -117,6 +123,129 @@ func (ds *MangoStore) WriteGameActivePlayers(id string, numPlayers int32, host s
 		bson.D{primitive.E{Key: "$set", Value: updateSet}},
 	)
 	return err
+}
+
+func (ds *MangoStore) WriteGamePresence(
+	id string,
+	connectedPlayers int32,
+	connectedHumans int32,
+	host string,
+	hostId string,
+	lastHumanSeenAt *time.Time,
+) error {
+	updateSet := bson.M{
+		"active_players":          int(connectedPlayers),
+		"connected_players":       int(connectedPlayers),
+		"connected_humans":        int(connectedHumans),
+		"last_presence_update_at": time.Now(),
+		"updatedAt":               time.Now(),
+	}
+	if host != "" {
+		updateSet["host"] = host
+	}
+	if hostId != "" {
+		updateSet["host_id"] = hostId
+	}
+	if lastHumanSeenAt != nil {
+		updateSet["last_human_seen_at"] = *lastHumanSeenAt
+	}
+
+	db := GetDatabase()
+	collection := db.Collection(GamesTable)
+	_, err := collection.UpdateOne(
+		context.TODO(),
+		bson.D{primitive.E{Key: "id", Value: id}},
+		bson.D{primitive.E{Key: "$set", Value: updateSet}},
+	)
+	return err
+}
+
+func (ds *MangoStore) WriteGameParticipants(id string, participantIds []string) error {
+	bsonParticipants := make(bson.A, 0, len(participantIds))
+	for _, participantId := range participantIds {
+		bsonParticipants = append(bsonParticipants, participantId)
+	}
+
+	db := GetDatabase()
+	collection := db.Collection(GamesTable)
+	_, err := collection.UpdateOne(
+		context.TODO(),
+		bson.D{primitive.E{Key: "id", Value: id}},
+		bson.D{primitive.E{Key: "$set", Value: bson.M{
+			"participant_ids": bsonParticipants,
+			"updatedAt":       time.Now(),
+		}}},
+	)
+	return err
+}
+
+func (ds *MangoStore) CleanupInactiveGames() (int64, int64, error) {
+	db := GetDatabase()
+	collection := db.Collection(GamesTable)
+
+	now := time.Now()
+	prestartCutoff := now.Add(-1 * time.Minute)
+	playingCutoff := now.Add(-10 * time.Minute)
+
+	prestartFilter := bson.M{
+		"stage": 0,
+		"$or": bson.A{
+			bson.M{"connected_humans": bson.M{"$exists": false}},
+			bson.M{"connected_humans": bson.M{"$lte": 0}},
+		},
+		"$expr": bson.M{
+			"$lt": bson.A{
+				bson.M{
+					"$ifNull": bson.A{
+						"$last_human_seen_at",
+						bson.M{
+							"$ifNull": bson.A{
+								"$last_presence_update_at",
+								"$updatedAt",
+							},
+						},
+					},
+				},
+				prestartCutoff,
+			},
+		},
+	}
+
+	playingFilter := bson.M{
+		"stage": 1,
+		"$or": bson.A{
+			bson.M{"connected_humans": bson.M{"$exists": false}},
+			bson.M{"connected_humans": bson.M{"$lte": 0}},
+		},
+		"$expr": bson.M{
+			"$lt": bson.A{
+				bson.M{
+					"$ifNull": bson.A{
+						"$last_human_seen_at",
+						bson.M{
+							"$ifNull": bson.A{
+								"$last_presence_update_at",
+								"$updatedAt",
+							},
+						},
+					},
+				},
+				playingCutoff,
+			},
+		},
+	}
+
+	prestartRes, err := collection.DeleteMany(context.TODO(), prestartFilter)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	playingRes, err := collection.DeleteMany(context.TODO(), playingFilter)
+	if err != nil {
+		return prestartRes.DeletedCount, 0, err
+	}
+
+	return prestartRes.DeletedCount, playingRes.DeletedCount, nil
 }
 
 func (ds *MangoStore) WriteGamePlayers(id string, numPlayers int32) error {

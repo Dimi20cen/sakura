@@ -26,7 +26,11 @@ import { white as spinner } from "./spinner";
 import { useRouter } from "next/router";
 import Header from "./header";
 import { IAdvancedSettings, IGameSettings } from "../tsg";
-import { capitalizeFirstLetter, toggleFullscreen } from "../utils";
+import {
+    capitalizeFirstLetter,
+    getIdFromToken,
+    toggleFullscreen,
+} from "../utils";
 import { Combobox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/24/solid";
 
@@ -58,6 +62,17 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
     });
 
     const [gameServer, gameExists] = useGameServer(gameId);
+
+    useEffect(() => {
+        if (typeof window !== "undefined" && gameId) {
+            localStorage.setItem("lastGameId", gameId);
+            const profileId = getIdFromToken(localStorage.getItem("auth"));
+            if (profileId) {
+                localStorage.setItem("lastGameProfileId", profileId);
+            }
+        }
+    }, [gameId]);
+
     const { socket, socketState } = useSocket(
         gameId,
         true,

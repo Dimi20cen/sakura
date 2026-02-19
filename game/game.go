@@ -89,6 +89,8 @@ type (
 		WriteGameCompletedForUser(id string) error
 		WriteGamePlayers(id string, numPlayers int32) error
 		WriteGameActivePlayers(id string, numPlayers int32, host string) error
+		WriteGamePresence(id string, connectedPlayers int32, connectedHumans int32, host string, hostId string, lastHumanSeenAt *time.Time) error
+		WriteGameParticipants(id string, participantIds []string) error
 		WriteGamePrivacy(id string, private bool) error
 		WriteGameSettings(id string, settings []byte) error
 		WriteJournalEntries(id string, entries [][]byte) error

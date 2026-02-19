@@ -332,11 +332,30 @@ func RunServer() {
 	}
 
 	ticker := time.NewTicker(10 * time.Second)
+	cleanupTicker := time.NewTicker(30 * time.Second)
+	cleanupStore := &mango.MangoStore{}
 	go func(ticker *time.Ticker) {
 		for {
 			<-ticker.C
 			server.registry.Heartbeat(os.Getenv("SERVER_URL"))
 		}
 	}(ticker)
+	go func(ticker *time.Ticker) {
+		for {
+			<-ticker.C
+			deletedPrestart, deletedPlaying, err := cleanupStore.CleanupInactiveGames()
+			if err != nil {
+				log.Println("cleanup error:", err)
+				continue
+			}
+			if deletedPrestart > 0 || deletedPlaying > 0 {
+				log.Printf(
+					"cleanup removed pre-start=%d playing=%d",
+					deletedPrestart,
+					deletedPlaying,
+				)
+			}
+		}
+	}(cleanupTicker)
 	server.Run()
 }

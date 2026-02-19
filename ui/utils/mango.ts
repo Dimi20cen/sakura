@@ -76,11 +76,11 @@ async function getGameStatesCollection() {
     return collections.gameStates;
 }
 
-export const gamesList = async (stage: string) => {
+export const gamesList = async (stage: string, userId?: string) => {
     const qStage = stage === "playing" ? 1 : 0;
     const collection = await getGamesCollection();
     if (collection) {
-        return collection
+        const games = await collection
             .find({
                 stage: qStage,
                 private: false,
@@ -98,8 +98,26 @@ export const gamesList = async (stage: string) => {
                 stage: 1,
                 settings: 1,
                 host: 1,
+                host_id: 1,
+                participant_ids: 1,
             })
             .toArray();
+
+        return games.map((game: any) => {
+            const participantIds = Array.isArray(game.participant_ids)
+                ? game.participant_ids
+                : [];
+            const reconnectable = Boolean(
+                userId &&
+                    ((qStage === 0 && game.host_id === userId) ||
+                        (qStage === 1 && participantIds.includes(userId))),
+            );
+
+            return {
+                ...game,
+                reconnectable,
+            };
+        });
     }
 };
 

@@ -244,6 +244,16 @@ func startGame(gameId string, numPlayers int32, hub *WsHub) {
 			cp.Order = uint16(playerOrder[i])
 			hub.Game.Store.WriteGameIdForUser(gameId, cp.Id, &hub.Game.Settings)
 		}
+
+		participantIds := make([]string, 0, len(hub.Game.Players))
+		for _, p := range hub.Game.Players {
+			if !p.GetIsBot() && p.Id != "" {
+				participantIds = append(participantIds, p.Id)
+			}
+		}
+		if err := hub.Game.Store.WriteGameParticipants(gameId, participantIds); err != nil {
+			log.Println(gameId, err)
+		}
 	}
 
 	hub.Clients.Range(func(key, value interface{}) bool {

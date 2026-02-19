@@ -112,7 +112,7 @@ export function handleGameRuntimeMessage(msg: WsResponse) {
             relayoutHUD();
             board.setRobberTile(gs.Robber.Tile);
             board.setMerchantTile(gs.Merchant);
-            resourceBank.syncPublicDevTotal(gs.PlayerStates || []);
+            resourceBank.syncFromGameState(gs);
             return;
         }
 

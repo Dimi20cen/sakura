@@ -26,15 +26,14 @@ let chipText: Record<number, PIXI.Text> = {};
 let devText: PIXI.Text | null = null;
 
 let counts: CardCountMap = {
-    [CardType.Wood]: 24,
-    [CardType.Brick]: 24,
-    [CardType.Wool]: 24,
-    [CardType.Wheat]: 24,
-    [CardType.Ore]: 24,
+    [CardType.Wood]: 19,
+    [CardType.Brick]: 19,
+    [CardType.Wool]: 19,
+    [CardType.Wheat]: 19,
+    [CardType.Ore]: 19,
 };
 
 let devRemaining = 25;
-let lastPublicDevTotal = 0;
 
 function clampCount(v: number) {
     return Math.max(0, Math.min(99, v));
@@ -163,16 +162,25 @@ export function relayout() {
 
 export function setMode(mode: number) {
     counts = {
-        [CardType.Wood]: 24,
-        [CardType.Brick]: 24,
-        [CardType.Wool]: 24,
-        [CardType.Wheat]: 24,
-        [CardType.Ore]: 24,
+        [CardType.Wood]: 19,
+        [CardType.Brick]: 19,
+        [CardType.Wool]: 19,
+        [CardType.Wheat]: 19,
+        [CardType.Ore]: 19,
     };
 
     // Base has 25 development cards. C&K has 3 progress stacks (17/18/18).
     devRemaining = mode === 2 ? 53 : 25;
-    lastPublicDevTotal = 0;
+    refreshText();
+}
+
+export function syncFromGameState(gs: tsg.GameState) {
+    counts[CardType.Wood] = clampCount(Number(gs.BankWood || 0));
+    counts[CardType.Brick] = clampCount(Number(gs.BankBrick || 0));
+    counts[CardType.Wool] = clampCount(Number(gs.BankWool || 0));
+    counts[CardType.Wheat] = clampCount(Number(gs.BankWheat || 0));
+    counts[CardType.Ore] = clampCount(Number(gs.BankOre || 0));
+    devRemaining = clampCount(Number(gs.BankDevRemaining || 0));
     refreshText();
 }
 
@@ -197,20 +205,5 @@ export function applyCardMove(move: tsg.CardMoveInfo) {
         counts[ct] = clampCount((counts[ct] || 0) + q);
     }
 
-    refreshText();
-}
-
-export function syncPublicDevTotal(states: tsg.PlayerState[]) {
-    const total = states.reduce(
-        (sum, p) => sum + Number(p?.NumDevelopmentCards || 0),
-        0,
-    );
-
-    const delta = total - lastPublicDevTotal;
-    if (delta > 0) {
-        devRemaining = clampCount(devRemaining - delta);
-    }
-
-    lastPublicDevTotal = total;
     refreshText();
 }

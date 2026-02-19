@@ -22,11 +22,32 @@ func (g *Game) GetGameState() *entities.GameState {
 		Robber:             g.Robber,
 		Merchant:           g.Merchant,
 		PlayerStates:       playerStates,
+		BankWood:           g.Bank.Hand.GetCardDeck(entities.CardTypeWood).Quantity,
+		BankBrick:          g.Bank.Hand.GetCardDeck(entities.CardTypeBrick).Quantity,
+		BankWool:           g.Bank.Hand.GetCardDeck(entities.CardTypeWool).Quantity,
+		BankWheat:          g.Bank.Hand.GetCardDeck(entities.CardTypeWheat).Quantity,
+		BankOre:            g.Bank.Hand.GetCardDeck(entities.CardTypeOre).Quantity,
+		BankDevRemaining:   int16(g.GetBankDevelopmentRemaining()),
 
 		BarbarianPosition: g.BarbarianPosition,
 		BarbarianStrength: g.GetBarbarianStrength(),
 		BarbarianKnights:  g.GetBarbarianKnights(),
 	}
+}
+
+func (g *Game) GetBankDevelopmentRemaining() int {
+	if g.Mode == entities.CitiesAndKnights {
+		return len(g.Bank.DevelopmentCardOrder[entities.CardTypePaper]) +
+			len(g.Bank.DevelopmentCardOrder[entities.CardTypeCloth]) +
+			len(g.Bank.DevelopmentCardOrder[entities.CardTypeCoin])
+	}
+
+	deck := g.Bank.DevelopmentCardOrder[0]
+	remaining := len(deck) - g.Bank.DevelopmentCardCursor
+	if remaining < 0 {
+		return 0
+	}
+	return remaining
 }
 
 func (g *Game) GetPlayerState(p *entities.Player) *entities.PlayerState {

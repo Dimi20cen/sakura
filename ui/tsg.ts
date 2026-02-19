@@ -79,6 +79,12 @@ export type IGameState = {
     NeedDice: boolean;
     Robber: Robber /* entities.Robber */;
     PlayerStates: PlayerState /* []*entities.PlayerState */[];
+    BankWood: number;
+    BankBrick: number;
+    BankWool: number;
+    BankWheat: number;
+    BankOre: number;
+    BankDevRemaining: number;
     BarbarianPosition: number;
     BarbarianStrength: number;
     BarbarianKnights: number;
@@ -90,6 +96,12 @@ export class GameState implements IGameState {
     public NeedDice: boolean;
     public Robber: Robber /* entities.Robber */;
     public PlayerStates: PlayerState /* []*entities.PlayerState */[];
+    public BankWood: number;
+    public BankBrick: number;
+    public BankWool: number;
+    public BankWheat: number;
+    public BankOre: number;
+    public BankDevRemaining: number;
     public BarbarianPosition: number;
     public BarbarianStrength: number;
     public BarbarianKnights: number;
@@ -102,6 +114,12 @@ export class GameState implements IGameState {
         this.PlayerStates = input.p?.map((v: any) =>
             v ? new PlayerState(v) : undefined,
         );
+        this.BankWood = input.bw;
+        this.BankBrick = input.bb;
+        this.BankWool = input.bl;
+        this.BankWheat = input.bt;
+        this.BankOre = input.bo;
+        this.BankDevRemaining = input.bd;
         this.BarbarianPosition = input.bp;
         this.BarbarianStrength = input.bs;
         this.BarbarianKnights = input.bk;
@@ -114,6 +132,12 @@ export class GameState implements IGameState {
         out.d = this.NeedDice;
         out.r = this.Robber?.encode?.();
         out.p = this.PlayerStates?.map((v: any) => v?.encode?.());
+        out.bw = this.BankWood;
+        out.bb = this.BankBrick;
+        out.bl = this.BankWool;
+        out.bt = this.BankWheat;
+        out.bo = this.BankOre;
+        out.bd = this.BankDevRemaining;
         out.bp = this.BarbarianPosition;
         out.bs = this.BarbarianStrength;
         out.bk = this.BarbarianKnights;

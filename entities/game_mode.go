@@ -5,7 +5,7 @@ type GameMode uint16
 const (
 	Base               GameMode = 1
 	CitiesAndKnights   GameMode = 2
-	IQBaseResource     int16    = 24
+	IQBaseResource     int16    = 19
 	IQBaseKnight       int16    = 14
 	IQBaseVP           int16    = 5
 	IQBaseRoadBuilding int16    = 2

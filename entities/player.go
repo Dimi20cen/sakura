@@ -49,6 +49,12 @@ type (
 		NeedDice           bool           `msgpack:"d"`
 		Robber             *Robber        `msgpack:"r"`
 		PlayerStates       []*PlayerState `msgpack:"p"`
+		BankWood           int16          `msgpack:"bw"`
+		BankBrick          int16          `msgpack:"bb"`
+		BankWool           int16          `msgpack:"bl"`
+		BankWheat          int16          `msgpack:"bt"`
+		BankOre            int16          `msgpack:"bo"`
+		BankDevRemaining   int16          `msgpack:"bd"`
 
 		BarbarianPosition int       `msgpack:"bp"`
 		BarbarianStrength int       `msgpack:"bs"`

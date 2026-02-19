@@ -100,6 +100,19 @@ export function computeDevConfirmationPosition({
     };
 }
 
+type SpectatorsPositionInput = {
+    canvasHeight: number;
+};
+
+export function computeSpectatorsPosition({
+    canvasHeight: _canvasHeight,
+}: SpectatorsPositionInput) {
+    return {
+        x: 60,
+        y: 20,
+    };
+}
+
 type DicePositionInput = {
     canvasWidth: number;
     canvasHeight: number;
@@ -136,4 +149,64 @@ export function computeDicePosition({
     y = Math.max(HUD_PADDING, Math.min(canvasHeight - HUD_PADDING - diceHeight, y));
 
     return { x, y };
+}
+
+type SpecialBuildPositionInput = {
+    canvasWidth: number;
+    canvasHeight: number;
+};
+
+export function computeSpecialBuildPosition({
+    canvasWidth,
+    canvasHeight,
+}: SpecialBuildPositionInput) {
+    return {
+        x: canvasWidth - 40 - 100,
+        y: canvasHeight - 260,
+    };
+}
+
+type ChatWindowPositionInput = {
+    canvasWidth: number;
+    canvasHeight: number;
+};
+
+export function computeChatWindowPosition({
+    canvasWidth,
+    canvasHeight,
+}: ChatWindowPositionInput) {
+    return {
+        x: canvasWidth - HUD_PADDING,
+        y: canvasHeight - 250,
+    };
+}
+
+type ChatButtonPositionInput = {
+    canvasWidth: number;
+    canvasHeight: number;
+};
+
+export function computeChatButtonPosition({
+    canvasWidth,
+    canvasHeight,
+}: ChatButtonPositionInput) {
+    return {
+        x: canvasWidth - HUD_PADDING,
+        y: canvasHeight - 285,
+    };
+}
+
+type ChatPopupPositionInput = {
+    canvasWidth: number;
+    chatButtonY: number;
+};
+
+export function computeChatPopupPosition({
+    canvasWidth,
+    chatButtonY,
+}: ChatPopupPositionInput) {
+    return {
+        x: canvasWidth - (20 + 40 + 10),
+        y: chatButtonY,
+    };
 }

@@ -9,7 +9,11 @@ import * as anim from "./animation";
 import * as actions from "./actions";
 import * as windows from "./windows";
 import * as trade from "./trade";
-import { computeBankPosition, computePlayerPanelPosition } from "./hudLayout";
+import {
+    computeBankPosition,
+    computePlayerPanelPosition,
+    computeSpectatorsPosition,
+} from "./hudLayout";
 import { sound } from "@pixi/sound";
 import { cancelPendingAction } from "./actions";
 import { getThisPlayerOrder } from "./ws";
@@ -984,8 +988,11 @@ export function renderSpectators(list: string[]) {
 
         container.addChild(spectators.icon);
         container.addChild(spectators.text);
-        container.x = 60;
-        container.y = 20;
+        const pos = computeSpectatorsPosition({
+            canvasHeight: canvas.getHeight(),
+        });
+        container.x = pos.x;
+        container.y = pos.y;
         container.zIndex = 1;
         container.interactive = true;
         canvas.app.stage.addChild(container);

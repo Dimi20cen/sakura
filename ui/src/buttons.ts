@@ -5,7 +5,7 @@ import * as ws from "./ws";
 import * as state from "./state";
 import * as assets from "./assets";
 import * as windows from "./windows";
-import { computeActionBarPosition } from "./hudLayout";
+import { computeActionBarPosition, computeSpecialBuildPosition } from "./hudLayout";
 import { BuildableType, CardType } from "./entities";
 import CommandHub from "./commands";
 import { PlayerSecretState } from "../tsg";
@@ -88,8 +88,12 @@ export function relayout() {
     }
 
     if (buttons.specialBuild && !buttons.specialBuild.destroyed) {
-        buttons.specialBuild.x = canvas.getWidth() - 40 - 100;
-        buttons.specialBuild.y = canvas.getHeight() - 260;
+        const pos = computeSpecialBuildPosition({
+            canvasWidth: canvas.getWidth(),
+            canvasHeight: canvas.getHeight(),
+        });
+        buttons.specialBuild.x = pos.x;
+        buttons.specialBuild.y = pos.y;
     }
 
     canvas.app.markDirty();
@@ -803,8 +807,12 @@ export function render(commandHub: CommandHub) {
         buttons.specialBuild = b;
         b.reactDisable = true;
         b.setEnabled(true);
-        b.x = canvas.getWidth() - 40 - 100;
-        b.y = canvas.getHeight() - 260;
+        const pos = computeSpecialBuildPosition({
+            canvasWidth: canvas.getWidth(),
+            canvasHeight: canvas.getHeight(),
+        });
+        b.x = pos.x;
+        b.y = pos.y;
         b.zIndex = 1000;
         b.onClick(rerenderAnd(commandHub.specialBuild));
         canvas.app.stage.addChild(b);

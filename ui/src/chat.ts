@@ -3,6 +3,11 @@ import * as canvas from "./canvas";
 import * as windows from "./windows";
 import * as ws from "./ws";
 import * as buttons from "./buttons";
+import {
+    computeChatButtonPosition,
+    computeChatPopupPosition,
+    computeChatWindowPosition,
+} from "./hudLayout";
 import { sound } from "@pixi/sound";
 
 type Message = { text: string; color: string };
@@ -43,8 +48,12 @@ export function initialize() {
     windowSprite = windows.getWindowSprite(CHAT_WIDTH, CHAT_HEIGHT);
     windowSprite.pivot.x = CHAT_WIDTH;
     windowSprite.pivot.y = CHAT_HEIGHT;
-    windowSprite.x = canvas.getWidth() - 20;
-    windowSprite.y = canvas.getHeight() - G_X;
+    const chatWindowPos = computeChatWindowPosition({
+        canvasWidth: canvas.getWidth(),
+        canvasHeight: canvas.getHeight(),
+    });
+    windowSprite.x = chatWindowPos.x;
+    windowSprite.y = chatWindowPos.y;
     windowSprite.interactive = true;
     windowSprite.zIndex = 2000;
     windowSprite.sortableChildren = true;
@@ -141,8 +150,12 @@ export function initialize() {
         chatButton.setEnabled(true);
         chatButton.pivot.x = 40;
         chatButton.pivot.y = 20;
-        chatButton.x = canvas.getWidth() - 20;
-        chatButton.y = canvas.getHeight() - 285;
+        const chatButtonPos = computeChatButtonPosition({
+            canvasWidth: canvas.getWidth(),
+            canvasHeight: canvas.getHeight(),
+        });
+        chatButton.x = chatButtonPos.x;
+        chatButton.y = chatButtonPos.y;
         chatButton.zIndex = 1000;
         chatButton.onClick(() => setVisible(true));
         canvas.app.stage.addChild(chatButton);
@@ -151,12 +164,20 @@ export function initialize() {
 
 export function relayout() {
     if (windowSprite && !windowSprite.destroyed) {
-        windowSprite.x = canvas.getWidth() - 20;
-        windowSprite.y = canvas.getHeight() - G_X;
+        const chatWindowPos = computeChatWindowPosition({
+            canvasWidth: canvas.getWidth(),
+            canvasHeight: canvas.getHeight(),
+        });
+        windowSprite.x = chatWindowPos.x;
+        windowSprite.y = chatWindowPos.y;
     }
     if (chatButton && !chatButton.destroyed) {
-        chatButton.x = canvas.getWidth() - 20;
-        chatButton.y = canvas.getHeight() - 285;
+        const chatButtonPos = computeChatButtonPosition({
+            canvasWidth: canvas.getWidth(),
+            canvasHeight: canvas.getHeight(),
+        });
+        chatButton.x = chatButtonPos.x;
+        chatButton.y = chatButtonPos.y;
     }
     canvas.app.markDirty();
 }
@@ -280,8 +301,12 @@ export function chatMessage(msg: Message) {
 
         popup.pivot.x = WIDTH;
         popup.pivot.y = HEIGHT / 2;
-        popup.x = canvas.getWidth() - (20 + 40 + 10);
-        popup.y = chatButton.y;
+        const popupPos = computeChatPopupPosition({
+            canvasWidth: canvas.getWidth(),
+            chatButtonY: chatButton.y,
+        });
+        popup.x = popupPos.x;
+        popup.y = popupPos.y;
         popup.zIndex = 1001;
 
         canvas.app.stage.addChild(popup);

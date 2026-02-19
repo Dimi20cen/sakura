@@ -8,6 +8,7 @@ This folder contains practical, project-specific docs for running and understand
 - [Ubuntu Setup](./LOCAL_SETUP_UBUNTU.md): detailed Ubuntu instructions.
 - [Environment Variables](./ENVIRONMENT.md): backend/frontend env reference with required values.
 - [Architecture](./ARCHITECTURE.md): how backend, frontend, MongoDB, and websockets fit together.
+- [UI Migration Checklist](./UI_MIGRATION_CHECKLIST.md): architecture migration status + parity checklist.
 - [Troubleshooting](./TROUBLESHOOTING.md): common local setup and runtime issues.
 
 ## Recommended Reading Order

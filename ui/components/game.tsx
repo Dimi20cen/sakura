@@ -4,24 +4,15 @@ import {
     FunctionComponent,
     KeyboardEventHandler,
     useEffect,
-    useReducer,
+    useRef,
     useState,
 } from "react";
 import { classNames } from "../utils/styles";
-import { useSocket } from "../hooks/socket";
-import {
-    MSG_LOCATION_TYPE,
-    MSG_TYPE,
-    sendMessage,
-    SOCKET_STATE,
-    WsMessage,
-} from "../src/sock";
-import { lobbyReducer, getInitialLobbyState, GAME_MODE } from "../src/lobby";
+import { SOCKET_STATE } from "../src/sock";
+import { GAME_MODE } from "../src/store/lobbySlice";
 import Error from "next/error";
 import Pixi from "./pixi";
 import PlayerList from "./playerList";
-import { disconnect } from "../hooks/socket";
-import { useGameServer } from "../hooks/gameServer";
 import { white as spinner } from "./spinner";
 import { useRouter } from "next/router";
 import Header from "./header";
@@ -33,35 +24,22 @@ import {
 } from "../utils";
 import { Combobox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/24/solid";
+import { useLobbySession } from "../hooks/lobbySession";
 
 const selectClasses =
     "form-select appearance-none block w-full px-3 py-1.5 text-lg font-normal text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none";
 
-const sendSinglePlayerMessage = (e: any) => {
-    const target: WebSocket = e.target;
-    const msg: WsMessage = {
-        l: MSG_LOCATION_TYPE.LOBBY,
-        t: MSG_TYPE.SINGLE_PLAYER,
-    };
-    sendMessage(target, msg);
-};
-
 const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
-    const [lobbyState, dispatch] = useReducer(
-        lobbyReducer,
-        getInitialLobbyState(),
-    );
     const router = useRouter();
-
-    let chatDiv: HTMLDivElement | null;
+    const chatDiv = useRef<HTMLDivElement | null>(null);
+    const { lobbyState, socketState, gameExists, commands, socketRef, disconnect } =
+        useLobbySession(gameId);
 
     useEffect(() => {
-        if (chatDiv) {
-            chatDiv.scrollTop = chatDiv.scrollHeight;
+        if (chatDiv.current) {
+            chatDiv.current.scrollTop = chatDiv.current.scrollHeight;
         }
     });
-
-    const [gameServer, gameExists] = useGameServer(gameId);
 
     useEffect(() => {
         if (typeof window !== "undefined" && gameId) {
@@ -73,29 +51,17 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
         }
     }, [gameId]);
 
-    const { socket, socketState } = useSocket(
-        gameId,
-        true,
-        MSG_LOCATION_TYPE.LOBBY,
-        dispatch,
-        undefined,
-        gameExists,
-        gameServer,
-    );
-
-    if (router.query.sp && socket.current) {
-        socket.current.removeEventListener("open", sendSinglePlayerMessage);
-        socket.current.addEventListener("open", sendSinglePlayerMessage);
-        if (socket.current.OPEN) {
-            sendSinglePlayerMessage({ target: socket.current });
+    useEffect(() => {
+        if (router.query.sp && commands) {
+            commands.startSinglePlayer();
         }
-    }
+    }, [commands, router.query.sp]);
 
     const [mapQuery, setMapQuery] = useState("");
     const filteredMaps =
         (mapQuery === ""
             ? lobbyState.settingsOptions?.MapName
-            : lobbyState.settingsOptions?.MapName.filter((n) =>
+            : lobbyState.settingsOptions?.MapName.filter((n: string) =>
                   n
                       .toLowerCase()
                       .replace(/\s+/g, "")
@@ -103,102 +69,77 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
               )) || [];
 
     const changeMode: ChangeEventHandler<HTMLSelectElement> = (event) => {
-        lobbyState.settings.Mode = Number(event.target.value);
-        lobbyState.settings.VictoryPoints =
-            lobbyState.settings.Mode == GAME_MODE.CitiesAndKnights ? 13 : 10;
-        sendSettings();
+        const mode = Number(event.target.value);
+        sendSettings({
+            ...lobbyState.settings,
+            Mode: mode,
+            VictoryPoints: mode === GAME_MODE.CitiesAndKnights ? 13 : 10,
+        });
     };
 
     const changeMap = (name: string) => {
-        lobbyState.settings.MapName = name;
-        sendSettings();
+        sendSettings({
+            ...lobbyState.settings,
+            MapName: name,
+        });
     };
 
     const changeMaxPlayers: ChangeEventHandler<HTMLSelectElement> = (event) => {
-        lobbyState.settings.MaxPlayers = Number(event.target.value);
-        lobbyState.settings.SpecialBuild = lobbyState.settings.MaxPlayers > 4;
-        sendSettings();
+        const maxPlayers = Number(event.target.value);
+        sendSettings({
+            ...lobbyState.settings,
+            MaxPlayers: maxPlayers,
+            SpecialBuild: maxPlayers > 4,
+        });
     };
 
     const changeDiscard: ChangeEventHandler<HTMLSelectElement> = (event) => {
-        lobbyState.settings.DiscardLimit = Number(event.target.value);
-        sendSettings();
+        sendSettings({
+            ...lobbyState.settings,
+            DiscardLimit: Number(event.target.value),
+        });
     };
 
     const changeVicP: ChangeEventHandler<HTMLSelectElement> = (event) => {
-        lobbyState.settings.VictoryPoints = Number(event.target.value);
-        sendSettings();
+        sendSettings({
+            ...lobbyState.settings,
+            VictoryPoints: Number(event.target.value),
+        });
     };
 
     const changeSpeed: ChangeEventHandler<HTMLSelectElement> = (event) => {
-        lobbyState.settings.Speed = event.target.value;
-        sendSettings();
+        sendSettings({
+            ...lobbyState.settings,
+            Speed: event.target.value,
+        });
     };
 
-    const sendSettings = () => {
-        if (socket.current != null) {
-            const msg: WsMessage = {
-                l: MSG_LOCATION_TYPE.LOBBY,
-                t: MSG_TYPE.SET_SETTINGS,
-                settings: lobbyState.settings,
-            };
-            sendMessage(socket.current, msg);
-        }
+    const sendSettings = (settings: IGameSettings) => {
+        commands?.setSettings(settings);
     };
 
-    const sendAdvancedSettings = () => {
-        if (socket.current != null) {
-            const msg: WsMessage = {
-                l: MSG_LOCATION_TYPE.LOBBY,
-                t: MSG_TYPE.SET_ADVANCED_SETTINGS,
-                advanced: lobbyState.advanced,
-            };
-            sendMessage(socket.current, msg);
-        }
+    const sendAdvancedSettings = (advanced: IAdvancedSettings) => {
+        commands?.setAdvancedSettings(advanced);
     };
 
     const botAdd = () => {
-        if (socket.current != null) {
-            const msg: WsMessage = {
-                l: MSG_LOCATION_TYPE.LOBBY,
-                t: MSG_TYPE.BOT_ADD,
-            };
-            sendMessage(socket.current, msg);
-        }
+        commands?.addBot();
     };
 
     const changeReady: ChangeEventHandler<HTMLInputElement> = (event) => {
-        if (socket.current != null) {
-            const msg: WsMessage = {
-                l: MSG_LOCATION_TYPE.LOBBY,
-                t: MSG_TYPE.READY,
-                ready: Boolean(event.target.checked),
-            };
-            sendMessage(socket.current, msg);
-        }
+        commands?.setReady(Boolean(event.target.checked));
     };
 
     const startGame = () => {
-        if (socket.current != null) {
-            const msg: WsMessage = {
-                l: MSG_LOCATION_TYPE.LOBBY,
-                t: MSG_TYPE.START_GAME,
-            };
-            sendMessage(socket.current, msg);
-        }
+        commands?.startGame();
     };
 
     const sendChat: KeyboardEventHandler<HTMLInputElement> = (event) => {
         let val: string = (event.target as any).value;
         val = val.trim();
-        if (event.key.includes("Enter") && socket.current != null && val) {
-            const msg: WsMessage = {
-                l: MSG_LOCATION_TYPE.CHAT,
-                t: MSG_TYPE.CHAT,
-                cmsg: val,
-            };
+        if (event.key.includes("Enter") && val) {
             (event.target as any).value = "";
-            sendMessage(socket.current, msg);
+            commands?.sendChat(val);
         }
     };
 
@@ -225,7 +166,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
     }
 
     if (lobbyState.started) {
-        disconnect(socket);
+        disconnect();
         return (
             <>
                 <Pixi gameId={gameId} order={lobbyState.order} />
@@ -249,10 +190,10 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
 
     function getCheckBox(text: string, setting: keyof IGameSettings) {
         const changeVal: ChangeEventHandler<HTMLInputElement> = (event) => {
-            lobbyState.settings[setting] = Boolean(
-                event.target.checked,
-            ) as never;
-            sendSettings();
+            sendSettings({
+                ...lobbyState.settings,
+                [setting]: Boolean(event.target.checked),
+            });
         };
 
         return (
@@ -302,10 +243,10 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
         setting: keyof IAdvancedSettings,
     ) {
         const changeVal: ChangeEventHandler<HTMLInputElement> = (event) => {
-            lobbyState.advanced[setting] = Boolean(
-                event.target.checked,
-            ) as never;
-            sendAdvancedSettings();
+            sendAdvancedSettings({
+                ...lobbyState.advanced,
+                [setting]: Boolean(event.target.checked),
+            });
         };
 
         return (
@@ -760,7 +701,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                         <div className="basis-auto m-1 text-white text-3xl p-3 pb-6">
                             Players
                         </div>
-                        <PlayerList lobbyState={lobbyState} socket={socket} />
+                        <PlayerList lobbyState={lobbyState} socket={socketRef} />
 
                         <div className="basis-auto mt-2 overflow-auto">
                             <button
@@ -788,11 +729,9 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                     <div
                         className="basis-full text-white bg-black bg-opacity-5
                                    rounded-lg text-left p-4 overflow-auto max-h-screen"
-                        ref={(el) => {
-                            chatDiv = el;
-                        }}
+                        ref={chatDiv}
                     >
-                        {lobbyState.chatMessages.map((m) => (
+                        {lobbyState.chatMessages.map((m: { id: number; msg: string }) => (
                             <p key={m.id} className="mb-1">
                                 {m.msg}
                             </p>

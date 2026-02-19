@@ -1,25 +1,15 @@
 import { FunctionComponent, useCallback } from "react";
 import * as canvas from "../src/canvas";
 import { isBrowser } from "../utils";
-import { useSocket } from "../hooks/socket";
-import { MSG_LOCATION_TYPE, SOCKET_STATE } from "../src/sock";
-import { useGameServer } from "../hooks/gameServer";
+import { SOCKET_STATE } from "../src/sock";
+import { useGameSession } from "../hooks/gameSession";
 
 const Pixi: FunctionComponent<{ gameId: string; order: number }> = ({
     gameId,
     order,
 }) => {
-    const [gameServer, gameExists] = useGameServer(gameId);
     let allowRender = true;
-    const { socketState, setInit } = useSocket(
-        gameId,
-        false,
-        MSG_LOCATION_TYPE.GAME,
-        undefined,
-        order,
-        gameExists,
-        gameServer,
-    );
+    const { socketState, setInit, gameExists } = useGameSession(gameId, order);
 
     const divRef = useCallback((node: any) => {
         if (isBrowser && node !== null && allowRender) {

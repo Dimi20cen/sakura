@@ -1,5 +1,5 @@
 import { FunctionComponent, MutableRefObject } from "react";
-import { LobbyState } from "../src/lobby";
+import { LobbyState } from "../src/store/types";
 import { hexToUrlString } from "../utils";
 import { classNames, playerColors } from "../utils/styles";
 import ReconnectingWebSocket from "reconnecting-websocket";
@@ -39,12 +39,12 @@ const playerRowClass = (self: boolean, ready: boolean) => {
 
 const PlayerList: FunctionComponent<{
     lobbyState: LobbyState;
-    socket: MutableRefObject<ReconnectingWebSocket | null>;
+    socket?: MutableRefObject<ReconnectingWebSocket | null>;
 }> = ({ lobbyState, socket }) => {
     const usernameModal = UsernameChangeModal(socket);
 
     const kickUser = (username: string) => {
-        if (socket.current != null) {
+        if (socket?.current != null) {
             const msg: WsMessage = {
                 l: MSG_LOCATION_TYPE.LOBBY,
                 t: MSG_TYPE.KICK,

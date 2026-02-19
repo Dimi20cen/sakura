@@ -7,6 +7,8 @@ import Head from "next/head";
 import "../styles/globals.css";
 import * as gtag from "../utils/gtag";
 import dynamic from "next/dynamic";
+import { Provider } from "react-redux";
+import { store } from "../src/store";
 
 const Consent = dynamic(() => import("../components/cookieConsent"), {
     ssr: false,
@@ -141,12 +143,14 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
             )}
 
             <SessionProvider session={session}>
-                <div className="h-screen w-full bg-gradient-to-r from-sky-400 to-blue-800">
-                    <div className="absolute h-full w-full bg-[url('/assets/clash-background.png')] bg-cover bg-center opacity-100"></div>
-                    <div className="absolute h-full w-full">
-                        <Component {...pageProps} />
+                <Provider store={store}>
+                    <div className="h-screen w-full bg-gradient-to-r from-sky-400 to-blue-800">
+                        <div className="absolute h-full w-full bg-[url('/assets/clash-background.png')] bg-cover bg-center opacity-100"></div>
+                        <div className="absolute h-full w-full">
+                            <Component {...pageProps} />
+                        </div>
                     </div>
-                </div>
+                </Provider>
             </SessionProvider>
         </>
     );

@@ -16,8 +16,12 @@ This document explains how Clash components communicate in local development.
 - `game/`: game engine and rule logic
 - `entities/`: domain models
 - `ui/pages/`: Next.js pages + API routes
-- `ui/hooks/`: socket and auth hooks
-- `ui/src/`: client websocket protocol/message handling
+- `ui/hooks/`: auth + session orchestration hooks (`lobbySession`, `gameSession`)
+- `ui/src/net/`: websocket transport lifecycle
+- `ui/src/protocol/`: wire-message adaptation to domain events
+- `ui/src/commands/`: outbound command builders
+- `ui/src/store/`: Redux Toolkit slices + runtime handlers
+- `ui/src/`: Pixi/runtime rendering modules
 - `ui/utils/mango.ts`: Mongo access from Next.js API routes
 
 ## Runtime Flow
@@ -76,13 +80,29 @@ For local single-server dev, this is typically `http://localhost:8090`.
 
 ## 5. Websocket model
 
-Connection is created by `ui/hooks/socket.ts` using:
+Connection is created by session hooks:
+
+- `ui/hooks/lobbySession.ts` (lobby lifecycle)
+- `ui/hooks/gameSession.ts` (in-game lifecycle)
+
+Both use transport in `ui/src/net/transport.ts` and protocol adaptation in `ui/src/protocol/adapter.ts`.
+
+Socket URL format:
 
 `ws(s)://<backend>/socket?id=<gameId>&token=<jwt>`
 
 Backend `JWTMiddleware` supports reading token from query when upgrading websocket.
 
-Messages are msgpack-encoded and handled in `ui/src/ws.ts`, `ui/src/sock.ts`, and server websocket handlers.
+Messages are msgpack-encoded and parsed by `ui/src/sock.ts` types + adapter layer.
+
+Inbound game messages are handled by `ui/src/store/gameRuntime.ts` (with Pixi rendering side-effects). `ui/src/ws.ts` is now a compatibility module for command hub/player context ownership.
+
+## 6. Frontend state ownership
+
+- Redux Toolkit store is configured in `ui/src/store/index.ts`.
+- App root wires provider in `ui/pages/_app.tsx`.
+- Lobby state: `ui/src/store/lobbySlice.ts` + `ui/src/store/connectionSlice.ts`.
+- Game runtime state: `ui/src/store/gameSlice.ts`.
 
 ## Data Model (MongoDB collections)
 

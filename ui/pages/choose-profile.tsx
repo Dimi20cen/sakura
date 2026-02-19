@@ -73,8 +73,10 @@ const ChooseProfile: NextPage = () => {
     return (
         <main>
             <Header />
-            <div className="mx-auto mt-10 max-w-xl rounded-xl bg-black/60 p-6 text-white backdrop-blur">
-                <h1 className="text-3xl font-semibold">Choose Profile</h1>
+            <div className="mx-auto mt-4 sm:mt-10 max-w-xl rounded-xl bg-black/60 p-4 sm:p-6 text-white backdrop-blur w-[94%] sm:w-auto">
+                <h1 className="text-2xl sm:text-3xl font-semibold">
+                    Choose Profile
+                </h1>
                 <p className="mt-2 text-sm text-gray-200">
                     Pick your default profile before joining games.
                 </p>
@@ -84,13 +86,13 @@ const ChooseProfile: NextPage = () => {
                         <button
                             key={profile.username}
                             disabled={busy}
-                            className="flex items-center justify-between rounded-lg border border-white/20 bg-indigo-900/70 px-4 py-3 text-left hover:bg-indigo-800 disabled:opacity-60"
+                            className="flex items-center justify-between rounded-lg border border-white/20 bg-indigo-900/70 px-3 sm:px-4 py-3 text-left hover:bg-indigo-800 disabled:opacity-60"
                             onClick={() => chooseProfile(profile.username)}
                         >
-                            <span className="text-lg font-medium">
+                            <span className="text-base sm:text-lg font-medium break-all pr-2">
                                 {profile.username}
                             </span>
-                            <span className="inline-flex items-center gap-2 text-sm">
+                            <span className="inline-flex items-center gap-2 text-xs sm:text-sm shrink-0">
                                 <span
                                     className={`inline-block h-3 w-3 rounded-full ${profile.colorClass}`}
                                 />

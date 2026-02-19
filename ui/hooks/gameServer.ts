@@ -42,7 +42,13 @@ export const useGameServer = (gameId: string): [string, boolean | null] => {
                     }
                 }
             } else if (data && data.status === 404) {
-                setGameExists(false);
+                const [createData, serverUrl] = await createGame(token!, gameId);
+                if (!createData || createData.error) {
+                    setGameExists(false);
+                } else {
+                    setGameExists(true);
+                    setGameServer(serverUrl);
+                }
             }
         };
 

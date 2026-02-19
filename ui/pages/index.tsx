@@ -8,17 +8,17 @@ const Index: NextPage = () => {
             <Header />
 
             <div className="text-4xl">
-                <div className="flex max-h-[90vh] overflow-auto">
+                <div className="flex min-h-[85vh] overflow-auto">
                     <div className="w-full flex flex-col md:h-[60vh]">
                         <div className="basis-full"></div>
-                        <div className="basis-auto w-11/12 sm:w-3/4 md:w-[380px] m-auto md:mr-24">
+                        <div className="basis-auto w-11/12 sm:w-3/4 md:w-[420px] m-auto md:mr-24">
                             <Link href="/sp">
-                                <button className="w-full p-4 text-3xl my-1 text-white bg-black bg-opacity-70 hover:bg-green-700 backdrop-blur rounded-lg small-caps">
+                                <button className="w-full p-3 sm:p-4 text-2xl sm:text-3xl my-1 text-white bg-black bg-opacity-70 hover:bg-green-700 backdrop-blur rounded-lg small-caps">
                                     Single Player
                                 </button>
                             </Link>
                             <Link href="/lobby">
-                                <button className="w-full p-4 text-3xl my-1 text-white bg-black bg-opacity-70 hover:bg-red-700 backdrop-blur rounded-lg small-caps">
+                                <button className="w-full p-3 sm:p-4 text-2xl sm:text-3xl my-1 text-white bg-black bg-opacity-70 hover:bg-red-700 backdrop-blur rounded-lg small-caps">
                                     Multiplayer
                                 </button>
                             </Link>

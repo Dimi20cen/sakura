@@ -19,7 +19,7 @@ const AdUnit = dynamic(() => import("./adunit-lobby"), {
 });
 
 const textClass = classNames(
-    `px-6 py-3 tracking-wider text-center text-lg font-medium`,
+    `px-2 sm:px-6 py-3 tracking-wider text-center text-sm sm:text-lg font-medium`,
     "text-white",
 );
 
@@ -148,10 +148,10 @@ const GameList: FunctionComponent = () => {
     return (
         <>
             <Header />
-            <div className="max-w-7xl h-screen mx-auto my-4 py-4 sm:px-6 lg:px-8">
-                <div className="flex flex-col ml-5 mr-5 lg:flex-row">
+            <div className="max-w-7xl min-h-screen mx-auto my-2 sm:my-4 py-2 sm:py-4 px-3 sm:px-6 lg:px-8">
+                <div className="flex flex-col lg:flex-row gap-4">
                     <div className="-my-2 overflow-x-auto basis-full lg:basis-3/4">
-                        <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                        <div className="py-2 align-middle inline-block min-w-full sm:px-4 lg:px-6">
                             <div className="flex flex-col border-0 border-blue-500 min-h-[10vh] max-h-[80vh]">
                                 <div className="flex-grow overflow-auto">
                                     <table
@@ -201,10 +201,23 @@ const GameList: FunctionComponent = () => {
                                             </tr>
                                         </thead>
                                         <tbody className="">
-                                            {renderGame(
-                                                data ? data.games : [],
-                                                selectedGameId,
-                                                handleRowClick,
+                                            {data && data.games.length > 0 ? (
+                                                renderGame(
+                                                    data.games,
+                                                    selectedGameId,
+                                                    handleRowClick,
+                                                )
+                                            ) : (
+                                                <tr className="bg-black bg-opacity-50">
+                                                    <td
+                                                        colSpan={4}
+                                                        className="px-4 py-8 text-center text-white text-base"
+                                                    >
+                                                        No active games yet.
+                                                        Click Host Game to start
+                                                        one.
+                                                    </td>
+                                                </tr>
                                             )}
                                         </tbody>
                                     </table>
@@ -215,7 +228,7 @@ const GameList: FunctionComponent = () => {
                     <div className="basis-full lg:basis-1/4">
                         <button
                             className={classNames(
-                                "my-8 mx-auto h-12 w-full text-xl rounded-xl",
+                                "my-3 sm:my-6 mx-auto h-12 w-full text-lg sm:text-xl rounded-xl",
                                 "bg-green-700 hover:bg-green-900 text-white",
                             )}
                             onClick={handleJoinGame}
@@ -224,7 +237,7 @@ const GameList: FunctionComponent = () => {
                         </button>
                         <button
                             className={classNames(
-                                "mb-8 mx-auto h-12 w-full text-xl rounded-xl",
+                                "mb-4 sm:mb-8 mx-auto h-12 w-full text-lg sm:text-xl rounded-xl",
                                 "bg-indigo-700 hover:bg-indigo-900 text-white",
                             )}
                             onClick={handleHostGame}

@@ -173,7 +173,7 @@ const Header: FunctionComponent<{
             >
                 <Popover.Panel
                     focus
-                    className="absolute z-30 top-0 inset-x-0 p-1 transition transform origin-top-right md:hidden"
+                    className="absolute z-30 top-0 inset-x-0 p-2 transition transform origin-top-right md:hidden"
                 >
                     <div className="rounded-lg shadow-lg ring-black ring-opacity-5 bg-indigo-900 divide-y-2 divide-gray-50">
                         <div className="pt-3 pb-3 px-5 sm:pb-3">
@@ -200,19 +200,22 @@ const Header: FunctionComponent<{
                                 </div>
                             </div>
                         </div>
-                        <div className="py-6 px-5">
-                            <div className="grid grid-cols-2 gap-4">
-                                <Link href="/lobby">
-                                    <a className={textClass}>Lobby</a>
+                        <div className="py-4 px-5">
+                            <div className="grid grid-cols-1 gap-3">
+                                <Link href="/lobby" className={textClass}>
+                                    Lobby
                                 </Link>
-                                <Link href="/maps">
-                                    <a className={textClass}>Map Editor</a>
+                                <Link href="/maps" className={textClass}>
+                                    Map Editor
                                 </Link>
-                                <Link href="/choose-profile">
-                                    <a className={textClass}>Profile</a>
+                                <Link
+                                    href="/choose-profile"
+                                    className={textClass}
+                                >
+                                    Profile
                                 </Link>
                             </div>
-                            <div className="mt-6 flex flex-row space-x-3">
+                            <div className="mt-4 flex flex-row space-x-3">
                                 {authButton}
                                 {status === "authenticated" ? (
                                     <UserMenu socket={socket} />

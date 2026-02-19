@@ -1,6 +1,6 @@
 # Quick Start
 
-This is the shortest path to run Imperials locally.
+This is the shortest path to run Clash locally.
 
 ## Prerequisites
 
@@ -95,6 +95,12 @@ cd ui
 npm run dev
 ```
 
+For LAN testing:
+
+```bash
+npm run dev -- -H 0.0.0.0 -p 3000
+```
+
 ## 8. Open game
 
 - App: `http://localhost:3000`
@@ -120,6 +126,27 @@ The UI will:
 
 - Backend changes: restart `go run cmd/server/main.go` (or use `nodemon` from root)
 - Frontend changes: auto-reloaded by Next.js dev server
+
+## Mobile and LAN Check
+
+1. Find your host LAN IP:
+
+```bash
+hostname -I | awk '{print $1}'
+```
+
+2. Set backend `.env`:
+
+```env
+HOST=0.0.0.0
+PORT=8090
+SERVER_URL=http://<YOUR_LAN_IP>:8090
+FRONTEND_URL=http://<YOUR_LAN_IP>:3000
+```
+
+3. Start backend and frontend, then open from phone on same Wi-Fi:
+
+- `http://<YOUR_LAN_IP>:3000`
 
 Optional backend watcher:
 

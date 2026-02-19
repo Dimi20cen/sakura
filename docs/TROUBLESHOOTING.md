@@ -1,6 +1,6 @@
 # Troubleshooting
 
-Common issues when running Imperials locally and how to resolve them.
+Common issues when running Clash locally and how to resolve them.
 
 ## Backend fails to start with Mongo connection errors
 
@@ -84,6 +84,18 @@ Likely fixes:
 - Ensure token is valid.
 - Ensure game exists before joining.
 
+## Mobile shows `404` when opening a newly hosted game
+
+Symptoms:
+
+- Hosting from mobile lands on `404` game page occasionally.
+
+Fixes:
+
+- Refresh once and retry host/join.
+- Ensure backend and frontend are both running with current env values.
+- Ensure only one active backend URL is being used in `servers` collection.
+
 ## Frontend fails with missing env values
 
 Symptoms:
@@ -139,6 +151,22 @@ Fix options:
 
 - Stop existing process using the port
 - Or change app ports and update env variables accordingly
+
+## Works on host PC but not on phone/LAN device
+
+Checks:
+
+```bash
+hostname -I | awk '{print $1}'
+curl -i http://<YOUR_LAN_IP>:8090/heartbeat
+```
+
+Fixes:
+
+- Start frontend with `npm run dev -- -H 0.0.0.0 -p 3000`.
+- Set backend `.env` `HOST=0.0.0.0`.
+- Set `SERVER_URL` and `FRONTEND_URL` to LAN IP-based URLs.
+- Open firewall ports `3000` and `8090`.
 
 ## Quick reset path
 

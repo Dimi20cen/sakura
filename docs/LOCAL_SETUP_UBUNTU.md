@@ -4,7 +4,7 @@ This guide walks through a clean local setup on Ubuntu 22.04/24.04.
 
 ## Overview
 
-Imperials has:
+Clash has:
 
 - A Go backend (`cmd/server/main.go`) running on `:8090`
 - A Next.js frontend (`ui`) running on `:3000`
@@ -188,6 +188,52 @@ Stop Mongo container:
 ```bash
 docker compose down
 ```
+
+## 14. Access From Mobile on Same Network
+
+1. Find your LAN IP:
+
+```bash
+hostname -I | awk '{print $1}'
+```
+
+2. Update root `.env`:
+
+```env
+HOST=0.0.0.0
+PORT=8090
+SERVER_URL=http://<YOUR_LAN_IP>:8090
+FRONTEND_URL=http://<YOUR_LAN_IP>:3000
+```
+
+3. Run frontend bound to all interfaces:
+
+```bash
+cd ui
+npm run dev -- -H 0.0.0.0 -p 3000
+```
+
+4. Open firewall ports:
+
+```bash
+sudo ufw allow 3000/tcp
+sudo ufw allow 8090/tcp
+```
+
+5. Open from phone or tablet on same Wi-Fi:
+
+- `http://<YOUR_LAN_IP>:3000`
+
+## 15. Access From Different Networks (Friends)
+
+Recommended:
+
+- Use Tailscale for private cross-network access without exposing ports publicly.
+
+Alternative:
+
+- Port-forward frontend/backend and set public URLs in `SERVER_URL` and `FRONTEND_URL`.
+- If Google sign-in is used, update OAuth callback URLs accordingly.
 
 ## Optional: Backend auto-restart
 

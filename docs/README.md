@@ -1,6 +1,6 @@
-# Imperials Documentation
+# Clash Documentation
 
-This folder contains practical, project-specific docs for running and understanding Imperials locally.
+This folder contains practical, project-specific docs for running and understanding Clash locally.
 
 ## Contents
 
@@ -17,4 +17,3 @@ This folder contains practical, project-specific docs for running and understand
 3. Use [Environment Variables](./ENVIRONMENT.md) when creating `.env` files
 4. Use [Troubleshooting](./TROUBLESHOOTING.md) if anything fails
 5. Read [Architecture](./ARCHITECTURE.md) for deeper understanding
-

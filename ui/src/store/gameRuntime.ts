@@ -7,6 +7,7 @@ import * as actions from "../actions";
 import * as buttons from "../buttons";
 import * as notif from "../notif";
 import * as gameLog from "../gameLog";
+import * as resourceBank from "../resourceBank";
 import { chatMessage } from "../chat";
 import * as tsg from "../../tsg";
 import { initialize as initializeSettings } from "../settings";
@@ -65,6 +66,7 @@ export function handleGameRuntimeMessage(msg: WsResponse) {
             const settings = new tsg.GameSettings(msg.data);
             state.setSettings(settings);
             initializeSettings(settings);
+            resourceBank.setMode(settings.Mode);
             return;
         }
 
@@ -110,6 +112,7 @@ export function handleGameRuntimeMessage(msg: WsResponse) {
             relayoutHUD();
             board.setRobberTile(gs.Robber.Tile);
             board.setMerchantTile(gs.Merchant);
+            resourceBank.syncPublicDevTotal(gs.PlayerStates || []);
             return;
         }
 
@@ -175,6 +178,7 @@ export function handleGameRuntimeMessage(msg: WsResponse) {
         case MSG_RES_TYPE.CARD_MOVE:
             const move = new tsg.CardMoveInfo(msg?.data);
             gameLog.logCardMove(move);
+            resourceBank.applyCardMove(move);
             state.addPendingCardMoves([move]);
             return;
 

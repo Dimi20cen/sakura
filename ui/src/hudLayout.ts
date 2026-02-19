@@ -280,3 +280,16 @@ export function computeGameLogPosition({ canvasWidth }: GameLogPositionInput) {
         y: 12,
     };
 }
+
+type ResourceBankPositionInput = {
+    canvasWidth: number;
+};
+
+export function computeResourceBankPosition({
+    canvasWidth,
+}: ResourceBankPositionInput) {
+    return {
+        x: canvasWidth - HUD_LAYOUT_PRESET.padding - 286,
+        y: 2,
+    };
+}

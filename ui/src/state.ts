@@ -3,6 +3,7 @@ import * as assets from "./assets";
 import * as canvas from "./canvas";
 import * as chat from "./chat";
 import * as gameLog from "./gameLog";
+import * as resourceBank from "./resourceBank";
 import * as buttons from "./buttons";
 import * as board from "./board";
 import * as hand from "./hand";
@@ -190,6 +191,7 @@ function intialize(commandHub: CommandHub) {
     buttons.render(commandHub);
     chat.initialize();
     gameLog.initialize();
+    resourceBank.initialize();
     trade.initialize();
 
     bankContainer = new PIXI.Container();

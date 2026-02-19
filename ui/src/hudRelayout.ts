@@ -4,6 +4,7 @@ import * as chat from "./chat";
 import * as dice from "./dice";
 import * as gameLog from "./gameLog";
 import * as hand from "./hand";
+import * as resourceBank from "./resourceBank";
 import * as state from "./state";
 
 let installed = false;
@@ -15,6 +16,7 @@ export function relayoutHUD() {
     state.relayout();
     buttons.relayout();
     hand.relayout();
+    resourceBank.relayout();
     chat.relayout();
     gameLog.relayout();
     dice.relayout();

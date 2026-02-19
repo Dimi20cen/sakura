@@ -77,6 +77,13 @@ export function setSettings(s: GameSettings) {
     settings = s;
 }
 
+const profileAvatarByUsername: Record<string, string> = {
+    jethro7194: "/assets/profile-icons/jethro.png",
+    kopstiklapsa: "/assets/profile-icons/kopsetinklapsa.png",
+    staxtoputa: "/assets/profile-icons/staxtoputa.png",
+    giorgaros: "/assets/profile-icons/giorgaros.png",
+};
+
 /**
  * Initialize the players list UI
  * @param commandHub Command hub
@@ -526,31 +533,79 @@ export function highlightPlayers(boolmatrix?: boolean[]) {
  */
 export function getPlayerAvatarSprite(order: number, rendered?: () => void) {
     const button: InitializableSprite = new PIXI.Sprite();
-    const color = lastKnownStates ? lastKnownStates[order].Color : "black";
-    const randInt = lastKnownStates ? lastKnownStates[order].RandInt : 10;
+    button.texture = PIXI.Texture.EMPTY;
+    const state = lastKnownStates ? lastKnownStates[order] : undefined;
+    const color = state ? state.Color : "black";
+    const randInt = state ? state.RandInt : 10;
+    const normalizedUsername = (state?.Username || "")
+        .replace(/\*$/, "")
+        .toLowerCase();
+    const customAvatar = profileAvatarByUsername[normalizedUsername];
     const cstr = hexToUrlString(color);
 
     const variant = Math.ceil((randInt / 10000) * 5);
-    PIXI.Texture.fromURL(`/assets/avatars/${cstr}/${variant}.jpg`).then((t) => {
-        if (button.destroyed) return;
+    const avatarPath = customAvatar || `/assets/avatars/${cstr}/${variant}.jpg`;
 
-        // main avatar image
-        button.texture = t;
+    PIXI.Texture.fromURL(avatarPath)
+        .then((t) => {
+            if (button.destroyed) return;
 
-        // black border
-        const border = new PIXI.Graphics();
-        border.lineStyle({ color: 0, width: 15 });
-        border.beginFill(0, 0);
-        border.drawRoundedRect(0, 0, 400, 600, 40);
-        border.endFill();
-        button.addChild(border);
+            if (customAvatar) {
+                // Render custom avatars as a dedicated child sprite to avoid white base artifacts.
+                const cropSize = Math.min(t.width, t.height);
+                const cropFrame = new PIXI.Rectangle(
+                    (t.width - cropSize) / 2,
+                    (t.height - cropSize) / 2,
+                    cropSize,
+                    cropSize,
+                );
+                const avatarSprite = new PIXI.Sprite(
+                    new PIXI.Texture(t.baseTexture, cropFrame),
+                );
+                avatarSprite.width = 52;
+                avatarSprite.height = 52;
+                button.addChild(avatarSprite);
 
-        // set scale and flags
-        button.scale.set(0.1);
-        button.initialized = true;
-        canvas.app.markDirty();
-        rendered?.();
-    });
+                const mask = new PIXI.Graphics();
+                mask.beginFill(0xffffff);
+                mask.drawCircle(26, 26, 24);
+                mask.endFill();
+                button.addChild(mask);
+                avatarSprite.mask = mask;
+
+                const border = new PIXI.Graphics();
+                border.lineStyle({ color: 0, width: 2 });
+                border.beginFill(0, 0);
+                border.drawCircle(26, 26, 24);
+                border.endFill();
+                button.addChild(border);
+            } else {
+                // Legacy avatar style.
+                button.texture = t;
+                const border = new PIXI.Graphics();
+                border.lineStyle({ color: 0, width: 15 });
+                border.beginFill(0, 0);
+                border.drawRoundedRect(0, 0, 400, 600, 40);
+                border.endFill();
+                button.addChild(border);
+                button.scale.set(0.1);
+            }
+
+            button.initialized = true;
+            canvas.app.markDirty();
+            rendered?.();
+        })
+        .catch(() => {
+            if (button.destroyed) return;
+            // Safe fallback on load failure.
+            button.texture = PIXI.Texture.WHITE;
+            button.width = 48;
+            button.height = 48;
+            button.tint = 0x444444;
+            button.initialized = true;
+            canvas.app.markDirty();
+            rendered?.();
+        });
     return button;
 }
 
@@ -710,23 +765,37 @@ export function renderTimers() {
         const seconds = time % 60;
         const timeString = `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
 
+        const avatarWidth = spriteset.avatar.width || 40;
+        const avatarHeight = spriteset.avatar.height || 40;
+        const overlayFontSize = Math.max(12, Math.round(avatarHeight * 0.38));
         const text = new PIXI.Text(timeString, {
-            fontSize: 120,
+            fontSize: overlayFontSize,
             fontWeight: "bold",
             fill: 0xffffff,
         });
-        text.anchor.x = 0.5;
-        text.anchor.y = 1;
-        text.x = 200;
-        text.y = 600;
+        text.anchor.set(0.5);
         text.zIndex = 100;
 
-        const g = new PIXI.Graphics()
+        const padX = Math.max(4, Math.round(avatarWidth * 0.12));
+        const padY = Math.max(2, Math.round(avatarHeight * 0.07));
+        const overlayWidth = Math.max(
+            avatarWidth * 0.7,
+            text.width + padX * 2,
+        );
+        const overlayHeight = text.height + padY * 2;
+
+        const g = new PIXI.Container();
+        const bg = new PIXI.Graphics()
             .beginFill(0x000000, 0.6)
-            .drawRoundedRect(0, text.y - text.height, 400, text.height, 40)
+            .drawRoundedRect(0, 0, overlayWidth, overlayHeight, 8)
             .endFill();
+        text.x = overlayWidth / 2;
+        text.y = overlayHeight / 2;
+        g.x = spriteset.avatar.x + avatarWidth / 2 - overlayWidth / 2;
+        g.y = spriteset.avatar.y + avatarHeight - overlayHeight - 2;
+        g.addChild(bg);
         g.addChild(text);
-        spriteset.avatar.addChild(g);
+        container.addChild(g);
         timerOverlays.push(g);
     }
 

@@ -54,13 +54,13 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
     return (
         <>
             <Head>
-                <title>Imperials!</title>
-                <meta name="title" content="Imperials!" />
+                <title>Clash</title>
+                <meta name="title" content="Clash" />
                 <meta name="description" content="Strategize to imperialize" />
 
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content="https://imperials.app/" />
-                <meta property="og:title" content="Imperials!" />
+                <meta property="og:url" content="http://localhost:3000/" />
+                <meta property="og:title" content="Clash" />
                 <meta
                     property="og:description"
                     content="Strategize to imperialize"
@@ -68,8 +68,8 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
                 <meta property="og:image" content="" />
 
                 <meta property="twitter:card" content="summary_large_image" />
-                <meta property="twitter:url" content="https://imperials.app/" />
-                <meta property="twitter:title" content="Imperials!" />
+                <meta property="twitter:url" content="http://localhost:3000/" />
+                <meta property="twitter:title" content="Clash" />
                 <meta
                     property="twitter:description"
                     content="Strategize to imperialize"
@@ -81,11 +81,13 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
                     content="initial-scale=1.0, user-scalable=no, width=device-width"
                 />
 
+                <link rel="icon" href="/icon.png" />
+                <link rel="apple-touch-icon" href="/icon.png" />
                 <link rel="manifest" href="manifest.json" />
                 <meta name="mobile-web-app-capable" content="yes" />
                 <meta name="apple-mobile-web-app-capable" content="yes" />
-                <meta name="application-name" content="Imperials!" />
-                <meta name="apple-mobile-web-app-title" content="Imperials!" />
+                <meta name="application-name" content="Clash" />
+                <meta name="apple-mobile-web-app-title" content="Clash" />
                 <meta name="theme-color" content="#3A62BE" />
                 <meta name="msapplication-navbutton-color" content="#3A62BE" />
                 <meta
@@ -140,7 +142,7 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
 
             <SessionProvider session={session}>
                 <div className="h-screen w-full bg-gradient-to-r from-sky-400 to-blue-800">
-                    <div className="absolute h-full w-full bg-[url('/assets/lobby-bg.jpg')] bg-cover opacity-100"></div>
+                    <div className="absolute h-full w-full bg-[url('/assets/clash-background.png')] bg-cover bg-center opacity-100"></div>
                     <div className="absolute h-full w-full">
                         <Component {...pageProps} />
                     </div>

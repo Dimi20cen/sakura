@@ -545,7 +545,7 @@ const Index: NextPage = () => {
                             className="ml-4 text-4xl font-bold mt-1 text-white mb-1"
                             style={{ fontVariant: "small-caps" }}
                         >
-                            Imperials Map Editor
+                            Clash Map Editor
                         </h2>
                         <div className="ml-4 text-white m-4 text-sm">
                             Click on a hex to cycle through tile options. Right

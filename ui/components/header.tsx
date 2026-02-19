@@ -121,15 +121,15 @@ const Header: FunctionComponent<{
             <div className="relative z-20">
                 <div className="max-w-7xl mx-auto flex justify-between items-center px-4 py-2 lg:px-8 md:justify-start md:space-x-10">
                     <div>
-                        <span className="sr-only">Imperials</span>
+                        <span className="sr-only">Clash</span>
                         <div className="h-auto w-auto rounded-lg">
                             <Link href="/" passHref>
                                 <Image
                                     src="/icon.png"
-                                    alt="Imperials"
-                                    height="40"
-                                    width="40"
-                                    className="h-auto w-auto sm:h-10 cursor-pointer rounded-full"
+                                    alt="Clash"
+                                    height="52"
+                                    width="52"
+                                    className="h-auto w-auto sm:h-12 cursor-pointer rounded-full"
                                 />
                             </Link>
                         </div>
@@ -181,9 +181,9 @@ const Header: FunctionComponent<{
                                 <div className="">
                                     <Image
                                         src="/icon.png"
-                                        alt="Imperials"
-                                        height="40"
-                                        width="40"
+                                        alt="Clash"
+                                        height="52"
+                                        width="52"
                                         className="rounded-full"
                                     />
                                 </div>

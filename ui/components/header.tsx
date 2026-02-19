@@ -2,7 +2,6 @@ import {
     Fragment,
     FunctionComponent,
     MutableRefObject,
-    ReactElement,
     useEffect,
     useState,
 } from "react";
@@ -10,107 +9,37 @@ import { Popover, Transition } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import Image from "next/legacy/image";
 import Link from "next/link";
-import { useSession, signIn, signOut } from "next-auth/react";
-import { jwtDecode } from "jwt-decode";
 import { textBase, classNames } from "../utils/styles";
-import { getUsernameFromToken } from "../utils";
-import UserMenu from "./UserMenu";
 import ReconnectingWebSocket from "reconnecting-websocket";
 
 const textClass = classNames(textBase, "text-white", "text-lg");
-const signInProcess = async () => {
-    const anonToken = localStorage.getItem("auth");
-    const options = {
-        method: "GET",
-        headers: {},
-    };
 
-    if (anonToken) {
-        options.headers = {
-            Authorization: anonToken,
-        };
-    }
-    const res = await fetch(`/api/jwt`, options);
-    if (res.status === 200) {
-        const { token } = await res.json();
-        localStorage.setItem("auth", token);
-
-        if (
-            anonToken &&
-            getUsernameFromToken(token) != getUsernameFromToken(anonToken)
-        ) {
-            localStorage.setItem("anonAuth", anonToken!);
-        }
-
-        const decoded = jwtDecode(token) as any;
-        return decoded.username;
-    } else {
-        console.error(await res.json());
-        return null;
-    }
-};
-
-const signOutProcess = () => {
-    localStorage.removeItem("auth");
-    if (localStorage.getItem("anonAuth") != null) {
-        localStorage.setItem("auth", localStorage.getItem("anonAuth")!);
-    }
-    signOut({ callbackUrl: "/" });
+const profileIconByUsername: Record<string, string> = {
+    jethro7194: "/assets/profile-icons/jethro.png",
+    kopstiklapsa: "/assets/profile-icons/kopsetinklapsa.png",
+    staxtoputa: "/assets/profile-icons/staxtoputa.png",
+    giorgaros: "/assets/profile-icons/giorgaros.png",
 };
 
 const Header: FunctionComponent<{
     socket?: MutableRefObject<ReconnectingWebSocket | null>;
-}> = ({ socket }) => {
-    const [registered, setRegistered] = useState(false);
-    const { status } = useSession();
+}> = ({ socket: _socket }) => {
+    const [profileIcon, setProfileIcon] = useState(
+        "/assets/profile-icons/user-icon.jpeg",
+    );
 
     useEffect(() => {
-        if (status === "authenticated" && !registered) {
-            const signInAndRegister = async () => {
-                const username = await signInProcess();
-                if (username) {
-                    setRegistered(true);
-                } else {
-                    signOut();
-                    setRegistered(false);
-                }
-            };
-            signInAndRegister();
-        } else if (status === "unauthenticated") {
-            if (localStorage.getItem("anonAuth") != null) {
-                localStorage.setItem("auth", localStorage.getItem("anonAuth")!);
-            }
+        if (typeof window === "undefined") {
+            return;
         }
-    }, [status, registered]);
-
-    let authButton: ReactElement;
-    if (status === "authenticated") {
-        authButton = (
-            <button
-                className={classNames(
-                    textClass,
-                    "w-full flex items-center justify-center px-4 py-1 border border-transparent rounded-md shadow-sm text-base font-medium " +
-                        "text-white bg-indigo-700 hover:bg-red-800",
-                )}
-                onClick={() => signOutProcess()}
-            >
-                Sign out
-            </button>
+        const profileUsername = (
+            localStorage.getItem("profileUsername") || ""
+        ).toLowerCase();
+        setProfileIcon(
+            profileIconByUsername[profileUsername] ||
+                "/assets/profile-icons/user-icon.jpeg",
         );
-    } else {
-        authButton = (
-            <button
-                className={classNames(
-                    textClass,
-                    "w-full flex items-center justify-center px-4 py-1 border border-transparent rounded-md",
-                    "shadow-sm text-base font-medium text-white bg-indigo-700 hover:bg-green-800",
-                )}
-                onClick={() => signIn("google", { callbackUrl: "/" })}
-            >
-                Sign In
-            </button>
-        );
-    }
+    }, []);
 
     return (
         <Popover className="relative bg-indigo-900">
@@ -148,15 +77,21 @@ const Header: FunctionComponent<{
                             <Link href="/maps" className={textClass}>
                                 Map Editor
                             </Link>
-                            <Link href="/choose-profile" className={textClass}>
-                                Profile
-                            </Link>
                         </Popover.Group>
                         <div className="flex items-center md:ml-12">
-                            {status === "authenticated" ? (
-                                <UserMenu socket={socket} />
-                            ) : null}
-                            {authButton}
+                            <Link
+                                href="/choose-profile"
+                                aria-label="Choose profile"
+                                className="inline-flex items-center justify-center rounded-md p-1 hover:bg-indigo-800"
+                            >
+                                <Image
+                                    src={profileIcon}
+                                    alt="Profile"
+                                    width="42"
+                                    height="42"
+                                    className="rounded-full"
+                                />
+                            </Link>
                         </div>
                     </div>
                 </div>
@@ -210,16 +145,20 @@ const Header: FunctionComponent<{
                                 </Link>
                                 <Link
                                     href="/choose-profile"
-                                    className={textClass}
+                                    className={classNames(
+                                        textClass,
+                                        "inline-flex items-center gap-2",
+                                    )}
                                 >
+                                    <Image
+                                        src={profileIcon}
+                                        alt="Profile"
+                                        width="34"
+                                        height="34"
+                                        className="rounded-full"
+                                    />
                                     Profile
                                 </Link>
-                            </div>
-                            <div className="mt-4 flex flex-row space-x-3">
-                                {authButton}
-                                {status === "authenticated" ? (
-                                    <UserMenu socket={socket} />
-                                ) : null}
                             </div>
                         </div>
                     </div>

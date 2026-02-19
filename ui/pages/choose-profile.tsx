@@ -1,24 +1,23 @@
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
+import Image from "next/legacy/image";
 import Header from "../components/header";
 import { getServers } from "../utils/game";
 
 type ProfileOption = {
     username: string;
-    colorLabel: string;
-    colorClass: string;
+    icon: string;
 };
 
 const profiles: ProfileOption[] = [
-    { username: "Jethro7194", colorLabel: "Blue", colorClass: "bg-blue-500" },
+    { username: "Jethro7194", icon: "/assets/profile-icons/jethro.png" },
     {
         username: "KopsTiKlapsa",
-        colorLabel: "Yellow",
-        colorClass: "bg-yellow-400",
+        icon: "/assets/profile-icons/kopsetinklapsa.png",
     },
-    { username: "staxtoPUTA", colorLabel: "Plum", colorClass: "bg-fuchsia-500" },
-    { username: "Giorgaros", colorLabel: "Red", colorClass: "bg-red-500" },
+    { username: "staxtoPUTA", icon: "/assets/profile-icons/staxtoputa.png" },
+    { username: "Giorgaros", icon: "/assets/profile-icons/giorgaros.png" },
 ];
 
 const ChooseProfile: NextPage = () => {
@@ -81,22 +80,26 @@ const ChooseProfile: NextPage = () => {
                     Pick your default profile before joining games.
                 </p>
 
-                <div className="mt-6 grid grid-cols-1 gap-3">
+                <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-4">
                     {profiles.map((profile) => (
                         <button
                             key={profile.username}
                             disabled={busy}
-                            className="flex items-center justify-between rounded-lg border border-white/20 bg-indigo-900/70 px-3 sm:px-4 py-3 text-left hover:bg-indigo-800 disabled:opacity-60"
+                            className="rounded-lg border border-white/20 bg-indigo-900/70 p-3 sm:p-4 hover:bg-indigo-800 disabled:opacity-60"
                             onClick={() => chooseProfile(profile.username)}
                         >
-                            <span className="text-base sm:text-lg font-medium break-all pr-2">
-                                {profile.username}
-                            </span>
-                            <span className="inline-flex items-center gap-2 text-xs sm:text-sm shrink-0">
-                                <span
-                                    className={`inline-block h-3 w-3 rounded-full ${profile.colorClass}`}
-                                />
-                                {profile.colorLabel}
+                            <span className="flex flex-col items-center gap-2">
+                                <span className="relative h-20 w-20 sm:h-24 sm:w-24 overflow-hidden rounded-full border border-white/20">
+                                    <Image
+                                        src={profile.icon}
+                                        alt={profile.username}
+                                        layout="fill"
+                                        objectFit="cover"
+                                    />
+                                </span>
+                                <span className="text-sm sm:text-base font-medium text-center break-all">
+                                    {profile.username}
+                                </span>
                             </span>
                         </button>
                     ))}

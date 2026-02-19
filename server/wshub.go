@@ -224,7 +224,7 @@ func (h *WsHub) Unregister(client *WsClient) {
 			p := key.(*WsClient).Player
 			if p != nil && p.Order > client.Player.Order {
 				p.Order--
-				p.Color = entities.GetColor(p.Order)
+				p.Color = entities.GetColorByUsernameOrOrder(p.Username, p.Order)
 			}
 			return true
 		})

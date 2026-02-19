@@ -1,0 +1,128 @@
+# Quick Start
+
+This is the shortest path to run Imperials locally.
+
+## Prerequisites
+
+- Docker and Docker Compose plugin
+- Go (1.17+)
+- Node.js (18+)
+- npm
+
+## 1. Clone and enter repo
+
+```bash
+git clone <your-fork-or-repo-url> imperials
+cd imperials
+```
+
+## 2. Start MongoDB
+
+Create a root `.env` file first (used by Docker Compose for Mongo init values):
+
+```env
+MONGO_USER=root
+MONGO_PASSWORD=root
+```
+
+Then run:
+
+```bash
+docker compose up -d mongodb
+```
+
+## 3. Configure backend env
+
+Create `/path/to/imperials/.env`:
+
+```env
+ENVIRONMENT=local
+MONGO_URL=mongodb://root:root@localhost:27017/imperials?authSource=admin
+HMAC_SECRET=replace-with-a-long-random-secret
+FRONTEND_URL=http://localhost:3000
+HOST=0.0.0.0
+PORT=8090
+SERVER_URL=http://localhost:8090
+AWS_REGION=us-east-1
+MONGO_USER=root
+MONGO_PASSWORD=root
+```
+
+## 4. Configure frontend env
+
+Create `/path/to/imperials/ui/.env.local`:
+
+```env
+MONGO_URL=mongodb://root:root@localhost:27017/imperials?authSource=admin
+NEXTAUTH_SECRET=replace-with-a-second-long-random-secret
+NEXT_PUBLIC_ENVIRONMENT=local
+GOOGLE_ID=
+GOOGLE_SECRET=
+```
+
+Notes:
+
+- Google OAuth is optional for local play (anonymous auth works without it).
+- Leave `GOOGLE_ID` and `GOOGLE_SECRET` empty unless you are testing Google sign-in.
+
+## 5. Install frontend dependencies
+
+```bash
+cd ui
+npm install
+cd ..
+```
+
+## 6. Run backend
+
+In terminal 1:
+
+```bash
+go run cmd/server/main.go
+```
+
+You should see logs including:
+
+- `Connected to MongoDB!`
+- `Starting the Imperial backend on 0.0.0.0:8090`
+
+## 7. Run frontend
+
+In terminal 2:
+
+```bash
+cd ui
+npm run dev
+```
+
+## 8. Open game
+
+- App: `http://localhost:3000`
+- Lobby: `http://localhost:3000/lobby`
+- Profile picker: `http://localhost:3000/choose-profile`
+
+The UI will:
+
+1. Read active game servers from MongoDB via `ui/pages/api/servers.ts`
+2. Ask you to choose one of the default local profiles if no profile is selected
+3. Use anonymous auth token for that selected profile
+4. Connect to backend websocket endpoint at `/socket`
+
+## Current local UI simplifications
+
+- Top navigation only shows: `Lobby`, `Map Editor`, `Profile`, `Sign In`
+- Lobby actions are intentionally simplified to:
+  - `Join Game`
+  - `Host Game`
+- Spectate controls are removed from lobby UI
+
+## Development Loop
+
+- Backend changes: restart `go run cmd/server/main.go` (or use `nodemon` from root)
+- Frontend changes: auto-reloaded by Next.js dev server
+
+Optional backend watcher:
+
+```bash
+nodemon --signal SIGINT -e go --exec "go run --race cmd/server/main.go"
+```

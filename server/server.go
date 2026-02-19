@@ -30,6 +30,7 @@ type (
 		CheckIfUserEmailExists(string) (map[string]interface{}, error)
 		UpdateUsername(string, string) error
 		UpdateEmail(string, string) error
+		CountUsers() (int64, error)
 	}
 	Server struct {
 		hubs     sync.Map
@@ -205,6 +206,7 @@ func (s *Server) getAnonymousJWT(w http.ResponseWriter, r *http.Request) {
 	var id string
 	providedId := ""
 	username := randomdata.SillyName()
+	customUsername := false
 
 	if r.Method == "POST" {
 		var data map[string]interface{}
@@ -212,7 +214,10 @@ func (s *Server) getAnonymousJWT(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			return
 		}
-		mapstructure.Decode(data["username"], &username)
+		if _, ok := data["username"]; ok {
+			mapstructure.Decode(data["username"], &username)
+			customUsername = true
+		}
 		mapstructure.Decode(data["id"], &providedId)
 	}
 
@@ -222,10 +227,69 @@ func (s *Server) getAnonymousJWT(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if providedId == "" {
-		id = uuid.New().String()
-		if err := s.registry.CreateUser(id, username); err != nil {
-			WriteJson(w, http.StatusInternalServerError, map[string]string{"error": "Could not create user"})
-			return
+		if !customUsername && len(defaultProfiles) > 0 {
+			assigned := false
+			for _, profile := range defaultProfiles {
+				exists, err := s.registry.CheckIfUserExists(profile.ID)
+				if err != nil {
+					WriteJson(w, http.StatusInternalServerError, map[string]string{"error": "Could not check user"})
+					return
+				}
+				if !exists {
+					id = profile.ID
+					username = profile.Username
+					if err := s.registry.CreateUser(id, username); err != nil {
+						WriteJson(w, http.StatusInternalServerError, map[string]string{"error": "Could not create user"})
+						return
+					}
+					assigned = true
+					break
+				}
+			}
+
+			// If all default profiles already exist, reuse one round-robin.
+			if !assigned {
+				userCount, err := s.registry.CountUsers()
+				if err != nil {
+					WriteJson(w, http.StatusInternalServerError, map[string]string{"error": "Could not count users"})
+					return
+				}
+
+				profile := getDefaultProfile(userCount)
+				id = profile.ID
+				username = profile.Username
+
+				if err := s.registry.UpdateUsername(id, username); err != nil {
+					WriteJson(w, http.StatusInternalServerError, map[string]string{"error": "Could not update user"})
+					return
+				}
+			}
+		} else {
+			if profile, ok := getDefaultProfileByUsername(username); ok {
+				id = profile.ID
+				username = profile.Username
+				exists, err := s.registry.CheckIfUserExists(id)
+				if err != nil {
+					WriteJson(w, http.StatusInternalServerError, map[string]string{"error": "Could not check user"})
+					return
+				}
+
+				if !exists {
+					if err := s.registry.CreateUser(id, username); err != nil {
+						WriteJson(w, http.StatusInternalServerError, map[string]string{"error": "Could not create user"})
+						return
+					}
+				} else if err := s.registry.UpdateUsername(id, username); err != nil {
+					WriteJson(w, http.StatusInternalServerError, map[string]string{"error": "Could not update user"})
+					return
+				}
+			} else {
+				id = uuid.New().String()
+				if err := s.registry.CreateUser(id, username); err != nil {
+					WriteJson(w, http.StatusInternalServerError, map[string]string{"error": "Could not create user"})
+					return
+				}
+			}
 		}
 	} else {
 		id = providedId

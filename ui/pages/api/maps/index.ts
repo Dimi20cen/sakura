@@ -2,17 +2,37 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getUserIdFromEmail, mapsList, setMap } from "../../../utils/mango";
 import { getSession } from "next-auth/react";
+import { jwtDecode } from "jwt-decode";
 
 type Data = {
     maps?: any;
     error?: string;
 };
 
-async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
+const getUserIdFromAuth = async (req: NextApiRequest): Promise<string> => {
     const session = await getSession({ req });
-    const uId = session?.user?.email
-        ? await getUserIdFromEmail(session.user.email)
-        : "";
+    if (session?.user?.email) {
+        return (await getUserIdFromEmail(session.user.email)) || "";
+    }
+
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        return "";
+    }
+
+    try {
+        const token = authHeader.startsWith("Bearer ")
+            ? authHeader.slice("Bearer ".length)
+            : authHeader;
+        const claims = jwtDecode(token) as { id?: string };
+        return claims.id || "";
+    } catch {
+        return "";
+    }
+};
+
+async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
+    const uId = await getUserIdFromAuth(req);
 
     if (req.method === "GET") {
         try {
@@ -22,13 +42,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
             res.status(403).json({ error: (e as Error).message });
         }
     } else if (req.method === "POST") {
-        if (!session?.user?.email) {
-            res.status(403).json({ error: "Cannot do this unless logged in" });
-            return;
-        }
-
         if (!uId) {
-            res.status(403).json({ error: "User not found" });
+            res.status(403).json({ error: "Missing or invalid auth token" });
             return;
         }
 

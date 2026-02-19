@@ -25,6 +25,7 @@ export const anonymousAuth = async (): Promise<any> => {
     let res;
     let servers;
 
+    const selectedProfile = localStorage.getItem("profileUsername");
     const token = localStorage.getItem("auth");
     if (isBrowser && token) {
         const options = {
@@ -41,6 +42,16 @@ export const anonymousAuth = async (): Promise<any> => {
         }
     }
 
+    if (
+        isBrowser &&
+        !selectedProfile &&
+        window.location.pathname !== "/choose-profile"
+    ) {
+        const returnTo = `${window.location.pathname}${window.location.search}`;
+        window.location.href = `/choose-profile?returnTo=${encodeURIComponent(returnTo)}`;
+        return;
+    }
+
     if (!servers) {
         servers = await getServers();
     }
@@ -50,10 +61,21 @@ export const anonymousAuth = async (): Promise<any> => {
         return;
     }
 
-    res = await fetch(`${servers[0]}/anon`);
+    if (selectedProfile) {
+        res = await fetch(`${servers[0]}/anon`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ username: selectedProfile }),
+        });
+    } else {
+        res = await fetch(`${servers[0]}/anon`);
+    }
+
     const data = await res.json();
 
-    if (isBrowser) {
+    if (isBrowser && data?.token) {
         localStorage.setItem("auth", data.token);
     }
 };

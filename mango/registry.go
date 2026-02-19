@@ -7,6 +7,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -88,6 +89,9 @@ func (mr *MangoRegistry) CheckIfUserExists(id string) (bool, error) {
 	}
 
 	err := output.Decode(&result)
+	if errors.Is(err, mongo.ErrNoDocuments) {
+		return false, nil
+	}
 
 	if err != nil {
 		return false, err
@@ -144,4 +148,10 @@ func (mr *MangoRegistry) UpdateEmail(id, email string) error {
 	)
 
 	return err
+}
+
+func (mr *MangoRegistry) CountUsers() (int64, error) {
+	db := GetDatabase()
+	collection := db.Collection(UsersTable)
+	return collection.CountDocuments(context.TODO(), bson.D{})
 }

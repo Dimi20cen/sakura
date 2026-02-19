@@ -6,7 +6,6 @@ import { ICoordinate } from "../tsg";
 import { classNames } from "../utils/styles";
 import { PortType, TileType } from "../src/entities";
 import { Fragment, useEffect, useState } from "react";
-import { signIn, useSession } from "next-auth/react";
 import { Combobox, Transition } from "@headlessui/react";
 import { useAnonymousAuth } from "../hooks/auth";
 import { basicFetcher } from "../utils";
@@ -23,6 +22,8 @@ type Map = {
     tiles: number[];
     map: number[][];
 };
+
+const cloneMap = (map: Map): Map => JSON.parse(JSON.stringify(map));
 
 let initMap: Map = {
     name: "My Amazing Map",
@@ -97,8 +98,7 @@ const Index: NextPage = () => {
     const [token] = useAnonymousAuth();
     const { data } = useSWR([`/api/maps`, token ?? null], basicFetcher);
     const [selectedMap, setSelectedMap] = useState(initMap);
-    // check if user is logged in
-    const session = useSession();
+    const [resetSnapshot, setResetSnapshot] = useState<Map>(cloneMap(initMap));
 
     if (global.window !== undefined) {
         (window as any).setMap = setMap;
@@ -113,14 +113,47 @@ const Index: NextPage = () => {
                     token,
                 ]);
                 if (res?.map?.map) {
-                    setMap(res.map.map);
-                    setNumbers(getInitNum(res.map.map));
-                    setTiles(getInitTiles(res.map.map));
-                    setPorts(getInitPorts(res.map.map));
+                    const loadedMap = cloneMap(res.map.map);
+                    setMap(loadedMap);
+                    setResetSnapshot(loadedMap);
+                    setNumbers(getInitNum(loadedMap));
+                    setTiles(getInitTiles(loadedMap));
+                    setPorts(getInitPorts(loadedMap));
                 }
             })();
         }
     }, [selectedMap, token]);
+
+    const resetMap = () => {
+        const nextMap = cloneMap(resetSnapshot);
+        setMap(nextMap);
+        setNumbers(getInitNum(nextMap));
+        setTiles(getInitTiles(nextMap));
+        setPorts(getInitPorts(nextMap));
+    };
+
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            const target = event.target as HTMLElement | null;
+            if (
+                target &&
+                (target.tagName === "INPUT" ||
+                    target.tagName === "TEXTAREA" ||
+                    target.tagName === "SELECT" ||
+                    target.isContentEditable)
+            ) {
+                return;
+            }
+
+            if (event.key.toLowerCase() === "r") {
+                event.preventDefault();
+                resetMap();
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [resetSnapshot]);
 
     const [mapQuery, setMapQuery] = useState("");
     const filteredMaps =
@@ -334,10 +367,20 @@ const Index: NextPage = () => {
 
         console.log(JSON.stringify(map));
 
+        const authToken =
+            token || (typeof window !== "undefined"
+                ? localStorage.getItem("auth")
+                : null);
+        if (!authToken) {
+            alert("Auth token is still loading. Please try again in a second.");
+            return;
+        }
+
         fetch("/api/maps", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                Authorization: authToken,
             },
             body: JSON.stringify(map),
         })
@@ -509,6 +552,8 @@ const Index: NextPage = () => {
                             click to reset to random or fog.
                             <br />
                             Click on edge dots to assign port locations.
+                            <br />
+                            Press R to reset the map to the last loaded version.
                         </div>
                         {map.map.map((row, y) => (
                             <div
@@ -708,8 +753,7 @@ const Index: NextPage = () => {
                             </div>
                         </Combobox>
                     </div>
-                    {session.status === "authenticated" ? (
-                        <div>
+                    <div>
                             <h2 className="ml-4 text-xl mt-1">
                                 Map Attributes
                             </h2>
@@ -915,25 +959,7 @@ const Index: NextPage = () => {
                                     </li>
                                 ))}
                             </ul>
-                        </div>
-                    ) : (
-                        <>
-                            <h2 className="ml-4 text-xl mt-16">
-                                You must be logged in to use this feature
-                            </h2>
-                            <button
-                                className={classNames(
-                                    "ml-4 mt-5 w-full max-w-[200px] flex items-center justify-center px-4 py-2 text-xl border border-transparent rounded-md",
-                                    "shadow-sm font-medium text-white bg-indigo-700 hover:bg-green-800",
-                                )}
-                                onClick={() =>
-                                    signIn("google", { callbackUrl: "/" })
-                                }
-                            >
-                                Sign In
-                            </button>
-                        </>
-                    )}
+                    </div>
                 </div>
             </div>
         </main>

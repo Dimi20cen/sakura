@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"strings"
 	"sync/atomic"
 
 	"github.com/vmihailenco/msgpack/v5"
@@ -140,9 +141,24 @@ func GetColor(order uint16) string {
 	return colors[order]
 }
 
+func GetColorByUsernameOrOrder(username string, order uint16) string {
+	switch strings.ToLower(username) {
+	case "jethro7194":
+		return "#0000ff" // blue
+	case "kopstiklapsa":
+		return "#ffff00" // yellow
+	case "staxtoputa":
+		return "#fc41ec" // plum
+	case "giorgaros":
+		return "#ff0000" // red
+	default:
+		return GetColor(order)
+	}
+}
+
 func NewPlayer(g GameMode, id, username string, order uint16) (*Player, error) {
 	player := &Player{Id: id, Username: username, Order: order, Initialized: true}
-	player.Color = GetColor(order)
+	player.Color = GetColorByUsernameOrOrder(username, order)
 
 	hand, err := GetNewHand(g, false)
 	if err != nil {

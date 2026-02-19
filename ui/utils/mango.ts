@@ -110,7 +110,9 @@ export const gamesList = async (stage: string, userId?: string) => {
             const reconnectable = Boolean(
                 userId &&
                     ((qStage === 0 && game.host_id === userId) ||
-                        (qStage === 1 && participantIds.includes(userId))),
+                        (qStage === 1 &&
+                            (game.host_id === userId ||
+                                participantIds.includes(userId)))),
             );
 
             return {

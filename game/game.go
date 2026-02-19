@@ -440,6 +440,7 @@ func (g *Game) GetSpectatorListMessage() *entities.Message {
 
 func (g *Game) SetUsername(p *entities.Player, username string) {
 	p.Username = username
+	p.Color = entities.GetColorByUsernameOrOrder(username, p.Order)
 	g.j.WSetUsername(p, username)
 
 	if p.Username[len(p.Username)-1:] == "*" {

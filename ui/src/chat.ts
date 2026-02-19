@@ -11,6 +11,8 @@ let windowSprite: PIXI.Sprite;
 let inputBox: HTMLInputElement;
 let scrollOffset = 0;
 let chatButton: buttons.ButtonSprite;
+const CHAT_WIDTH = 250;
+const CHAT_HEIGHT = 160;
 const messages: Message[] = [];
 // [
 //     {
@@ -38,11 +40,9 @@ export function initialize() {
         windowSprite.destroy();
     }
 
-    const WIDTH = 250,
-        HEIGHT = 160;
-    windowSprite = windows.getWindowSprite(WIDTH, HEIGHT);
-    windowSprite.pivot.x = WIDTH;
-    windowSprite.pivot.y = HEIGHT;
+    windowSprite = windows.getWindowSprite(CHAT_WIDTH, CHAT_HEIGHT);
+    windowSprite.pivot.x = CHAT_WIDTH;
+    windowSprite.pivot.y = CHAT_HEIGHT;
     windowSprite.x = canvas.getWidth() - 20;
     windowSprite.y = canvas.getHeight() - G_X;
     windowSprite.interactive = true;
@@ -62,7 +62,7 @@ export function initialize() {
     const resize = () => {
         const ratio = canvas.getScaleRatio();
         inputBox.style.height = `${25 * ratio}px`;
-        inputBox.style.width = `${(WIDTH - 10) * ratio}px`;
+        inputBox.style.width = `${(CHAT_WIDTH - 10) * ratio}px`;
         inputBox.style.bottom = `${(G_X + 6) * ratio}px`;
         inputBox.style.right = `${25 * ratio}px`;
         inputBox.style.fontSize = `${0.9 * ratio}em`;
@@ -119,7 +119,7 @@ export function initialize() {
         btn.setEnabled(true);
         btn.pivot.x = 25;
         btn.zIndex = 30;
-        btn.x = WIDTH - 3;
+        btn.x = CHAT_WIDTH - 3;
         btn.y = 3;
         windowSprite.addChild(btn);
         btn.on("pointerdown", () => setVisible(false));
@@ -147,6 +147,18 @@ export function initialize() {
         chatButton.onClick(() => setVisible(true));
         canvas.app.stage.addChild(chatButton);
     }
+}
+
+export function relayout() {
+    if (windowSprite && !windowSprite.destroyed) {
+        windowSprite.x = canvas.getWidth() - 20;
+        windowSprite.y = canvas.getHeight() - G_X;
+    }
+    if (chatButton && !chatButton.destroyed) {
+        chatButton.x = canvas.getWidth() - 20;
+        chatButton.y = canvas.getHeight() - 285;
+    }
+    canvas.app.markDirty();
 }
 
 /**

@@ -7,6 +7,98 @@ type Rect = {
 
 const HUD_PADDING = 20;
 const HUD_GAP = 12;
+const PLAYER_PANEL_BOTTOM_OFFSET = 125;
+const BANK_SIZE = 90;
+const BANK_TOP_MIN = 10;
+
+const ACTION_BAR_INNER_OFFSET = 12;
+const ACTION_BAR_BUTTON_SPACING = 74;
+const ACTION_BAR_RIGHT_OFFSET = 30;
+const ACTION_BAR_BOTTOM = 120;
+
+type PlayerPanelPositionInput = {
+    canvasWidth: number;
+    canvasHeight: number;
+    panelWidth: number;
+    panelHeight: number;
+    panelScale: number;
+};
+
+export function computePlayerPanelPosition({
+    canvasWidth,
+    canvasHeight,
+    panelWidth,
+    panelHeight,
+    panelScale,
+}: PlayerPanelPositionInput) {
+    return {
+        x: canvasWidth - panelWidth * panelScale - HUD_PADDING,
+        y: Math.max(
+            HUD_PADDING,
+            canvasHeight - panelHeight * panelScale - PLAYER_PANEL_BOTTOM_OFFSET,
+        ),
+    };
+}
+
+type BankPositionInput = {
+    canvasWidth: number;
+    playerPanelY: number;
+};
+
+export function computeBankPosition({
+    canvasWidth,
+    playerPanelY,
+}: BankPositionInput) {
+    return {
+        x: canvasWidth - HUD_PADDING - BANK_SIZE,
+        y: Math.max(BANK_TOP_MIN, playerPanelY - 95),
+    };
+}
+
+type ActionBarPositionInput = {
+    canvasWidth: number;
+    canvasHeight: number;
+};
+
+export function computeActionBarPosition({
+    canvasWidth,
+    canvasHeight,
+}: ActionBarPositionInput) {
+    return {
+        x:
+            canvasWidth -
+            (ACTION_BAR_INNER_OFFSET + ACTION_BAR_BUTTON_SPACING * 5) -
+            ACTION_BAR_RIGHT_OFFSET,
+        y: canvasHeight - ACTION_BAR_BOTTOM,
+    };
+}
+
+type HandPositionInput = {
+    canvasHeight: number;
+    handHeight: number;
+};
+
+export function computeHandPosition({ canvasHeight, handHeight }: HandPositionInput) {
+    return {
+        x: HUD_PADDING,
+        y: canvasHeight - handHeight - 30,
+    };
+}
+
+type DevConfirmationPositionInput = {
+    canvasHeight: number;
+    handHeight: number;
+};
+
+export function computeDevConfirmationPosition({
+    canvasHeight,
+    handHeight,
+}: DevConfirmationPositionInput) {
+    return {
+        x: HUD_PADDING,
+        y: canvasHeight - handHeight - 360,
+    };
+}
 
 type DicePositionInput = {
     canvasWidth: number;

@@ -9,6 +9,7 @@ import * as anim from "./animation";
 import * as actions from "./actions";
 import * as windows from "./windows";
 import * as trade from "./trade";
+import { computeBankPosition, computePlayerPanelPosition } from "./hudLayout";
 import { sound } from "@pixi/sound";
 import { cancelPendingAction } from "./actions";
 import { getThisPlayerOrder } from "./ws";
@@ -84,6 +85,34 @@ export function getPlayerPanelBounds() {
     return container.getBounds();
 }
 
+export function relayout() {
+    if (!container || container.destroyed || !lastKnownStates) {
+        return;
+    }
+
+    const windowHeight = lastKnownStates.length * 80 + 15;
+    const playerPanelPos = computePlayerPanelPosition({
+        canvasWidth: canvas.getWidth(),
+        canvasHeight: canvas.getHeight(),
+        panelWidth: WINDOW_WIDTH,
+        panelHeight: windowHeight,
+        panelScale: WINDOW_SCALE,
+    });
+    container.x = playerPanelPos.x;
+    container.y = playerPanelPos.y;
+
+    if (bankContainer && !bankContainer.destroyed) {
+        const bankPos = computeBankPosition({
+            canvasWidth: canvas.getWidth(),
+            playerPanelY: container.y,
+        });
+        bankContainer.x = bankPos.x;
+        bankContainer.y = bankPos.y;
+    }
+
+    canvas.app.markDirty();
+}
+
 const profileAvatarByUsername: Record<string, string> = {
     jethro7194: "/assets/profile-icons/jethro.png",
     kopstiklapsa: "/assets/profile-icons/kopsetinklapsa.png",
@@ -105,11 +134,15 @@ function intialize(commandHub: CommandHub) {
     }
 
     container = new PIXI.Container();
-    container.x = canvas.getWidth() - WINDOW_WIDTH * WINDOW_SCALE - 20;
-    container.y = Math.max(
-        20,
-        canvas.getHeight() - WINDOW_HEIGHT * WINDOW_SCALE - 125,
-    );
+    const playerPanelPos = computePlayerPanelPosition({
+        canvasWidth: canvas.getWidth(),
+        canvasHeight: canvas.getHeight(),
+        panelWidth: WINDOW_WIDTH,
+        panelHeight: WINDOW_HEIGHT,
+        panelScale: WINDOW_SCALE,
+    });
+    container.x = playerPanelPos.x;
+    container.y = playerPanelPos.y;
     container.cacheAsBitmapResolution = 2;
     container.cacheAsBitmapMultisample = PIXI.MSAA_QUALITY.HIGH;
     canvas.app.stage.addChild(container);
@@ -162,8 +195,12 @@ function intialize(commandHub: CommandHub) {
     bankSprite.anchor.y = 0.5;
     bankSprite.x = 45;
     bankSprite.y = 45;
-    bankContainer.x = canvas.getWidth() - 20 - 90;
-    bankContainer.y = Math.max(10, container.y - 95);
+    const bankPos = computeBankPosition({
+        canvasWidth: canvas.getWidth(),
+        playerPanelY: container.y,
+    });
+    bankContainer.x = bankPos.x;
+    bankContainer.y = bankPos.y;
     bankContainer.zIndex = 900;
     bankContainer.addChild(bankSprite);
     canvas.app.stage.addChild(bankContainer);

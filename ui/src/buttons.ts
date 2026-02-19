@@ -5,6 +5,7 @@ import * as ws from "./ws";
 import * as state from "./state";
 import * as assets from "./assets";
 import * as windows from "./windows";
+import { computeActionBarPosition } from "./hudLayout";
 import { BuildableType, CardType } from "./entities";
 import CommandHub from "./commands";
 import { PlayerSecretState } from "../tsg";
@@ -44,6 +45,55 @@ export let buttons: {
     buildWall?: ButtonSprite;
     specialBuild?: ButtonSprite;
 };
+
+const BUTTON_WIDTH = 66;
+const BUTTON_Y = 12;
+const BUTTON_X_DELTA = 74;
+const COUNT_WIDTH = 20;
+const COUNT_HEIGHT = 19;
+const COUNT_FONTSIZE = 13;
+const C_HEIGHT = 90;
+
+export function relayout() {
+    if (!container || container.destroyed) {
+        return;
+    }
+
+    const actionBarPos = computeActionBarPosition({
+        canvasWidth: canvas.getWidth(),
+        canvasHeight: canvas.getHeight(),
+    });
+    container.x = actionBarPos.x;
+    container.y = actionBarPos.y;
+
+    if (container1 && !container1.destroyed) {
+        container1.x = container.x + BUTTON_X_DELTA * 1 - 18;
+        container1.y = container.y - C_HEIGHT - 10;
+    }
+
+    if (buttons.knightBox?.container && !buttons.knightBox.container.destroyed) {
+        buttons.knightBox.container.x = container.x;
+        buttons.knightBox.container.y =
+            (container1 && !container1.destroyed ? container1.y : container.y) -
+            C_HEIGHT -
+            10;
+    }
+
+    if (buttons.improveBox?.container && !buttons.improveBox.container.destroyed) {
+        buttons.improveBox.container.x = container.x;
+        buttons.improveBox.container.y =
+            (container1 && !container1.destroyed ? container1.y : container.y) -
+            C_HEIGHT -
+            10;
+    }
+
+    if (buttons.specialBuild && !buttons.specialBuild.destroyed) {
+        buttons.specialBuild.x = canvas.getWidth() - 40 - 100;
+        buttons.specialBuild.y = canvas.getHeight() - 260;
+    }
+
+    canvas.app.markDirty();
+}
 
 export enum ButtonType {
     Yes = "yes",
@@ -252,14 +302,6 @@ export function getCountSprite(
 export function render(commandHub: CommandHub) {
     const lks = state.lastKnownStates?.[ws.getThisPlayerOrder()];
 
-    const BUTTON_WIDTH = 66,
-        BUTTON_Y = 12,
-        BUTTON_X_DELTA = 74,
-        COUNT_WIDTH = 20,
-        COUNT_HEIGHT = 19,
-        COUNT_FONTSIZE = 13,
-        C_HEIGHT = 90;
-
     // Initialize sprites
     container = new PIXI.Container();
     buttons = {} as any;
@@ -286,8 +328,12 @@ export function render(commandHub: CommandHub) {
             C_HEIGHT,
         ),
     );
-    container.x = canvas.getWidth() - (BUTTON_Y + BUTTON_X_DELTA * 5) - 30;
-    container.y = canvas.getHeight() - 120;
+    const actionBarPos = computeActionBarPosition({
+        canvasWidth: canvas.getWidth(),
+        canvasHeight: canvas.getHeight(),
+    });
+    container.x = actionBarPos.x;
+    container.y = actionBarPos.y;
 
     // Build settlement
     {

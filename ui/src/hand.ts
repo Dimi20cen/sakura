@@ -7,6 +7,7 @@ import * as windows from "./windows";
 import * as anim from "./animation";
 import * as state from "./state";
 import * as board from "./board";
+import { computeDevConfirmationPosition, computeHandPosition } from "./hudLayout";
 import * as tsg from "../tsg";
 import { getCommandHub, getThisPlayerOrder, isSpectator } from "./ws";
 import { CardType, DevelopmentCardType } from "./entities";
@@ -21,6 +22,34 @@ let devConfirmationWindow: PIXI.Container;
 let devConfirmationSprite: PIXI.Sprite;
 let devConfirmationYesNoWindow: windows.YesNoWindow;
 let usingDevCardType: number;
+
+const HAND_WINDOW_HEIGHT = 90;
+
+export function relayout() {
+    if (!canvas.app) {
+        return;
+    }
+
+    if (handWindow && !handWindow.container.destroyed) {
+        const handPos = computeHandPosition({
+            canvasHeight: canvas.getHeight(),
+            handHeight: HAND_WINDOW_HEIGHT,
+        });
+        handWindow.container.x = handPos.x;
+        handWindow.container.y = handPos.y;
+    }
+
+    if (devConfirmationWindow && !devConfirmationWindow.destroyed) {
+        const confirmPos = computeDevConfirmationPosition({
+            canvasHeight: canvas.getHeight(),
+            handHeight: HAND_WINDOW_HEIGHT,
+        });
+        devConfirmationWindow.x = confirmPos.x;
+        devConfirmationWindow.y = confirmPos.y;
+    }
+
+    canvas.app.markDirty();
+}
 
 /**
  * Draw a card texture to a sprite
@@ -500,7 +529,7 @@ export class HandWindow {
 export function renderPlayerHand(secret: tsg.PlayerSecretState) {
     // Bigger window than others for dev cards
     const WINDOW_WIDTH = 750;
-    const WINDOW_HEIGHT = 90;
+    const WINDOW_HEIGHT = HAND_WINDOW_HEIGHT;
 
     if (!handWindow || handWindow.container.destroyed) {
         handWindow = new HandWindow(
@@ -508,8 +537,12 @@ export function renderPlayerHand(secret: tsg.PlayerSecretState) {
             WINDOW_WIDTH,
             WINDOW_HEIGHT,
         );
-        handWindow.container.x = 20;
-        handWindow.container.y = canvas.getHeight() - WINDOW_HEIGHT - 30;
+        const handPos = computeHandPosition({
+            canvasHeight: canvas.getHeight(),
+            handHeight: WINDOW_HEIGHT,
+        });
+        handWindow.container.x = handPos.x;
+        handWindow.container.y = handPos.y;
         handWindow.clickCallback = cardClick;
         handWindow.container.visible = !isSpectator();
     }
@@ -541,8 +574,12 @@ export function renderPlayerHand(secret: tsg.PlayerSecretState) {
     // Dev card Confirmation
     if (!devConfirmationWindow || devConfirmationWindow.destroyed) {
         devConfirmationWindow = new PIXI.Container();
-        devConfirmationWindow.x = 20;
-        devConfirmationWindow.y = canvas.getHeight() - WINDOW_HEIGHT - 360;
+        const confirmPos = computeDevConfirmationPosition({
+            canvasHeight: canvas.getHeight(),
+            handHeight: WINDOW_HEIGHT,
+        });
+        devConfirmationWindow.x = confirmPos.x;
+        devConfirmationWindow.y = confirmPos.y;
         devConfirmationWindow.visible = false;
 
         devConfirmationYesNoWindow = new windows.YesNoWindow(210, 100)

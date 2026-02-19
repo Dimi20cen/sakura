@@ -9,6 +9,7 @@ import * as notif from "./notif";
 import * as tsg from "../tsg";
 import { initialize as initializeSettings } from "./settings";
 import { handleGameOver } from "./game-over";
+import { ensureHUDRelayoutHooks, relayoutHUD } from "./hudRelayout";
 import { showErrorWindow } from "./windows";
 import { chatMessage } from "./chat";
 import ReconnectingWebSocket from "reconnecting-websocket";
@@ -39,6 +40,8 @@ export function isSpectator() {
 export function initialize(socket: ReconnectingWebSocket, order: number) {
     commandHub = new CommandHub(socket);
     thisPlayerOrder = order;
+    ensureHUDRelayoutHooks();
+    relayoutHUD();
 }
 
 export function handleResponse(msg: WsResponse) {
@@ -113,8 +116,8 @@ export function handleResponse(msg: WsResponse) {
                 gs.NeedDice && gs.CurrentPlayerOrder == getThisPlayerOrder(),
             );
             state.renderGameState(gs, commandHub);
-            // Ensure HUD-dependent dice positioning is corrected after state panel renders.
-            dice.relayout();
+            // Ensure all HUD elements get a deterministic post-state relayout.
+            relayoutHUD();
             board.setRobberTile(gs.Robber.Tile);
             board.setMerchantTile(gs.Merchant);
             return;

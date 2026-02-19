@@ -210,8 +210,9 @@ function addFullscreenButton() {
     );
     fsbtn.setEnabled(true);
     fsbtn.onClick(toggleFullscreen);
-    fsbtn.x = getWidth() - 38;
-    fsbtn.y = getHeight() - 38;
+    // Settings button is anchored at the top-left; keep fullscreen just below it.
+    fsbtn.x = 10;
+    fsbtn.y = 56;
     app.stage.addChild(fsbtn);
 }
 

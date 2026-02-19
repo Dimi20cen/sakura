@@ -269,3 +269,14 @@ export function computeChatPopupPosition({
         y: chatButtonY,
     };
 }
+
+type GameLogPositionInput = {
+    canvasWidth: number;
+};
+
+export function computeGameLogPosition({ canvasWidth }: GameLogPositionInput) {
+    return {
+        x: canvasWidth - HUD_LAYOUT_PRESET.padding - 320,
+        y: 12,
+    };
+}

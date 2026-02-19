@@ -2,6 +2,7 @@ import * as buttons from "./buttons";
 import * as canvas from "./canvas";
 import * as chat from "./chat";
 import * as dice from "./dice";
+import * as gameLog from "./gameLog";
 import * as hand from "./hand";
 import * as state from "./state";
 
@@ -15,6 +16,7 @@ export function relayoutHUD() {
     buttons.relayout();
     hand.relayout();
     chat.relayout();
+    gameLog.relayout();
     dice.relayout();
 }
 

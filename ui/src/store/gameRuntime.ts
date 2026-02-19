@@ -6,6 +6,7 @@ import * as trade from "../trade";
 import * as actions from "../actions";
 import * as buttons from "../buttons";
 import * as notif from "../notif";
+import * as gameLog from "../gameLog";
 import { chatMessage } from "../chat";
 import * as tsg from "../../tsg";
 import { initialize as initializeSettings } from "../settings";
@@ -18,6 +19,8 @@ import {
     setGameWsReceiving,
 } from "../ws";
 import { MSG_RES_TYPE, WsResponse } from "../sock";
+
+let lastKnownMyDevCardsTotal = 0;
 
 export function isHandledByGameRuntime(msg: WsResponse): boolean {
     switch (msg.t) {
@@ -116,6 +119,15 @@ export function handleGameRuntimeMessage(msg: WsResponse) {
             state.setLastKnownSecretVictoryPoints(data.VictoryPoints);
             buttons.updateButtonsSecretState(data);
             trade.updateTradeRatios(data.TradeRatios);
+
+            const currentTotal = (data.DevelopmentCards || []).reduce(
+                (sum, q) => sum + Number(q || 0),
+                0,
+            );
+            if (currentTotal > lastKnownMyDevCardsTotal) {
+                gameLog.logDevCardDraw(getThisPlayerOrder());
+            }
+            lastKnownMyDevCardsTotal = currentTotal;
             return;
         }
 
@@ -155,15 +167,21 @@ export function handleGameRuntimeMessage(msg: WsResponse) {
             return;
 
         case MSG_RES_TYPE.DICE:
-            dice.handleMessage(new tsg.DieRollState(msg.data));
+            const diceState = new tsg.DieRollState(msg.data);
+            gameLog.logDiceRoll(diceState);
+            dice.handleMessage(diceState);
             return;
 
         case MSG_RES_TYPE.CARD_MOVE:
-            state.addPendingCardMoves([new tsg.CardMoveInfo(msg?.data)]);
+            const move = new tsg.CardMoveInfo(msg?.data);
+            gameLog.logCardMove(move);
+            state.addPendingCardMoves([move]);
             return;
 
         case MSG_RES_TYPE.DEV_CARD_USE:
-            notif.showDevCardUse(new tsg.DevCardUseInfo(msg?.data));
+            const info = new tsg.DevCardUseInfo(msg?.data);
+            gameLog.logDevCardUse(info);
+            notif.showDevCardUse(info);
             return;
 
         case MSG_RES_TYPE.GAME_OVER:

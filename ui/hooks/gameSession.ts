@@ -17,6 +17,7 @@ import {
     handleGameRuntimeMessage,
     isHandledByGameRuntime,
 } from "../src/store/gameRuntime";
+import * as gameLog from "../src/gameLog";
 import { showErrorWindow } from "../src/windows";
 
 export function useGameSession(gameId: string, order: number) {
@@ -76,9 +77,23 @@ export function useGameSession(gameId: string, order: number) {
                     case "session":
                         if (event.payload.type === "error") {
                             dispatch(setGameError(event.payload.message));
+                            gameLog.logNotice(`Notice: ${event.payload.message}`);
                             showErrorWindow("Error", event.payload.message);
                         } else {
                             dispatch(setDisconnectedMessage(event.payload.message));
+                            if (
+                                event.payload.message
+                                    .toLowerCase()
+                                    .includes("inactive")
+                            ) {
+                                gameLog.logNotice(
+                                    `Inactivity: ${event.payload.message}`,
+                                );
+                            } else {
+                                gameLog.logNotice(
+                                    `Disconnected: ${event.payload.message}`,
+                                );
+                            }
                             showErrorWindow("Disconnected", event.payload.message);
                             transport.disconnect(1000, "Client closed connection");
                         }

@@ -2,6 +2,7 @@ import * as PIXI from "pixi.js";
 import * as assets from "./assets";
 import * as canvas from "./canvas";
 import * as chat from "./chat";
+import * as gameLog from "./gameLog";
 import * as buttons from "./buttons";
 import * as board from "./board";
 import * as hand from "./hand";
@@ -188,6 +189,7 @@ function intialize(commandHub: CommandHub) {
     // Render buttons here so we know the player's color
     buttons.render(commandHub);
     chat.initialize();
+    gameLog.initialize();
     trade.initialize();
 
     bankContainer = new PIXI.Container();

@@ -21,6 +21,7 @@ This document explains how Clash components communicate in local development.
 - `ui/src/protocol/`: wire-message adaptation to domain events
 - `ui/src/commands/`: outbound command builders
 - `ui/src/store/`: Redux Toolkit slices + runtime handlers
+- `ui/src/hudLayout.ts`: shared HUD positioning preset and right-rail/bottom-rail layout helpers
 - `ui/src/`: Pixi/runtime rendering modules
 - `ui/utils/mango.ts`: Mongo access from Next.js API routes
 
@@ -103,6 +104,12 @@ Inbound game messages are handled by `ui/src/store/gameRuntime.ts` (with Pixi re
 - App root wires provider in `ui/pages/_app.tsx`.
 - Lobby state: `ui/src/store/lobbySlice.ts` + `ui/src/store/connectionSlice.ts`.
 - Game runtime state: `ui/src/store/gameSlice.ts`.
+
+## 7. HUD layout ownership
+
+- In-game HUD placement is centralized in `ui/src/hudLayout.ts`.
+- Right-side stack (`Game Log`, `Chat`, `Resource Bank`, `Players`) is aligned via shared rail helpers.
+- Bottom controls (`player hand`, `action/options`, `dice`, `timer`) derive positions from the same preset to keep spacing consistent across resolutions.
 
 ## Data Model (MongoDB collections)
 

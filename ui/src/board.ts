@@ -722,17 +722,21 @@ export function renderClickHighlights() {
     const h = Math.max(...Object.values(DispCoordMap).map((c) => c.Y));
     const w = Math.max(...Object.values(DispCoordMap).map((c) => c.X));
     const ss = canvas.getScaled({ X: w, Y: h });
+    const worldPadding = 220;
+    const worldWidth = ss.x + worldPadding * 2;
+    const worldHeight = ss.y + worldPadding * 2;
     container.resize(
-        canvas.app.view.width / 1.25,
-        canvas.app.view.height / 1.25,
-        ss.x + 120,
-        ss.y + 120,
+        canvas.app.view.width,
+        canvas.app.view.height,
+        worldWidth,
+        worldHeight,
     );
     container.clamp({
-        left: -container.worldWidth * 0.5,
-        top: -container.worldHeight * 0.5,
-        right: container.worldWidth * 1.5,
-        bottom: container.worldHeight * 1.5,
+        // Keep panning available on both axes even when zoomed out.
+        left: -container.worldWidth,
+        top: -container.worldHeight,
+        right: container.worldWidth * 2,
+        bottom: container.worldHeight * 2,
         underflow: "none",
     });
     container.moveCenter(ss.x / 2 + 90, ss.y / 2 + 60);

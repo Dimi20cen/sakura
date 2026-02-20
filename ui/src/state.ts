@@ -195,14 +195,6 @@ function intialize(commandHub: CommandHub) {
     trade.initialize();
 
     bankContainer = new PIXI.Container();
-    bankContainer.addChild(windows.getWindowSprite(90, 90));
-    const bankSprite = new PIXI.Sprite();
-    assets.assignTexture(bankSprite, assets.bank);
-    bankSprite.scale.set(0.2);
-    bankSprite.anchor.x = 0.5;
-    bankSprite.anchor.y = 0.5;
-    bankSprite.x = 45;
-    bankSprite.y = 45;
     const bankPos = computeBankPosition({
         canvasWidth: canvas.getWidth(),
         playerPanelY: container.y,
@@ -210,7 +202,7 @@ function intialize(commandHub: CommandHub) {
     bankContainer.x = bankPos.x;
     bankContainer.y = bankPos.y;
     bankContainer.zIndex = 900;
-    bankContainer.addChild(bankSprite);
+    bankContainer.visible = false;
     canvas.app.stage.addChild(bankContainer);
 
     canvas.app.slowTicker.add(() => {
@@ -793,67 +785,17 @@ window.setInterval(() => {
 let timerOverlays: PIXI.Container[] = [];
 
 /**
- * Render the timer overlay for each avatar
+ * Legacy timer overlay for avatars.
+ * Timers are now rendered by the standalone HUD timer widget.
  */
 export function renderTimers() {
-    if (!lastKnownStates || !container || container.destroyed) return;
+    if (!container || container.destroyed) return;
 
+    // Ensure old overlays are removed if they were previously created.
     timerOverlays.forEach((s) => (s && !s.destroyed ? s.destroy() : undefined));
     timerOverlays = [];
-
-    for (const s of lastKnownStates) {
-        const spriteset = players[s.Order];
-        if (!spriteset?.avatar?.initialized) continue;
-
-        if (s.TimeLeft > 0) {
-            s.TimeLeft -= 1;
-        } else {
-            continue;
-        }
-
-        const time = s.TimeLeft;
-        const minutes = Math.floor(time / 60);
-        const seconds = time % 60;
-        const timeString = `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
-
-        const avatarWidth = spriteset.avatar.width || 40;
-        const avatarHeight = spriteset.avatar.height || 40;
-        const overlayFontSize = Math.max(12, Math.round(avatarHeight * 0.38));
-        const text = new PIXI.Text(timeString, {
-            fontSize: overlayFontSize,
-            fontWeight: "bold",
-            fill: 0xffffff,
-        });
-        text.anchor.set(0.5);
-        text.zIndex = 100;
-
-        const padX = Math.max(4, Math.round(avatarWidth * 0.12));
-        const padY = Math.max(2, Math.round(avatarHeight * 0.07));
-        const overlayWidth = Math.max(
-            avatarWidth * 0.7,
-            text.width + padX * 2,
-        );
-        const overlayHeight = text.height + padY * 2;
-
-        const g = new PIXI.Container();
-        const bg = new PIXI.Graphics()
-            .beginFill(0x000000, 0.6)
-            .drawRoundedRect(0, 0, overlayWidth, overlayHeight, 8)
-            .endFill();
-        text.x = overlayWidth / 2;
-        text.y = overlayHeight / 2;
-        g.x = spriteset.avatar.x + avatarWidth / 2 - overlayWidth / 2;
-        g.y = spriteset.avatar.y + avatarHeight - overlayHeight - 2;
-        g.addChild(bg);
-        g.addChild(text);
-        container.addChild(g);
-        timerOverlays.push(g);
-    }
-
-    rerender();
     canvas.app.markDirty();
 }
-window.setInterval(renderTimers, 1000);
 
 /**
  * Store the victory points of the current player.

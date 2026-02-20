@@ -16,6 +16,12 @@ export let container: PIXI.Container;
 
 /** Secondary button container */
 let container1: PIXI.Container;
+let turnTimerContainer: PIXI.Container | null = null;
+let turnTimerText: PIXI.Text | null = null;
+let timerTickerStarted = false;
+let timerOrder = -1;
+let timerSeconds = 0;
+let timerLastTickAt = 0;
 
 /** Static button sprites */
 export let buttons: {
@@ -53,6 +59,81 @@ const COUNT_WIDTH = 20;
 const COUNT_HEIGHT = 19;
 const COUNT_FONTSIZE = 13;
 const C_HEIGHT = 90;
+const ACTION_BAR_WIDTH = BUTTON_Y * 2 + BUTTON_X_DELTA * 4 + BUTTON_WIDTH;
+
+function formatSeconds(seconds: number) {
+    const s = Math.max(0, Math.floor(seconds || 0));
+    const m = Math.floor(s / 60);
+    const r = s % 60;
+    return `${m}:${r.toString().padStart(2, "0")}`;
+}
+
+function ensureTurnTimerWidget() {
+    if (turnTimerContainer && !turnTimerContainer.destroyed) {
+        return;
+    }
+
+    turnTimerContainer = new PIXI.Container();
+    turnTimerContainer.zIndex = 1300;
+    turnTimerContainer.addChild(windows.getWindowSprite(70, 36));
+
+    turnTimerText = new PIXI.Text("--:--", {
+        fontFamily: "sans-serif",
+        fontSize: 16,
+        fill: 0x1f2937,
+        fontWeight: "bold",
+    });
+    turnTimerText.anchor.set(0.5);
+    turnTimerText.x = 35;
+    turnTimerText.y = 18;
+    turnTimerContainer.addChild(turnTimerText);
+
+    canvas.app.stage.addChild(turnTimerContainer);
+}
+
+function updateTurnTimerWidget() {
+    if (!turnTimerContainer || turnTimerContainer.destroyed || !turnTimerText) {
+        return;
+    }
+
+    const currentOrder = state.lastKnownGameState?.CurrentPlayerOrder;
+    const current = state.lastKnownStates?.find((p) => p.Order === currentOrder);
+    if (!current) {
+        timerOrder = -1;
+        timerSeconds = 0;
+        timerLastTickAt = 0;
+        turnTimerText.text = "--:--";
+        canvas.app.markDirty();
+        return;
+    }
+
+    const serverSeconds = Math.max(0, Number(current.TimeLeft || 0));
+    const now = Date.now();
+
+    // Reset countdown when turn changes.
+    if (timerOrder !== current.Order) {
+        timerOrder = current.Order;
+        timerSeconds = serverSeconds;
+        timerLastTickAt = now;
+    } else {
+        // Keep synced to server when drift is significant.
+        if (Math.abs(serverSeconds - timerSeconds) > 2) {
+            timerSeconds = serverSeconds;
+            timerLastTickAt = now;
+        } else if (timerLastTickAt > 0) {
+            const elapsed = Math.floor((now - timerLastTickAt) / 1000);
+            if (elapsed > 0) {
+                timerSeconds = Math.max(0, timerSeconds - elapsed);
+                timerLastTickAt += elapsed * 1000;
+            }
+        } else {
+            timerLastTickAt = now;
+        }
+    }
+
+    turnTimerText.text = formatSeconds(timerSeconds);
+    canvas.app.markDirty();
+}
 
 export function relayout() {
     if (!container || container.destroyed) {
@@ -95,6 +176,12 @@ export function relayout() {
         buttons.specialBuild.x = pos.x;
         buttons.specialBuild.y = pos.y;
     }
+
+    if (turnTimerContainer && !turnTimerContainer.destroyed) {
+        turnTimerContainer.x = container.x + ACTION_BAR_WIDTH - 70;
+        turnTimerContainer.y = container.y + (C_HEIGHT - 36) / 2;
+    }
+    updateTurnTimerWidget();
 
     canvas.app.markDirty();
 }
@@ -328,7 +415,7 @@ export function render(commandHub: CommandHub) {
 
     container.addChild(
         windows.getWindowSprite(
-            BUTTON_Y * 2 + BUTTON_X_DELTA * 4 + BUTTON_WIDTH,
+            ACTION_BAR_WIDTH,
             C_HEIGHT,
         ),
     );
@@ -338,6 +425,11 @@ export function render(commandHub: CommandHub) {
     });
     container.x = actionBarPos.x;
     container.y = actionBarPos.y;
+    ensureTurnTimerWidget();
+    if (!timerTickerStarted) {
+        timerTickerStarted = true;
+        window.setInterval(updateTurnTimerWidget, 1000);
+    }
 
     // Build settlement
     {
@@ -910,5 +1002,6 @@ export function updateButtonsSecretState(state: PlayerSecretState) {
         Boolean(state.AllowedActions?.SpecialBuild),
     );
 
+    updateTurnTimerWidget();
     rerender();
 }

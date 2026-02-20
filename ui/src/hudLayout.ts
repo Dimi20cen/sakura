@@ -11,28 +11,33 @@ type Rect = {
  * Future position tweaks should happen here first.
  */
 export const HUD_LAYOUT_PRESET = {
-    padding: 20,
-    gap: 12,
+    padding: 12,
+    gap: 8,
 
     // Right rail where player list/bank/chat anchor.
     rightRailWidth: 292,
     rightRailBottomInset: 6,
+    rightRailTopInset: 4,
+    gameLogHeight: 300,
+    chatLaneHeight: 34,
+    chatLaneWidth: 270,
+    bankLaneHeight: 66,
 
     // Bottom rail where hand/action controls sit.
     bottomRailLeftInset: 10,
     bottomRailBottomInset: 8,
+    bottomRailGap: 8,
     handHeight: 90,
 
     // Action bar placement relative to canvas and right rail.
-    actionBarRightRailGap: 16,
     actionBarInnerOffset: 12,
     actionBarButtonSpacing: 74,
     actionBarHeight: 90,
-    actionBarOverlapWithHand: -6,
+    actionBarAboveHandGap: 8,
 
     // Dice placement around right rail/action bar.
-    diceRightRailGap: 4,
-    diceAboveActionBarGap: 14,
+    diceRightRailGap: 10,
+    diceAboveActionBarGap: 10,
     diceAbovePlayerRailGap: 12,
     minTopInset: 20,
 
@@ -41,12 +46,18 @@ export const HUD_LAYOUT_PRESET = {
     bankTopMin: 10,
 } as const;
 
+export const RIGHT_STACK_PANEL_WIDTH = HUD_LAYOUT_PRESET.chatLaneWidth;
+
 function getRightRailX(canvasWidth: number) {
     return (
         canvasWidth -
         HUD_LAYOUT_PRESET.padding -
         HUD_LAYOUT_PRESET.rightRailWidth
     );
+}
+
+function getRightRailContentX(canvasWidth: number, contentWidth: number) {
+    return canvasWidth - HUD_LAYOUT_PRESET.padding - contentWidth;
 }
 
 type PlayerPanelPositionInput = {
@@ -65,14 +76,16 @@ export function computePlayerPanelPosition({
     panelScale,
 }: PlayerPanelPositionInput) {
     const rightRailX = getRightRailX(canvasWidth);
+    const y =
+        canvasHeight -
+        panelHeight * panelScale -
+        HUD_LAYOUT_PRESET.rightRailBottomInset;
     return {
-        x: Math.max(HUD_LAYOUT_PRESET.padding, rightRailX + HUD_LAYOUT_PRESET.rightRailWidth - panelWidth * panelScale),
-        y: Math.max(
-            4,
-            canvasHeight -
-                panelHeight * panelScale -
-                HUD_LAYOUT_PRESET.rightRailBottomInset,
+        x: Math.max(
+            HUD_LAYOUT_PRESET.padding,
+            getRightRailContentX(canvasWidth, panelWidth * panelScale),
         ),
+        y: Math.max(HUD_LAYOUT_PRESET.rightRailTopInset, y),
     };
 }
 
@@ -100,23 +113,18 @@ export function computeActionBarPosition({
     canvasWidth,
     canvasHeight,
 }: ActionBarPositionInput) {
-    const actionBarWidth =
-        HUD_LAYOUT_PRESET.actionBarInnerOffset +
-        HUD_LAYOUT_PRESET.actionBarButtonSpacing * 5;
-    const rightRailX = getRightRailX(canvasWidth);
-
-    const handTop =
-        canvasHeight -
-        HUD_LAYOUT_PRESET.handHeight -
-        HUD_LAYOUT_PRESET.bottomRailBottomInset;
+    const handWidth = computeHandWidth(canvasWidth);
+    const x =
+        HUD_LAYOUT_PRESET.bottomRailLeftInset +
+        handWidth +
+        HUD_LAYOUT_PRESET.bottomRailGap;
 
     return {
-        x: rightRailX - HUD_LAYOUT_PRESET.actionBarRightRailGap - actionBarWidth,
-        // Keep action bar tied to the hand lane for stable spacing.
+        x: Math.max(HUD_LAYOUT_PRESET.padding, x),
         y:
-            handTop -
-            HUD_LAYOUT_PRESET.actionBarHeight +
-            HUD_LAYOUT_PRESET.actionBarOverlapWithHand,
+            canvasHeight -
+            HUD_LAYOUT_PRESET.bottomRailBottomInset -
+            HUD_LAYOUT_PRESET.actionBarHeight,
     };
 }
 
@@ -124,6 +132,19 @@ type HandPositionInput = {
     canvasHeight: number;
     handHeight: number;
 };
+
+export function computeHandWidth(canvasWidth: number) {
+    const rightRailX = getRightRailX(canvasWidth);
+    const actionBarWidth =
+        HUD_LAYOUT_PRESET.actionBarInnerOffset +
+        HUD_LAYOUT_PRESET.actionBarButtonSpacing * 5;
+    const width =
+        rightRailX -
+        HUD_LAYOUT_PRESET.bottomRailLeftInset -
+        HUD_LAYOUT_PRESET.bottomRailGap -
+        actionBarWidth;
+    return Math.max(260, Math.min(900, Math.floor(width)));
+}
 
 export function computeHandPosition({
     canvasHeight,
@@ -181,7 +202,7 @@ export function computeDicePosition({
     diceWidth,
     diceHeight,
     actionBarTop,
-    playerPanel,
+    playerPanel: _playerPanel,
 }: DicePositionInput) {
     const rightRailX = getRightRailX(canvasWidth);
 
@@ -190,12 +211,6 @@ export function computeDicePosition({
         actionBarTop -
         HUD_LAYOUT_PRESET.diceAboveActionBarGap -
         diceHeight;
-
-    if (playerPanel) {
-        const aboveRailY =
-            playerPanel.y - HUD_LAYOUT_PRESET.diceAbovePlayerRailGap - diceHeight;
-        y = Math.min(y, aboveRailY);
-    }
 
     x = Math.max(HUD_LAYOUT_PRESET.padding, x);
     y = Math.max(
@@ -230,13 +245,32 @@ type ChatWindowPositionInput = {
     canvasHeight: number;
 };
 
+type ChatLanePositionInput = {
+    canvasWidth: number;
+};
+
+export function computeChatLanePosition({ canvasWidth }: ChatLanePositionInput) {
+    return {
+        x: getRightRailContentX(canvasWidth, HUD_LAYOUT_PRESET.chatLaneWidth),
+        y:
+            HUD_LAYOUT_PRESET.rightRailTopInset +
+            HUD_LAYOUT_PRESET.gameLogHeight +
+            HUD_LAYOUT_PRESET.gap,
+    };
+}
+
 export function computeChatWindowPosition({
     canvasWidth,
-    canvasHeight,
+    canvasHeight: _canvasHeight,
 }: ChatWindowPositionInput) {
+    const chatBottom =
+        HUD_LAYOUT_PRESET.rightRailTopInset +
+        HUD_LAYOUT_PRESET.gameLogHeight +
+        HUD_LAYOUT_PRESET.gap +
+        HUD_LAYOUT_PRESET.chatLaneHeight;
     return {
         x: canvasWidth - HUD_LAYOUT_PRESET.padding,
-        y: canvasHeight - 250,
+        y: Math.max(250, chatBottom + 2),
     };
 }
 
@@ -247,11 +281,12 @@ type ChatButtonPositionInput = {
 
 export function computeChatButtonPosition({
     canvasWidth,
-    canvasHeight,
+    canvasHeight: _canvasHeight,
 }: ChatButtonPositionInput) {
+    const lane = computeChatLanePosition({ canvasWidth });
     return {
-        x: canvasWidth - HUD_LAYOUT_PRESET.padding,
-        y: canvasHeight - 285,
+        x: lane.x + HUD_LAYOUT_PRESET.chatLaneWidth / 2,
+        y: lane.y + HUD_LAYOUT_PRESET.chatLaneHeight / 2,
     };
 }
 
@@ -276,8 +311,8 @@ type GameLogPositionInput = {
 
 export function computeGameLogPosition({ canvasWidth }: GameLogPositionInput) {
     return {
-        x: canvasWidth - HUD_LAYOUT_PRESET.padding - 320,
-        y: 12,
+        x: getRightRailContentX(canvasWidth, HUD_LAYOUT_PRESET.chatLaneWidth),
+        y: HUD_LAYOUT_PRESET.rightRailTopInset,
     };
 }
 
@@ -288,8 +323,14 @@ type ResourceBankPositionInput = {
 export function computeResourceBankPosition({
     canvasWidth,
 }: ResourceBankPositionInput) {
+    const y =
+        HUD_LAYOUT_PRESET.rightRailTopInset +
+        HUD_LAYOUT_PRESET.gameLogHeight +
+        HUD_LAYOUT_PRESET.gap +
+        HUD_LAYOUT_PRESET.chatLaneHeight +
+        HUD_LAYOUT_PRESET.gap;
     return {
-        x: canvasWidth - HUD_LAYOUT_PRESET.padding - 286,
-        y: 2,
+        x: getRightRailContentX(canvasWidth, HUD_LAYOUT_PRESET.chatLaneWidth),
+        y,
     };
 }

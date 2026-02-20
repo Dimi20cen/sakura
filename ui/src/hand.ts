@@ -7,7 +7,11 @@ import * as windows from "./windows";
 import * as anim from "./animation";
 import * as state from "./state";
 import * as board from "./board";
-import { computeDevConfirmationPosition, computeHandPosition } from "./hudLayout";
+import {
+    computeDevConfirmationPosition,
+    computeHandPosition,
+    computeHandWidth,
+} from "./hudLayout";
 import * as tsg from "../tsg";
 import { getCommandHub, getThisPlayerOrder, isSpectator } from "./ws";
 import { CardType, DevelopmentCardType } from "./entities";
@@ -24,10 +28,38 @@ let devConfirmationYesNoWindow: windows.YesNoWindow;
 let usingDevCardType: number;
 
 const HAND_WINDOW_HEIGHT = 90;
+let handWindowWidth = 750;
 
 export function relayout() {
     if (!canvas.app) {
         return;
+    }
+
+    const expectedHandWidth = computeHandWidth(canvas.getWidth());
+    if (
+        handWindow &&
+        !handWindow.container.destroyed &&
+        handWindowWidth !== expectedHandWidth
+    ) {
+        const prevDevCards = [...handWindow.developmentCards];
+        const prevDevUsable = [...handWindow.developmentCardsUsable];
+        const prevInteractive = handWindow.interactive;
+        const isVisible = handWindow.container.visible;
+        handWindow.container.destroy({ children: true });
+        handWindow = new HandWindow(
+            canvas.app.stage,
+            expectedHandWidth,
+            HAND_WINDOW_HEIGHT,
+        );
+        handWindowWidth = expectedHandWidth;
+        handWindow.clickCallback = cardClick;
+        handWindow.container.visible = isVisible;
+        handWindow.setDevelopmentCards(prevDevCards);
+        for (let i = 0; i < prevDevUsable.length; i++) {
+            handWindow.setDevelopmentCardUsable(i, prevDevUsable[i]);
+        }
+        handWindow.interactive = prevInteractive;
+        handWindow.setCards(JSON.parse(JSON.stringify(currentCards)));
     }
 
     if (handWindow && !handWindow.container.destroyed) {
@@ -528,15 +560,21 @@ export class HandWindow {
  */
 export function renderPlayerHand(secret: tsg.PlayerSecretState) {
     // Bigger window than others for dev cards
-    const WINDOW_WIDTH = 750;
+    const WINDOW_WIDTH = computeHandWidth(canvas.getWidth());
     const WINDOW_HEIGHT = HAND_WINDOW_HEIGHT;
 
-    if (!handWindow || handWindow.container.destroyed) {
+    if (
+        !handWindow ||
+        handWindow.container.destroyed ||
+        handWindowWidth !== WINDOW_WIDTH
+    ) {
+        handWindow?.container.destroy({ children: true });
         handWindow = new HandWindow(
             canvas.app.stage,
             WINDOW_WIDTH,
             WINDOW_HEIGHT,
         );
+        handWindowWidth = WINDOW_WIDTH;
         const handPos = computeHandPosition({
             canvasHeight: canvas.getHeight(),
             handHeight: WINDOW_HEIGHT,

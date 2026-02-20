@@ -4,9 +4,10 @@ import * as windows from "./windows";
 import * as ws from "./ws";
 import * as buttons from "./buttons";
 import {
-    computeChatButtonPosition,
+    computeChatLanePosition,
     computeChatPopupPosition,
     computeChatWindowPosition,
+    RIGHT_STACK_PANEL_WIDTH,
 } from "./hudLayout";
 import { sound } from "@pixi/sound";
 
@@ -15,9 +16,12 @@ type Message = { text: string; color: string };
 let windowSprite: PIXI.Sprite;
 let inputBox: HTMLInputElement;
 let scrollOffset = 0;
-let chatButton: buttons.ButtonSprite;
+let chatLane: PIXI.Container;
+let unreadDot: PIXI.Graphics;
 const CHAT_WIDTH = 250;
 const CHAT_HEIGHT = 160;
+const CHAT_LANE_WIDTH = RIGHT_STACK_PANEL_WIDTH;
+const CHAT_LANE_HEIGHT = 34;
 const messages: Message[] = [];
 // [
 //     {
@@ -136,29 +140,44 @@ export function initialize() {
 
     // Chat button
     {
-        chatButton = buttons.getButtonSprite(
-            buttons.ButtonType.Chat,
-            40,
-            40,
-            "grey",
-            undefined,
-            "circle",
-        );
-        const g = new PIXI.Graphics();
-        g.drawCircle(20, 20, 50);
+        chatLane = new PIXI.Container();
+        chatLane.interactive = true;
+        chatLane.cursor = "pointer";
+        chatLane.zIndex = 1000;
+        chatLane.hitArea = new PIXI.Rectangle(0, 0, CHAT_LANE_WIDTH, CHAT_LANE_HEIGHT);
 
-        chatButton.setEnabled(true);
-        chatButton.pivot.x = 40;
-        chatButton.pivot.y = 20;
-        const chatButtonPos = computeChatButtonPosition({
-            canvasWidth: canvas.getWidth(),
-            canvasHeight: canvas.getHeight(),
+        const bg = windows.getWindowSprite(CHAT_LANE_WIDTH, CHAT_LANE_HEIGHT);
+        chatLane.addChild(bg);
+
+        const label = new PIXI.Text("Chat", {
+            fontFamily: "sans-serif",
+            fontSize: 26,
+            fill: 0x1f2937,
+            fontWeight: "bold",
         });
-        chatButton.x = chatButtonPos.x;
-        chatButton.y = chatButtonPos.y;
-        chatButton.zIndex = 1000;
-        chatButton.onClick(() => setVisible(true));
-        canvas.app.stage.addChild(chatButton);
+        label.anchor.set(0.5);
+        label.scale.set(0.5);
+        label.x = CHAT_LANE_WIDTH / 2;
+        label.y = CHAT_LANE_HEIGHT / 2;
+        chatLane.addChild(label);
+
+        unreadDot = new PIXI.Graphics();
+        unreadDot.beginFill(0xdc2626);
+        unreadDot.drawCircle(0, 0, 5);
+        unreadDot.endFill();
+        unreadDot.x = CHAT_LANE_WIDTH - 14;
+        unreadDot.y = CHAT_LANE_HEIGHT / 2;
+        unreadDot.visible = false;
+        chatLane.addChild(unreadDot);
+
+        const lanePos = computeChatLanePosition({
+            canvasWidth: canvas.getWidth(),
+        });
+        chatLane.x = lanePos.x;
+        chatLane.y = lanePos.y;
+
+        chatLane.on("pointerdown", () => setVisible(true));
+        canvas.app.stage.addChild(chatLane);
     }
 }
 
@@ -171,13 +190,12 @@ export function relayout() {
         windowSprite.x = chatWindowPos.x;
         windowSprite.y = chatWindowPos.y;
     }
-    if (chatButton && !chatButton.destroyed) {
-        const chatButtonPos = computeChatButtonPosition({
+    if (chatLane && !chatLane.destroyed) {
+        const lanePos = computeChatLanePosition({
             canvasWidth: canvas.getWidth(),
-            canvasHeight: canvas.getHeight(),
         });
-        chatButton.x = chatButtonPos.x;
-        chatButton.y = chatButtonPos.y;
+        chatLane.x = lanePos.x;
+        chatLane.y = lanePos.y;
     }
     canvas.app.markDirty();
 }
@@ -256,6 +274,9 @@ function renderMessages() {
  */
 function setVisible(visible: boolean) {
     windowSprite.visible = visible;
+    if (visible && unreadDot && !unreadDot.destroyed) {
+        unreadDot.visible = false;
+    }
     inputBox.style.display = visible ? "block" : "none";
     renderMessages();
     canvas.app.markDirty();
@@ -267,7 +288,9 @@ function setVisible(visible: boolean) {
  */
 export function chatMessage(msg: Message) {
     messages.push(msg);
-    chatButton.setBgColor?.(msg.color);
+    if (!windowSprite?.visible && unreadDot && !unreadDot.destroyed) {
+        unreadDot.visible = true;
+    }
     sound.play("soundChat");
 
     const style = new PIXI.TextStyle({
@@ -301,9 +324,10 @@ export function chatMessage(msg: Message) {
 
         popup.pivot.x = WIDTH;
         popup.pivot.y = HEIGHT / 2;
+        const laneY = chatLane?.y || 0;
         const popupPos = computeChatPopupPosition({
             canvasWidth: canvas.getWidth(),
-            chatButtonY: chatButton.y,
+            chatButtonY: laneY + CHAT_LANE_HEIGHT / 2,
         });
         popup.x = popupPos.x;
         popup.y = popupPos.y;

@@ -4,9 +4,9 @@ import * as canvas from "./canvas";
 import * as windows from "./windows";
 import * as tsg from "../tsg";
 import { CardType } from "./entities";
-import { computeResourceBankPosition } from "./hudLayout";
+import { computeResourceBankPosition, RIGHT_STACK_PANEL_WIDTH } from "./hudLayout";
 
-const WIDTH = 286;
+const WIDTH = RIGHT_STACK_PANEL_WIDTH;
 const HEIGHT = 66;
 const CARD_WIDTH = 34;
 const CARD_HEIGHT = 48;
@@ -68,15 +68,7 @@ function ensureUI() {
 
     container.addChild(windows.getWindowSprite(WIDTH, HEIGHT));
 
-    const bankIcon = new PIXI.Sprite();
-    assets.assignTexture(bankIcon, assets.bank);
-    bankIcon.x = 10;
-    bankIcon.y = 12;
-    bankIcon.width = 28;
-    bankIcon.height = 28;
-    container.addChild(bankIcon);
-
-    let x = 44;
+    let x = 26;
     for (const ct of RESOURCE_ORDER) {
         const chip = new PIXI.Container();
 

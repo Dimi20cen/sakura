@@ -5,7 +5,7 @@ import * as state from "./state";
 import * as windows from "./windows";
 import * as tsg from "../tsg";
 import { CardType } from "./entities";
-import { computeGameLogPosition } from "./hudLayout";
+import { computeGameLogPosition, RIGHT_STACK_PANEL_WIDTH } from "./hudLayout";
 
 type LogEntry = {
     id: number;
@@ -13,10 +13,10 @@ type LogEntry = {
     icons?: number[];
 };
 
-const WIDTH = 320;
-const HEIGHT = 180;
+const WIDTH = RIGHT_STACK_PANEL_WIDTH;
+const HEIGHT = 300;
 const MAX_ENTRIES = 80;
-const VISIBLE_ROWS = 7;
+const VISIBLE_ROWS = 13;
 
 let container: PIXI.Container | null = null;
 let content: PIXI.Container | null = null;

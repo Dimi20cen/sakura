@@ -131,6 +131,20 @@ func TestSeafarersSmokeBuildShipAndMoveShip(t *testing.T) {
 		}
 	}
 	if firstShipEdge == nil {
+		for _, tile := range g.Tiles {
+			if tile.Type != entities.TileTypeSea {
+				g.Robber.Move(tile)
+				break
+			}
+		}
+		for _, e := range shipLocs {
+			if !g.IsSeaRobberBlockingEdge(e) {
+				firstShipEdge = e
+				break
+			}
+		}
+	}
+	if firstShipEdge == nil {
 		t.Fatal("no non-blocked ship edge found")
 	}
 	if err := g.BuildShip(p, firstShipEdge.C); err != nil {
@@ -352,6 +366,12 @@ func TestSeafarersCoastalRoadAllowed(t *testing.T) {
 	if coastalRoad == nil {
 		t.Fatal("no coastal road edge found")
 	}
+	for _, tile := range g.Tiles {
+		if tile.Type != entities.TileTypeSea {
+			g.Robber.Move(tile)
+			break
+		}
+	}
 	if err := g.BuildRoad(p, coastalRoad.C); err != nil {
 		t.Fatalf("expected road build on coastal edge to succeed: %v", err)
 	}
@@ -400,5 +420,215 @@ func TestRevealFogAdjacentToEdgeAwardsResource(t *testing.T) {
 	}
 	if got := player.CurrentHand.GetCardDeck(entities.CardTypeWood).Quantity; got != 1 {
 		t.Fatalf("expected player to receive 1 wood for discovered fog tile, got %d", got)
+	}
+}
+
+func TestSeafarersFogIslandsStyleDiscoveryByShip(t *testing.T) {
+	defn := &entities.MapDefinition{
+		Name:        "Seafarers - Fog Islands (Test)",
+		Order:       []bool{false, false, false},
+		Ports:       []entities.PortType{},
+		Numbers:     []uint16{5},
+		RandomTiles: []entities.TileType{entities.TileTypeWood},
+		Map: [][]int{
+			{int(entities.TileTypeNone), int(entities.TileTypeSea), int(entities.TileTypeNone)},
+			{int(entities.TileTypeSea), int(entities.TileTypeFog), int(entities.TileTypeSea)},
+			{int(entities.TileTypeNone), int(entities.TileTypeSea), int(entities.TileTypeNone)},
+		},
+	}
+
+	g := &Game{
+		Store: &noopStore{},
+		Settings: entities.GameSettings{
+			Mode:          entities.Seafarers,
+			MapName:       defn.Name,
+			MapDefn:       defn,
+			VictoryPoints: 12,
+			Speed:         entities.NormalSpeed,
+		},
+	}
+	if _, err := g.Initialize("fog-islands-style-discovery", 2); err != nil {
+		t.Fatalf("initialize failed: %v", err)
+	}
+
+	var fogTile *entities.Tile
+	for _, tile := range g.Tiles {
+		if tile.Fog {
+			fogTile = tile
+			break
+		}
+	}
+	if fogTile == nil {
+		t.Fatal("expected at least one fog tile")
+	}
+
+	var targetEdge *entities.Edge
+	var anchor *entities.Vertex
+	for _, ec := range fogTile.GetEdgeCoordinates() {
+		e, err := g.Graph.GetEdge(ec)
+		if err != nil || e == nil || !e.IsWaterEdge() {
+			continue
+		}
+		v1, _ := g.Graph.GetVertex(e.C.C1)
+		v2, _ := g.Graph.GetVertex(e.C.C2)
+		if v1 != nil && v1.HasAdjacentSea() {
+			targetEdge = e
+			anchor = v1
+			break
+		}
+		if v2 != nil && v2.HasAdjacentSea() {
+			targetEdge = e
+			anchor = v2
+			break
+		}
+	}
+	if targetEdge == nil || anchor == nil {
+		t.Fatal("could not find edge/vertex for fog discovery by ship")
+	}
+
+	p := g.CurrentPlayer
+	if err := p.BuildAtVertex(anchor, entities.BTSettlement); err != nil {
+		t.Fatalf("failed to place anchor settlement: %v", err)
+	}
+
+	g.InitPhase = false
+	g.DiceState = 1
+	p.CurrentHand.UpdateResources(10, 10, 10, 10, 10)
+
+	if err := g.BuildShip(p, targetEdge.C); err != nil {
+		t.Fatalf("failed to build ship on fog-adjacent edge: %v", err)
+	}
+	if fogTile.Fog {
+		t.Fatal("expected fog tile to be revealed after building adjacent ship")
+	}
+	if p.CurrentHand.GetCardDeck(entities.CardTypeWood).Quantity == 0 {
+		t.Fatal("expected discovery reward when revealing fog land tile")
+	}
+}
+
+func TestSeafarersScriptedMultiplayerSmoke(t *testing.T) {
+	defn := maps.GetMapByName(maps.SeafarersHeadingForNewShores)
+	if defn == nil {
+		t.Fatal("seafarers map definition missing")
+	}
+
+	g := &Game{
+		Store: &noopStore{},
+		Settings: entities.GameSettings{
+			Mode:          entities.Seafarers,
+			MapName:       maps.SeafarersHeadingForNewShores,
+			MapDefn:       defn,
+			VictoryPoints: 12,
+			Speed:         entities.NormalSpeed,
+		},
+	}
+	if _, err := g.Initialize("scripted-multiplayer-smoke", 2); err != nil {
+		t.Fatalf("initialize failed: %v", err)
+	}
+
+	p0 := g.Players[0]
+	p1 := g.Players[1]
+
+	var coastal *entities.Vertex
+	for _, v := range p0.GetBuildLocationsSettlement(g.Graph, true, false) {
+		if v.HasAdjacentSea() {
+			coastal = v
+			break
+		}
+	}
+	if coastal == nil {
+		t.Fatal("no coastal settlement location found for p0")
+	}
+	if err := g.BuildSettlement(p0, coastal.C); err != nil {
+		t.Fatalf("failed to build p0 initial settlement: %v", err)
+	}
+
+	g.InitPhase = false
+	g.CurrentPlayer = p0
+	g.DiceState = 1
+	p0.CurrentHand.UpdateResources(10, 10, 10, 10, 10)
+
+	shipLocs := p0.GetBuildLocationsShip(g.Graph)
+	if len(shipLocs) == 0 {
+		t.Fatal("no ship build locations found for p0")
+	}
+	var firstShip *entities.Edge
+	for _, e := range shipLocs {
+		if !g.IsSeaRobberBlockingEdge(e) {
+			firstShip = e
+			break
+		}
+	}
+	if firstShip == nil {
+		for _, tile := range g.Tiles {
+			if tile.Type != entities.TileTypeSea {
+				g.Robber.Move(tile)
+				break
+			}
+		}
+		for _, e := range shipLocs {
+			if !g.IsSeaRobberBlockingEdge(e) {
+				firstShip = e
+				break
+			}
+		}
+	}
+	if firstShip == nil {
+		t.Fatal("no non-blocked ship edge found for p0")
+	}
+	if err := g.BuildShip(p0, firstShip.C); err != nil {
+		t.Fatalf("failed to build first ship: %v", err)
+	}
+
+	if err := g.EndTurn(p0); err != nil {
+		t.Fatalf("failed to end p0 turn: %v", err)
+	}
+	g.DiceState = 1
+	if err := g.EndTurn(p1); err != nil {
+		t.Fatalf("failed to end p1 turn: %v", err)
+	}
+
+	if g.CurrentPlayer != p0 {
+		t.Fatal("expected turn to return to p0")
+	}
+	if err := g.RollDice(p0, 1, 1); err != nil {
+		t.Fatalf("failed to roll dice for p0: %v", err)
+	}
+	if g.DiceState == 0 {
+		t.Fatal("expected dice state to be rolled after roll")
+	}
+
+	// Pirate-steal leg of the smoke flow: place p1 ship on a sea hex and steal.
+	var seaTile *entities.Tile
+	var p1Ship *entities.Edge
+	for _, tile := range g.Tiles {
+		if tile.Type != entities.TileTypeSea {
+			continue
+		}
+		for _, ec := range tile.GetEdgeCoordinates() {
+			e, err := g.Graph.GetEdge(ec)
+			if err == nil && e != nil && e.Placement == nil {
+				seaTile = tile
+				p1Ship = e
+				break
+			}
+		}
+		if seaTile != nil {
+			break
+		}
+	}
+	if seaTile == nil || p1Ship == nil {
+		t.Fatal("no sea tile/edge for pirate smoke leg")
+	}
+	if err := p1.BuildAtEdge(p1Ship, entities.BTShip); err != nil {
+		t.Fatalf("failed to place p1 ship for pirate smoke leg: %v", err)
+	}
+	p1.CurrentHand.UpdateCards(entities.CardTypeBrick, 1)
+	g.Robber.Move(seaTile)
+	if err := g.StealCardWithRobber(); err != nil {
+		t.Fatalf("pirate steal failed in scripted smoke: %v", err)
+	}
+	if p0.CurrentHand.GetCardDeck(entities.CardTypeBrick).Quantity == 0 {
+		t.Fatal("expected p0 to steal one card in pirate smoke leg")
 	}
 }

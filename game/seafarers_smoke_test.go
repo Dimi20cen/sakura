@@ -77,6 +77,16 @@ func (s *noopStore) CheckIfJournalExists(id string) (bool, error) {
 }
 func (s *noopStore) TerminateGame(id string) error { return nil }
 
+func stopTickerForTest(g *Game) {
+	if g == nil || g.TickerStop == nil {
+		return
+	}
+	select {
+	case g.TickerStop <- true:
+	default:
+	}
+}
+
 func TestSeafarersSmokeBuildShipAndMoveShip(t *testing.T) {
 	defn := maps.GetMapByName(maps.SeafarersHeadingForNewShores)
 	if defn == nil {
@@ -96,14 +106,24 @@ func TestSeafarersSmokeBuildShipAndMoveShip(t *testing.T) {
 	if _, err := g.Initialize("smoke-seafarers", 2); err != nil {
 		t.Fatalf("initialize failed: %v", err)
 	}
+	stopTickerForTest(g)
 
 	p := g.CurrentPlayer
 
 	var coastal *entities.Vertex
+	bestShipLocs := 0
 	for _, v := range p.GetBuildLocationsSettlement(g.Graph, true, false) {
-		if v.HasAdjacentSea() {
+		if !v.HasAdjacentSea() {
+			continue
+		}
+		if err := p.BuildAtVertex(v, entities.BTSettlement); err != nil {
+			continue
+		}
+		count := len(p.GetBuildLocationsShip(g.Graph))
+		_ = v.RemovePlacement()
+		if count > bestShipLocs {
+			bestShipLocs = count
 			coastal = v
-			break
 		}
 	}
 	if coastal == nil {
@@ -118,10 +138,16 @@ func TestSeafarersSmokeBuildShipAndMoveShip(t *testing.T) {
 	g.InitPhase = false
 	g.DiceState = 1
 	p.CurrentHand.UpdateResources(10, 10, 10, 10, 10)
+	for _, tile := range g.Tiles {
+		if tile.Type != entities.TileTypeSea {
+			g.Robber.Move(tile)
+			break
+		}
+	}
 
 	shipLocs := p.GetBuildLocationsShip(g.Graph)
-	if len(shipLocs) == 0 {
-		t.Fatal("no ship build locations found")
+	if len(shipLocs) < 2 {
+		t.Fatalf("expected at least 2 ship build locations, got %d", len(shipLocs))
 	}
 	var firstShipEdge *entities.Edge
 	for _, e := range shipLocs {
@@ -176,25 +202,30 @@ func TestSeafarersSmokeBuildShipAndMoveShip(t *testing.T) {
 	if len(movable) == 0 {
 		t.Fatal("expected at least one movable ship")
 	}
-	from := movable[0]
-
-	// Find a valid destination by emulating interactive flow.
-	if err := from.RemovePlacement(); err != nil {
-		t.Fatalf("remove ship for destination search failed: %v", err)
-	}
-	destinations := make([]*entities.Edge, 0)
-	for _, e := range p.GetBuildLocationsShip(g.Graph) {
-		if e != from && !g.IsSeaRobberBlockingEdge(e) {
-			destinations = append(destinations, e)
+	var from *entities.Edge
+	var to *entities.Edge
+	for _, candidate := range movable {
+		if err := candidate.RemovePlacement(); err != nil {
+			t.Fatalf("remove ship for destination search failed: %v", err)
+		}
+		destinations := make([]*entities.Edge, 0)
+		for _, e := range p.GetBuildLocationsShip(g.Graph) {
+			if e != candidate && !g.IsSeaRobberBlockingEdge(e) {
+				destinations = append(destinations, e)
+			}
+		}
+		if err := p.BuildAtEdge(candidate, entities.BTShip); err != nil {
+			t.Fatalf("restore ship placement failed: %v", err)
+		}
+		if len(destinations) > 0 {
+			from = candidate
+			to = destinations[0]
+			break
 		}
 	}
-	if err := p.BuildAtEdge(from, entities.BTShip); err != nil {
-		t.Fatalf("restore ship placement failed: %v", err)
+	if from == nil || to == nil {
+		t.Fatal("expected at least one movable ship with a valid destination")
 	}
-	if len(destinations) == 0 {
-		t.Fatal("expected at least one ship move destination")
-	}
-	to := destinations[0]
 
 	// Cannot move before dice rolled.
 	g.DiceState = 0
@@ -236,6 +267,7 @@ func TestSeafarersPirateStealsFromShip(t *testing.T) {
 	if _, err := g.Initialize("pirate-steal-seafarers", 2); err != nil {
 		t.Fatalf("initialize failed: %v", err)
 	}
+	stopTickerForTest(g)
 
 	p0 := g.Players[0]
 	p1 := g.Players[1]
@@ -300,6 +332,7 @@ func TestSeafarersEndTurnMakesDevCardsUsable(t *testing.T) {
 	if _, err := g.Initialize("dev-usable-seafarers", 2); err != nil {
 		t.Fatalf("initialize failed: %v", err)
 	}
+	stopTickerForTest(g)
 
 	g.InitPhase = false
 	g.DiceState = 1
@@ -336,6 +369,7 @@ func TestSeafarersCoastalRoadAllowed(t *testing.T) {
 	if _, err := g.Initialize("coastal-road-seafarers", 2); err != nil {
 		t.Fatalf("initialize failed: %v", err)
 	}
+	stopTickerForTest(g)
 
 	p := g.CurrentPlayer
 	var coastal *entities.Vertex
@@ -450,6 +484,7 @@ func TestSeafarersFogIslandsStyleDiscoveryByShip(t *testing.T) {
 	if _, err := g.Initialize("fog-islands-style-discovery", 2); err != nil {
 		t.Fatalf("initialize failed: %v", err)
 	}
+	stopTickerForTest(g)
 
 	var fogTile *entities.Tile
 	for _, tile := range g.Tiles {
@@ -531,6 +566,7 @@ func TestSeafarersScriptedMultiplayerSmoke(t *testing.T) {
 	if _, err := g.Initialize("scripted-multiplayer-smoke", 2); err != nil {
 		t.Fatalf("initialize failed: %v", err)
 	}
+	stopTickerForTest(g)
 
 	p0 := g.Players[0]
 	p1 := g.Players[1]

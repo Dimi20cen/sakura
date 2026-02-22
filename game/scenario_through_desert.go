@@ -1,6 +1,9 @@
 package game
 
-import "imperials/entities"
+import (
+	"imperials/entities"
+	"sort"
+)
 
 func (g *Game) configureThroughDesertHooks() {
 	g.ScenarioHooks.FilterInitVertices = func(g *Game, p *entities.Player, allowed []*entities.Vertex) []*entities.Vertex {
@@ -116,7 +119,7 @@ func (g *Game) applyThroughDesertSettlementBonus(p *entities.Player, v *entities
 		g.ScenarioDesertAwarded[p] = make(map[int]bool)
 	}
 
-	regionsToAward := make(map[int]bool)
+	eligibleRegions := make(map[int]bool)
 	for _, t := range v.AdjacentTiles {
 		if t == nil {
 			continue
@@ -125,16 +128,24 @@ func (g *Game) applyThroughDesertSettlementBonus(p *entities.Player, v *entities
 		if !ok || rid == g.ScenarioDesertMainRegion {
 			continue
 		}
-		regionsToAward[rid] = true
+		if !g.ScenarioDesertAwarded[p][rid] {
+			eligibleRegions[rid] = true
+		}
 	}
 
-	for rid := range regionsToAward {
-		if g.ScenarioDesertAwarded[p][rid] {
-			continue
-		}
-		g.ScenarioDesertAwarded[p][rid] = true
-		g.ScenarioBonusVP[p] += 2
+	if len(eligibleRegions) == 0 {
+		return
 	}
+
+	// Award at most one region bonus per settlement build.
+	keys := make([]int, 0, len(eligibleRegions))
+	for rid := range eligibleRegions {
+		keys = append(keys, rid)
+	}
+	sort.Ints(keys)
+	rid := keys[0]
+	g.ScenarioDesertAwarded[p][rid] = true
+	g.ScenarioBonusVP[p] += 2
 }
 
 func (g *Game) throughDesertVertexTouchesRegion(v *entities.Vertex, regionID int) bool {

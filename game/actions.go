@@ -261,6 +261,17 @@ func (g *Game) chooseDiscoveryGoldCardType(player *entities.Player) entities.Car
 		return 0
 	}
 
+	// BlockForAction expects the game mutex to be held by caller context.
+	// In non-interactive paths (e.g. tests/tooling) fall back to random.
+	canPrompt := true
+	if g.mutex.TryLock() {
+		g.mutex.Unlock()
+		canPrompt = false
+	}
+	if player == nil || player.GetIsBot() || !canPrompt {
+		return available[rand.Intn(len(available))]
+	}
+
 	exp, err := g.BlockForAction(player, g.TimerVals.UseDevCard, &entities.PlayerAction{
 		Type:    entities.PlayerActionTypeSelectCards,
 		Message: "Choose a resource for discovered gold",

@@ -159,6 +159,7 @@ func (game *Game) Initialize(id string, numPlayers uint16) (*Game, error) {
 
 	// Start game ticker
 	game.Ticker = time.NewTicker(1000 * time.Millisecond)
+	game.TickerStop = make(chan bool)
 	go game.TickWatcher()
 	game.TimerVals = TimerValues{
 		DiceRoll:     int(10 * entities.SpeedMultiplier[game.Settings.Speed]),
@@ -316,7 +317,6 @@ func (g *Game) HasPlayerPendingAction() bool {
 }
 
 func (g *Game) TickWatcher() {
-	g.TickerStop = make(chan bool)
 	i := 0
 	for {
 		select {

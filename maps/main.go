@@ -23,9 +23,16 @@ func GetMapByName(name string) *entities.MapDefinition {
 	case SeafarersHeadingForNewShores:
 		var defn entities.MapDefinition
 		json.Unmarshal([]byte(seafarersHeadingForNewShores), &defn)
+		defn.Scenario = &entities.ScenarioMetadata{
+			Expansion:       "Seafarers",
+			Key:             "seafarers_heading_for_new_shores",
+			Title:           SeafarersHeadingForNewShores,
+			Placeholder:     false,
+			VictoryRuleText: "Reach scenario victory points during your turn.",
+		}
 		return &defn
 	default:
-		return nil
+		return getSeafarersScenarioMapByName(name)
 	}
 }
 

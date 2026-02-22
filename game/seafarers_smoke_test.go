@@ -160,7 +160,7 @@ func TestSeafarersSmokeBuildShipAndMoveShip(t *testing.T) {
 
 	var someWaterEdge *entities.Edge
 	for _, e := range g.Edges {
-		if e.IsWaterEdge() && e.Placement == nil {
+		if e.IsWaterEdge() && !e.IsLandEdge() && e.Placement == nil {
 			someWaterEdge = e
 			break
 		}

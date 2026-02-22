@@ -64,13 +64,22 @@ type (
 	}
 
 	MapDefinition struct {
-		Name            string           `json:"name"`
-		Numbers         []uint16         `json:"numbers"`
-		Order           []bool           `json:"order"`
-		Ports           []PortType       `json:"ports"`
-		PortCoordinates []EdgeCoordinate `json:"port_coordinates"`
-		Map             [][]int          `json:"map"`
-		RandomTiles     []TileType       `json:"tiles"`
+		Name            string            `json:"name"`
+		Numbers         []uint16          `json:"numbers"`
+		Order           []bool            `json:"order"`
+		Ports           []PortType        `json:"ports"`
+		PortCoordinates []EdgeCoordinate  `json:"port_coordinates"`
+		Map             [][]int           `json:"map"`
+		RandomTiles     []TileType        `json:"tiles"`
+		Scenario        *ScenarioMetadata `json:"scenario,omitempty"`
+	}
+
+	ScenarioMetadata struct {
+		Expansion       string `json:"expansion,omitempty"`
+		Key             string `json:"key,omitempty"`
+		Title           string `json:"title,omitempty"`
+		Placeholder     bool   `json:"placeholder,omitempty"`
+		VictoryRuleText string `json:"victory_rule_text,omitempty"`
 	}
 )
 

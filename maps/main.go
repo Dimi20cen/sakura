@@ -28,6 +28,7 @@ func GetMapByName(name string) *entities.MapDefinition {
 			Key:             "seafarers_heading_for_new_shores",
 			Title:           SeafarersHeadingForNewShores,
 			Placeholder:     false,
+			VictoryPoints:   12,
 			VictoryRuleText: "Reach scenario victory points during your turn.",
 		}
 		return &defn
@@ -40,6 +41,7 @@ func GetOfficialMapNames() []string {
 	return []string{
 		BaseMapName,
 		SeafarersHeadingForNewShores,
+		SeafarersFourIslands,
 	}
 }
 

@@ -26,7 +26,7 @@ This document tracks parity between the implemented Seafarers mode and the offic
 | Scenario | Status | What exists now | Gaps |
 |---|---|---|---|
 | Heading for New Shores (1) | `Partial` | Built-in map exists and core flow works. | Full scenario acceptance sweep still needed. |
-| The Four Islands (2) | `Missing` | Not present as official built-in map. | Add official map + scenario acceptance tests. |
+| The Four Islands (2) | `Partial` | Built-in map and scenario metadata now exist as first-pass implementation. | Run full rulebook-accurate setup/rules acceptance and refine map parity. |
 | The Fog Islands (3) | `Partial` | Engine supports fog + discovery behavior; test-only fog-style map exists. | Add official map/variable setup + scenario win-condition tests. |
 | Through the Desert (4) | `Missing` | No dedicated scenario map/rules. | Add map + scenario-specific validations. |
 | The Forgotten Tribe (5) | `Missing` | No dedicated scenario support. | Implement scenario mechanics and map definitions. |

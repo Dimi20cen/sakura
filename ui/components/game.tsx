@@ -23,11 +23,17 @@ import {
     toggleFullscreen,
 } from "../utils";
 import { Combobox, Transition } from "@headlessui/react";
-import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/24/solid";
+import {
+    CheckIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
+    ChevronUpDownIcon,
+} from "@heroicons/react/24/solid";
 import { useLobbySession } from "../hooks/lobbySession";
 
 const selectClasses =
     "form-select appearance-none block w-full px-3 py-1.5 text-lg font-normal text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none";
+const lobbySidePadding = "clamp(1rem, 3vw, 4rem)";
 
 const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
     const router = useRouter();
@@ -90,8 +96,14 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
         });
     };
 
-    const changeMaxPlayers: ChangeEventHandler<HTMLSelectElement> = (event) => {
-        const maxPlayers = Number(event.target.value);
+    const minPlayers = 2;
+    const maxPlayersLimit = 6;
+    const minDiscardLimit = 5;
+    const maxDiscardLimit = 15;
+    const minVictoryPoints = 5;
+    const maxVictoryPoints = 21;
+
+    const setMaxPlayers = (maxPlayers: number) => {
         sendSettings({
             ...lobbyState.settings,
             MaxPlayers: maxPlayers,
@@ -99,14 +111,14 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
         });
     };
 
-    const changeDiscard: ChangeEventHandler<HTMLSelectElement> = (event) => {
+    const changeDiscard: ChangeEventHandler<HTMLInputElement> = (event) => {
         sendSettings({
             ...lobbyState.settings,
             DiscardLimit: Number(event.target.value),
         });
     };
 
-    const changeVicP: ChangeEventHandler<HTMLSelectElement> = (event) => {
+    const changeVicP: ChangeEventHandler<HTMLInputElement> = (event) => {
         sendSettings({
             ...lobbyState.settings,
             VictoryPoints: Number(event.target.value),
@@ -300,9 +312,15 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
     return (
         <>
             <Header />
-            <div className="flex flex-col h-[90vh] py-5 xl:px-12 lg:px-4 px-2 xl:flex-row mx-auto overflow-auto">
-                <div className="md:flex md:flex-row xl:flex-none xl:basis-2/3">
-                    <div className="basis-full bg-black bg-opacity-50 backdrop-blur rounded-xl text-center p-6 flex flex-col md:basis-1/2 xl:basis-2/3 overflow-auto">
+            <div
+                className="flex flex-col h-[90vh] py-5 xl:flex-row mx-auto overflow-auto"
+                style={{
+                    paddingLeft: lobbySidePadding,
+                    paddingRight: lobbySidePadding,
+                }}
+            >
+                <div className="basis-full xl:basis-3/4 min-h-0">
+                    <div className="basis-full bg-black bg-opacity-50 backdrop-blur rounded-xl text-center p-6 flex flex-col overflow-auto h-full">
                         <div className="basis-full">
                             <div className="basis-auto m-1 text-white text-3xl p-3 pb-6">
                                 Game Settings
@@ -310,16 +328,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
 
                             <div className="flex flex-col lg:flex-row mb-4 md:mb-0">
                                 {getCheckBox("Private Game", "Private")}
-                                {getCheckBox(
-                                    "Special Build Phase",
-                                    "SpecialBuild",
-                                )}
-                            </div>
-
-                            <div className="flex flex-col lg:flex-row mb-4 md:mb-0">
-                                {getCheckBox("Enable Karma", "EnableKarma")}
                                 {getCheckBox("Creative Mode", "CreativeMode")}
-                                {getCheckBox("Advanced", "Advanced")}
                             </div>
 
                             <div className="flex flex-col lg:flex-row mt-2">
@@ -331,7 +340,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                                 className="block text-white text-lg mb-1"
                                                 htmlFor="gameMode"
                                             >
-                                                Complexity
+                                                Mode
                                             </label>
                                             <select
                                                 className={selectClasses}
@@ -498,34 +507,79 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                         <div className="w-full">
                                             <label
                                                 className="block text-white text-lg mb-1"
-                                                htmlFor="maxplayers"
+                                                htmlFor="maxplayers-control"
                                             >
                                                 Max Players
                                             </label>
-                                            <select
-                                                className={selectClasses}
-                                                aria-label="Discard Limit"
-                                                id="maxplayers"
-                                                onChange={changeMaxPlayers}
-                                                disabled={
+                                            <div
+                                                id="maxplayers-control"
+                                                className={classNames(
+                                                    "rounded-md px-4 py-2 bg-sky-700 text-white",
                                                     lobbyState.order !== 0
-                                                }
-                                                value={
-                                                    lobbyState.settings
-                                                        .MaxPlayers
-                                                }
-                                            >
-                                                {[2, 3, 4, 5, 6].map(
-                                                    (n: number) => (
-                                                        <option
-                                                            key={n}
-                                                            value={n}
-                                                        >
-                                                            {n}
-                                                        </option>
-                                                    ),
+                                                        ? "opacity-70"
+                                                        : "",
                                                 )}
-                                            </select>
+                                            >
+                                                <div className="flex items-center justify-between">
+                                                    <button
+                                                        type="button"
+                                                        aria-label="Decrease max players"
+                                                        className="p-1 rounded-md hover:bg-sky-800 disabled:opacity-40"
+                                                        disabled={
+                                                            lobbyState.order !==
+                                                                0 ||
+                                                            lobbyState.settings
+                                                                .MaxPlayers <=
+                                                                minPlayers
+                                                        }
+                                                        onClick={() =>
+                                                            setMaxPlayers(
+                                                                Math.max(
+                                                                    minPlayers,
+                                                                    lobbyState
+                                                                        .settings
+                                                                        .MaxPlayers -
+                                                                        1,
+                                                                ),
+                                                            )
+                                                        }
+                                                    >
+                                                        <ChevronLeftIcon className="w-5 h-5" />
+                                                    </button>
+                                                    <span className="text-2xl font-semibold">
+                                                        {
+                                                            lobbyState.settings
+                                                                .MaxPlayers
+                                                        }
+                                                        /{maxPlayersLimit}
+                                                    </span>
+                                                    <button
+                                                        type="button"
+                                                        aria-label="Increase max players"
+                                                        className="p-1 rounded-md hover:bg-sky-800 disabled:opacity-40"
+                                                        disabled={
+                                                            lobbyState.order !==
+                                                                0 ||
+                                                            lobbyState.settings
+                                                                .MaxPlayers >=
+                                                                maxPlayersLimit
+                                                        }
+                                                        onClick={() =>
+                                                            setMaxPlayers(
+                                                                Math.min(
+                                                                    maxPlayersLimit,
+                                                                    lobbyState
+                                                                        .settings
+                                                                        .MaxPlayers +
+                                                                        1,
+                                                                ),
+                                                            )
+                                                        }
+                                                    >
+                                                        <ChevronRightIcon className="w-5 h-5" />
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -537,12 +591,21 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                                 className="block text-white text-lg mb-1"
                                                 htmlFor="discardlimit"
                                             >
-                                                Discard Limit
+                                                Discard Limit (
+                                                {
+                                                    lobbyState.settings
+                                                        .DiscardLimit
+                                                }
+                                                )
                                             </label>
-                                            <select
-                                                className={selectClasses}
+                                            <input
+                                                className="w-full h-2 rounded-lg appearance-none cursor-pointer accent-indigo-500 disabled:opacity-40"
                                                 aria-label="Discard Limit"
                                                 id="discardlimit"
+                                                type="range"
+                                                min={minDiscardLimit}
+                                                max={maxDiscardLimit}
+                                                step={1}
                                                 onChange={changeDiscard}
                                                 disabled={
                                                     lobbyState.order !== 0
@@ -551,16 +614,11 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                                     lobbyState.settings
                                                         .DiscardLimit
                                                 }
-                                            >
-                                                {[
-                                                    5, 6, 7, 8, 9, 10, 11, 12,
-                                                    13, 14, 15,
-                                                ].map((n: number) => (
-                                                    <option key={n} value={n}>
-                                                        {n}
-                                                    </option>
-                                                ))}
-                                            </select>
+                                            />
+                                            <div className="flex justify-between text-xs text-white/70 mt-1">
+                                                <span>{minDiscardLimit}</span>
+                                                <span>{maxDiscardLimit}</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -572,12 +630,21 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                                 className="block text-white text-lg mb-1 z-10"
                                                 htmlFor="victoryPoint"
                                             >
-                                                Victory Points
+                                                Victory Points (
+                                                {
+                                                    lobbyState.settings
+                                                        .VictoryPoints
+                                                }
+                                                )
                                             </label>
-                                            <select
-                                                className={selectClasses}
+                                            <input
+                                                className="w-full h-2 rounded-lg appearance-none cursor-pointer accent-indigo-500 disabled:opacity-40"
                                                 aria-label="Victory Points"
                                                 id="victoryPoint"
+                                                type="range"
+                                                min={minVictoryPoints}
+                                                max={maxVictoryPoints}
+                                                step={1}
                                                 onChange={changeVicP}
                                                 disabled={
                                                     lobbyState.order !== 0
@@ -586,17 +653,11 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                                     lobbyState.settings
                                                         .VictoryPoints
                                                 }
-                                            >
-                                                {[
-                                                    5, 6, 7, 8, 9, 10, 11, 12,
-                                                    13, 14, 15, 16, 17, 18, 19,
-                                                    20, 21,
-                                                ].map((n: number) => (
-                                                    <option key={n} value={n}>
-                                                        {n}
-                                                    </option>
-                                                ))}
-                                            </select>
+                                            />
+                                            <div className="flex justify-between text-xs text-white/70 mt-1">
+                                                <span>{minVictoryPoints}</span>
+                                                <span>{maxVictoryPoints}</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -709,17 +770,20 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                         </div>
                     </div>
 
-                    <div className="basis-full md:basis-1/2 xl-basis-1/3 bg-black bg-opacity-50 backdrop-blur rounded-xl p-5 text-center mt-4 md:mt-0 md:ml-5 overflow-auto">
-                        <div className="basis-auto m-1 text-white text-3xl p-3 pb-6">
-                            Players
+                </div>
+
+                <div className="basis-full xl:basis-1/4 mt-4 xl:mt-0 xl:ml-5 flex flex-col min-h-0">
+                    <div className="bg-black bg-opacity-50 backdrop-blur rounded-xl p-4 text-center flex-none">
+                        <div className="basis-auto m-1 text-white text-2xl p-2 pb-4">
+                            Players ({lobbyState.players.length}/{lobbyState.settings.MaxPlayers})
                         </div>
                         <PlayerList lobbyState={lobbyState} socket={socketRef} />
 
-                        <div className="basis-auto mt-2 overflow-auto">
+                        <div className="basis-auto mt-2">
                             <button
                                 disabled={lobbyState.order != 0}
                                 className={classNames(
-                                    "h-11 w-1/2 text-lg rounded-xl",
+                                    "h-11 w-2/3 text-lg rounded-xl",
                                     "text-white",
                                     lobbyState.order == 0
                                         ? "bg-gradient-to-r from-indigo-700 to-indigo-700 hover:from-indigo-800 hover:to-indigo-800"
@@ -731,32 +795,32 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                             </button>
                         </div>
                     </div>
-                </div>
 
-                <div className="basis-full lg:basis-1/3 bg-black bg-opacity-50 backdrop-blur rounded-xl p-5 text-center mt-4 lg:mt-0 lg:ml-5 flex flex-col">
-                    <div className="basis-auto rounded-xl m-1 text-white text-3xl p-3 pb-6">
-                        Chatroom
-                    </div>
+                    <div className="bg-black bg-opacity-50 backdrop-blur rounded-xl p-5 text-center mt-4 flex flex-col flex-1 min-h-0">
+                        <div className="basis-auto rounded-xl m-1 text-white text-3xl p-3 pb-6">
+                            Chatroom
+                        </div>
 
-                    <div
-                        className="basis-full text-white bg-black bg-opacity-5
-                                   rounded-lg text-left p-4 overflow-auto max-h-screen"
-                        ref={chatDiv}
-                    >
-                        {lobbyState.chatMessages.map((m: { id: number; msg: string }) => (
-                            <p key={m.id} className="mb-1">
-                                {m.msg}
-                            </p>
-                        ))}
-                    </div>
-                    <div className="basis-auto">
-                        <div className="flex justify-center">
-                            <div className="w-full mt-6">
-                                <input
-                                    type="text"
-                                    className={selectClasses}
-                                    onKeyDown={sendChat}
-                                ></input>
+                        <div
+                            className="basis-full text-white bg-black bg-opacity-5
+                                   rounded-lg text-left p-4 overflow-auto min-h-[12rem]"
+                            ref={chatDiv}
+                        >
+                            {lobbyState.chatMessages.map((m: { id: number; msg: string }) => (
+                                <p key={m.id} className="mb-1">
+                                    {m.msg}
+                                </p>
+                            ))}
+                        </div>
+                        <div className="basis-auto">
+                            <div className="flex justify-center">
+                                <div className="w-full mt-6">
+                                    <input
+                                        type="text"
+                                        className={selectClasses}
+                                        onKeyDown={sendChat}
+                                    ></input>
+                                </div>
                             </div>
                         </div>
                     </div>

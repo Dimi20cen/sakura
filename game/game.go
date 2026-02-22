@@ -6,6 +6,7 @@ import (
 	"imperials/maps"
 	"log"
 	"math/rand"
+	"strings"
 	"sync"
 	"time"
 )
@@ -49,10 +50,11 @@ type (
 		SpecialBuildPhase   bool
 		SpecialBuildStarter *entities.Player
 
-		Ticker      *time.Ticker
-		TickerPause bool
-		TickerStop  chan bool
-		TimerVals   TimerValues
+		Ticker       *time.Ticker
+		TickerPause  bool
+		TickerStop   chan bool
+		TimerVals    TimerValues
+		TimerPhaseId uint64
 
 		DispCoordMap map[entities.Coordinate]entities.FloatCoordinate
 
@@ -125,10 +127,12 @@ type (
 )
 
 func timerValuesForSpeed(speed string) TimerValues {
+	s := strings.ToLower(strings.TrimSpace(speed))
+	s = strings.ReplaceAll(s, " ", "")
 	// Timings are aligned with catan_timers.json.
 	// 15s is an extra fast option requested for turn timer UX; other action timers
 	// use the "Very Fast" tier values.
-	switch speed {
+	switch s {
 	case entities.Speed15s:
 		return TimerValues{
 			DiceRoll:     10,
@@ -139,7 +143,7 @@ func timerValuesForSpeed(speed string) TimerValues {
 			InitVert:     60,
 			InitEdge:     15,
 			UseDevCard:   10,
-			SpecialBuild: 10,
+			SpecialBuild: 5,
 		}
 	case entities.Speed30s:
 		return TimerValues{
@@ -151,7 +155,7 @@ func timerValuesForSpeed(speed string) TimerValues {
 			InitVert:     60,
 			InitEdge:     15,
 			UseDevCard:   10,
-			SpecialBuild: 10,
+			SpecialBuild: 5,
 		}
 	case entities.Speed120s:
 		return TimerValues{
@@ -165,7 +169,7 @@ func timerValuesForSpeed(speed string) TimerValues {
 			UseDevCard:   40,
 			SpecialBuild: 20,
 		}
-	case entities.Speed200m:
+	case entities.Speed200m, "200min":
 		return TimerValues{
 			DiceRoll:     3000,
 			Turn:         12000,
@@ -177,9 +181,7 @@ func timerValuesForSpeed(speed string) TimerValues {
 			UseDevCard:   3000,
 			SpecialBuild: 3000,
 		}
-	case entities.SlowSpeed:
-		fallthrough
-	case "240s":
+	case entities.SlowSpeed, "240s":
 		return TimerValues{
 			DiceRoll:     60,
 			Turn:         240,
@@ -221,7 +223,7 @@ func (game *Game) Initialize(id string, numPlayers uint16) (*Game, error) {
 
 	defer func() {
 		if game.CurrentPlayer != nil {
-			game.CurrentPlayer.TimeLeft = game.TimerVals.Turn
+			game.setCurrentPlayerTimeLeft(game.TimerVals.Turn)
 		}
 	}()
 

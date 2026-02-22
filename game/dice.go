@@ -71,7 +71,7 @@ func (g *Game) RollDiceWith(redRoll int, whiteRoll int) (*entities.DieRollState,
 	g.DiceState = 1
 	g.LastRollRed = redRoll
 	g.LastRollWhite = whiteRoll
-	g.CurrentPlayer.TimeLeft = g.TimerVals.Turn
+	g.setCurrentPlayerTimeLeft(g.TimerVals.Turn)
 
 	// Write to journal
 	g.j.WRollDice(redRoll, whiteRoll)
@@ -319,7 +319,7 @@ func (g *Game) RollDice7(state *entities.DieRollState) {
 	g.MoveRobberInteractive()
 	if g.Robber.Tile.Type == entities.TileTypeDesert && g.Settings.Advanced && g.AdvancedSettings.RerollOn7 {
 		g.DiceState = 0
-		g.CurrentPlayer.TimeLeft = g.TimerVals.DiceRoll
+		g.setCurrentPlayerTimeLeft(g.TimerVals.DiceRoll)
 		g.BroadcastState()
 		g.SendPlayerSecret(g.CurrentPlayer)
 		return

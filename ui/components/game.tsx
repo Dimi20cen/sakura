@@ -39,14 +39,30 @@ const turnTimerOptions = [
     { value: "30s", label: "30s" },
     { value: "60s", label: "60s" },
     { value: "120s", label: "120s" },
+    { value: "240s", label: "240s" },
     { value: "200m", label: "200m" },
 ];
-const legacyTimerAlias: Record<string, string> = {
-    "12s": "15s",
-    fast: "30s",
-    normal: "60s",
-    slow: "120s",
-};
+
+function normalizeTimerSpeed(speed: string) {
+    const normalized = (speed || "").trim().toLowerCase();
+    const compact = normalized.replace(/\s+/g, "");
+    const aliasMap: Record<string, string> = {
+        "12s": "15s",
+        "15": "15s",
+        "30": "30s",
+        "60": "60s",
+        "120": "120s",
+        "240": "240s",
+        fast: "30s",
+        normal: "60s",
+        slow: "240s",
+        "200min": "200m",
+        "200 m": "200m",
+        "200minutes": "200m",
+        veryslow: "200m",
+    };
+    return aliasMap[compact] || aliasMap[normalized] || normalized;
+}
 
 const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
     const router = useRouter();
@@ -138,8 +154,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
         });
     };
 
-    const normalizedTimerValue =
-        legacyTimerAlias[lobbyState.settings.Speed] || lobbyState.settings.Speed;
+    const normalizedTimerValue = normalizeTimerSpeed(lobbyState.settings.Speed);
     const matchedTimerIndex = turnTimerOptions.findIndex(
         (opt) => opt.value === normalizedTimerValue,
     );

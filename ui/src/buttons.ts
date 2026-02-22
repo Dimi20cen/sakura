@@ -19,9 +19,9 @@ let container1: PIXI.Container;
 let turnTimerContainer: PIXI.Container | null = null;
 let turnTimerText: PIXI.Text | null = null;
 let timerTickerStarted = false;
-let timerOrder = -1;
-let timerSeconds = 0;
-let timerLastTickAt = 0;
+let timerPhaseId = -1;
+let timerEndsAtMs = 0;
+let timerServerOffsetMs = 0;
 
 /** Static button sprites */
 export let buttons: {
@@ -103,41 +103,38 @@ function updateTurnTimerWidget() {
     }
 
     const currentOrder = state.lastKnownGameState?.CurrentPlayerOrder;
+    const gs = state.lastKnownGameState;
     const current = state.lastKnownStates?.find((p) => p.Order === currentOrder);
     if (!current) {
-        timerOrder = -1;
-        timerSeconds = 0;
-        timerLastTickAt = 0;
+        timerPhaseId = -1;
+        timerEndsAtMs = 0;
+        timerServerOffsetMs = 0;
         turnTimerText.text = "--:--";
         canvas.app.markDirty();
         return;
     }
 
-    const serverSeconds = Math.max(0, Number(current.TimeLeft || 0));
-    const now = Date.now();
-
-    // Reset countdown when turn changes.
-    if (timerOrder !== current.Order) {
-        timerOrder = current.Order;
-        timerSeconds = serverSeconds;
-        timerLastTickAt = now;
-    } else {
-        // Keep synced to server when drift is significant.
-        if (Math.abs(serverSeconds - timerSeconds) > 2) {
-            timerSeconds = serverSeconds;
-            timerLastTickAt = now;
-        } else if (timerLastTickAt > 0) {
-            const elapsed = Math.floor((now - timerLastTickAt) / 1000);
-            if (elapsed > 0) {
-                timerSeconds = Math.max(0, timerSeconds - elapsed);
-                timerLastTickAt += elapsed * 1000;
-            }
-        } else {
-            timerLastTickAt = now;
-        }
+    const incomingPhaseId = Number(gs?.TimerPhaseId || 0);
+    const incomingEndsAtMs = Number(gs?.TimerEndsAtMs || 0);
+    const incomingServerNowMs = Number(gs?.ServerNowMs || 0);
+    if (incomingServerNowMs > 0) {
+        timerServerOffsetMs = incomingServerNowMs - Date.now();
+    }
+    if (incomingPhaseId !== timerPhaseId) {
+        timerPhaseId = incomingPhaseId;
+        timerEndsAtMs = incomingEndsAtMs;
+    } else if (incomingEndsAtMs > 0 && (timerEndsAtMs <= 0 || incomingEndsAtMs < timerEndsAtMs)) {
+        // Same phase: only tighten downward to avoid visual "restarts".
+        timerEndsAtMs = incomingEndsAtMs;
     }
 
-    turnTimerText.text = formatSeconds(timerSeconds);
+    let displaySeconds = Math.max(0, Number(current.TimeLeft || 0));
+    if (timerEndsAtMs > 0) {
+        const estimatedServerNow = Date.now() + timerServerOffsetMs;
+        displaySeconds = Math.max(0, Math.ceil((timerEndsAtMs - estimatedServerNow) / 1000));
+    }
+
+    turnTimerText.text = formatSeconds(displaySeconds);
     canvas.app.markDirty();
 }
 
@@ -400,6 +397,9 @@ export function getCountSprite(
  */
 export function render(commandHub: CommandHub) {
     const lks = state.lastKnownStates?.[ws.getThisPlayerOrder()];
+    timerPhaseId = -1;
+    timerEndsAtMs = 0;
+    timerServerOffsetMs = 0;
 
     // Initialize sprites
     container = new PIXI.Container();

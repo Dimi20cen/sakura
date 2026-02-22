@@ -213,7 +213,7 @@ func (g *Game) startInitPhase() {
 	}
 
 	g.resetTimeLeft()
-	g.CurrentPlayer.TimeLeft = g.TimerVals.DiceRoll
+	g.setCurrentPlayerTimeLeft(g.TimerVals.DiceRoll)
 	g.onScenarioTurnStart(g.CurrentPlayer)
 
 	g.InitPhase = false

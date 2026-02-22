@@ -23,6 +23,22 @@ func (g *Game) BroadcastState() {
 	})
 }
 
+func (g *Game) bumpTimerPhase() {
+	g.TimerPhaseId++
+}
+
+func (g *Game) setPlayerTimeLeft(p *entities.Player, seconds int) {
+	if p == nil {
+		return
+	}
+	p.TimeLeft = seconds
+	g.bumpTimerPhase()
+}
+
+func (g *Game) setCurrentPlayerTimeLeft(seconds int) {
+	g.setPlayerTimeLeft(g.CurrentPlayer, seconds)
+}
+
 func (g *Game) SendPlayerSecret(p *entities.Player) {
 	if g.j.playing || !g.Initialized {
 		return
@@ -63,7 +79,7 @@ func (g *Game) BlockForAction(
 
 	oldTimeLeft := p.TimeLeft
 	if timeout > 0 {
-		p.TimeLeft = timeout
+		g.setPlayerTimeLeft(p, timeout)
 	}
 
 	g.SetPendingAction(p, action)
@@ -103,7 +119,7 @@ func (g *Game) BlockForAction(
 	}
 
 	if timeout > 0 {
-		p.TimeLeft = oldTimeLeft
+		g.setPlayerTimeLeft(p, oldTimeLeft)
 	}
 
 	if pauseTicker {
@@ -121,4 +137,5 @@ func (g *Game) resetTimeLeft() {
 	for _, p := range g.Players {
 		p.TimeLeft = 0
 	}
+	g.bumpTimerPhase()
 }

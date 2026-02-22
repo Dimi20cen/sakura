@@ -111,6 +111,47 @@ Inbound game messages are handled by `ui/src/store/gameRuntime.ts` (with Pixi re
 - Right-side stack (`Game Log`, `Chat`, `Resource Bank`, `Players`) is aligned via shared rail helpers.
 - Bottom controls (`player hand`, `action/options`, `dice`, `timer`) derive positions from the same preset to keep spacing consistent across resolutions.
 
+## 8. Authoritative Timer Protocol
+
+The turn timer is now server-authoritative.
+
+### Wire fields
+
+`entities.GameState` includes:
+
+- `tp` (`TimerPhaseId`): monotonically increasing phase/version id.
+- `te` (`TimerEndsAtMs`): server-calculated wall-clock end time in Unix milliseconds.
+- `ts` (`ServerNowMs`): server wall-clock snapshot in Unix milliseconds for skew correction.
+
+These are populated in:
+
+- `game/state.go` (`GetGameState`)
+
+and consumed in:
+
+- `ui/src/buttons.ts` (HUD timer widget)
+
+### Server behavior
+
+- Whenever the active timer is reset (new turn/dice phase/special build/action timeout), the server increments `TimerPhaseId`.
+- The server continues sending per-player `TimeLeft` for compatibility, but HUD countdown is derived from `TimerEndsAtMs`.
+- When `TickerPause` is active and the current player has no pending timed action, the server sets `TimerEndsAtMs = 0` so the HUD freezes.
+- If `TickerPause` is active but the current player is in a pending timed action (for example robber placement), `TimerEndsAtMs` is still provided so the HUD countdown continues.
+
+Timer phase bumps happen through helper methods in:
+
+- `game/comm.go`:
+  - `bumpTimerPhase`
+  - `setPlayerTimeLeft`
+  - `setCurrentPlayerTimeLeft`
+
+### Client behavior
+
+- If `TimerPhaseId` changes: client adopts the new `TimerEndsAtMs`.
+- If `TimerPhaseId` is unchanged: client only accepts a lower `TimerEndsAtMs` (tightening), which prevents visual timer restarts from stale/out-of-order snapshots.
+- Client estimates server time with `estimatedServerNow = clientNow + (ts - clientNowAtReceipt)`.
+- Display value is computed as `ceil((TimerEndsAtMs - estimatedServerNow) / 1000)` and clamped at `0`.
+
 ## Game Modes and Maps
 
 - Supported game modes:

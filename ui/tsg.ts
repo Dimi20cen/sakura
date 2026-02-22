@@ -79,6 +79,9 @@ return out; }
 export type IGameState = {
 CurrentPlayerOrder: number;
 NeedDice: boolean;
+TimerPhaseId: number;
+TimerEndsAtMs: number;
+ServerNowMs: number;
 Robber: Robber /* entities.Robber */;
 PlayerStates: PlayerState /* []*entities.PlayerState */[];
 BankWood: number;
@@ -96,6 +99,9 @@ Merchant: Merchant /* entities.Merchant */;
 export class GameState implements IGameState { 
 public CurrentPlayerOrder: number;
 public NeedDice: boolean;
+public TimerPhaseId: number;
+public TimerEndsAtMs: number;
+public ServerNowMs: number;
 public Robber: Robber /* entities.Robber */;
 public PlayerStates: PlayerState /* []*entities.PlayerState */[];
 public BankWood: number;
@@ -112,6 +118,9 @@ public Merchant: Merchant /* entities.Merchant */;
 constructor(input: any) {
 this.CurrentPlayerOrder = input.c;
 this.NeedDice = input.d;
+this.TimerPhaseId = input.tp;
+this.TimerEndsAtMs = input.te;
+this.ServerNowMs = input.ts;
 this.Robber = input.r ? new Robber(input.r) : input.r;
 this.PlayerStates = input.p?.map((v: any) => v ? new PlayerState(v) : undefined);
 this.BankWood = input.bw;
@@ -130,6 +139,9 @@ public encode() {
 const out: any = {};
 out.c = this.CurrentPlayerOrder;
 out.d = this.NeedDice;
+out.tp = this.TimerPhaseId;
+out.te = this.TimerEndsAtMs;
+out.ts = this.ServerNowMs;
 out.r = this.Robber?.encode?.();
 out.p = this.PlayerStates?.map((v: any) => v?.encode?.());
 out.bw = this.BankWood;
@@ -1068,4 +1080,3 @@ out.g = this.GameOver;
 out.w = this.Winner;
 return out; }
 }
-

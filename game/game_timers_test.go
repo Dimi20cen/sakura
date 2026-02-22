@@ -23,7 +23,7 @@ func TestTimerValuesForSpeed(t *testing.T) {
 				InitVert:     60,
 				InitEdge:     15,
 				UseDevCard:   10,
-				SpecialBuild: 10,
+				SpecialBuild: 5,
 			},
 		},
 		{
@@ -38,7 +38,7 @@ func TestTimerValuesForSpeed(t *testing.T) {
 				InitVert:     60,
 				InitEdge:     15,
 				UseDevCard:   10,
-				SpecialBuild: 10,
+				SpecialBuild: 5,
 			},
 		},
 		{
@@ -74,6 +74,21 @@ func TestTimerValuesForSpeed(t *testing.T) {
 		{
 			name:  "200m very slow tier",
 			speed: entities.Speed200m,
+			expected: TimerValues{
+				DiceRoll:     3000,
+				Turn:         12000,
+				DiscardCards: 3000,
+				PlaceRobber:  3000,
+				ChoosePlayer: 3000,
+				InitVert:     18000,
+				InitEdge:     4500,
+				UseDevCard:   3000,
+				SpecialBuild: 3000,
+			},
+		},
+		{
+			name:  "200 min alias maps to very slow tier",
+			speed: "200 min",
 			expected: TimerValues{
 				DiceRoll:     3000,
 				Turn:         12000,

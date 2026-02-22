@@ -4,6 +4,7 @@ import (
 	"imperials/entities"
 	"log"
 	"sort"
+	"time"
 
 	"github.com/vmihailenco/msgpack/v5"
 )
@@ -11,14 +12,34 @@ import (
 // GetGameState for game g creates a list of PlayerStates for each Player in game
 func (g *Game) GetGameState() *entities.GameState {
 	playerStates := make([]*entities.PlayerState, len(g.Players))
+	needDice := !g.IsInitPhase() && g.DiceState == 0 && !g.HasPlayerPendingAction()
+	serverNowMs := time.Now().UnixMilli()
+	currentPlayerOrder := uint16(0)
+	currentTimeLeft := 0
+	if g.CurrentPlayer != nil {
+		currentPlayerOrder = g.CurrentPlayer.Order
+		currentTimeLeft = g.CurrentPlayer.TimeLeft
+	}
+	if currentTimeLeft < 0 {
+		currentTimeLeft = 0
+	}
+	timerEndsAtMs := int64(0)
+	shouldAdvanceTimer := !g.TickerPause ||
+		(g.CurrentPlayer != nil && g.CurrentPlayer.PendingAction != nil)
+	if shouldAdvanceTimer {
+		timerEndsAtMs = serverNowMs + int64(currentTimeLeft)*1000
+	}
 
 	for i, p := range g.Players {
 		playerStates[i] = g.GetPlayerState(p)
 	}
 
 	return &entities.GameState{
-		CurrentPlayerOrder: g.CurrentPlayer.Order,
-		NeedDice:           !g.IsInitPhase() && g.DiceState == 0 && !g.HasPlayerPendingAction(),
+		CurrentPlayerOrder: currentPlayerOrder,
+		NeedDice:           needDice,
+		TimerPhaseId:       g.TimerPhaseId,
+		TimerEndsAtMs:      timerEndsAtMs,
+		ServerNowMs:        serverNowMs,
 		Robber:             g.Robber,
 		Merchant:           g.Merchant,
 		PlayerStates:       playerStates,

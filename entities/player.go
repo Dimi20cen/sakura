@@ -49,6 +49,9 @@ type (
 	GameState struct {
 		CurrentPlayerOrder uint16         `msgpack:"c"`
 		NeedDice           bool           `msgpack:"d"`
+		TimerPhaseId       uint64         `msgpack:"tp"`
+		TimerEndsAtMs      int64          `msgpack:"te"`
+		ServerNowMs        int64          `msgpack:"ts"`
 		Robber             *Robber        `msgpack:"r"`
 		PlayerStates       []*PlayerState `msgpack:"p"`
 		BankWood           int16          `msgpack:"bw"`

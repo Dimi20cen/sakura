@@ -1228,10 +1228,10 @@ func (g *Game) EndTurn(player *entities.Player) error {
 		g.DiceState = 0
 		g.EndTurnResetDevelopmentCards()
 		g.CurrentPlayer.ResetTurnState()
-		g.CurrentPlayer.TimeLeft = g.TimerVals.DiceRoll
+		g.setCurrentPlayerTimeLeft(g.TimerVals.DiceRoll)
 		g.onScenarioTurnStart(g.CurrentPlayer)
 	} else {
-		g.CurrentPlayer.TimeLeft = g.TimerVals.SpecialBuild
+		g.setCurrentPlayerTimeLeft(g.TimerVals.SpecialBuild)
 	}
 
 	// Previous player

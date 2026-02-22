@@ -247,3 +247,48 @@ func TestSeafarersThroughDesertSettlementRegionBonus(t *testing.T) {
 		t.Fatalf("expected scenario bonus to contribute to total VP, got %d", total)
 	}
 }
+
+func TestSeafarersThroughDesertInitPlacementRestrictedToMainIsland(t *testing.T) {
+	defn := maps.GetMapByName(maps.SeafarersThroughDesert)
+	if defn == nil {
+		t.Fatal("through the desert map definition missing")
+	}
+
+	g := &Game{
+		Store: &noopStore{},
+		Settings: entities.GameSettings{
+			Mode:          entities.Seafarers,
+			MapName:       maps.SeafarersThroughDesert,
+			MapDefn:       defn,
+			VictoryPoints: 10,
+			Speed:         entities.NormalSpeed,
+		},
+	}
+	if _, err := g.Initialize("seafarers-through-desert-init-restrict", 2); err != nil {
+		t.Fatalf("initialize failed: %v", err)
+	}
+	g.ensureThroughDesertRegions()
+
+	p := g.CurrentPlayer
+	raw := p.GetBuildLocationsSettlement(g.Graph, true, false)
+	filtered := g.applyInitVertexScenarioHooks(p, raw)
+	if len(filtered) == 0 {
+		t.Fatal("expected at least one allowed initial settlement on main island")
+	}
+
+	excluded := 0
+	for _, v := range raw {
+		if !g.throughDesertVertexTouchesRegion(v, g.ScenarioDesertMainRegion) {
+			excluded++
+		}
+	}
+	if excluded == 0 {
+		t.Fatal("expected at least one non-main-island init settlement candidate to be excluded")
+	}
+
+	for _, v := range filtered {
+		if !g.throughDesertVertexTouchesRegion(v, g.ScenarioDesertMainRegion) {
+			t.Fatal("found filtered init vertex outside main island")
+		}
+	}
+}

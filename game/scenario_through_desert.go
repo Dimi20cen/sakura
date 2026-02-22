@@ -3,6 +3,36 @@ package game
 import "imperials/entities"
 
 func (g *Game) configureThroughDesertHooks() {
+	g.ScenarioHooks.FilterInitVertices = func(g *Game, p *entities.Player, allowed []*entities.Vertex) []*entities.Vertex {
+		g.ensureThroughDesertRegions()
+		if g.ScenarioDesertMainRegion == 0 {
+			return allowed
+		}
+
+		filtered := make([]*entities.Vertex, 0, len(allowed))
+		for _, v := range allowed {
+			if g.throughDesertVertexTouchesRegion(v, g.ScenarioDesertMainRegion) {
+				filtered = append(filtered, v)
+			}
+		}
+		return filtered
+	}
+
+	g.ScenarioHooks.FilterInitEdges = func(g *Game, p *entities.Player, allowed []*entities.Edge) []*entities.Edge {
+		g.ensureThroughDesertRegions()
+		if g.ScenarioDesertMainRegion == 0 {
+			return allowed
+		}
+
+		filtered := make([]*entities.Edge, 0, len(allowed))
+		for _, e := range allowed {
+			if g.throughDesertEdgeTouchesRegion(e, g.ScenarioDesertMainRegion) {
+				filtered = append(filtered, e)
+			}
+		}
+		return filtered
+	}
+
 	g.ScenarioHooks.OnSettlementBuilt = func(g *Game, p *entities.Player, v *entities.Vertex) {
 		g.applyThroughDesertSettlementBonus(p, v)
 	}
@@ -105,4 +135,34 @@ func (g *Game) applyThroughDesertSettlementBonus(p *entities.Player, v *entities
 		g.ScenarioDesertAwarded[p][rid] = true
 		g.ScenarioBonusVP[p] += 2
 	}
+}
+
+func (g *Game) throughDesertVertexTouchesRegion(v *entities.Vertex, regionID int) bool {
+	if v == nil || regionID == 0 {
+		return false
+	}
+	for _, t := range v.AdjacentTiles {
+		if t == nil {
+			continue
+		}
+		if rid, ok := g.ScenarioDesertRegionByTile[t.Center]; ok && rid == regionID {
+			return true
+		}
+	}
+	return false
+}
+
+func (g *Game) throughDesertEdgeTouchesRegion(e *entities.Edge, regionID int) bool {
+	if e == nil || regionID == 0 {
+		return false
+	}
+	for _, t := range e.AdjacentTiles {
+		if t == nil {
+			continue
+		}
+		if rid, ok := g.ScenarioDesertRegionByTile[t.Center]; ok && rid == regionID {
+			return true
+		}
+	}
+	return false
 }

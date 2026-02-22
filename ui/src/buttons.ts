@@ -10,6 +10,10 @@ import { BuildableType, CardType } from "./entities";
 import CommandHub from "./commands";
 import { PlayerSecretState } from "../tsg";
 import { hexToUrlString } from "../utils";
+import {
+    getTurnTimerView,
+    resetTurnTimerRuntime,
+} from "./store/turnTimerRuntime";
 
 /** Main button container */
 export let container: PIXI.Container;
@@ -18,10 +22,8 @@ export let container: PIXI.Container;
 let container1: PIXI.Container;
 let turnTimerContainer: PIXI.Container | null = null;
 let turnTimerText: PIXI.Text | null = null;
+let turnTimerDebugText: PIXI.Text | null = null;
 let timerTickerStarted = false;
-let timerPhaseId = -1;
-let timerEndsAtMs = 0;
-let timerServerOffsetMs = 0;
 
 /** Static button sprites */
 export let buttons: {
@@ -91,50 +93,40 @@ function ensureTurnTimerWidget() {
     });
     turnTimerText.anchor.set(0.5);
     turnTimerText.x = 35;
-    turnTimerText.y = 18;
+    turnTimerText.y = 14;
     turnTimerContainer.addChild(turnTimerText);
+
+    turnTimerDebugText = new PIXI.Text("", {
+        fontFamily: "sans-serif",
+        fontSize: 9,
+        fill: 0x4b5563,
+        align: "center",
+    });
+    turnTimerDebugText.anchor.set(0.5);
+    turnTimerDebugText.x = 35;
+    turnTimerDebugText.y = 27;
+    turnTimerContainer.addChild(turnTimerDebugText);
 
     canvas.app.stage.addChild(turnTimerContainer);
 }
 
 function updateTurnTimerWidget() {
-    if (!turnTimerContainer || turnTimerContainer.destroyed || !turnTimerText) {
+    if (
+        !turnTimerContainer ||
+        turnTimerContainer.destroyed ||
+        !turnTimerText ||
+        !turnTimerDebugText
+    ) {
         return;
     }
 
-    const currentOrder = state.lastKnownGameState?.CurrentPlayerOrder;
-    const gs = state.lastKnownGameState;
-    const current = state.lastKnownStates?.find((p) => p.Order === currentOrder);
-    if (!current) {
-        timerPhaseId = -1;
-        timerEndsAtMs = 0;
-        timerServerOffsetMs = 0;
-        turnTimerText.text = "--:--";
-        canvas.app.markDirty();
-        return;
-    }
+    const computed = getTurnTimerView(Date.now());
 
-    const incomingPhaseId = Number(gs?.TimerPhaseId || 0);
-    const incomingEndsAtMs = Number(gs?.TimerEndsAtMs || 0);
-    const incomingServerNowMs = Number(gs?.ServerNowMs || 0);
-    if (incomingServerNowMs > 0) {
-        timerServerOffsetMs = incomingServerNowMs - Date.now();
-    }
-    if (incomingPhaseId !== timerPhaseId) {
-        timerPhaseId = incomingPhaseId;
-        timerEndsAtMs = incomingEndsAtMs;
-    } else if (incomingEndsAtMs > 0 && (timerEndsAtMs <= 0 || incomingEndsAtMs < timerEndsAtMs)) {
-        // Same phase: only tighten downward to avoid visual "restarts".
-        timerEndsAtMs = incomingEndsAtMs;
-    }
-
-    let displaySeconds = Math.max(0, Number(current.TimeLeft || 0));
-    if (timerEndsAtMs > 0) {
-        const estimatedServerNow = Date.now() + timerServerOffsetMs;
-        displaySeconds = Math.max(0, Math.ceil((timerEndsAtMs - estimatedServerNow) / 1000));
-    }
-
-    turnTimerText.text = formatSeconds(displaySeconds);
+    turnTimerText.text =
+        computed.displaySeconds === null
+            ? "--:--"
+            : formatSeconds(computed.displaySeconds);
+    turnTimerDebugText.text = computed.mode;
     canvas.app.markDirty();
 }
 
@@ -397,9 +389,7 @@ export function getCountSprite(
  */
 export function render(commandHub: CommandHub) {
     const lks = state.lastKnownStates?.[ws.getThisPlayerOrder()];
-    timerPhaseId = -1;
-    timerEndsAtMs = 0;
-    timerServerOffsetMs = 0;
+    resetTurnTimerRuntime();
 
     // Initialize sprites
     container = new PIXI.Container();

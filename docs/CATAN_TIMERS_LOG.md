@@ -49,8 +49,17 @@ Rules used by the client HUD:
 - On new `tp`, adopt incoming `te`.
 - On same `tp`, only tighten to a lower `te`.
 - Estimate server-now with `estimatedServerNow = now + (ts - nowAtReceipt)`.
+- Recalculate server offset only when `ts` changes.
 - Render `max(0, ceil((te - estimatedServerNow) / 1000))`.
 - If `te == 0`, treat the timer as paused and display the server `TimeLeft` snapshot without local countdown.
 - `te` may still be non-zero during `TickerPause` when the current player is in a pending timed action; this keeps countdown visible for those action windows.
+- If timer metadata is absent (`tp/te/ts` all zero), run compatibility fallback countdown from `TimeLeft`.
 
 This avoids countdown restarts caused by stale or out-of-order state snapshots.
+
+Implementation notes:
+
+- Timer computation lives in `ui/src/timer/turnTimer.ts`.
+- Runtime timer ownership/snapshot sync lives in `ui/src/store/turnTimerRuntime.ts`.
+- HUD rendering lives in `ui/src/buttons.ts`.
+- Unit coverage for mode selection/countdown behavior is in `ui/src/timer/turnTimer.test.ts`.

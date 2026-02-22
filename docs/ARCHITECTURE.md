@@ -129,7 +129,9 @@ These are populated in:
 
 and consumed in:
 
-- `ui/src/buttons.ts` (HUD timer widget)
+- `ui/src/timer/turnTimer.ts` (timer state machine + countdown computation)
+- `ui/src/store/turnTimerRuntime.ts` (timer runtime state ownership + snapshot sync)
+- `ui/src/buttons.ts` (HUD timer widget renderer)
 
 ### Server behavior
 
@@ -147,10 +149,15 @@ Timer phase bumps happen through helper methods in:
 
 ### Client behavior
 
+- Timer state transitions are centralized in `ui/src/timer/turnTimer.ts`.
+- Timer runtime ownership (latest snapshot + mutable timer state across ticks) lives in `ui/src/store/turnTimerRuntime.ts`.
+- `ui/src/buttons.ts` only renders the computed output (`displaySeconds`, mode).
 - If `TimerPhaseId` changes: client adopts the new `TimerEndsAtMs`.
 - If `TimerPhaseId` is unchanged: client only accepts a lower `TimerEndsAtMs` (tightening), which prevents visual timer restarts from stale/out-of-order snapshots.
 - Client estimates server time with `estimatedServerNow = clientNow + (ts - clientNowAtReceipt)`.
 - Display value is computed as `ceil((TimerEndsAtMs - estimatedServerNow) / 1000)` and clamped at `0`.
+- Server offset is only recalculated when `ServerNowMs` changes, preventing countdown freezes from repeated snapshots.
+- Compatibility fallback mode is used only when timer metadata is absent; this keeps older payloads functional.
 
 ## Game Modes and Maps
 

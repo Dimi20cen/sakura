@@ -29,6 +29,7 @@ import {
 import { CardType } from "./entities";
 import CommandHub from "./commands";
 import { hexToUrlString } from "../utils";
+import { syncTurnTimerSnapshot } from "./store/turnTimerRuntime";
 
 type InitializableSprite = PIXI.Sprite & { initialized?: boolean };
 
@@ -278,6 +279,7 @@ export function renderGameState(gs: GameState, commandHub: CommandHub) {
     if (!container || container.destroyed) {
         intialize(commandHub);
     }
+    syncTurnTimerSnapshot(gs, states);
 
     states.forEach((state) => {
         // Clear pending action if not found

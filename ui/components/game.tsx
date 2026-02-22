@@ -23,9 +23,9 @@ import { useLobbySession } from "../hooks/lobbySession";
 import Image from "next/legacy/image";
 
 const selectClasses =
-    "ui-input form-select appearance-none block w-full !py-2 !text-base !font-normal";
+    "ui-input form-select appearance-none block w-full !py-1.5 !text-[15px] !font-normal";
 const labelClasses =
-    "block text-[color:var(--ui-ivory-soft)] text-sm uppercase tracking-[0.06em] mb-1";
+    "block text-[color:var(--ui-ivory-soft)] text-sm uppercase tracking-[0.06em] mb-0.5";
 const turnTimerOptions = [
     { value: "15s", label: "15s" },
     { value: "30s", label: "30s" },
@@ -223,10 +223,10 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
             <div className="p-1 basis-full lg:basis-1/2">
                 <div
                     className={classNames(
-                        "px-4 pt-3 pb-2 rounded-xl border transition-colors duration-200",
+                        "px-3 py-2 rounded-lg border transition-colors duration-200",
                         lobbyState.settings[setting]
-                            ? "bg-[rgba(122,31,36,0.62)] border-[rgba(183,148,90,0.55)]"
-                            : "bg-[rgba(42,34,31,0.82)] border-[rgba(231,222,206,0.18)]",
+                            ? "bg-[rgba(122,31,36,0.46)] border-[rgba(183,148,90,0.42)]"
+                            : "bg-[rgba(42,34,31,0.62)] border-[rgba(231,222,206,0.14)]",
                     )}
                 >
                     <div className="flex justify-center">
@@ -249,7 +249,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                 onChange={changeVal}
                             />
                             <label
-                                className="block text-base text-left mb-1 text-[color:var(--ui-ivory)] cursor-pointer"
+                                className="block text-sm text-left text-[color:var(--ui-ivory)] cursor-pointer"
                                 htmlFor={setting}
                             >
                                 {text}
@@ -322,16 +322,11 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                 <div className="basis-full min-h-0">
                     <div className="ui-panel ui-panel-pad text-center flex flex-col lg:overflow-y-auto lg:h-full">
                         <div>
-                            <div className="basis-auto m-1 text-[color:var(--ui-ivory)] text-3xl p-3 pb-5">
-                                Settings
+                            <div className="basis-auto m-1 text-[color:var(--ui-ivory)] text-2xl p-2 pb-3">
+                                Game Settings
                             </div>
 
-                            <div className="flex flex-col lg:flex-row mb-4 md:mb-0">
-                                {getCheckBox("Private Game", "Private")}
-                                {getCheckBox("Creative Mode", "CreativeMode")}
-                            </div>
-
-                            <div className="flex flex-col lg:flex-row mt-2">
+                            <div className="flex flex-col lg:flex-row mt-1">
                                 <div className="basis-full lg:basis-1/2 rounded-xl m-1">
                                     {/* Game mode selection */}
                                     <div className="flex justify-center">
@@ -394,6 +389,11 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                 </div>
                             </div>
 
+                            <div className="flex flex-col lg:flex-row mt-1 mb-2">
+                                {getCheckBox("Private Game", "Private")}
+                                {getCheckBox("Creative Mode", "CreativeMode")}
+                            </div>
+
                             <div className="flex flex-col lg:flex-row md:mt-2">
                                 <div className="basis-full lg:basis-1/4 rounded-xl m-1">
                                     {/* Max Player */}
@@ -405,7 +405,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                             <div
                                                 id="maxplayers-control"
                                                 className={classNames(
-                                                    "rounded-md px-4 py-2 bg-[rgba(42,34,31,0.85)] border border-[rgba(231,222,206,0.2)] text-[color:var(--ui-ivory)]",
+                                                    "rounded-md px-4 py-1.5 bg-[rgba(42,34,31,0.85)] border border-[rgba(231,222,206,0.2)] text-[color:var(--ui-ivory)]",
                                                     lobbyState.order !== 0
                                                         ? "opacity-70"
                                                         : "",
@@ -437,7 +437,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                                     >
                                                         <ChevronLeftIcon className="w-5 h-5" />
                                                     </button>
-                                                    <span className="text-2xl font-semibold">
+                                                    <span className="text-3xl font-semibold leading-none">
                                                         {
                                                             lobbyState.settings
                                                                 .MaxPlayers
@@ -566,7 +566,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                             <div
                                                 id="turnTimerControl"
                                                 className={classNames(
-                                                    "rounded-md px-4 py-2 bg-[rgba(42,34,31,0.85)] border border-[rgba(231,222,206,0.2)] text-[color:var(--ui-ivory)]",
+                                                    "rounded-md px-4 py-1.5 bg-[rgba(42,34,31,0.85)] border border-[rgba(231,222,206,0.2)] text-[color:var(--ui-ivory)]",
                                                     "flex items-center justify-between",
                                                     lobbyState.order !== 0 ? "opacity-70" : "",
                                                 )}
@@ -589,7 +589,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                                 >
                                                     <ChevronLeftIcon className="w-5 h-5" />
                                                 </button>
-                                                <span className="text-2xl font-semibold leading-none">
+                                                <span className="text-3xl font-semibold leading-none">
                                                     {selectedTimer.label}
                                                 </span>
                                                 <button
@@ -633,35 +633,28 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                             {/* Ready selection */}
                             <div
                                 className={classNames(
-                                    "w-3/4 sm:w-1/2 md:w-3/4 lg:w-3/4 xl:w-1/2 px-4 pt-3 pb-2 rounded-xl my-3 mx-auto cursor-pointer border",
+                                    "w-3/4 sm:w-1/2 md:w-3/4 lg:w-3/4 xl:w-1/2 px-5 py-3 rounded-xl my-3 mx-auto border",
                                     lobbyState.ready
-                                        ? "bg-[rgba(54,101,66,0.62)] border-[rgba(183,148,90,0.45)]"
-                                        : "bg-[rgba(122,31,36,0.65)] border-[rgba(183,148,90,0.52)]",
+                                        ? "bg-[rgba(88,44,48,0.58)] border-[rgba(183,148,90,0.45)]"
+                                        : "bg-[rgba(61,42,35,0.62)] border-[rgba(231,222,206,0.18)]",
                                 )}
                             >
-                                <div className="flex justify-center cursor-pointer">
-                                    <div className="w-full">
-                                        <input
-                                            className="border rounded-sm bg-white scale-[1.75]
-                                                       checked:bg-[color:var(--ui-gold)] checked:border-[color:var(--ui-gold)]
-                                                       focus:outline-none transition duration-200 align-top
-                                                       bg-no-repeat bg-center bg-contain float-left mr-2
-                                                       cursor-pointer translate-y-2 translate-x-2.5"
-                                            type="checkbox"
-                                            aria-label="Ready to play"
-                                            checked={lobbyState.ready}
-                                            id="ready"
-                                            onChange={changeReady}
-                                        />
-                                        <label
-                                            className="block text-2xl pl-10 mb-1 text-left text-[color:var(--ui-ivory)]
-                                                       translate-x-1 cursor-pointer"
-                                            htmlFor="ready"
-                                        >
-                                            Ready
-                                        </label>
-                                    </div>
-                                </div>
+                                <label
+                                    className="w-full flex items-center gap-3 cursor-pointer text-left text-[color:var(--ui-ivory)]"
+                                    htmlFor="ready"
+                                >
+                                    <input
+                                        className="h-5 w-5 rounded-sm border-[rgba(231,222,206,0.45)] bg-[color:var(--ui-ivory)]
+                                                   checked:bg-[color:var(--ui-gold)] checked:border-[color:var(--ui-gold)]
+                                                   focus:ring-2 focus:ring-[rgba(183,148,90,0.45)] focus:ring-offset-0"
+                                        type="checkbox"
+                                        aria-label="Ready to play"
+                                        checked={lobbyState.ready}
+                                        id="ready"
+                                        onChange={changeReady}
+                                    />
+                                    <span className="text-[2rem] leading-none">Ready</span>
+                                </label>
                             </div>
 
                             <button
@@ -670,7 +663,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                     !lobbyState.canStart
                                 }
                                 className={classNames(
-                                    "ui-button w-3/4 sm:w-1/2 md:w-3/4 lg:w-3/4 xl:w-1/2 h-14 text-2xl rounded-xl",
+                                    "ui-button w-3/4 sm:w-1/2 md:w-3/4 lg:w-3/4 xl:w-1/2 h-12 text-xl rounded-xl",
                                     lobbyState.order == 0 && lobbyState.canStart
                                         ? "ui-button-primary"
                                         : "bg-stone-700 opacity-40",

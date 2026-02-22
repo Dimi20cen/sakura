@@ -124,6 +124,94 @@ type (
 	}
 )
 
+func timerValuesForSpeed(speed string) TimerValues {
+	// Timings are aligned with catan_timers.json.
+	// 15s is an extra fast option requested for turn timer UX; other action timers
+	// use the "Very Fast" tier values.
+	switch speed {
+	case entities.Speed15s:
+		return TimerValues{
+			DiceRoll:     10,
+			Turn:         15,
+			DiscardCards: 20,
+			PlaceRobber:  15,
+			ChoosePlayer: 10,
+			InitVert:     60,
+			InitEdge:     15,
+			UseDevCard:   10,
+			SpecialBuild: 10,
+		}
+	case entities.Speed30s:
+		return TimerValues{
+			DiceRoll:     10,
+			Turn:         30,
+			DiscardCards: 20,
+			PlaceRobber:  15,
+			ChoosePlayer: 10,
+			InitVert:     60,
+			InitEdge:     15,
+			UseDevCard:   10,
+			SpecialBuild: 10,
+		}
+	case entities.Speed120s:
+		return TimerValues{
+			DiceRoll:     20,
+			Turn:         120,
+			DiscardCards: 40,
+			PlaceRobber:  40,
+			ChoosePlayer: 40,
+			InitVert:     180,
+			InitEdge:     45,
+			UseDevCard:   40,
+			SpecialBuild: 20,
+		}
+	case entities.Speed200m:
+		return TimerValues{
+			DiceRoll:     3000,
+			Turn:         12000,
+			DiscardCards: 3000,
+			PlaceRobber:  3000,
+			ChoosePlayer: 3000,
+			InitVert:     18000,
+			InitEdge:     4500,
+			UseDevCard:   3000,
+			SpecialBuild: 3000,
+		}
+	case entities.SlowSpeed:
+		fallthrough
+	case "240s":
+		return TimerValues{
+			DiceRoll:     60,
+			Turn:         240,
+			DiscardCards: 80,
+			PlaceRobber:  80,
+			ChoosePlayer: 80,
+			InitVert:     360,
+			InitEdge:     90,
+			UseDevCard:   60,
+			SpecialBuild: 60,
+		}
+	case entities.FastSpeed:
+		fallthrough
+	case entities.Speed60s:
+		fallthrough
+	case entities.NormalSpeed:
+		fallthrough
+	default:
+		return TimerValues{
+			DiceRoll:     10,
+			Turn:         60,
+			DiscardCards: 20,
+			PlaceRobber:  20,
+			ChoosePlayer: 20,
+			InitVert:     120,
+			InitEdge:     30,
+			UseDevCard:   20,
+			SpecialBuild: 10,
+		}
+	}
+}
+
 func (game *Game) Initialize(id string, numPlayers uint16) (*Game, error) {
 	game.mutex.Lock()
 	defer game.mutex.Unlock()
@@ -161,17 +249,7 @@ func (game *Game) Initialize(id string, numPlayers uint16) (*Game, error) {
 	game.Ticker = time.NewTicker(1000 * time.Millisecond)
 	game.TickerStop = make(chan bool)
 	go game.TickWatcher()
-	game.TimerVals = TimerValues{
-		DiceRoll:     int(10 * entities.SpeedMultiplier[game.Settings.Speed]),
-		Turn:         int(60 * entities.SpeedMultiplier[game.Settings.Speed]),
-		DiscardCards: int(20 * entities.SpeedMultiplier[game.Settings.Speed]),
-		PlaceRobber:  int(15 * entities.SpeedMultiplier[game.Settings.Speed]),
-		InitVert:     int(60 * entities.SpeedMultiplier[game.Settings.Speed]),
-		InitEdge:     int(20 * entities.SpeedMultiplier[game.Settings.Speed]),
-		ChoosePlayer: int(10 * entities.SpeedMultiplier[game.Settings.Speed]),
-		UseDevCard:   int(20 * entities.SpeedMultiplier[game.Settings.Speed]),
-		SpecialBuild: int(20 * entities.SpeedMultiplier[game.Settings.Speed]),
-	}
+	game.TimerVals = timerValuesForSpeed(game.Settings.Speed)
 
 	// Dice init
 	game.DiceState = 0

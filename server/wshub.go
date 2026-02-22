@@ -60,7 +60,7 @@ func (s *Server) NewWsHub(id string) *WsHub {
 				MaxPlayers:    4,
 				EnableKarma:   true,
 				CreativeMode:  false,
-				Speed:         entities.NormalSpeed,
+				Speed:         entities.Speed60s,
 				Advanced:      false,
 			},
 			AdvancedSettings: entities.AdvancedSettings{

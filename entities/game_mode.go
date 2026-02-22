@@ -18,6 +18,12 @@ const (
 	SlowSpeed   string = "slow"
 	NormalSpeed string = "normal"
 	FastSpeed   string = "fast"
+
+	Speed15s  string = "15s"
+	Speed30s  string = "30s"
+	Speed60s  string = "60s"
+	Speed120s string = "120s"
+	Speed200m string = "200m"
 )
 
 type GameSettings struct {
@@ -40,6 +46,12 @@ type AdvancedSettings struct {
 }
 
 var SpeedMultiplier = map[string]float32{
+	Speed15s:  0.25,
+	Speed30s:  0.5,
+	Speed60s:  1,
+	Speed120s: 2,
+	Speed200m: 200,
+	// Backward compatibility for older persisted rooms.
 	SlowSpeed:   2,
 	NormalSpeed: 1,
 	FastSpeed:   0.5,

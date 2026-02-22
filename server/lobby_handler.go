@@ -57,7 +57,7 @@ func (ws *WsClient) handleLobby(msg map[string]interface{}) {
 		}
 		ws.Hub.Game.Settings.Private = false
 		ws.Hub.Game.Settings.EnableKarma = false
-		ws.Hub.Game.Settings.Speed = "slow"
+		ws.Hub.Game.Settings.Speed = entities.Speed60s
 		ws.Ready = true
 		go ws.Hub.StoreSettings()
 		ws.Hub.BroadcastLobbyMessage(ws.Hub.GetLobbySettingsMessage())

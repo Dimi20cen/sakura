@@ -8,13 +8,7 @@ const Index: NextPage = () => {
             <Header />
             <div className="ui-page ui-fade-in">
                 <section className="ui-panel ui-panel-pad mt-8 sm:mt-12 max-w-2xl mx-auto">
-                    <div className="space-y-4 text-center">
-                        <h1 className="ui-title ui-title-lg">Clash</h1>
-                        <p className="ui-text-muted">
-                            Choose how you want to play.
-                        </p>
-                    </div>
-                    <div className="ui-grid gap-3 mt-6 sm:mt-8">
+                    <div className="ui-grid gap-3">
                         <Link href="/sp">
                             <button className="ui-button ui-button-secondary">
                                 Start Solo

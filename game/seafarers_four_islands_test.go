@@ -159,3 +159,91 @@ func TestSeafarersThroughDesertInitialize(t *testing.T) {
 		t.Fatalf("expected scenario victory target 14, got %d", target)
 	}
 }
+
+func TestSeafarersThroughDesertSettlementRegionBonus(t *testing.T) {
+	defn := maps.GetMapByName(maps.SeafarersThroughDesert)
+	if defn == nil {
+		t.Fatal("through the desert map definition missing")
+	}
+
+	g := &Game{
+		Store: &noopStore{},
+		Settings: entities.GameSettings{
+			Mode:          entities.Seafarers,
+			MapName:       maps.SeafarersThroughDesert,
+			MapDefn:       defn,
+			VictoryPoints: 10,
+			Speed:         entities.NormalSpeed,
+		},
+	}
+	if _, err := g.Initialize("seafarers-through-desert-bonus", 2); err != nil {
+		t.Fatalf("initialize failed: %v", err)
+	}
+	g.ensureThroughDesertRegions()
+
+	p := g.CurrentPlayer
+	var vFirst *entities.Vertex
+	var vSameRegion *entities.Vertex
+	var vOtherRegion *entities.Vertex
+	regionSeen := make(map[int]*entities.Vertex)
+
+	getUnexploredRegion := func(v *entities.Vertex) int {
+		for _, t := range v.AdjacentTiles {
+			if rid, ok := g.ScenarioDesertRegionByTile[t.Center]; ok && rid != g.ScenarioDesertMainRegion {
+				return rid
+			}
+		}
+		return 0
+	}
+
+	for _, v := range g.Vertices {
+		rid := getUnexploredRegion(v)
+		if rid == 0 {
+			continue
+		}
+		if vFirst == nil {
+			vFirst = v
+			regionSeen[rid] = v
+			continue
+		}
+		if vSameRegion == nil && regionSeen[rid] != nil {
+			vSameRegion = v
+			continue
+		}
+		if vOtherRegion == nil && regionSeen[rid] == nil {
+			vOtherRegion = v
+			regionSeen[rid] = v
+		}
+	}
+
+	if vFirst == nil || vSameRegion == nil || vOtherRegion == nil {
+		t.Fatal("could not find vertices for through the desert region bonus test")
+	}
+
+	if err := p.BuildAtVertex(vFirst, entities.BTSettlement); err != nil {
+		t.Fatalf("failed to place settlement on first unexplored region: %v", err)
+	}
+	g.onScenarioSettlementBuilt(p, vFirst)
+	if got := g.ScenarioBonusVP[p]; got != 2 {
+		t.Fatalf("expected +2 VP after first unexplored-region settlement, got %d", got)
+	}
+
+	if err := p.BuildAtVertex(vSameRegion, entities.BTSettlement); err != nil {
+		t.Fatalf("failed to place settlement on same unexplored region: %v", err)
+	}
+	g.onScenarioSettlementBuilt(p, vSameRegion)
+	if got := g.ScenarioBonusVP[p]; got != 2 {
+		t.Fatalf("expected no extra VP on second settlement in same region, got %d", got)
+	}
+
+	if err := p.BuildAtVertex(vOtherRegion, entities.BTSettlement); err != nil {
+		t.Fatalf("failed to place settlement on second unexplored region: %v", err)
+	}
+	g.onScenarioSettlementBuilt(p, vOtherRegion)
+	if got := g.ScenarioBonusVP[p]; got != 4 {
+		t.Fatalf("expected +4 VP after first settlement in two regions, got %d", got)
+	}
+	if total := g.GetVictoryPoints(p, false); total < 7 {
+		t.Fatalf("expected scenario bonus to contribute to total VP, got %d", total)
+	}
+}

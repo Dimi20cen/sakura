@@ -221,6 +221,10 @@ func (g *Game) GetVictoryPoints(p *entities.Player, public bool) int {
 		}
 	}
 
+	if g.ScenarioBonusVP != nil {
+		victoryPoints += g.ScenarioBonusVP[p]
+	}
+
 	if g.Mode == entities.CitiesAndKnights {
 		// Defender
 		for _, dp := range g.ExtraVictoryPoints.DefenderPoints {

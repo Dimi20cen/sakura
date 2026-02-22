@@ -62,8 +62,12 @@ type (
 		OfferCounter  int
 		CurrentOffers []*entities.TradeOffer
 
-		DiceStats     *entities.DiceStats
-		ScenarioHooks ScenarioHookSet
+		DiceStats                  *entities.DiceStats
+		ScenarioHooks              ScenarioHookSet
+		ScenarioBonusVP            map[*entities.Player]int
+		ScenarioDesertRegionByTile map[entities.Coordinate]int
+		ScenarioDesertMainRegion   int
+		ScenarioDesertAwarded      map[*entities.Player]map[int]bool
 
 		mutex       sync.Mutex
 		ActionMutex sync.Mutex
@@ -229,6 +233,9 @@ func (game *Game) InitWithGameMode() error {
 	// Extra points
 	game.ExtraVictoryPoints = &entities.ExtraVictoryPoints{}
 	game.SetExtraVictoryPoints()
+	game.ScenarioBonusVP = make(map[*entities.Player]int)
+	game.ScenarioDesertRegionByTile = make(map[entities.Coordinate]int)
+	game.ScenarioDesertAwarded = make(map[*entities.Player]map[int]bool)
 
 	if game.Mode == entities.CitiesAndKnights {
 		// Merchant

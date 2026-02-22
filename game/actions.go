@@ -93,6 +93,7 @@ func (g *Game) BuildSettlement(player *entities.Player, coordinates entities.Coo
 	}
 
 	player.BuildablesLeft[entities.BTSettlement]--
+	g.onScenarioSettlementBuilt(player, vertex)
 
 	g.SetExtraVictoryPoints()
 	g.SendPlayerSecret(player)

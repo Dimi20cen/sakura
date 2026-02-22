@@ -28,7 +28,7 @@ This document tracks parity between the implemented Seafarers mode and the offic
 | Heading for New Shores (1) | `Partial` | Built-in map exists and core flow works. | Full scenario acceptance sweep still needed. |
 | The Four Islands (2) | `Partial` | Built-in map and scenario metadata now exist as first-pass implementation. | Run full rulebook-accurate setup/rules acceptance and refine map parity. |
 | The Fog Islands (3) | `Partial` | Built-in map and scenario metadata now exist as first-pass implementation. | Add full variable-setup/discovery-stack parity and scenario-specific acceptance rules. |
-| Through the Desert (4) | `Partial` | Built-in map and scenario metadata now exist as first-pass implementation (14 VP target). | Implement unexplored-region +2 VP mechanic and full setup constraints parity. |
+| Through the Desert (4) | `Partial` | Built-in map + metadata + 14 VP target + unexplored-region settlement bonus scoring are implemented. | Add strict setup constraints parity and full rulebook acceptance pass. |
 | The Forgotten Tribe (5) | `Missing` | No dedicated scenario support. | Implement scenario mechanics and map definitions. |
 | Cloth for Catan (6) | `Missing` | No dedicated scenario support. | Implement cloth-trade scenario rules and map. |
 | The Pirate Islands (7) | `Missing` | No dedicated scenario support. | Implement pirate fortress/fleet mechanics and map. |

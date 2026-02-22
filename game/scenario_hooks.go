@@ -5,6 +5,7 @@ import "imperials/entities"
 type ScenarioHookSet struct {
 	FilterInitVertices func(g *Game, p *entities.Player, allowed []*entities.Vertex) []*entities.Vertex
 	FilterInitEdges    func(g *Game, p *entities.Player, allowed []*entities.Edge) []*entities.Edge
+	OnSettlementBuilt  func(g *Game, p *entities.Player, v *entities.Vertex)
 	OnTurnStart        func(g *Game, p *entities.Player)
 	OnDiceRolled       func(g *Game, roll int)
 	VictoryEvaluator   func(g *Game) *entities.Player
@@ -12,6 +13,14 @@ type ScenarioHookSet struct {
 
 func (g *Game) configureScenarioHooks() {
 	g.ScenarioHooks = ScenarioHookSet{}
+	if g.Settings.MapDefn == nil || g.Settings.MapDefn.Scenario == nil {
+		return
+	}
+
+	switch g.Settings.MapDefn.Scenario.Key {
+	case "seafarers_through_the_desert":
+		g.configureThroughDesertHooks()
+	}
 }
 
 func (g *Game) applyInitVertexScenarioHooks(p *entities.Player, allowed []*entities.Vertex) []*entities.Vertex {
@@ -26,6 +35,12 @@ func (g *Game) applyInitEdgeScenarioHooks(p *entities.Player, allowed []*entitie
 		return allowed
 	}
 	return g.ScenarioHooks.FilterInitEdges(g, p, allowed)
+}
+
+func (g *Game) onScenarioSettlementBuilt(p *entities.Player, v *entities.Vertex) {
+	if g.ScenarioHooks.OnSettlementBuilt != nil {
+		g.ScenarioHooks.OnSettlementBuilt(g, p, v)
+	}
 }
 
 func (g *Game) onScenarioTurnStart(p *entities.Player) {

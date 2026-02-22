@@ -2,6 +2,7 @@ package server
 
 import (
 	"imperials/entities"
+	"imperials/maps"
 	"log"
 	"math/rand"
 	"sort"
@@ -318,7 +319,9 @@ func (h *WsHub) GetLobbyPlayersMessage() *entities.Message {
 }
 
 func (ws *WsClient) GetLobbySettingsOptionsMessage() *entities.Message {
-	mapNames := ws.Hub.Game.Store.GetOfficalMapNames()
+	mapNames := maps.GetOfficialMapNames()
+	mapNames = append(mapNames, ws.Hub.Game.Store.GetOfficalMapNames()...)
+	mapNames = uniqStrings(mapNames)
 
 	myMaps, err := ws.Hub.Game.Store.GetAllMapNamesForUser(ws.Player.Id, false)
 	if err == nil && len(myMaps) > 0 {
@@ -341,6 +344,23 @@ func (ws *WsClient) GetLobbySettingsOptionsMessage() *entities.Message {
 			"MapName": mapNames,
 		},
 	}
+}
+
+func uniqStrings(in []string) []string {
+	seen := make(map[string]bool, len(in))
+	out := make([]string, 0, len(in))
+	for _, s := range in {
+		if s == "" {
+			out = append(out, s)
+			continue
+		}
+		if seen[s] {
+			continue
+		}
+		seen[s] = true
+		out = append(out, s)
+	}
+	return out
 }
 
 func (h *WsHub) GetLobbySettingsMessage() *entities.Message {

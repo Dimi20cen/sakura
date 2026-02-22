@@ -387,6 +387,11 @@ func (j *Journal) PEdgeBuild(e *JournalEntry) {
 		if err != nil {
 			log.Println("error building road when playing journal: ", err)
 		}
+	case entities.BTShip:
+		err := j.g.BuildShip(player, C)
+		if err != nil {
+			log.Println("error building ship when playing journal: ", err)
+		}
 	}
 }
 

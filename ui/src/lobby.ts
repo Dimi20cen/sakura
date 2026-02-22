@@ -5,11 +5,13 @@ import { MSG_RES_TYPE, WsResponse } from "./sock";
 export enum GAME_MODE {
     Base = 1,
     CitiesAndKnights = 2,
+    Seafarers = 3,
 }
 
 export const DISPLAY_GAME_MODE = {
     [GAME_MODE.Base]: "Basic",
     [GAME_MODE.CitiesAndKnights]: "W&W",
+    [GAME_MODE.Seafarers]: "Seafarers",
 };
 
 export type LobbyState = {

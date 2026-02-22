@@ -120,7 +120,7 @@ func (ws *WsClient) handleGame(msg map[string]interface{}) {
 			}
 
 		case "dc": // Development card
-			if ws.Hub.Game.Mode != entities.Base {
+			if ws.Hub.Game.Mode == entities.CitiesAndKnights {
 				return
 			}
 
@@ -277,6 +277,51 @@ func (ws *WsClient) handleGame(msg map[string]interface{}) {
 			}
 			err = ws.Hub.Game.BuildWall(ws.Player, loc)
 			if err != nil {
+				ws.Hub.Game.SendError(err, ws.Player)
+				return
+			}
+
+		case "sh": // Ship
+			if ws.Hub.Game.Mode != entities.Seafarers {
+				return
+			}
+
+			edges := ws.Player.GetBuildLocationsShip(ws.Hub.Game.Graph)
+			if len(edges) == 0 || ws.Player.CanBuild(entities.BTShip) != nil {
+				ws.Hub.Game.SendError(errors.New("nowhere to build or cannot build"), ws.Player)
+				return
+			}
+
+			defer ws.Hub.Game.BroadcastState()
+			res, err := ws.Hub.Game.BlockForAction(ws.Player, 0, &entities.PlayerAction{
+				Type:      entities.PlayerActionTypeChooseEdge,
+				Message:   "Choose location for ship",
+				CanCancel: true,
+				Data:      entities.PlayerActionChooseEdge{Allowed: edges},
+			})
+
+			if res == nil || err != nil {
+				return
+			}
+
+			var loc entities.EdgeCoordinate
+			err = mapstructure.Decode(res, &loc)
+			if err != nil {
+				ws.Hub.Game.SendError(err, ws.Player)
+				return
+			}
+
+			err = ws.Hub.Game.BuildShip(ws.Player, loc)
+			if err != nil {
+				ws.Hub.Game.SendError(err, ws.Player)
+				return
+			}
+
+		case "ms": // Move ship
+			if ws.Hub.Game.Mode != entities.Seafarers {
+				return
+			}
+			if err := ws.Hub.Game.MoveShipInteractive(ws.Player); err != nil {
 				ws.Hub.Game.SendError(err, ws.Player)
 				return
 			}

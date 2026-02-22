@@ -56,6 +56,20 @@ export default class CommandHub {
         });
     };
 
+    public buildShip = () => {
+        this.sendGameMessage({
+            t: socketTypes.MSG_TYPE.BUILD,
+            o: socketTypes.BUILD_OBJECT.SHIP,
+        });
+    };
+
+    public moveShip = () => {
+        this.sendGameMessage({
+            t: socketTypes.MSG_TYPE.BUILD,
+            o: socketTypes.BUILD_OBJECT.MOVE_SHIP,
+        });
+    };
+
     public getGameState = () => {
         this.sendGameMessage({
             t: socketTypes.MSG_TYPE.REQUEST_INFO,

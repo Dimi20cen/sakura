@@ -421,6 +421,9 @@ func (g *Game) MoveRobberInteractive() error {
 	// Move the robber
 	tiles := make([]*entities.Tile, 0)
 	for _, t := range g.Graph.Tiles {
+		if g.Mode != entities.Seafarers && t.Type == entities.TileTypeSea {
+			continue
+		}
 		if (g.Robber.Tile != t ||
 			(g.Robber.Tile.Type == entities.TileTypeDesert && g.Settings.Advanced && g.AdvancedSettings.RerollOn7)) &&
 			!t.Fog {
@@ -436,7 +439,7 @@ func (g *Game) MoveRobberInteractive() error {
 	exp, err := g.BlockForAction(g.CurrentPlayer, g.TimerVals.PlaceRobber, &entities.PlayerAction{
 		Type:    entities.PlayerActionTypeChooseTile,
 		Data:    robberAction,
-		Message: "Choose a position for the robber",
+		Message: "Choose a position for the robber/pirate",
 	})
 	if err != nil {
 		return err

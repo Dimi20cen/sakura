@@ -15,6 +15,24 @@ Open source game with mechanics similar to Catan.
 - Run `go run cmd/server/main.go`. Use `nodemon --signal SIGINT -e go --exec go run --race cmd/server/main.go` to watch backend changes and restart the server automatically.
 - Run `npm run dev` in `./ui` to start the frontend.
 
+## Game Modes
+
+- `Basic` (Mode `1`)
+- `Wonders & Warriors` (Mode `2`)
+- `Seafarers` (Mode `3`)
+
+### Seafarers MVP
+
+The current Seafarers rollout includes:
+
+- Ships as a separate buildable (`wood + wool`)
+- Ship movement once per turn, before rolling dice
+- Pirate behavior via robber-on-sea (blocks ship edge usage on adjacent edges)
+- Longest trade route logic (roads + ships with settlement/city transition rule)
+- One built-in official map: `Seafarers - Heading for New Shores`
+
+Automated smoke coverage is in `game/seafarers_smoke_test.go`.
+
 ## License
 
 All code in this repository is licensed under the AGPLv3 license. The copyright for the artwork is owned by the project owners and may not be used without permission.

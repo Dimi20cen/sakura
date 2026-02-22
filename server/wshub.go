@@ -297,10 +297,13 @@ func (h *WsHub) StoreSettings() {
 
 	if h.Game.Settings.MapDefn == nil || h.Game.Settings.MapDefn.Name != h.Game.Settings.MapName {
 		defn := h.Game.Store.GetMap(h.Game.Settings.MapName)
+		if defn == nil {
+			defn = maps.GetMapByName(h.Game.Settings.MapName)
+		}
 
 		// Get base map as default
 		if defn == nil {
-			h.Game.Settings.MapName = "Base"
+			h.Game.Settings.MapName = maps.BaseMapName
 			defn = maps.GetBaseMap()
 			h.BroadcastLobbyMessage(h.GetLobbySettingsMessage())
 		}

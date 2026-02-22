@@ -86,16 +86,18 @@ func (g *Game) GetPlayerSecretState(p *entities.Player) entities.PlayerSecretSta
 		cardData[t] = int(deck.Quantity)
 	}
 
-	busy := g.HasPlayerPendingAction() ||
-		g.DiceState == 0 ||
+	commonBusy := g.HasPlayerPendingAction() ||
 		g.CurrentPlayer != p ||
 		g.GameOver ||
 		p.IsSpectator
+	busy := commonBusy || g.DiceState == 0
 
 	actions := entities.AllowedActionsMap{
 		BuildSettlement:    !busy && p.CanBuild(entities.BTSettlement) == nil && len(p.GetBuildLocationsSettlement(g.Graph, false, false)) > 0,
 		BuildCity:          !busy && p.CanBuild(entities.BTCity) == nil && len(p.GetBuildLocationsCity(g.Graph)) > 0,
 		BuildRoad:          !busy && p.CanBuild(entities.BTRoad) == nil && len(p.GetBuildLocationsRoad(g.Graph, false)) > 0,
+		BuildShip:          !busy && p.CanBuild(entities.BTShip) == nil && len(p.GetBuildLocationsShip(g.Graph)) > 0,
+		MoveShip:           !commonBusy && g.DiceState == 0 && g.Mode == entities.Seafarers && !p.ShipMoved && len(g.GetMovableShips(p)) > 0,
 		BuyDevelopmentCard: !busy && p.CanBuyDevelopmentCard(),
 		Trade:              !busy && !g.SpecialBuildPhase,
 		EndTurn:            !busy && g.CanEndTurn() == nil,

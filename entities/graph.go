@@ -74,6 +74,28 @@ type (
 	}
 )
 
+func (e *Edge) IsWaterEdge() bool {
+	for _, t := range e.AdjacentTiles {
+		if t.Type == TileTypeSea {
+			return true
+		}
+	}
+	return false
+}
+
+func (e *Edge) IsLandEdge() bool {
+	return !e.IsWaterEdge()
+}
+
+func (v *Vertex) HasAdjacentSea() bool {
+	for _, t := range v.AdjacentTiles {
+		if t.Type == TileTypeSea {
+			return true
+		}
+	}
+	return false
+}
+
 func (tile *Tile) GetVertexCoordinates() []Coordinate {
 	c := tile.Center
 	coords := make([]Coordinate, 6)

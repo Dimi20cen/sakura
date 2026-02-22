@@ -27,6 +27,8 @@ let timerLastTickAt = 0;
 export let buttons: {
     buildSettlement: ButtonSprite;
     buildRoad: ButtonSprite;
+    buildShip?: ButtonSprite;
+    moveShip?: ButtonSprite;
     buildCity: ButtonSprite;
     buyDevelopmentCard?: ButtonSprite;
     openKnightBox?: ButtonSprite;
@@ -59,7 +61,11 @@ const COUNT_WIDTH = 20;
 const COUNT_HEIGHT = 19;
 const COUNT_FONTSIZE = 13;
 const C_HEIGHT = 90;
-const ACTION_BAR_WIDTH = BUTTON_Y * 2 + BUTTON_X_DELTA * 4 + BUTTON_WIDTH;
+const actionBarWidth = () =>
+    BUTTON_Y * 2 +
+    BUTTON_X_DELTA *
+        (state.settings.Mode == state.GameMode.Seafarers ? 5 : 4) +
+    BUTTON_WIDTH;
 
 function formatSeconds(seconds: number) {
     const s = Math.max(0, Math.floor(seconds || 0));
@@ -178,7 +184,7 @@ export function relayout() {
     }
 
     if (turnTimerContainer && !turnTimerContainer.destroyed) {
-        turnTimerContainer.x = container.x + ACTION_BAR_WIDTH - 70;
+        turnTimerContainer.x = container.x + actionBarWidth() - 70;
         turnTimerContainer.y = container.y + (C_HEIGHT - 36) / 2;
     }
     updateTurnTimerWidget();
@@ -192,6 +198,8 @@ export enum ButtonType {
     Settlement = "settlement",
     City = "city",
     Road = "road",
+    Ship = "ship",
+    MoveShip = "move_ship",
     DevelopmentCard = "dcard",
     KnightBox = "knight",
     KnightBuild = "knight_build",
@@ -415,7 +423,7 @@ export function render(commandHub: CommandHub) {
 
     container.addChild(
         windows.getWindowSprite(
-            ACTION_BAR_WIDTH,
+            actionBarWidth(),
             C_HEIGHT,
         ),
     );
@@ -546,6 +554,88 @@ export function render(commandHub: CommandHub) {
             buttons.buyDevelopmentCard,
             "Buy an action card",
         ).setCards([3, 4, 5]);
+    }
+
+    if (state.settings.Mode == state.GameMode.Seafarers) {
+        buttons.buyDevelopmentCard = getButtonSprite(
+            ButtonType.DevelopmentCard,
+            BUTTON_WIDTH,
+            0,
+            playerColor,
+            rerender,
+        );
+        buttons.buyDevelopmentCard.interactive = true;
+        buttons.buyDevelopmentCard.cursor = "pointer";
+        buttons.buyDevelopmentCard.reactDisable = true;
+        buttons.buyDevelopmentCard.x = BUTTON_Y + BUTTON_X_DELTA * 3;
+        buttons.buyDevelopmentCard.y = BUTTON_Y;
+        buttons.buyDevelopmentCard.zIndex = 10;
+        buttons.buyDevelopmentCard.onClick(
+            rerenderAnd(commandHub.buyDevelopmentCard),
+        );
+        container.addChild(buttons.buyDevelopmentCard);
+        buttons.buyDevelopmentCard.tooltip = new windows.TooltipHandler(
+            buttons.buyDevelopmentCard,
+            "Buy an action card",
+        ).setCards([3, 4, 5]);
+    }
+
+    if (state.settings.Mode == state.GameMode.Seafarers) {
+        buttons.buildShip = getButtonSprite(
+            ButtonType.Ship,
+            BUTTON_WIDTH,
+            0,
+            playerColor,
+            rerender,
+        );
+        buttons.buildShip.interactive = true;
+        buttons.buildShip.cursor = "pointer";
+        buttons.buildShip.reactDisable = true;
+        buttons.buildShip.x = BUTTON_Y + BUTTON_X_DELTA * 4;
+        buttons.buildShip.y = BUTTON_Y;
+        buttons.buildShip.zIndex = 10;
+        buttons.buildShip.onClick(rerenderAnd(commandHub.buildShip));
+        container.addChild(buttons.buildShip);
+        const cs = getCountSprite(COUNT_WIDTH, COUNT_HEIGHT, COUNT_FONTSIZE);
+        buttonCounts[ButtonType.Ship] = cs;
+        cs.sprite.anchor.x = 1;
+        cs.sprite.x = BUTTON_WIDTH;
+        cs.sprite.zIndex = 10;
+        buttons.buildShip.sortableChildren = true;
+        buttons.buildShip.addChild(cs.sprite);
+        buttons.buildShip.tooltip = new windows.TooltipHandler(
+            buttons.buildShip,
+            "Build a ship",
+        ).setCards([1, 3]);
+
+        buttons.moveShip = getButtonSprite(
+            ButtonType.MoveShip,
+            BUTTON_WIDTH,
+            0,
+            playerColor,
+            rerender,
+        );
+        buttons.moveShip.interactive = true;
+        buttons.moveShip.cursor = "pointer";
+        buttons.moveShip.reactDisable = true;
+        buttons.moveShip.x = BUTTON_Y + BUTTON_X_DELTA * 1;
+        buttons.moveShip.y = BUTTON_Y;
+        buttons.moveShip.zIndex = 10;
+        buttons.moveShip.onClick(rerenderAnd(commandHub.moveShip));
+        container1 = new PIXI.Container();
+        container1.addChild(
+            windows.getWindowSprite(BUTTON_X_DELTA + BUTTON_WIDTH + 2 * BUTTON_Y, C_HEIGHT),
+        );
+        container1.x = container.x + BUTTON_X_DELTA * 1 - 18;
+        container1.y = container.y - C_HEIGHT - 10;
+        container1.zIndex = 1300;
+        container1.visible = !ws.isSpectator();
+        container1.addChild(buttons.moveShip);
+        canvas.app.stage.addChild(container1);
+        buttons.moveShip.tooltip = new windows.TooltipHandler(
+            buttons.moveShip,
+            "Move one open-ended ship before rolling dice",
+        );
     }
 
     // Build wall
@@ -866,6 +956,8 @@ export function render(commandHub: CommandHub) {
 
     // End Turn
     {
+        const endTurnSlot =
+            state.settings.Mode == state.GameMode.Seafarers ? 5 : 4;
         buttons.endTurn = getButtonSprite(
             ButtonType.EndTurn,
             BUTTON_WIDTH,
@@ -876,7 +968,7 @@ export function render(commandHub: CommandHub) {
         buttons.endTurn.interactive = true;
         buttons.endTurn.cursor = "pointer";
         buttons.endTurn.reactDisable = true;
-        buttons.endTurn.x = BUTTON_Y + BUTTON_X_DELTA * 4;
+        buttons.endTurn.x = BUTTON_Y + BUTTON_X_DELTA * endTurnSlot;
         buttons.endTurn.y = BUTTON_Y;
         buttons.endTurn.zIndex = 10;
         buttons.endTurn.onClick(rerenderAnd(commandHub.endTurn));
@@ -961,6 +1053,8 @@ export function updateButtonsSecretState(state: PlayerSecretState) {
     buttons.buildSettlement.setEnabled(state.AllowedActions?.BuildSettlement);
     buttons.buildCity.setEnabled(state.AllowedActions?.BuildCity);
     buttons.buildRoad.setEnabled(state.AllowedActions?.BuildRoad);
+    buttons.buildShip?.setEnabled(state.AllowedActions?.BuildShip);
+    buttons.moveShip?.setEnabled(state.AllowedActions?.MoveShip);
     buttons.buyDevelopmentCard?.setEnabled(
         state.AllowedActions?.BuyDevelopmentCard,
     );

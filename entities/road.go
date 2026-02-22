@@ -1,9 +1,5 @@
 package entities
 
-import (
-	"math"
-)
-
 type Road struct {
 	Owner    *Player       `msgpack:"p"`
 	Location *Edge         `msgpack:"e"`
@@ -52,7 +48,7 @@ func (p *Player) GetBuildLocationsRoad(g *Graph, init bool) []*Edge {
 		}
 
 		for _, e := range g.GetAdjacentVertexEdges(v) {
-			if e.Placement == nil {
+			if e.Placement == nil && e.IsLandEdge() {
 				edges[e] = true
 			}
 		}
@@ -62,7 +58,7 @@ func (p *Player) GetBuildLocationsRoad(g *Graph, init bool) []*Edge {
 		v, _ := g.GetVertex(*c)
 		if v != nil && (v.Placement == nil || v.Placement.GetOwner() == p) {
 			for _, adjE := range g.GetAdjacentVertexEdges(v) {
-				if adjE.Placement == nil {
+				if adjE.Placement == nil && adjE.IsLandEdge() {
 					edges[adjE] = true
 				}
 			}
@@ -71,11 +67,57 @@ func (p *Player) GetBuildLocationsRoad(g *Graph, init bool) []*Edge {
 
 	if !init {
 		for _, ep := range p.EdgePlacements {
+			if ep.GetType() != BTRoad {
+				continue
+			}
 			e := ep.GetLocation()
 
 			addVertex(&e.C.C1)
 			addVertex(&e.C.C2)
 		}
+	}
+
+	keys := make([]*Edge, 0, len(edges))
+	for k := range edges {
+		keys = append(keys, k)
+	}
+	return keys
+}
+
+func (p *Player) GetBuildLocationsShip(g *Graph) []*Edge {
+	edges := make(map[*Edge]bool)
+
+	addVertex := func(c *Coordinate) {
+		v, _ := g.GetVertex(*c)
+		if v == nil || (v.Placement != nil && v.Placement.GetOwner() != p) {
+			return
+		}
+
+		for _, adjE := range g.GetAdjacentVertexEdges(v) {
+			if adjE.Placement == nil && adjE.IsWaterEdge() {
+				edges[adjE] = true
+			}
+		}
+	}
+
+	// Coastal settlements/cities can start shipping routes.
+	for _, vp := range p.VertexPlacements {
+		if vp.GetType() != BTSettlement && vp.GetType() != BTCity {
+			continue
+		}
+		if vp.GetLocation().HasAdjacentSea() {
+			addVertex(&vp.GetLocation().C)
+		}
+	}
+
+	// Existing ships can extend the route.
+	for _, ep := range p.EdgePlacements {
+		if ep.GetType() != BTShip {
+			continue
+		}
+		e := ep.GetLocation()
+		addVertex(&e.C.C1)
+		addVertex(&e.C.C2)
 	}
 
 	keys := make([]*Edge, 0, len(edges))
@@ -131,53 +173,96 @@ func (p *Player) GetLongestRoad(g *Graph) int {
 		return 0
 	}
 
-	longest := 0
-
-	var dfs func(r *Road, v *Vertex, start bool, visited map[EdgeBuildable]bool) int
-	dfs = func(r *Road, v *Vertex, start bool, visited map[EdgeBuildable]bool) int {
-		if !start && visited[r] {
-			return 0
+	owned := make([]EdgeBuildable, 0, len(p.EdgePlacements))
+	for _, ep := range p.EdgePlacements {
+		if ep.GetType() == BTRoad || ep.GetType() == BTShip {
+			owned = append(owned, ep)
 		}
-
-		visited[r] = true
-
-		var currentLength int
-		if !start {
-			currentLength = 1
-		} else {
-			currentLength = 0
-		}
-		longestSubPath := 0
-
-		for _, adjRoad := range r.GetAdjacentRoads(g, v) {
-			if !visited[adjRoad] {
-				v1, v2 := adjRoad.GetVertices(g)
-				var adjV *Vertex
-				if v1 == v {
-					adjV = v2
-				} else {
-					adjV = v1
-				}
-
-				currentLongestSubPath := dfs(adjRoad, adjV, false, visited)
-				longestSubPath = int(math.Max(float64(longestSubPath), float64(currentLongestSubPath)))
-			}
-		}
-
-		currentLength += longestSubPath
-
-		return currentLength
+	}
+	if len(owned) == 0 {
+		return 0
 	}
 
-	for _, ep := range p.EdgePlacements {
-		visited := make(map[EdgeBuildable]bool)
-		v1, v2 := ep.(*Road).GetVertices(g)
-		longestPath1 := dfs(ep.(*Road), v1, true, visited)
-		longestPath2 := dfs(ep.(*Road), v2, true, visited)
+	canTransition := func(at *Vertex, from, to EdgeBuildable) bool {
+		// Enemy settlement/city blocks passing through this vertex.
+		if at.Placement != nil && at.Placement.GetOwner() != p &&
+			(at.Placement.GetType() == BTSettlement || at.Placement.GetType() == BTCity) {
+			return false
+		}
 
-		currentLength := int(math.Max(float64(longestPath1), float64(longestPath2))) + 1
-		if currentLength > longest {
-			longest = currentLength
+		if from.GetType() == to.GetType() {
+			return true
+		}
+
+		// Road<->Ship transition requires own settlement/city on the junction.
+		return at.Placement != nil &&
+			at.Placement.GetOwner() == p &&
+			(at.Placement.GetType() == BTSettlement || at.Placement.GetType() == BTCity)
+	}
+
+	getVertices := func(e EdgeBuildable) (*Vertex, *Vertex) {
+		v1, _ := g.GetVertex(e.GetLocation().C.C1)
+		v2, _ := g.GetVertex(e.GetLocation().C.C2)
+		return v1, v2
+	}
+
+	getOtherVertex := func(e EdgeBuildable, at *Vertex) *Vertex {
+		v1, v2 := getVertices(e)
+		if v1 == at {
+			return v2
+		}
+		return v1
+	}
+
+	getAdjacent := func(current EdgeBuildable, at *Vertex) []EdgeBuildable {
+		if at == nil {
+			return []EdgeBuildable{}
+		}
+
+		adj := make([]EdgeBuildable, 0)
+		for _, e := range g.GetAdjacentVertexEdges(at) {
+			if e.Placement == nil || e.Placement == current || e.Placement.GetOwner() != p {
+				continue
+			}
+			t := e.Placement.GetType()
+			if t != BTRoad && t != BTShip {
+				continue
+			}
+			if canTransition(at, current, e.Placement) {
+				adj = append(adj, e.Placement)
+			}
+		}
+		return adj
+	}
+
+	visited := make(map[EdgeBuildable]bool, len(owned))
+	var dfs func(current EdgeBuildable, at *Vertex) int
+	dfs = func(current EdgeBuildable, at *Vertex) int {
+		visited[current] = true
+		best := 0
+		for _, next := range getAdjacent(current, at) {
+			if visited[next] {
+				continue
+			}
+			l := dfs(next, getOtherVertex(next, at))
+			if l > best {
+				best = l
+			}
+		}
+		visited[current] = false
+		return 1 + best
+	}
+
+	longest := 0
+	for _, e := range owned {
+		v1, v2 := getVertices(e)
+		l1 := dfs(e, v1)
+		l2 := dfs(e, v2)
+		if l1 > longest {
+			longest = l1
+		}
+		if l2 > longest {
+			longest = l2
 		}
 	}
 

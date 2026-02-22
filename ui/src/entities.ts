@@ -120,7 +120,8 @@ export enum VertexPlacementType {
 }
 
 export enum EdgePlacementType {
-    Road = 1,
+    Road = 3,
+    Ship = 8,
 }
 
 export enum BuildableType {
@@ -128,4 +129,5 @@ export enum BuildableType {
     City = 2,
     Road = 3,
     Wall = 7,
+    Ship = 8,
 }

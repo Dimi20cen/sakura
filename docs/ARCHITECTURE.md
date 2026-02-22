@@ -111,6 +111,18 @@ Inbound game messages are handled by `ui/src/store/gameRuntime.ts` (with Pixi re
 - Right-side stack (`Game Log`, `Chat`, `Resource Bank`, `Players`) is aligned via shared rail helpers.
 - Bottom controls (`player hand`, `action/options`, `dice`, `timer`) derive positions from the same preset to keep spacing consistent across resolutions.
 
+## Game Modes and Maps
+
+- Supported game modes:
+  - `1` = Base
+  - `2` = Cities and Knights (Wonders & Warriors)
+  - `3` = Seafarers
+- Built-in official maps are resolved in `maps/main.go`.
+- At runtime, map resolution order is:
+  1. DB map (`store.GetMap(name)`)
+  2. Built-in map fallback (`maps.GetMapByName(name)`)
+  3. Fallback to `Base`
+
 ## Data Model (MongoDB collections)
 
 Created/used through `mango/creator.go`, `mango/registry.go`, and `ui/utils/mango.ts`:

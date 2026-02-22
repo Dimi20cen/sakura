@@ -75,6 +75,7 @@ let WINDOW_SCALE = 1.08;
 export enum GameMode {
     Base = 1,
     CitiesAndKnights = 2,
+    Seafarers = 3,
 }
 
 // Game settings

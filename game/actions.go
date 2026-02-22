@@ -201,6 +201,12 @@ func (g *Game) BuildRoad(player *entities.Player, c entities.EdgeCoordinate) err
 	if err != nil {
 		return err
 	}
+	if !e.IsLandEdge() {
+		return errors.New("roads can only be built on land edges")
+	}
+	if g.IsSeaRobberBlockingEdge(e) {
+		return errors.New("pirate blocks this edge")
+	}
 
 	err = player.BuildAtEdge(e, entities.BTRoad)
 	if err != nil {
@@ -257,6 +263,293 @@ func (g *Game) BuildRoad(player *entities.Player, c entities.EdgeCoordinate) err
 	g.CheckForVictory()
 
 	return nil
+}
+
+func (g *Game) IsSeaRobberBlockingEdge(e *entities.Edge) bool {
+	if g.Mode != entities.Seafarers || g.Robber == nil || g.Robber.Tile == nil || g.Robber.Tile.Type != entities.TileTypeSea {
+		return false
+	}
+	for _, t := range e.AdjacentTiles {
+		if t == g.Robber.Tile {
+			return true
+		}
+	}
+	return false
+}
+
+func (g *Game) BuildShip(player *entities.Player, c entities.EdgeCoordinate) error {
+	if g.Mode != entities.Seafarers {
+		return errors.New("ships are only available in Seafarers")
+	}
+	init := g.IsInitPhase()
+
+	if err := g.EnsureCurrentPlayer(player); err != nil && !init {
+		return err
+	}
+
+	if err := g.ensureDiceRolled(); err != nil {
+		return err
+	}
+
+	if err := player.CanBuild(entities.BTShip); !init && err != nil {
+		return err
+	}
+
+	canBuild := func() bool {
+		for _, e := range player.GetBuildLocationsShip(g.Graph) {
+			if (e.C.C1 == c.C1 && e.C.C2 == c.C2) || (e.C.C1 == c.C2 && e.C.C2 == c.C1) {
+				return true
+			}
+		}
+		return false
+	}
+
+	if !canBuild() {
+		return errors.New("cannot build ship here")
+	}
+
+	e, err := g.Graph.GetEdge(c)
+	if err != nil {
+		return err
+	}
+	if !e.IsWaterEdge() {
+		return errors.New("ships can only be built on water edges")
+	}
+	if g.IsSeaRobberBlockingEdge(e) {
+		return errors.New("pirate blocks this edge")
+	}
+
+	g.MoveCards(int(player.Order), -1, entities.CardTypeWood, 1, false, false)
+	g.MoveCards(int(player.Order), -1, entities.CardTypeWool, 1, false, false)
+
+	err = player.BuildAtEdge(e, entities.BTShip)
+	if err != nil {
+		return err
+	}
+	player.BuildablesLeft[entities.BTShip]--
+
+	g.SetExtraVictoryPoints()
+	g.SendPlayerSecret(player)
+	g.BroadcastState()
+	g.BroadcastMessage(&entities.Message{
+		Type: entities.MessageTypeEdgePlacement,
+		Data: e.Placement,
+	})
+	g.j.WEdgeBuild(e)
+	g.CheckForVictory()
+
+	return nil
+}
+
+func (g *Game) GetMovableShips(player *entities.Player) []*entities.Edge {
+	movable := make([]*entities.Edge, 0)
+
+	shipDegreeAtVertex := func(v *entities.Vertex, exclude *entities.Edge) int {
+		deg := 0
+		for _, adjE := range g.Graph.GetAdjacentVertexEdges(v) {
+			if adjE == exclude || adjE.Placement == nil || adjE.Placement.GetOwner() != player || adjE.Placement.GetType() != entities.BTShip {
+				continue
+			}
+			deg++
+		}
+		return deg
+	}
+
+	for _, ep := range player.EdgePlacements {
+		if ep.GetType() != entities.BTShip {
+			continue
+		}
+		e := ep.GetLocation()
+		if g.IsSeaRobberBlockingEdge(e) {
+			continue
+		}
+
+		v1, _ := g.Graph.GetVertex(e.C.C1)
+		v2, _ := g.Graph.GetVertex(e.C.C2)
+		if v1 == nil || v2 == nil {
+			continue
+		}
+
+		isEndpoint := func(v *entities.Vertex) bool {
+			if v.Placement != nil {
+				return false
+			}
+			return shipDegreeAtVertex(v, e) == 0
+		}
+
+		if isEndpoint(v1) || isEndpoint(v2) {
+			movable = append(movable, e)
+		}
+	}
+
+	return movable
+}
+
+func (g *Game) MoveShip(player *entities.Player, fromC, toC entities.EdgeCoordinate) error {
+	if g.Mode != entities.Seafarers {
+		return errors.New("ships are only available in Seafarers")
+	}
+	if err := g.EnsureCurrentPlayer(player); err != nil {
+		return err
+	}
+	if g.DiceState != 0 {
+		return errors.New("ship movement is only allowed before rolling dice")
+	}
+	if player.ShipMoved {
+		return errors.New("already moved a ship this turn")
+	}
+
+	allowed := g.GetMovableShips(player)
+	isAllowedFrom := false
+	for _, e := range allowed {
+		if (e.C.C1 == fromC.C1 && e.C.C2 == fromC.C2) || (e.C.C1 == fromC.C2 && e.C.C2 == fromC.C1) {
+			isAllowedFrom = true
+			break
+		}
+	}
+	if !isAllowedFrom {
+		return errors.New("this ship cannot be moved")
+	}
+
+	from, err := g.Graph.GetEdge(fromC)
+	if err != nil || from.Placement == nil || from.Placement.GetOwner() != player || from.Placement.GetType() != entities.BTShip {
+		return errors.New("invalid source ship")
+	}
+
+	if err := from.RemovePlacement(); err != nil {
+		return err
+	}
+	g.j.WEdgeBuild(from)
+	g.BroadcastMessage(&entities.Message{
+		Type: entities.MessageTypeEdgePlacementRem,
+		Data: &entities.Road{Owner: player, Location: from, Type: entities.BTShip},
+	})
+
+	defer func() {
+		// If placement failed, we should have restored before returning with error.
+		g.BroadcastState()
+	}()
+
+	canBuild := false
+	for _, e := range player.GetBuildLocationsShip(g.Graph) {
+		if (e.C.C1 == toC.C1 && e.C.C2 == toC.C2) || (e.C.C1 == toC.C2 && e.C.C2 == toC.C1) {
+			canBuild = true
+			break
+		}
+	}
+	if !canBuild {
+		player.BuildAtEdge(from, entities.BTShip)
+		g.j.WEdgeBuild(from)
+		return errors.New("invalid destination for moved ship")
+	}
+
+	to, err := g.Graph.GetEdge(toC)
+	if err != nil || !to.IsWaterEdge() || g.IsSeaRobberBlockingEdge(to) {
+		player.BuildAtEdge(from, entities.BTShip)
+		g.j.WEdgeBuild(from)
+		return errors.New("destination edge is blocked")
+	}
+
+	if err := player.BuildAtEdge(to, entities.BTShip); err != nil {
+		player.BuildAtEdge(from, entities.BTShip)
+		g.j.WEdgeBuild(from)
+		return err
+	}
+	g.j.WEdgeBuild(to)
+	g.BroadcastMessage(&entities.Message{
+		Type: entities.MessageTypeEdgePlacement,
+		Data: to.Placement,
+	})
+	player.ShipMoved = true
+	g.SetExtraVictoryPoints()
+	g.SendPlayerSecret(player)
+	g.CheckForVictory()
+	return nil
+}
+
+func (g *Game) MoveShipInteractive(player *entities.Player) error {
+	if g.Mode != entities.Seafarers {
+		return errors.New("ships are only available in Seafarers")
+	}
+	if err := g.EnsureCurrentPlayer(player); err != nil {
+		return err
+	}
+	if g.DiceState != 0 {
+		return errors.New("ship movement is only allowed before rolling dice")
+	}
+	if player.ShipMoved {
+		return errors.New("already moved a ship this turn")
+	}
+
+	movable := g.GetMovableShips(player)
+	if len(movable) == 0 {
+		return errors.New("no movable ships")
+	}
+
+	resFrom, err := g.BlockForAction(player, 0, &entities.PlayerAction{
+		Type:      entities.PlayerActionTypeChooseEdge,
+		Message:   "Choose ship to move",
+		CanCancel: true,
+		Data: entities.PlayerActionChooseEdge{
+			Allowed: movable,
+		},
+	})
+	if err != nil || resFrom == nil {
+		return err
+	}
+
+	var fromC entities.EdgeCoordinate
+	if err := mapstructure.Decode(resFrom, &fromC); err != nil {
+		return err
+	}
+	from, err := g.Graph.GetEdge(fromC)
+	if err != nil || from.Placement == nil || from.Placement.GetOwner() != player || from.Placement.GetType() != entities.BTShip {
+		return errors.New("invalid ship selection")
+	}
+
+	// Temporarily remove selected ship to calculate destination edges.
+	if err := from.RemovePlacement(); err != nil {
+		return err
+	}
+	restore := true
+	defer func() {
+		if restore && from.Placement == nil {
+			_ = player.BuildAtEdge(from, entities.BTShip)
+		}
+	}()
+
+	destinations := make([]*entities.Edge, 0)
+	for _, e := range player.GetBuildLocationsShip(g.Graph) {
+		if e == from || g.IsSeaRobberBlockingEdge(e) {
+			continue
+		}
+		destinations = append(destinations, e)
+	}
+	if len(destinations) == 0 {
+		return errors.New("no valid destination for selected ship")
+	}
+
+	resTo, err := g.BlockForAction(player, 0, &entities.PlayerAction{
+		Type:      entities.PlayerActionTypeChooseEdge,
+		Message:   "Choose destination for ship",
+		CanCancel: true,
+		Data: entities.PlayerActionChooseEdge{
+			Allowed: destinations,
+		},
+	})
+	if err != nil || resTo == nil {
+		return err
+	}
+	restore = true
+	_ = player.BuildAtEdge(from, entities.BTShip)
+
+	var toC entities.EdgeCoordinate
+	if err := mapstructure.Decode(resTo, &toC); err != nil {
+		return err
+	}
+
+	restore = false
+	return g.MoveShip(player, fromC, toC)
 }
 
 func (g *Game) BuyDevelopmentCard(player *entities.Player) error {
@@ -822,6 +1115,7 @@ func (g *Game) EndTurn(player *entities.Player) error {
 	if !g.SpecialBuildPhase {
 		g.DiceState = 0
 		g.EndTurnResetDevelopmentCards()
+		g.CurrentPlayer.ShipMoved = false
 		g.CurrentPlayer.TimeLeft = g.TimerVals.DiceRoll
 	} else {
 		g.CurrentPlayer.TimeLeft = g.TimerVals.SpecialBuild

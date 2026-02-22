@@ -35,4 +35,5 @@ const (
 	BTKnight2    BuildableType = 5
 	BTKnight3    BuildableType = 6
 	BTWall       BuildableType = 7
+	BTShip       BuildableType = 8
 )

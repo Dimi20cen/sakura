@@ -36,6 +36,7 @@ type (
 
 		TimeLeft     int  `msgpack:"-"`
 		SpecialBuild bool `msgpack:"-"`
+		ShipMoved    bool `msgpack:"-"`
 
 		IsBot           int32 `msgpack:"-"`
 		InactiveSeconds int32 `msgpack:"-"`
@@ -99,6 +100,8 @@ type (
 		BuildSettlement    bool `msgpack:"s,omitempty"`
 		BuildCity          bool `msgpack:"c,omitempty"`
 		BuildRoad          bool `msgpack:"r,omitempty"`
+		BuildShip          bool `msgpack:"sh,omitempty"`
+		MoveShip           bool `msgpack:"ms,omitempty"`
 		BuyDevelopmentCard bool `msgpack:"d,omitempty"`
 		Trade              bool `msgpack:"t,omitempty"`
 		EndTurn            bool `msgpack:"e,omitempty"`
@@ -181,6 +184,9 @@ func NewPlayer(g GameMode, id, username string, order uint16) (*Player, error) {
 	player.BuildablesLeft[BTSettlement] = 5
 	player.BuildablesLeft[BTCity] = 4
 	player.BuildablesLeft[BTRoad] = 15
+	if g == Seafarers {
+		player.BuildablesLeft[BTShip] = 15
+	}
 
 	if g == CitiesAndKnights {
 		player.BuildablesLeft[BTKnight1] = 2
@@ -257,6 +263,8 @@ func (p *Player) BuildAtEdge(e *Edge, t BuildableType) error {
 	switch t {
 	case BTRoad:
 		e.Placement = NewRoad(e)
+	case BTShip:
+		e.Placement = NewShip(e)
 	default:
 		return errors.New("invalid build type")
 	}
@@ -327,6 +335,13 @@ func (p *Player) CanBuild(t BuildableType) error {
 
 	if t == BTRoad {
 		if !p.CurrentHand.HasResources(1, 1, 0, 0, 0) {
+			return errors.New("not enough resources")
+		}
+		return nil
+	}
+
+	if t == BTShip {
+		if !p.CurrentHand.HasResources(1, 0, 1, 0, 0) {
 			return errors.New("not enough resources")
 		}
 		return nil

@@ -355,12 +355,14 @@ import btnNo from "../public/assets/buttons/no.png";
 import btnSettlement from "../public/assets/buttons/settlement.png";
 import btnCity from "../public/assets/buttons/city.png";
 import btnRoad from "../public/assets/buttons/road.png";
+import btnShip from "../public/assets/buttons/road.png";
 import btnDevelopmentCard from "../public/assets/buttons/dcard.png";
 import btnKnightBox from "../public/assets/buttons/knight.png";
 import btnKnightBuild from "../public/assets/buttons/knight_build.png";
 import btnKnightActivate from "../public/assets/buttons/knight_activate.png";
 import btnKnightRobber from "../public/assets/buttons/knight_robber.png";
 import btnKnightMove from "../public/assets/buttons/knight_move.png";
+import btnMoveShip from "../public/assets/buttons/knight_move.png";
 import btnCityImprove from "../public/assets/buttons/improve.png";
 import btnCityImprovePaper from "../public/assets/buttons/improve_paper.jpg";
 import btnCityImproveCloth from "../public/assets/buttons/improve_cloth.jpg";
@@ -378,6 +380,8 @@ export const buttons: { [key in ButtonType]: StaticImageData } = {
     settlement: btnSettlement,
     city: btnCity,
     road: btnRoad,
+    ship: btnShip,
+    move_ship: btnMoveShip,
     dcard: btnDevelopmentCard,
     knight: btnKnightBox,
     knight_build: btnKnightBuild,

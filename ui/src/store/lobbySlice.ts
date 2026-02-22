@@ -7,6 +7,7 @@ import { LobbyState } from "./types";
 export enum GAME_MODE {
     Base = 1,
     CitiesAndKnights = 2,
+    Seafarers = 3,
 }
 
 export const getInitialLobbyState = (): LobbyState => ({

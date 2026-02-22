@@ -137,7 +137,7 @@ func GetNewHand(g GameMode, isBank bool) (*Hand, error) {
 	addCard(hand, CardTypeOre)
 
 	switch g {
-	case Base:
+	case Base, Seafarers:
 		knightQuantity, vpQuantity, roadBuildingQuantity, yearOfPlentyQuantity, monopolyQuantity := GetInitialDevelopmentCardQuantity(isBank)
 		hand.addDevelopmentCardDeck(DevelopmentCardDeck{Type: DevelopmentCardKnight, Quantity: knightQuantity})
 		hand.addDevelopmentCardDeck(DevelopmentCardDeck{Type: DevelopmentCardVictoryPoint, Quantity: vpQuantity})

@@ -21,7 +21,7 @@ func GetNewBank(gameMode GameMode) (*Bank, error) {
 	bank.DevelopmentCardOrder = make(map[CardType][]DevelopmentCardType)
 
 	// Create development card order
-	if gameMode == Base {
+	if gameMode == Base || gameMode == Seafarers {
 		bank.DevelopmentCardOrder[0] = GenerateDevelopmentCardOrder()
 	} else if gameMode == CitiesAndKnights {
 		bank.DevelopmentCardOrder[CardTypePaper] = GenerateProgessCardOrder(CardTypePaper)

@@ -133,7 +133,7 @@ func (game *Game) Initialize(id string, numPlayers uint16) (*Game, error) {
 	}()
 
 	gameMode := game.Settings.Mode
-	if gameMode != entities.Base && gameMode != entities.CitiesAndKnights {
+	if gameMode != entities.Base && gameMode != entities.CitiesAndKnights && gameMode != entities.Seafarers {
 		gameMode = entities.Base
 	}
 

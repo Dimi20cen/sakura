@@ -5,10 +5,35 @@ import (
 	"imperials/entities"
 )
 
+const (
+	BaseMapName                  = "Base"
+	SeafarersHeadingForNewShores = "Seafarers - Heading for New Shores"
+)
+
 func GetBaseMap() *entities.MapDefinition {
 	var defn entities.MapDefinition
 	json.Unmarshal([]byte(baseMap), &defn)
 	return &defn
+}
+
+func GetMapByName(name string) *entities.MapDefinition {
+	switch name {
+	case BaseMapName:
+		return GetBaseMap()
+	case SeafarersHeadingForNewShores:
+		var defn entities.MapDefinition
+		json.Unmarshal([]byte(seafarersHeadingForNewShores), &defn)
+		return &defn
+	default:
+		return nil
+	}
+}
+
+func GetOfficialMapNames() []string {
+	return []string{
+		BaseMapName,
+		SeafarersHeadingForNewShores,
+	}
 }
 
 const baseMap = `{"name":"Base","order":[false,true,false,true,false],"ports":[6,6,6,6,1,2,3,4,5],"port_coordinates":[{"C1":{"X":2,"Y":8},"C2":{"X":2,"Y":6}},{"C1":{"X":4,"Y":2},"C2":{"X":6,"Y":0}},{"C1":{"X":10,"Y":0},"C2":{"X":12,"Y":2}},{"C1":{"X":16,"Y":4},"C2":{"X":18,"Y":6}},{"C1":{"X":20,"Y":10},"C2":{"X":20,"Y":12}},{"C1":{"X":18,"Y":16},"C2":{"X":16,"Y":18}},{"C1":{"X":12,"Y":20},"C2":{"X":10,"Y":22}},{"C1":{"X":6,"Y":22},"C2":{"X":4,"Y":20}},{"C1":{"X":2,"Y":16},"C2":{"X":2,"Y":14}}],"numbers":[2,3,3,4,4,5,5,6,6,8,8,9,9,10,10,11,11,12],"tiles":[0,1,1,1,1,2,2,2,3,3,3,3,4,4,4,4,5,5,5],"map":[[8,9,9,9,8],[9,9,9,9,8],[9,9,9,9,9],[9,9,9,9,8],[8,9,9,9,8]]}`
@@ -196,3 +221,19 @@ const goldMap = `{
 		[8, 9, 9, 9, 9],
 		[8, 9, 9, 9, 8]
 	]}`
+
+const seafarersHeadingForNewShores = `{
+	"name":"Seafarers - Heading for New Shores",
+	"order":[false,true,false,true,false],
+	"ports":[6,6,6,6,1,2,3,4,5],
+	"port_coordinates":[{"C1":{"X":2,"Y":8},"C2":{"X":2,"Y":6}},{"C1":{"X":4,"Y":2},"C2":{"X":6,"Y":0}},{"C1":{"X":16,"Y":4},"C2":{"X":18,"Y":6}},{"C1":{"X":20,"Y":10},"C2":{"X":20,"Y":12}},{"C1":{"X":18,"Y":16},"C2":{"X":16,"Y":18}},{"C1":{"X":12,"Y":20},"C2":{"X":10,"Y":22}},{"C1":{"X":6,"Y":22},"C2":{"X":4,"Y":20}},{"C1":{"X":2,"Y":16},"C2":{"X":2,"Y":14}},{"C1":{"X":12,"Y":2},"C2":{"X":14,"Y":0}}],
+	"numbers":[2,3,3,4,4,5,5,6,6,8,8,9,9,10,10,11,11,12],
+	"tiles":[0,1,1,1,2,2,2,3,3,3,4,4,5,5],
+	"map":[
+		[8,9,9,9,8],
+		[9,9,7,7,8],
+		[9,9,7,9,9],
+		[8,9,7,9,8],
+		[8,9,9,9,8]
+	]
+}`

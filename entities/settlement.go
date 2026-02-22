@@ -55,6 +55,15 @@ func (p *Player) GetBuildLocationsSettlement(g *Graph, init bool, allowFog bool)
 		return false
 	}
 
+	hasAdjacentLandTile := func(v *Vertex) bool {
+		for _, tile := range v.AdjacentTiles {
+			if tile.Type != TileTypeSea {
+				return true
+			}
+		}
+		return false
+	}
+
 	if init {
 		for _, v := range g.Vertices {
 			if v.Placement != nil {
@@ -62,6 +71,10 @@ func (p *Player) GetBuildLocationsSettlement(g *Graph, init bool, allowFog bool)
 			}
 
 			if !allowFog && hasAdjacentFogTile(v) {
+				continue
+			}
+
+			if !hasAdjacentLandTile(v) {
 				continue
 			}
 
@@ -74,7 +87,11 @@ func (p *Player) GetBuildLocationsSettlement(g *Graph, init bool, allowFog bool)
 	} else {
 		checkVertex := func(c *Coordinate) {
 			v, _ := g.GetVertex(*c)
-			if v != nil && v.Placement == nil && hasEmptyAdjacentVertices(v) && !hasAdjacentFogTile(v) {
+			if v != nil &&
+				v.Placement == nil &&
+				hasEmptyAdjacentVertices(v) &&
+				!hasAdjacentFogTile(v) &&
+				hasAdjacentLandTile(v) {
 				vertices[v] = true
 			}
 		}

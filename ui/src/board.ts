@@ -7,6 +7,7 @@ import * as assets from "./assets";
 import {
     CoordStr,
     IBoard,
+    BuildableType,
     IEdgePlacement,
     IVertexPlacement,
     VertexPlacementType,
@@ -471,11 +472,15 @@ export function renderEdgePlacement(ep: IEdgePlacement, removed = false) {
     // Container
     const roadContainer: PIXI.Container & anim.Translatable =
         new PIXI.Container();
+    const isShip = ep.Type === BuildableType.Ship;
 
     // Generate sprite with correct color
     const roadSprite = new PIXI.Sprite();
     const color = hexToUrlString(ep.Owner.Color);
     assets.assignTexture(roadSprite, assets.road[color]);
+    if (isShip) {
+        roadSprite.tint = 0x6ea8ff;
+    }
     roadSprite.anchor.x = 0.5;
     roadSprite.anchor.y = 0.5;
     roadContainer.addChild(roadSprite);
@@ -496,6 +501,9 @@ export function renderEdgePlacement(ep: IEdgePlacement, removed = false) {
 
     const shadow = new PIXI.Sprite();
     assets.assignTexture(shadow, assets.road[color]);
+    if (isShip) {
+        shadow.tint = 0x3f6aa8;
+    }
     shadow.anchor.x = roadSprite.anchor.x;
     shadow.anchor.y = roadSprite.anchor.y;
     shadow.x = 6;
@@ -507,7 +515,7 @@ export function renderEdgePlacement(ep: IEdgePlacement, removed = false) {
     roadContainer.addChild(roadSprite);
 
     container.addChild(roadContainer);
-    roadContainer.scale.set(25 / roadSprite.texture.width);
+    roadContainer.scale.set((isShip ? 22 : 25) / roadSprite.texture.width);
 
     if (isInitComplete) {
         anim.requestTranslationAnimation([roadContainer], 4);

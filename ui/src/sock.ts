@@ -55,6 +55,8 @@ export enum BUILD_OBJECT {
     SETTLEMENT = "s",
     CITY = "c",
     ROAD = "r",
+    SHIP = "sh",
+    MOVE_SHIP = "ms",
     DEVELOPMENT_CARD = "dc",
     USE_DEVELOPMENT_CARD = "udc",
 

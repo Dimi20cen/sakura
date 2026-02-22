@@ -70,10 +70,16 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
 
     const changeMode: ChangeEventHandler<HTMLSelectElement> = (event) => {
         const mode = Number(event.target.value);
+        const vpDefault =
+            mode === GAME_MODE.CitiesAndKnights
+                ? 13
+                : mode === GAME_MODE.Seafarers
+                  ? 12
+                  : 10;
         sendSettings({
             ...lobbyState.settings,
             Mode: mode,
-            VictoryPoints: mode === GAME_MODE.CitiesAndKnights ? 13 : 10,
+            VictoryPoints: vpDefault,
         });
     };
 
@@ -345,6 +351,11 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                                     }
                                                 >
                                                     Wonders &amp; Warriors
+                                                </option>
+                                                <option
+                                                    value={GAME_MODE.Seafarers}
+                                                >
+                                                    Seafarers
                                                 </option>
                                             </select>
                                         </div>

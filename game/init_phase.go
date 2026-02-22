@@ -3,6 +3,7 @@ package game
 import (
 	"imperials/entities"
 	"log"
+	"math/rand"
 
 	"github.com/mitchellh/mapstructure"
 )
@@ -80,7 +81,47 @@ func (g *Game) startInitPhase() {
 		if built >= len(g.Players) {
 			v, _ := g.Graph.GetVertex(C)
 			for _, t := range v.AdjacentTiles {
-				if t.Type != entities.TileTypeGold {
+				if t.Type == entities.TileTypeGold {
+					available := make([]entities.CardType, 0, 5)
+					for i := 1; i <= 5; i++ {
+						ct := entities.CardType(i)
+						if g.Bank.Hand.GetCardDeck(ct).Quantity > 0 {
+							available = append(available, ct)
+						}
+					}
+					if len(available) == 0 {
+						continue
+					}
+
+					expGold, errGold := g.BlockForAction(p, g.TimerVals.InitVert, &entities.PlayerAction{
+						Type:    entities.PlayerActionTypeSelectCards,
+						Message: "Choose a resource for starting gold",
+						Data: entities.PlayerActionSelectCards{
+							AllowedTypes: []int{1, 2, 3, 4, 5},
+							Quantity:     1,
+							NotSelfHand:  true,
+						},
+					})
+
+					chosen := available[rand.Intn(len(available))]
+					if errGold == nil {
+						var cards []float64
+						if mapstructure.Decode(expGold, &cards) == nil && len(cards) == 9 {
+							for i := 1; i <= 5; i++ {
+								ct := entities.CardType(i)
+								if cards[i] > 0 && g.Bank.Hand.GetCardDeck(ct).Quantity > 0 {
+									chosen = ct
+									break
+								}
+							}
+						}
+					}
+
+					g.MoveCards(-1, int(p.Order), chosen, 1, true, false)
+					continue
+				}
+
+				if t.Type >= entities.TileTypeWood && t.Type <= entities.TileTypeOre {
 					g.MoveCards(-1, int(p.Order), entities.CardType(t.Type), 1, true, false)
 				}
 			}
@@ -92,14 +133,31 @@ func (g *Game) startInitPhase() {
 	// Build at edge
 	initEdge := func(g *Game, p *entities.Player) {
 		g.resetTimeLeft()
-		AllowedEdges := p.GetBuildLocationsRoad(g.Graph, true)
+		edgeSet := make(map[*entities.Edge]bool)
+		AllowedEdges := make([]*entities.Edge, 0)
+		for _, e := range p.GetBuildLocationsRoad(g.Graph, true) {
+			edgeSet[e] = true
+			AllowedEdges = append(AllowedEdges, e)
+		}
+		if g.Mode == entities.Seafarers {
+			for _, e := range p.GetBuildLocationsShip(g.Graph) {
+				if !edgeSet[e] {
+					edgeSet[e] = true
+					AllowedEdges = append(AllowedEdges, e)
+				}
+			}
+		}
 		if len(AllowedEdges) == 0 {
 			return
 		}
 
+		msg := "Choose location for road"
+		if g.Mode == entities.Seafarers {
+			msg = "Choose location for road/ship"
+		}
 		exp, err := g.BlockForAction(p, g.TimerVals.InitEdge, &entities.PlayerAction{
 			Type:    entities.PlayerActionTypeChooseEdge,
-			Message: "Choose location for road",
+			Message: msg,
 			Data: &entities.PlayerActionChooseEdge{
 				Allowed: AllowedEdges,
 			},
@@ -114,10 +172,27 @@ func (g *Game) startInitPhase() {
 			C.C1.X = -999 // Make it invalid
 		}
 
-		err = g.BuildRoad(p, C)
+		edge, edgeErr := g.Graph.GetEdge(C)
+		if edgeErr != nil {
+			edge = nil
+		}
+		if edge != nil && g.Mode == entities.Seafarers && edge.IsWaterEdge() {
+			err = g.BuildShip(p, C)
+		} else {
+			err = g.BuildRoad(p, C)
+		}
 		if err != nil {
-			C = g.ai.ChooseBestEdgeRoad(p, AllowedEdges).C
-			g.BuildRoad(p, C)
+			if g.Mode == entities.Seafarers {
+				C = AllowedEdges[0].C
+				if AllowedEdges[0].IsWaterEdge() {
+					_ = g.BuildShip(p, C)
+				} else {
+					_ = g.BuildRoad(p, C)
+				}
+			} else {
+				C = g.ai.ChooseBestEdgeRoad(p, AllowedEdges).C
+				_ = g.BuildRoad(p, C)
+			}
 		}
 	}
 

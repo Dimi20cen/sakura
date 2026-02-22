@@ -84,7 +84,12 @@ func (e *Edge) IsWaterEdge() bool {
 }
 
 func (e *Edge) IsLandEdge() bool {
-	return !e.IsWaterEdge()
+	for _, t := range e.AdjacentTiles {
+		if t.Type != TileTypeSea {
+			return true
+		}
+	}
+	return false
 }
 
 func (v *Vertex) HasAdjacentSea() bool {

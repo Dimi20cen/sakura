@@ -31,7 +31,7 @@ func (g *Game) UseDevelopmentCard(player *entities.Player, developmentCardType e
 		thisDeck.Quantity--
 		thisDeck.NumUsed++
 		g.MoveDevelopmentCard(int(player.Order), -1, thisDeck.Type, false)
-		if g.Mode == entities.Base {
+		if g.Mode == entities.Base || g.Mode == entities.Seafarers {
 			for _, deck := range g.CurrentPlayer.CurrentHand.DevelopmentCardDeckMap {
 				deck.CanUse = false
 				g.j.WUpdateDevelopmentCard(player, deck.Type, deck.Quantity, deck.NumUsed, deck.CanUse)
@@ -187,15 +187,43 @@ func (g *Game) UseDevelopmentCard(player *entities.Player, developmentCardType e
 }
 
 func (g *Game) UseDevRoadBuilding(player *entities.Player, types []entities.BuildableType) {
-	buildRoad := func() {
-		locations := player.GetBuildLocationsRoad(g.Graph, false)
-		if player.BuildablesLeft[entities.BTRoad] <= 0 || len(locations) == 0 {
+	buildOne := func() {
+		roadLocations := player.GetBuildLocationsRoad(g.Graph, false)
+		shipLocations := make([]*entities.Edge, 0)
+		if g.Mode == entities.Seafarers && player.BuildablesLeft[entities.BTShip] > 0 {
+			shipLocations = player.GetBuildLocationsShip(g.Graph)
+		}
+		if player.BuildablesLeft[entities.BTRoad] <= 0 {
+			roadLocations = []*entities.Edge{}
+		}
+
+		locationSet := make(map[*entities.Edge]bool)
+		locations := make([]*entities.Edge, 0, len(roadLocations)+len(shipLocations))
+		for _, e := range roadLocations {
+			if g.IsSeaRobberBlockingEdge(e) {
+				continue
+			}
+			if !locationSet[e] {
+				locationSet[e] = true
+				locations = append(locations, e)
+			}
+		}
+		for _, e := range shipLocations {
+			if g.IsSeaRobberBlockingEdge(e) {
+				continue
+			}
+			if !locationSet[e] {
+				locationSet[e] = true
+				locations = append(locations, e)
+			}
+		}
+		if len(locations) == 0 {
 			return
 		}
 
 		res, err := g.BlockForAction(player, g.TimerVals.UseDevCard, &entities.PlayerAction{
 			Type:    entities.PlayerActionTypeChooseEdge,
-			Message: "Choose position for road",
+			Message: "Choose position for road/ship",
 			Data: entities.PlayerActionChooseEdge{
 				Allowed: locations,
 			},
@@ -207,27 +235,41 @@ func (g *Game) UseDevRoadBuilding(player *entities.Player, types []entities.Buil
 		var bedge entities.EdgeCoordinate
 		mapstructure.Decode(res, &bedge)
 
-		// Make sure the player has cards
-		// Do not check the bank
-		player.CurrentHand.UpdateResources(1, 1, 0, 0, 0)
-		g.j.WUpdateResources(player, 1, 1, 0, 0, 0)
-
-		// Prevent animation
-		orig := player.UsingDevCard
-		player.UsingDevCard = entities.DevelopmentCardRoadBuilding
-
-		err = g.BuildRoad(player, bedge)
-		if err != nil {
-			// Build at first place possible
-			g.BuildRoad(player, locations[0].C)
+		selected := locations[0]
+		for _, e := range locations {
+			if (e.C.C1 == bedge.C1 && e.C.C2 == bedge.C2) || (e.C.C1 == bedge.C2 && e.C.C2 == bedge.C1) {
+				selected = e
+				break
+			}
 		}
 
-		// Reset
+		buildType := entities.BTRoad
+		if g.Mode == entities.Seafarers && selected.IsWaterEdge() {
+			buildType = entities.BTShip
+		}
+
+		// Make sure the player has cards; they will immediately be spent by build.
+		// We bypass bank checks for Road Building card.
+		if buildType == entities.BTRoad {
+			player.CurrentHand.UpdateResources(1, 1, 0, 0, 0)
+			g.j.WUpdateResources(player, 1, 1, 0, 0, 0)
+		} else {
+			player.CurrentHand.UpdateResources(1, 0, 1, 0, 0)
+			g.j.WUpdateResources(player, 1, 0, 1, 0, 0)
+		}
+
+		orig := player.UsingDevCard
+		player.UsingDevCard = entities.DevelopmentCardRoadBuilding
+		if buildType == entities.BTRoad {
+			_ = g.BuildRoad(player, selected.C)
+		} else {
+			_ = g.BuildShip(player, selected.C)
+		}
 		player.UsingDevCard = orig
 	}
 
 	for range types {
-		buildRoad()
+		buildOne()
 	}
 }
 

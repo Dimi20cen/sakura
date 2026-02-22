@@ -34,9 +34,10 @@ type (
 
 		LongestRoad int `msgpack:"-"`
 
-		TimeLeft     int  `msgpack:"-"`
-		SpecialBuild bool `msgpack:"-"`
-		ShipMoved    bool `msgpack:"-"`
+		TimeLeft           int            `msgpack:"-"`
+		SpecialBuild       bool           `msgpack:"-"`
+		ShipMoved          bool           `msgpack:"-"`
+		ShipsBuiltThisTurn map[*Edge]bool `msgpack:"-"`
 
 		IsBot           int32 `msgpack:"-"`
 		InactiveSeconds int32 `msgpack:"-"`
@@ -201,8 +202,16 @@ func NewPlayer(g GameMode, id, username string, order uint16) (*Player, error) {
 	player.Improvements[int(CardTypeCoin)] = 0
 
 	player.RandInt = rand.Intn(9950) + 25
+	player.ShipsBuiltThisTurn = make(map[*Edge]bool)
 
 	return player, nil
+}
+
+func (p *Player) ResetTurnState() {
+	p.ShipMoved = false
+	for e := range p.ShipsBuiltThisTurn {
+		delete(p.ShipsBuiltThisTurn, e)
+	}
 }
 
 func GetNewPlayers(g GameMode, numPlayers uint16) ([]*Player, error) {

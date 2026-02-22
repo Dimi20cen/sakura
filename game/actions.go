@@ -230,40 +230,7 @@ func (g *Game) BuildRoad(player *entities.Player, c entities.EdgeCoordinate) err
 	}
 
 	player.BuildablesLeft[entities.BTRoad]--
-
-	// Reveal Fog Tiles if possible
-	adjacentTiles := make([]*entities.Tile, 0)
-	v1, err := g.Graph.GetVertex(c.C1)
-	if err != nil {
-		return err
-	}
-
-	v2, err := g.Graph.GetVertex(c.C2)
-	if err != nil {
-		return err
-	}
-
-	adjacentTiles = append(adjacentTiles, v1.AdjacentTiles...)
-	adjacentTiles = append(adjacentTiles, v2.AdjacentTiles...)
-
-	for _, t := range adjacentTiles {
-		if t.Fog {
-			t.Fog = false
-
-			if t.Type >= entities.TileTypeWood && t.Type <= entities.TileTypeOre {
-				if g.Bank.Hand.GetCardDeck(entities.CardType(t.Type)).Quantity > 0 {
-					g.MoveCards(-1, int(player.Order), entities.CardType(t.Type), 1, false, false)
-				}
-			}
-
-			// TODO: Give gold on opening gold
-
-			g.BroadcastMessage(&entities.Message{
-				Type: entities.MessageTypeTileFog,
-				Data: t,
-			})
-		}
-	}
+	g.RevealFogAdjacentToEdge(player, e)
 
 	g.SetExtraVictoryPoints()
 
@@ -279,6 +246,97 @@ func (g *Game) BuildRoad(player *entities.Player, c entities.EdgeCoordinate) err
 	g.CheckForVictory()
 
 	return nil
+}
+
+func (g *Game) chooseDiscoveryGoldCardType(player *entities.Player) entities.CardType {
+	available := make([]entities.CardType, 0, 5)
+	for i := 1; i <= 5; i++ {
+		ct := entities.CardType(i)
+		if g.Bank.Hand.GetCardDeck(ct).Quantity > 0 {
+			available = append(available, ct)
+		}
+	}
+	if len(available) == 0 {
+		return 0
+	}
+
+	exp, err := g.BlockForAction(player, g.TimerVals.UseDevCard, &entities.PlayerAction{
+		Type:    entities.PlayerActionTypeSelectCards,
+		Message: "Choose a resource for discovered gold",
+		Data: entities.PlayerActionSelectCards{
+			AllowedTypes: []int{1, 2, 3, 4, 5},
+			Quantity:     1,
+			NotSelfHand:  true,
+		},
+	})
+	if err == nil {
+		var resp []float64
+		if mapstructure.Decode(exp, &resp) == nil && len(resp) == 9 {
+			for i := 1; i <= 5; i++ {
+				ct := entities.CardType(i)
+				if resp[i] > 0 && g.Bank.Hand.GetCardDeck(ct).Quantity > 0 {
+					return ct
+				}
+			}
+		}
+	}
+
+	return available[rand.Intn(len(available))]
+}
+
+func (g *Game) giveDiscoveryRewardForTile(player *entities.Player, tile *entities.Tile) {
+	if tile == nil {
+		return
+	}
+
+	if tile.Type >= entities.TileTypeWood && tile.Type <= entities.TileTypeOre {
+		ct := entities.CardType(tile.Type)
+		if g.Bank.Hand.GetCardDeck(ct).Quantity > 0 {
+			g.MoveCards(-1, int(player.Order), ct, 1, false, false)
+		}
+		return
+	}
+
+	if tile.Type == entities.TileTypeGold {
+		ct := g.chooseDiscoveryGoldCardType(player)
+		if ct != 0 && g.Bank.Hand.GetCardDeck(ct).Quantity > 0 {
+			g.MoveCards(-1, int(player.Order), ct, 1, false, false)
+		}
+	}
+}
+
+func (g *Game) RevealFogAdjacentToEdge(player *entities.Player, edge *entities.Edge) {
+	if edge == nil {
+		return
+	}
+
+	v1, err := g.Graph.GetVertex(edge.C.C1)
+	if err != nil {
+		return
+	}
+	v2, err := g.Graph.GetVertex(edge.C.C2)
+	if err != nil {
+		return
+	}
+
+	seen := make(map[*entities.Tile]bool)
+	adjacentTiles := append(v1.AdjacentTiles, v2.AdjacentTiles...)
+	for _, t := range adjacentTiles {
+		if t == nil || seen[t] {
+			continue
+		}
+		seen[t] = true
+		if !t.Fog {
+			continue
+		}
+
+		t.Fog = false
+		g.giveDiscoveryRewardForTile(player, t)
+		g.BroadcastMessage(&entities.Message{
+			Type: entities.MessageTypeTileFog,
+			Data: t,
+		})
+	}
 }
 
 func (g *Game) IsSeaRobberBlockingEdge(e *entities.Edge) bool {
@@ -345,6 +403,11 @@ func (g *Game) BuildShip(player *entities.Player, c entities.EdgeCoordinate) err
 		return err
 	}
 	player.BuildablesLeft[entities.BTShip]--
+	if player.ShipsBuiltThisTurn == nil {
+		player.ShipsBuiltThisTurn = make(map[*entities.Edge]bool)
+	}
+	player.ShipsBuiltThisTurn[e] = true
+	g.RevealFogAdjacentToEdge(player, e)
 
 	g.SetExtraVictoryPoints()
 	g.SendPlayerSecret(player)
@@ -373,11 +436,22 @@ func (g *Game) GetMovableShips(player *entities.Player) []*entities.Edge {
 		return deg
 	}
 
+	hasOwnBuildingAtVertex := func(v *entities.Vertex) bool {
+		if v == nil || v.Placement == nil || v.Placement.GetOwner() != player {
+			return false
+		}
+		t := v.Placement.GetType()
+		return t == entities.BTSettlement || t == entities.BTCity
+	}
+
 	for _, ep := range player.EdgePlacements {
 		if ep.GetType() != entities.BTShip {
 			continue
 		}
 		e := ep.GetLocation()
+		if player.ShipsBuiltThisTurn[e] {
+			continue
+		}
 		if g.IsSeaRobberBlockingEdge(e) {
 			continue
 		}
@@ -389,7 +463,7 @@ func (g *Game) GetMovableShips(player *entities.Player) []*entities.Edge {
 		}
 
 		isEndpoint := func(v *entities.Vertex) bool {
-			if v.Placement != nil {
+			if hasOwnBuildingAtVertex(v) {
 				return false
 			}
 			return shipDegreeAtVertex(v, e) == 0
@@ -410,8 +484,8 @@ func (g *Game) MoveShip(player *entities.Player, fromC, toC entities.EdgeCoordin
 	if err := g.EnsureCurrentPlayer(player); err != nil {
 		return err
 	}
-	if g.DiceState != 0 {
-		return errors.New("ship movement is only allowed before rolling dice")
+	if g.DiceState == 0 {
+		return errors.New("ship movement is only allowed after rolling dice")
 	}
 	if player.ShipMoved {
 		return errors.New("already moved a ship this turn")
@@ -492,8 +566,8 @@ func (g *Game) MoveShipInteractive(player *entities.Player) error {
 	if err := g.EnsureCurrentPlayer(player); err != nil {
 		return err
 	}
-	if g.DiceState != 0 {
-		return errors.New("ship movement is only allowed before rolling dice")
+	if g.DiceState == 0 {
+		return errors.New("ship movement is only allowed after rolling dice")
 	}
 	if player.ShipMoved {
 		return errors.New("already moved a ship this turn")
@@ -1141,7 +1215,7 @@ func (g *Game) EndTurn(player *entities.Player) error {
 	if !g.SpecialBuildPhase {
 		g.DiceState = 0
 		g.EndTurnResetDevelopmentCards()
-		g.CurrentPlayer.ShipMoved = false
+		g.CurrentPlayer.ResetTurnState()
 		g.CurrentPlayer.TimeLeft = g.TimerVals.DiceRoll
 	} else {
 		g.CurrentPlayer.TimeLeft = g.TimerVals.SpecialBuild
@@ -1172,7 +1246,7 @@ func (g *Game) EndTurn(player *entities.Player) error {
 
 func (g *Game) EndTurnResetDevelopmentCards() {
 	// Make all development cards usable
-	if g.Mode == entities.Base {
+	if g.Mode == entities.Base || g.Mode == entities.Seafarers {
 		for _, deck := range g.CurrentPlayer.CurrentHand.DevelopmentCardDeckMap {
 			if deck.Quantity > 0 && deck.Type != entities.DevelopmentCardVictoryPoint {
 				deck.CanUse = true

@@ -101,7 +101,7 @@ func (g *Game) GetPlayerSecretState(p *entities.Player) entities.PlayerSecretSta
 			len(p.GetBuildLocationsRoad(g.Graph, false)) > 0,
 		BuildShip: !busy && g.ensureCanBuild(p, entities.BTShip) == nil &&
 			len(p.GetBuildLocationsShip(g.Graph)) > 0,
-		MoveShip: !commonBusy && g.DiceState == 0 && g.Mode == entities.Seafarers &&
+		MoveShip: !commonBusy && g.DiceState != 0 && g.Mode == entities.Seafarers &&
 			!p.ShipMoved && len(g.GetMovableShips(p)) > 0,
 		BuyDevelopmentCard: !busy &&
 			(g.IsCreativeMode() || p.CanBuyDevelopmentCard()),
@@ -159,22 +159,31 @@ func (g *Game) GetPlayerSecretState(p *entities.Player) entities.PlayerSecretSta
 
 func (g *Game) SetExtraVictoryPoints() {
 	// Longest Road
-	currentLongestRoad := 0
-	if g.ExtraVictoryPoints.LongestRoadHolder != nil {
-		currentLongestRoad = g.ExtraVictoryPoints.LongestRoadHolder.GetLongestRoad(g.Graph)
-		if currentLongestRoad < 5 {
-			g.ExtraVictoryPoints.LongestRoadHolder = nil
-		}
-	}
-
+	oldHolder := g.ExtraVictoryPoints.LongestRoadHolder
+	longest := 0
+	leaders := make([]*entities.Player, 0)
 	for _, p := range g.Players {
 		longestRoad := p.GetLongestRoad(g.Graph)
 		p.LongestRoad = longestRoad
-		if longestRoad >= 5 && longestRoad > currentLongestRoad {
-			currentLongestRoad = longestRoad
-			g.ExtraVictoryPoints.LongestRoadHolder = p
-			g.BroadcastDevCardUse(entities.CardLongestRoad, DevCardShowTime, int(p.Order))
+		if longestRoad > longest {
+			longest = longestRoad
+			leaders = []*entities.Player{p}
+		} else if longestRoad == longest {
+			leaders = append(leaders, p)
 		}
+	}
+	newHolder := (*entities.Player)(nil)
+	if longest >= 5 {
+		if len(leaders) == 1 {
+			newHolder = leaders[0]
+		} else if oldHolder != nil && oldHolder.LongestRoad == longest {
+			// On ties the current holder keeps the tile.
+			newHolder = oldHolder
+		}
+	}
+	g.ExtraVictoryPoints.LongestRoadHolder = newHolder
+	if newHolder != nil && newHolder != oldHolder {
+		g.BroadcastDevCardUse(entities.CardLongestRoad, DevCardShowTime, int(newHolder.Order))
 	}
 
 	// Largest Army

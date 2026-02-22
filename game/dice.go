@@ -463,15 +463,31 @@ func (g *Game) StealCardWithRobber() error {
 	// Check if anyone to steal from
 	stealChoicesSlice := make([]*entities.Player, 0)
 	stealChoices := make([]bool, len(g.Players))
-	for _, vp := range g.Graph.GetTilePlacements(g.Robber.Tile) {
-		if vp.GetType() != entities.BTSettlement && vp.GetType() != entities.BTCity {
-			continue
-		}
 
-		o := vp.GetOwner()
-		if !stealChoices[o.Order] && o != g.CurrentPlayer && o.CurrentHand.GetCardCount() > 0 {
-			stealChoices[o.Order] = true
-			stealChoicesSlice = append(stealChoicesSlice, vp.GetOwner())
+	if g.Mode == entities.Seafarers && g.Robber.Tile != nil && g.Robber.Tile.Type == entities.TileTypeSea {
+		for _, ec := range g.Robber.Tile.GetEdgeCoordinates() {
+			e, err := g.Graph.GetEdge(ec)
+			if err != nil || e == nil || e.Placement == nil || e.Placement.GetType() != entities.BTShip {
+				continue
+			}
+
+			o := e.Placement.GetOwner()
+			if !stealChoices[o.Order] && o != g.CurrentPlayer && o.CurrentHand.GetCardCount() > 0 {
+				stealChoices[o.Order] = true
+				stealChoicesSlice = append(stealChoicesSlice, o)
+			}
+		}
+	} else {
+		for _, vp := range g.Graph.GetTilePlacements(g.Robber.Tile) {
+			if vp.GetType() != entities.BTSettlement && vp.GetType() != entities.BTCity {
+				continue
+			}
+
+			o := vp.GetOwner()
+			if !stealChoices[o.Order] && o != g.CurrentPlayer && o.CurrentHand.GetCardCount() > 0 {
+				stealChoices[o.Order] = true
+				stealChoicesSlice = append(stealChoicesSlice, vp.GetOwner())
+			}
 		}
 	}
 

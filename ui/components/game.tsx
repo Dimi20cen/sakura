@@ -1,6 +1,5 @@
 import {
     ChangeEventHandler,
-    Fragment,
     FunctionComponent,
     KeyboardEventHandler,
     useEffect,
@@ -17,23 +16,29 @@ import { white as spinner } from "./spinner";
 import { useRouter } from "next/router";
 import Header from "./header";
 import { IAdvancedSettings, IGameSettings } from "../tsg";
-import {
-    capitalizeFirstLetter,
-    getIdFromToken,
-    toggleFullscreen,
-} from "../utils";
-import { Combobox, Transition } from "@headlessui/react";
-import {
-    CheckIcon,
-    ChevronLeftIcon,
-    ChevronRightIcon,
-    ChevronUpDownIcon,
-} from "@heroicons/react/24/solid";
+import { getIdFromToken, toggleFullscreen } from "../utils";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
 import { useLobbySession } from "../hooks/lobbySession";
+import Image from "next/legacy/image";
 
 const selectClasses =
-    "form-select appearance-none block w-full px-3 py-1.5 text-lg font-normal text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none";
-const lobbySidePadding = "clamp(1rem, 3vw, 4rem)";
+    "ui-input form-select appearance-none block w-full !py-2 !text-base !font-normal";
+const labelClasses =
+    "block text-[color:var(--ui-ivory-soft)] text-sm uppercase tracking-[0.06em] mb-1";
+const turnTimerOptions = [
+    { value: "15s", label: "15s" },
+    { value: "30s", label: "30s" },
+    { value: "60s", label: "60s" },
+    { value: "120s", label: "120s" },
+    { value: "200m", label: "200m" },
+];
+const legacyTimerAlias: Record<string, string> = {
+    "12s": "15s",
+    fast: "30s",
+    normal: "60s",
+    slow: "120s",
+};
 
 const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
     const router = useRouter();
@@ -45,7 +50,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
         if (chatDiv.current) {
             chatDiv.current.scrollTop = chatDiv.current.scrollHeight;
         }
-    });
+    }, [lobbyState.chatMessages.length]);
 
     useEffect(() => {
         if (typeof window !== "undefined" && gameId) {
@@ -63,16 +68,8 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
         }
     }, [commands, router.query.sp]);
 
-    const [mapQuery, setMapQuery] = useState("");
-    const filteredMaps =
-        (mapQuery === ""
-            ? lobbyState.settingsOptions?.MapName
-            : lobbyState.settingsOptions?.MapName.filter((n: string) =>
-                  n
-                      .toLowerCase()
-                      .replace(/\s+/g, "")
-                      .includes(mapQuery.toLowerCase().replace(/\s+/g, "")),
-              )) || [];
+    const mapOptions = lobbyState.settingsOptions?.MapName || [];
+    const [showTimerInfo, setShowTimerInfo] = useState(false);
 
     const changeMode: ChangeEventHandler<HTMLSelectElement> = (event) => {
         const mode = Number(event.target.value);
@@ -125,12 +122,20 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
         });
     };
 
-    const changeSpeed: ChangeEventHandler<HTMLSelectElement> = (event) => {
+    const changeSpeed = (nextSpeed: string) => {
         sendSettings({
             ...lobbyState.settings,
-            Speed: event.target.value,
+            Speed: nextSpeed,
         });
     };
+
+    const normalizedTimerValue =
+        legacyTimerAlias[lobbyState.settings.Speed] || lobbyState.settings.Speed;
+    const matchedTimerIndex = turnTimerOptions.findIndex(
+        (opt) => opt.value === normalizedTimerValue,
+    );
+    const timerIndex = matchedTimerIndex >= 0 ? matchedTimerIndex : 2;
+    const selectedTimer = turnTimerOptions[timerIndex];
 
     const sendSettings = (settings: IGameSettings) => {
         commands?.setSettings(settings);
@@ -187,16 +192,16 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
         disconnect();
         return (
             <>
-                <Pixi gameId={gameId} order={lobbyState.order} />
-                {/* We don't do portrait */}
-                <div className="bg-white p-2 invisible portrait:visible">
-                    <div>
-                        The game is best played in landscape mode on a mobile
-                        device.
+                <div className="h-screen overflow-hidden">
+                    <Pixi gameId={gameId} order={lobbyState.order} />
+                </div>
+                <div className="bg-[color:var(--ui-ivory)] p-2 invisible portrait:visible">
+                    <div className="text-[color:var(--ui-ink)]">
+                        The game is best played in landscape mode on a mobile device.
                     </div>
 
                     <button
-                        className="flex items-center justify-center px-4 py-1 mt-2 rounded-md text-base font-medium text-white bg-indigo-700"
+                        className="ui-button ui-button-primary !w-auto mt-2"
                         onClick={toggleFullscreen}
                     >
                         Toggle Fullscreen
@@ -218,18 +223,18 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
             <div className="p-1 basis-full lg:basis-1/2">
                 <div
                     className={classNames(
-                        "px-4 pt-3 pb-2 rounded-md",
+                        "px-4 pt-3 pb-2 rounded-xl border transition-colors duration-200",
                         lobbyState.settings[setting]
-                            ? "bg-red-500"
-                            : "bg-indigo-700",
+                            ? "bg-[rgba(122,31,36,0.62)] border-[rgba(183,148,90,0.55)]"
+                            : "bg-[rgba(42,34,31,0.82)] border-[rgba(231,222,206,0.18)]",
                     )}
                 >
                     <div className="flex justify-center">
                         <div className="w-full">
                             <input
                                 className={classNames(
-                                    "border rounded-sm bg-white checked:bg-indigo-600 checked:border-indigo-600",
-                                    "focus:outline-none transition duration-200 align-top bg-no-repeat bg-center bg-contain float-left mt-1.5 mr-2",
+                                    "rounded-sm bg-[color:var(--ui-ivory)] checked:bg-[color:var(--ui-gold)] checked:border-[color:var(--ui-gold)]",
+                                    "transition duration-200 align-top bg-no-repeat bg-center bg-contain float-left mt-1.5 mr-2",
                                     lobbyState.order === 0
                                         ? "cursor-pointer"
                                         : "",
@@ -244,7 +249,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                 onChange={changeVal}
                             />
                             <label
-                                className="block text-lg text-left mb-1 text-white cursor-pointer"
+                                className="block text-base text-left mb-1 text-[color:var(--ui-ivory)] cursor-pointer"
                                 htmlFor={setting}
                             >
                                 {text}
@@ -271,18 +276,18 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
             <div className="p-1 basis-full lg:basis-1/3">
                 <div
                     className={classNames(
-                        "px-4 pt-3 pb-2 rounded-md",
+                        "px-4 pt-3 pb-2 rounded-xl border transition-colors duration-200",
                         lobbyState.advanced[setting]
-                            ? "bg-red-500"
-                            : "bg-indigo-700",
+                            ? "bg-[rgba(122,31,36,0.62)] border-[rgba(183,148,90,0.55)]"
+                            : "bg-[rgba(42,34,31,0.82)] border-[rgba(231,222,206,0.18)]",
                     )}
                 >
                     <div className="flex justify-center">
                         <div className="w-full">
                             <input
                                 className={classNames(
-                                    "border rounded-sm bg-white checked:bg-indigo-600 checked:border-indigo-600",
-                                    "focus:outline-none transition duration-200 align-top bg-no-repeat bg-center bg-contain float-left mt-1.5 mr-2",
+                                    "rounded-sm bg-[color:var(--ui-ivory)] checked:bg-[color:var(--ui-gold)] checked:border-[color:var(--ui-gold)]",
+                                    "transition duration-200 align-top bg-no-repeat bg-center bg-contain float-left mt-1.5 mr-2",
                                     lobbyState.order === 0
                                         ? "cursor-pointer"
                                         : "",
@@ -297,7 +302,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                 onChange={changeVal}
                             />
                             <label
-                                className="block text-lg text-left mb-1 text-white"
+                                className="block text-base text-left mb-1 text-[color:var(--ui-ivory)]"
                                 htmlFor={setting}
                             >
                                 {text}
@@ -312,18 +317,13 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
     return (
         <>
             <Header />
-            <div
-                className="flex flex-col h-[90vh] py-5 xl:flex-row mx-auto overflow-auto"
-                style={{
-                    paddingLeft: lobbySidePadding,
-                    paddingRight: lobbySidePadding,
-                }}
-            >
-                <div className="basis-full xl:basis-3/4 min-h-0">
-                    <div className="basis-full bg-black bg-opacity-50 backdrop-blur rounded-xl text-center p-6 flex flex-col overflow-auto h-full">
-                        <div className="basis-full">
-                            <div className="basis-auto m-1 text-white text-3xl p-3 pb-6">
-                                Game Settings
+            <div className="ui-page ui-fade-in !py-4">
+                <div className="ui-grid xl:grid-cols-[minmax(0,3fr),minmax(280px,1fr)] gap-4 lg:h-[calc(100vh-116px)]">
+                <div className="basis-full min-h-0">
+                    <div className="ui-panel ui-panel-pad text-center flex flex-col lg:overflow-y-auto lg:h-full">
+                        <div>
+                            <div className="basis-auto m-1 text-[color:var(--ui-ivory)] text-3xl p-3 pb-5">
+                                Settings
                             </div>
 
                             <div className="flex flex-col lg:flex-row mb-4 md:mb-0">
@@ -336,10 +336,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                     {/* Game mode selection */}
                                     <div className="flex justify-center">
                                         <div className="w-full">
-                                            <label
-                                                className="block text-white text-lg mb-1"
-                                                htmlFor="gameMode"
-                                            >
+                                            <label className={labelClasses} htmlFor="gameMode">
                                                 Mode
                                             </label>
                                             <select
@@ -373,129 +370,26 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                 </div>
                                 <div className="basis-full lg:basis-1/2 rounded-xl m-1">
                                     {/* Map selection */}
-                                    <div className="w-full top-16">
-                                        <label
-                                            className="block text-white text-lg mb-1"
-                                            htmlFor="gameMode"
-                                        >
+                                    <div className="w-full">
+                                        <label className={labelClasses} htmlFor="mapName">
                                             Map Name
                                         </label>
-                                        <div
-                                            className={classNames(
-                                                lobbyState.order !== 0
-                                                    ? "opacity-[75%]"
-                                                    : "",
-                                            )}
+                                        <select
+                                            id="mapName"
+                                            className={selectClasses}
+                                            aria-label="Map Name"
+                                            disabled={lobbyState.order !== 0}
+                                            onChange={(event) =>
+                                                changeMap(event.target.value)
+                                            }
+                                            value={lobbyState.settings.MapName}
                                         >
-                                            <Combobox
-                                                value={
-                                                    lobbyState.settings.MapName
-                                                }
-                                                onChange={changeMap}
-                                                disabled={
-                                                    lobbyState.order !== 0
-                                                }
-                                            >
-                                                <div className="relative mt-1">
-                                                    <div className="relative w-full text-left bg-white rounded-md shadow-md cursor-default focus:outline-none focus-visible:ring-2 focus-visible:ring-opacity-75 focus-visible:ring-white focus-visible:ring-offset-teal-300 focus-visible:ring-offset-2 sm:text-sm overflow-hidden">
-                                                        <Combobox.Input
-                                                            className="w-full border-none focus:ring-0 py-2 pl-3 pr-10 leading-6 text-gray-900 text-lg"
-                                                            autoComplete="off"
-                                                            onChange={(
-                                                                event: any,
-                                                            ) =>
-                                                                setMapQuery(
-                                                                    event.target
-                                                                        .value,
-                                                                )
-                                                            }
-                                                        />
-                                                        <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
-                                                            <ChevronUpDownIcon
-                                                                className="w-5 h-5 text-gray-400"
-                                                                aria-hidden="true"
-                                                            />
-                                                        </Combobox.Button>
-                                                    </div>
-                                                    <Transition
-                                                        as={Fragment}
-                                                        leave="transition ease-in duration-100"
-                                                        leaveFrom="opacity-100"
-                                                        leaveTo="opacity-0"
-                                                        afterLeave={() =>
-                                                            setMapQuery("")
-                                                        }
-                                                    >
-                                                        <Combobox.Options className="absolute w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                                                            {filteredMaps.length ===
-                                                                0 &&
-                                                            mapQuery !== "" ? (
-                                                                <div className="cursor-default select-none relative py-2 px-4 text-gray-700">
-                                                                    Nothing
-                                                                    found.
-                                                                </div>
-                                                            ) : (
-                                                                filteredMaps.map(
-                                                                    (
-                                                                        name: string,
-                                                                    ) => (
-                                                                        <Combobox.Option
-                                                                            key={
-                                                                                name
-                                                                            }
-                                                                            className={(
-                                                                                obj: any,
-                                                                            ) =>
-                                                                                `select-none relative py-1 pl-10 pr-4 cursor-pointer ${
-                                                                                    obj.active
-                                                                                        ? "text-white bg-indigo-600"
-                                                                                        : "text-gray-900"
-                                                                                }`
-                                                                            }
-                                                                            value={
-                                                                                name
-                                                                            }
-                                                                        >
-                                                                            {(
-                                                                                obj: any,
-                                                                            ) => (
-                                                                                <>
-                                                                                    <span
-                                                                                        className={`block truncate text-left ${
-                                                                                            obj.selected
-                                                                                                ? "font-medium"
-                                                                                                : "font-normal"
-                                                                                        }`}
-                                                                                    >
-                                                                                        {
-                                                                                            name
-                                                                                        }
-                                                                                    </span>
-                                                                                    {obj.selected ? (
-                                                                                        <span
-                                                                                            className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
-                                                                                                obj.active
-                                                                                                    ? "text-white"
-                                                                                                    : "text-indigo-600"
-                                                                                            }`}
-                                                                                        >
-                                                                                            <CheckIcon
-                                                                                                className="w-5 h-5"
-                                                                                                aria-hidden="true"
-                                                                                            />
-                                                                                        </span>
-                                                                                    ) : null}
-                                                                                </>
-                                                                            )}
-                                                                        </Combobox.Option>
-                                                                    ),
-                                                                )
-                                                            )}
-                                                        </Combobox.Options>
-                                                    </Transition>
-                                                </div>
-                                            </Combobox>
-                                        </div>
+                                            {mapOptions.map((name: string) => (
+                                                <option key={name} value={name}>
+                                                    {name}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -505,16 +399,13 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                     {/* Max Player */}
                                     <div className="flex justify-center">
                                         <div className="w-full">
-                                            <label
-                                                className="block text-white text-lg mb-1"
-                                                htmlFor="maxplayers-control"
-                                            >
+                                            <label className={labelClasses} htmlFor="maxplayers-control">
                                                 Max Players
                                             </label>
                                             <div
                                                 id="maxplayers-control"
                                                 className={classNames(
-                                                    "rounded-md px-4 py-2 bg-sky-700 text-white",
+                                                    "rounded-md px-4 py-2 bg-[rgba(42,34,31,0.85)] border border-[rgba(231,222,206,0.2)] text-[color:var(--ui-ivory)]",
                                                     lobbyState.order !== 0
                                                         ? "opacity-70"
                                                         : "",
@@ -524,7 +415,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                                     <button
                                                         type="button"
                                                         aria-label="Decrease max players"
-                                                        className="p-1 rounded-md hover:bg-sky-800 disabled:opacity-40"
+                                                        className="p-1 rounded-md hover:bg-[rgba(183,148,90,0.2)] disabled:opacity-40"
                                                         disabled={
                                                             lobbyState.order !==
                                                                 0 ||
@@ -556,7 +447,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                                     <button
                                                         type="button"
                                                         aria-label="Increase max players"
-                                                        className="p-1 rounded-md hover:bg-sky-800 disabled:opacity-40"
+                                                        className="p-1 rounded-md hover:bg-[rgba(183,148,90,0.2)] disabled:opacity-40"
                                                         disabled={
                                                             lobbyState.order !==
                                                                 0 ||
@@ -587,10 +478,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                     {/* Discard limit selection */}
                                     <div className="flex justify-center">
                                         <div className="w-full">
-                                            <label
-                                                className="block text-white text-lg mb-1"
-                                                htmlFor="discardlimit"
-                                            >
+                                            <label className={labelClasses} htmlFor="discardlimit">
                                                 Discard Limit (
                                                 {
                                                     lobbyState.settings
@@ -599,7 +487,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                                 )
                                             </label>
                                             <input
-                                                className="w-full h-2 rounded-lg appearance-none cursor-pointer accent-indigo-500 disabled:opacity-40"
+                                                className="w-full h-2 rounded-lg appearance-none cursor-pointer accent-[color:var(--ui-gold)] disabled:opacity-40"
                                                 aria-label="Discard Limit"
                                                 id="discardlimit"
                                                 type="range"
@@ -615,7 +503,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                                         .DiscardLimit
                                                 }
                                             />
-                                            <div className="flex justify-between text-xs text-white/70 mt-1">
+                                            <div className="flex justify-between text-xs text-[rgba(244,239,228,0.7)] mt-1">
                                                 <span>{minDiscardLimit}</span>
                                                 <span>{maxDiscardLimit}</span>
                                             </div>
@@ -626,10 +514,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                     {/* Victory Point selection */}
                                     <div className="flex justify-center">
                                         <div className="w-full">
-                                            <label
-                                                className="block text-white text-lg mb-1 z-10"
-                                                htmlFor="victoryPoint"
-                                            >
+                                            <label className={labelClasses} htmlFor="victoryPoint">
                                                 Victory Points (
                                                 {
                                                     lobbyState.settings
@@ -638,7 +523,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                                 )
                                             </label>
                                             <input
-                                                className="w-full h-2 rounded-lg appearance-none cursor-pointer accent-indigo-500 disabled:opacity-40"
+                                                className="w-full h-2 rounded-lg appearance-none cursor-pointer accent-[color:var(--ui-gold)] disabled:opacity-40"
                                                 aria-label="Victory Points"
                                                 id="victoryPoint"
                                                 type="range"
@@ -654,7 +539,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                                         .VictoryPoints
                                                 }
                                             />
-                                            <div className="flex justify-between text-xs text-white/70 mt-1">
+                                            <div className="flex justify-between text-xs text-[rgba(244,239,228,0.7)] mt-1">
                                                 <span>{minVictoryPoints}</span>
                                                 <span>{maxVictoryPoints}</span>
                                             </div>
@@ -662,40 +547,68 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                     </div>
                                 </div>
                                 <div className="basis-full lg:basis-1/4 rounded-xl m-1">
-                                    {/* Victory Point selection */}
+                                    {/* Turn timer selection */}
                                     <div className="flex justify-center">
                                         <div className="w-full">
-                                            <label
-                                                className="block text-white text-lg mb-1"
-                                                htmlFor="victoryPoint"
-                                            >
-                                                Game Speed
-                                            </label>
-                                            <select
-                                                className={selectClasses}
-                                                aria-label="Victory Points"
-                                                id="victoryPoint"
-                                                onChange={changeSpeed}
-                                                disabled={
-                                                    lobbyState.order !== 0
-                                                }
-                                                value={
-                                                    lobbyState.settings.Speed
-                                                }
-                                            >
-                                                {["slow", "normal", "fast"].map(
-                                                    (n: string) => (
-                                                        <option
-                                                            key={n}
-                                                            value={n}
-                                                        >
-                                                            {capitalizeFirstLetter(
-                                                                n,
-                                                            )}
-                                                        </option>
-                                                    ),
+                                            <div className="flex items-center justify-center gap-1 mb-1">
+                                                <label className={labelClasses + " !mb-0"} htmlFor="turnTimerControl">
+                                                    Turn Timer
+                                                </label>
+                                                <button
+                                                    type="button"
+                                                    aria-label="Show timer details"
+                                                    onClick={() => setShowTimerInfo(true)}
+                                                    className="text-[color:var(--ui-ivory-soft)] hover:text-[color:var(--ui-gold-soft)] transition-colors"
+                                                >
+                                                    <QuestionMarkCircleIcon className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                            <div
+                                                id="turnTimerControl"
+                                                className={classNames(
+                                                    "rounded-md px-4 py-2 bg-[rgba(42,34,31,0.85)] border border-[rgba(231,222,206,0.2)] text-[color:var(--ui-ivory)]",
+                                                    "flex items-center justify-between",
+                                                    lobbyState.order !== 0 ? "opacity-70" : "",
                                                 )}
-                                            </select>
+                                            >
+                                                <button
+                                                    type="button"
+                                                    aria-label="Decrease turn timer"
+                                                    className="p-1 rounded-md hover:bg-[rgba(183,148,90,0.2)] disabled:opacity-40"
+                                                    disabled={lobbyState.order !== 0}
+                                                    onClick={() =>
+                                                        changeSpeed(
+                                                            turnTimerOptions[
+                                                                (timerIndex -
+                                                                    1 +
+                                                                    turnTimerOptions.length) %
+                                                                    turnTimerOptions.length
+                                                            ].value,
+                                                        )
+                                                    }
+                                                >
+                                                    <ChevronLeftIcon className="w-5 h-5" />
+                                                </button>
+                                                <span className="text-2xl font-semibold leading-none">
+                                                    {selectedTimer.label}
+                                                </span>
+                                                <button
+                                                    type="button"
+                                                    aria-label="Increase turn timer"
+                                                    className="p-1 rounded-md hover:bg-[rgba(183,148,90,0.2)] disabled:opacity-40"
+                                                    disabled={lobbyState.order !== 0}
+                                                    onClick={() =>
+                                                        changeSpeed(
+                                                            turnTimerOptions[
+                                                                (timerIndex + 1) %
+                                                                    turnTimerOptions.length
+                                                            ].value,
+                                                        )
+                                                    }
+                                                >
+                                                    <ChevronRightIcon className="w-5 h-5" />
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -703,7 +616,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
 
                             {lobbyState.settings.Advanced && (
                                 <>
-                                    <div className="basis-auto rounded-xl m-1 text-white text-2xl font-bold p-3 pb-3">
+                                    <div className="basis-auto rounded-xl m-1 text-[color:var(--ui-ivory)] text-2xl font-bold p-3 pb-3">
                                         Advanced Settings
                                     </div>
                                     <div className="flex flex-col lg:flex-row md:mt-2">
@@ -716,21 +629,21 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                             )}
                         </div>
 
-                        <div className="basis-auto mt-4">
+                        <div className="basis-auto mt-6">
                             {/* Ready selection */}
                             <div
                                 className={classNames(
-                                    "w-3/4 sm:w-1/2 md:w-3/4 lg:w-3/4 xl:w-1/2 px-4 pt-3 pb-2 rounded-md my-3 mx-auto cursor-pointer",
+                                    "w-3/4 sm:w-1/2 md:w-3/4 lg:w-3/4 xl:w-1/2 px-4 pt-3 pb-2 rounded-xl my-3 mx-auto cursor-pointer border",
                                     lobbyState.ready
-                                        ? "bg-green-800"
-                                        : "bg-red-700",
+                                        ? "bg-[rgba(54,101,66,0.62)] border-[rgba(183,148,90,0.45)]"
+                                        : "bg-[rgba(122,31,36,0.65)] border-[rgba(183,148,90,0.52)]",
                                 )}
                             >
                                 <div className="flex justify-center cursor-pointer">
                                     <div className="w-full">
                                         <input
                                             className="border rounded-sm bg-white scale-[1.75]
-                                                       checked:bg-green-600 checked:border-green-600
+                                                       checked:bg-[color:var(--ui-gold)] checked:border-[color:var(--ui-gold)]
                                                        focus:outline-none transition duration-200 align-top
                                                        bg-no-repeat bg-center bg-contain float-left mr-2
                                                        cursor-pointer translate-y-2 translate-x-2.5"
@@ -741,7 +654,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                             onChange={changeReady}
                                         />
                                         <label
-                                            className="block text-2xl pl-10 mb-1 text-left text-white
+                                            className="block text-2xl pl-10 mb-1 text-left text-[color:var(--ui-ivory)]
                                                        translate-x-1 cursor-pointer"
                                             htmlFor="ready"
                                         >
@@ -757,10 +670,9 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                     !lobbyState.canStart
                                 }
                                 className={classNames(
-                                    "w-3/4 sm:w-1/2 md:w-3/4 lg:w-3/4 xl:w-1/2 h-14 text-2xl rounded-xl",
-                                    "text-white",
+                                    "ui-button w-3/4 sm:w-1/2 md:w-3/4 lg:w-3/4 xl:w-1/2 h-14 text-2xl rounded-xl",
                                     lobbyState.order == 0 && lobbyState.canStart
-                                        ? "bg-gradient-to-r from-green-700 to-green-700 hover:from-green-900 hover:to-green-900"
+                                        ? "ui-button-primary"
                                         : "bg-stone-700 opacity-40",
                                 )}
                                 onClick={startGame}
@@ -772,9 +684,9 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
 
                 </div>
 
-                <div className="basis-full xl:basis-1/4 mt-4 xl:mt-0 xl:ml-5 flex flex-col min-h-0">
-                    <div className="bg-black bg-opacity-50 backdrop-blur rounded-xl p-4 text-center flex-none">
-                        <div className="basis-auto m-1 text-white text-2xl p-2 pb-4">
+                <div className="basis-full xl:basis-1/4 flex flex-col min-h-0">
+                    <div className="ui-panel ui-panel-pad text-center flex-none">
+                        <div className="basis-auto m-1 text-[color:var(--ui-ivory)] text-2xl p-2 pb-4">
                             Players ({lobbyState.players.length}/{lobbyState.settings.MaxPlayers})
                         </div>
                         <PlayerList lobbyState={lobbyState} socket={socketRef} />
@@ -783,10 +695,9 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                             <button
                                 disabled={lobbyState.order != 0}
                                 className={classNames(
-                                    "h-11 w-2/3 text-lg rounded-xl",
-                                    "text-white",
+                                    "ui-button h-11 w-2/3 text-lg rounded-xl",
                                     lobbyState.order == 0
-                                        ? "bg-gradient-to-r from-indigo-700 to-indigo-700 hover:from-indigo-800 hover:to-indigo-800"
+                                        ? "ui-button-secondary"
                                         : "bg-stone-700 opacity-40",
                                 )}
                                 onClick={botAdd}
@@ -796,36 +707,87 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                         </div>
                     </div>
 
-                    <div className="bg-black bg-opacity-50 backdrop-blur rounded-xl p-5 text-center mt-4 flex flex-col flex-1 min-h-0">
-                        <div className="basis-auto rounded-xl m-1 text-white text-3xl p-3 pb-6">
-                            Chatroom
+                    <div className="ui-panel ui-panel-pad text-center mt-4 flex flex-col">
+                        <div className="basis-auto rounded-xl m-1 text-[color:var(--ui-ivory)] text-3xl p-3 pb-4">
+                            Chat
                         </div>
 
                         <div
-                            className="basis-full text-white bg-black bg-opacity-5
-                                   rounded-lg text-left p-4 overflow-auto min-h-[12rem]"
+                            className="text-[color:var(--ui-ivory)] bg-[rgba(21,18,15,0.45)] border border-[rgba(231,222,206,0.14)] rounded-lg text-left p-3 overflow-y-auto overscroll-contain h-[220px] sm:h-[240px] lg:h-[280px]"
                             ref={chatDiv}
                         >
-                            {lobbyState.chatMessages.map((m: { id: number; msg: string }) => (
-                                <p key={m.id} className="mb-1">
-                                    {m.msg}
-                                </p>
-                            ))}
-                        </div>
-                        <div className="basis-auto">
-                            <div className="flex justify-center">
-                                <div className="w-full mt-6">
-                                    <input
-                                        type="text"
-                                        className={selectClasses}
-                                        onKeyDown={sendChat}
-                                    ></input>
-                                </div>
+                            <div className="space-y-1.5">
+                                {lobbyState.chatMessages.length ? (
+                                    lobbyState.chatMessages.map((m: { id: number; msg: string }) => (
+                                        <p
+                                            key={m.id}
+                                            className="text-sm leading-relaxed text-[color:var(--ui-ivory)] break-words border-b border-[rgba(231,222,206,0.08)] pb-1"
+                                        >
+                                            {m.msg}
+                                        </p>
+                                    ))
+                                ) : (
+                                    <p className="text-sm text-[color:var(--ui-ivory-soft)] text-center pt-12">
+                                        No messages yet.
+                                    </p>
+                                )}
                             </div>
+                        </div>
+                        <div className="mt-3 text-left">
+                            <label
+                                className="block text-xs uppercase tracking-[0.06em] text-[color:var(--ui-ivory-soft)] mb-1"
+                                htmlFor="lobby-chat-input"
+                            >
+                                Message
+                            </label>
+                            <input
+                                id="lobby-chat-input"
+                                type="text"
+                                className="ui-input"
+                                placeholder="Press Enter to send"
+                                onKeyDown={sendChat}
+                            ></input>
                         </div>
                     </div>
                 </div>
+                </div>
             </div>
+            {showTimerInfo ? (
+                <div
+                    className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm p-4 flex items-center justify-center"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="Timer reference table"
+                    onClick={() => setShowTimerInfo(false)}
+                >
+                    <div
+                        className="ui-panel ui-panel-pad w-full max-w-5xl max-h-[90vh] overflow-auto"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="flex items-center justify-between mb-3">
+                            <h3 className="ui-title ui-title-md">Timer Reference</h3>
+                            <button
+                                type="button"
+                                className="ui-button ui-button-ghost !w-auto !min-h-0 !px-3 !py-1"
+                                onClick={() => setShowTimerInfo(false)}
+                            >
+                                Close
+                            </button>
+                        </div>
+                        <div className="relative w-full min-h-[280px]">
+                            <Image
+                                src="/assets/timing-rules.png"
+                                alt="Catan timer reference table"
+                                layout="responsive"
+                                width={1200}
+                                height={760}
+                                objectFit="contain"
+                                priority
+                            />
+                        </div>
+                    </div>
+                </div>
+            ) : null}
         </>
     );
 };

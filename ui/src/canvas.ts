@@ -28,6 +28,8 @@ type AppType = PIXI.Application & {
     rtex?: PIXI.RenderTexture;
     /** Slower ticker at lower FPS */
     slowTicker: PIXI.Ticker;
+    /** Prevent page scrolling while interacting with the canvas */
+    preventWheelScroll?: (e: WheelEvent) => void;
 };
 
 let app: AppType;
@@ -140,6 +142,14 @@ export async function initialize(div: HTMLDivElement, done?: () => void) {
     app.ticker.start();
 
     div.appendChild(app.view as HTMLCanvasElement);
+    app.preventWheelScroll = (e: WheelEvent) => {
+        e.preventDefault();
+    };
+    (app.view as HTMLCanvasElement).addEventListener(
+        "wheel",
+        app.preventWheelScroll,
+        { passive: false },
+    );
     app.stage.sortableChildren = true;
     resize();
     await loadAssets();
@@ -181,6 +191,13 @@ export function cleanup(done?: () => void) {
         wapp?.renderer.destroy(true);
     } catch (e) {
         console.warn(e);
+    }
+
+    if (wapp?.view && wapp.preventWheelScroll) {
+        (wapp.view as HTMLCanvasElement).removeEventListener(
+            "wheel",
+            wapp.preventWheelScroll,
+        );
     }
 
     (wapp?.view as HTMLCanvasElement)?.remove();

@@ -72,44 +72,52 @@ const ChooseProfile: NextPage = () => {
     return (
         <main>
             <Header />
-            <div className="mx-auto mt-4 sm:mt-10 max-w-xl rounded-xl bg-black/60 p-4 sm:p-6 text-white backdrop-blur w-[94%] sm:w-auto">
-                <h1 className="text-2xl sm:text-3xl font-semibold">
-                    Choose Profile
-                </h1>
-                <p className="mt-2 text-sm text-gray-200">
-                    Pick your default profile before joining games.
-                </p>
-
-                <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-4">
-                    {profiles.map((profile) => (
-                        <button
-                            key={profile.username}
-                            disabled={busy}
-                            className="rounded-lg border border-white/20 bg-indigo-900/70 p-3 sm:p-4 hover:bg-indigo-800 disabled:opacity-60"
-                            onClick={() => chooseProfile(profile.username)}
-                        >
-                            <span className="flex flex-col items-center gap-2">
-                                <span className="relative h-20 w-20 sm:h-24 sm:w-24 overflow-hidden rounded-full border border-white/20">
-                                    <Image
-                                        src={profile.icon}
-                                        alt={profile.username}
-                                        layout="fill"
-                                        objectFit="cover"
-                                    />
-                                </span>
-                                <span className="text-sm sm:text-base font-medium text-center break-all">
-                                    {profile.username}
-                                </span>
-                            </span>
-                        </button>
-                    ))}
-                </div>
-
-                {error ? (
-                    <div className="mt-4 rounded-md bg-red-700/50 px-3 py-2 text-sm">
-                        {error}
+            <div className="ui-page ui-fade-in">
+                <section className="ui-panel ui-panel-pad mt-4 sm:mt-8 max-w-3xl mx-auto">
+                    <div className="flex items-end justify-between gap-4">
+                        <div>
+                            <h1 className="ui-title ui-title-lg">
+                                Choose Profile
+                            </h1>
+                            <p className="ui-text-muted mt-2">
+                                Pick your default identity before joining
+                                games.
+                            </p>
+                        </div>
+                        <span className="ui-pill">Profile Setup</span>
                     </div>
-                ) : null}
+
+                    <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                        {profiles.map((profile) => (
+                            <button
+                                key={profile.username}
+                                disabled={busy}
+                                className="ui-panel rounded-xl border-[rgba(231,222,206,0.18)] p-4 hover:border-[rgba(183,148,90,0.55)] hover:bg-[rgba(58,45,40,0.9)] disabled:opacity-60 transition-colors duration-200"
+                                onClick={() => chooseProfile(profile.username)}
+                            >
+                                <span className="flex items-center gap-3">
+                                    <span className="relative h-16 w-16 sm:h-20 sm:w-20 overflow-hidden rounded-full border border-[rgba(231,222,206,0.28)] ring-2 ring-[rgba(183,148,90,0.28)]">
+                                        <Image
+                                            src={profile.icon}
+                                            alt={profile.username}
+                                            layout="fill"
+                                            objectFit="cover"
+                                        />
+                                    </span>
+                                    <span className="text-sm sm:text-base font-semibold text-left text-[color:var(--ui-ivory)] break-all">
+                                        {profile.username}
+                                    </span>
+                                </span>
+                            </button>
+                        ))}
+                    </div>
+
+                    {error ? (
+                        <div className="mt-4 rounded-md border border-[rgba(242,180,185,0.4)] bg-[rgba(122,31,36,0.4)] px-3 py-2 text-sm text-[#f2b4b9]">
+                            {error}
+                        </div>
+                    ) : null}
+                </section>
             </div>
         </main>
     );

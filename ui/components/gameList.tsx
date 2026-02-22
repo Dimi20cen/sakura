@@ -14,8 +14,7 @@ import { GameSettings } from "../tsg";
 import { DISPLAY_GAME_MODE, GAME_MODE } from "../src/lobby";
 
 const textClass = classNames(
-    `px-2 sm:px-6 py-3 tracking-wider text-center text-sm sm:text-lg font-medium`,
-    "text-white",
+    "px-3 sm:px-6 py-3 text-center text-xs sm:text-sm uppercase tracking-[0.08em] font-semibold text-[color:var(--ui-ivory-soft)]",
 );
 
 type LobbyGame = {
@@ -49,28 +48,28 @@ const renderGame = (
                     key={id}
                     onClick={handleRowClick(id)}
                     className={classNames(
-                        "cursor-pointer backdrop-blur-lg border-bottom-2",
+                        "cursor-pointer ui-panel",
                         selectedGameId === id
-                            ? "bg-indigo-800 bg-opacity-80"
-                            : "bg-black bg-opacity-50",
+                            ? "bg-[rgba(122,31,36,0.62)] border-[rgba(183,148,90,0.55)] shadow-[0_8px_20px_rgba(122,31,36,0.35)]"
+                            : "bg-[rgba(38,31,28,0.78)] border-[rgba(231,222,206,0.12)]",
                     )}
                 >
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-center text-base sm:text-lg text-white bg-clip-text">
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-center text-sm sm:text-base text-[color:var(--ui-ivory)]">
                         {DISPLAY_GAME_MODE[gameSettings.Mode as GAME_MODE]}
                     </td>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-center text-base sm:text-lg text-white bg-clip-text">
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-center text-sm sm:text-base text-[color:var(--ui-ivory)]">
                         {game.host}
                     </td>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-center text-base sm:text-lg text-white bg-clip-text">
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-center text-sm sm:text-base text-[color:var(--ui-ivory)]">
                         {[...Array(gameSettings.MaxPlayers)].map(
                             (_, i: number) => (
                                 <span
                                     key={i}
                                     className={classNames(
                                         game.active_players > i
-                                            ? "text-black opacity-80"
-                                            : "text-white",
-                                        "text-base mr-1",
+                                            ? "text-[color:var(--ui-gold-soft)]"
+                                            : "text-[rgba(244,239,228,0.45)]",
+                                        "text-sm mr-1",
                                     )}
                                 >
                                     &#x2B24;
@@ -78,10 +77,73 @@ const renderGame = (
                             ),
                         )}
                     </td>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-center text-base sm:text-lg text-white bg-clip-text">
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-center text-sm sm:text-base text-[color:var(--ui-ivory)]">
                         {gameSettings.MapName}
                     </td>
                 </tr>
+            );
+        } catch {
+            return null;
+        }
+    });
+};
+
+const renderGameCards = (
+    games: LobbyGame[],
+    selectedGameId: string,
+    handleRowClick: (gameId: string) => () => void,
+) => {
+    return games.map((game: LobbyGame) => {
+        if (!game.settings) {
+            return null;
+        }
+        try {
+            const { id, settings } = game;
+            const gameSettings = new GameSettings(
+                decode(Buffer.from(settings, "base64")),
+            );
+            return (
+                <button
+                    key={id}
+                    onClick={handleRowClick(id)}
+                    className={classNames(
+                        "ui-panel w-full rounded-xl border px-4 py-3 text-left transition-colors duration-200",
+                        selectedGameId === id
+                            ? "bg-[rgba(122,31,36,0.62)] border-[rgba(183,148,90,0.55)]"
+                            : "bg-[rgba(38,31,28,0.78)] border-[rgba(231,222,206,0.12)]",
+                    )}
+                >
+                    <div className="flex items-center justify-between text-sm">
+                        <span className="text-[color:var(--ui-ivory)] font-semibold">
+                            {DISPLAY_GAME_MODE[gameSettings.Mode as GAME_MODE]}
+                        </span>
+                        <span className="text-[color:var(--ui-ivory-soft)]">
+                            {gameSettings.MapName}
+                        </span>
+                    </div>
+                    <div className="mt-2 flex items-center justify-between text-sm">
+                        <span className="text-[color:var(--ui-ivory-soft)]">
+                            Host: {game.host}
+                        </span>
+                        <span className="text-[color:var(--ui-ivory)]">
+                            {[...Array(gameSettings.MaxPlayers)].map(
+                                (_, i: number) => (
+                                    <span
+                                        key={i}
+                                        className={classNames(
+                                            game.active_players > i
+                                                ? "text-[color:var(--ui-gold-soft)]"
+                                                : "text-[rgba(244,239,228,0.45)]",
+                                            "text-sm mr-1",
+                                        )}
+                                    >
+                                        &#x2B24;
+                                    </span>
+                                ),
+                            )}
+                        </span>
+                    </div>
+                </button>
             );
         } catch {
             return null;
@@ -185,7 +247,7 @@ const GameList: FunctionComponent = () => {
         return (
             <>
                 <Header />
-                <div className="text-white w-full h-screen flex">
+                <div className="text-[color:var(--ui-ivory)] w-full h-screen flex">
                     {spinner()}
                 </div>
             </>
@@ -194,19 +256,34 @@ const GameList: FunctionComponent = () => {
     return (
         <>
             <Header />
-            <div className="max-w-7xl min-h-screen mx-auto my-2 sm:my-4 py-2 sm:py-4 px-3 sm:px-6 lg:px-8">
-                <div className="flex flex-col gap-4">
-                    <div className="-my-2 overflow-x-auto basis-full">
-                        <div className="py-2 align-middle inline-block min-w-full sm:px-4 lg:px-6">
-                            <div className="flex flex-col border-0 border-blue-500 min-h-[10vh] max-h-[80vh]">
-                                <div className="flex-grow overflow-auto max-h-[250px] sm:max-h-[270px]">
-                                    <table
-                                        className="relative min-w-full divide-y-4 divide-transparent border-separate table-auto"
-                                        style={{
-                                            borderSpacing: "0 3px",
-                                        }}
-                                    >
-                                        <thead className="sticky top-0 bg-black bg-opacity-80 backdrop-blur">
+            <div className="ui-page ui-fade-in">
+                <div className="ui-grid gap-4 mt-4 sm:mt-6">
+                    <section className="ui-panel ui-panel-pad">
+                        <div className="mb-3 sm:mb-4">
+                            <h1 className="ui-title ui-title-lg">Lobby</h1>
+                            <p className="ui-text-muted">
+                                Select an active match to join, reconnect, or
+                                spectate.
+                            </p>
+                        </div>
+                        <div className="-mx-2 px-2">
+                            <div className="sm:hidden space-y-2 max-h-[360px] overflow-auto">
+                                {allGames.length > 0 ? (
+                                    renderGameCards(
+                                        allGames,
+                                        selectedGameId,
+                                        handleRowClick,
+                                    )
+                                ) : (
+                                    <div className="ui-panel rounded-xl border border-[rgba(231,222,206,0.12)] px-4 py-6 text-center text-[color:var(--ui-ivory-soft)] text-sm">
+                                        No active games found.
+                                    </div>
+                                )}
+                            </div>
+                            <div className="hidden sm:flex flex-col min-h-[10vh] max-h-[70vh]">
+                                <div className="flex-grow overflow-auto max-h-[320px]">
+                                    <table className="ui-data-table">
+                                        <thead>
                                             <tr>
                                                 <th
                                                     scope="col"
@@ -246,7 +323,7 @@ const GameList: FunctionComponent = () => {
                                                 </th>
                                             </tr>
                                         </thead>
-                                        <tbody className="">
+                                        <tbody>
                                             {allGames.length > 0 ? (
                                                 renderGame(
                                                     allGames,
@@ -254,10 +331,10 @@ const GameList: FunctionComponent = () => {
                                                     handleRowClick,
                                                 )
                                             ) : (
-                                                <tr className="bg-black bg-opacity-50">
+                                                <tr className="ui-panel">
                                                     <td
                                                         colSpan={4}
-                                                        className="px-4 py-8 text-center text-white text-base"
+                                                        className="px-4 py-8 text-center text-[color:var(--ui-ivory-soft)] text-sm"
                                                     >
                                                         No active games found.
                                                     </td>
@@ -268,13 +345,12 @@ const GameList: FunctionComponent = () => {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </section>
                     {selectedGame ? (
-                        <div className="w-full max-w-xs sm:max-w-sm mx-auto">
+                        <div className="w-full max-w-xs sm:max-w-sm mx-auto ui-fade-in">
                             <button
                                 className={classNames(
-                                    "h-12 w-full text-lg sm:text-xl rounded-xl",
-                                    "bg-green-700 hover:bg-green-900 text-white",
+                                    "ui-button ui-button-primary",
                                 )}
                                 onClick={handleGameAction}
                             >
@@ -285,12 +361,11 @@ const GameList: FunctionComponent = () => {
                     <div className="w-full max-w-xs sm:max-w-sm mx-auto">
                         <button
                             className={classNames(
-                                "h-12 w-full text-lg sm:text-xl rounded-xl",
-                                "bg-indigo-700 hover:bg-indigo-900 text-white",
+                                "ui-button ui-button-secondary",
                             )}
                             onClick={handleHostGame}
                         >
-                            Host Game
+                            Create Room
                         </button>
                     </div>
                 </div>

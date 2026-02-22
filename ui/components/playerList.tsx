@@ -15,23 +15,26 @@ import botImage from "../public/assets/bot.png";
 
 const playerRowClass = (self: boolean, ready: boolean) => {
     let base =
-        "relative mb-4 rounded-md shadow-sm flex hover:border-gray-400 " +
-        "focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-white text-white px-6 py-5";
+        "relative mb-3 rounded-xl border flex text-[color:var(--ui-ivory)] px-4 py-4 transition-colors duration-200";
 
     if (self) {
         base += " font-bold";
         if (ready) {
-            base += " bg-gradient-to-r from-green-600 to-green-700";
+            base +=
+                " bg-[rgba(54,101,66,0.62)] border-[rgba(183,148,90,0.45)]";
         } else {
-            base += " bg-gradient-to-r from-red-600 to-red-700";
+            base +=
+                " bg-[rgba(122,31,36,0.65)] border-[rgba(183,148,90,0.52)]";
         }
         return base;
     }
 
     if (ready) {
-        base += " bg-gradient-to-r from-green-800 to-green-900";
+        base +=
+            " bg-[rgba(49,71,54,0.62)] border-[rgba(231,222,206,0.18)]";
     } else {
-        base += " bg-gradient-to-r from-red-800 to-red-900";
+        base +=
+            " bg-[rgba(54,35,36,0.72)] border-[rgba(231,222,206,0.18)]";
     }
 
     return base;
@@ -68,7 +71,7 @@ const PlayerList: FunctionComponent<{
                 >
                     <div
                         className={classNames(
-                            "flex-shrink-0 rounded-full h-8 w-8 m-auto",
+                            "flex-shrink-0 rounded-full h-8 w-8 m-auto ring-1 ring-[rgba(231,222,206,0.4)]",
                             playerColors[hexToUrlString(player.Color)],
                         )}
                     >
@@ -79,7 +82,7 @@ const PlayerList: FunctionComponent<{
                     <div className="flex-col pl-4 text-left items-center w-full">
                         <span className="align-middle inline-block mr-2">
                             <p>{player.Username}</p>
-                            <p className="font-normal text-sm">
+                            <p className="font-normal text-xs text-[color:var(--ui-ivory-soft)]">
                                 {player.GamesFinished}/{player.GamesStarted}
                             </p>
                         </span>

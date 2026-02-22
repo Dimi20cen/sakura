@@ -30,7 +30,8 @@ const Pixi: FunctionComponent<{ gameId: string; order: number }> = ({
     return (
         <div
             ref={divRef}
-            className="relative m-auto pixi flex content-center justify-center"
+            className="relative m-auto pixi flex content-center justify-center overflow-hidden touch-none select-none"
+            style={{ overscrollBehavior: "contain" }}
         />
     );
 };

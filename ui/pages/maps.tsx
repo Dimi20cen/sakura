@@ -53,43 +53,43 @@ initMap = JSON.parse(
 
 const TileTypeToClass = {
     [TileType.Desert]: [
-        "bg-orange-100",
-        "border-b-orange-100",
-        "border-t-orange-100",
+        "bg-amber-100",
+        "border-b-amber-100",
+        "border-t-amber-100",
     ],
     [TileType.Wood]: [
-        "bg-green-800",
-        "border-b-green-800",
-        "border-t-green-800",
+        "bg-emerald-800",
+        "border-b-emerald-800",
+        "border-t-emerald-800",
     ],
-    [TileType.Ore]: ["bg-gray-600", "border-b-gray-600", "border-t-gray-600"],
+    [TileType.Ore]: ["bg-zinc-600", "border-b-zinc-600", "border-t-zinc-600"],
     // [TileType.Sea]: ["bg-blue-600", "border-b-blue-600", "border-t-blue-600"],
     [TileType.Brick]: [
-        "bg-amber-800",
-        "border-b-amber-800",
-        "border-t-amber-800",
+        "bg-red-800",
+        "border-b-red-800",
+        "border-t-red-800",
     ],
     [TileType.Wheat]: [
-        "bg-amber-400",
-        "border-b-amber-400",
-        "border-t-amber-400",
+        "bg-yellow-600",
+        "border-b-yellow-600",
+        "border-t-yellow-600",
     ],
     [TileType.Wool]: [
-        "bg-green-400",
-        "border-b-green-400",
-        "border-t-green-400",
+        "bg-lime-600",
+        "border-b-lime-600",
+        "border-t-lime-600",
     ],
-    [TileType.Fog]: ["bg-gray-300", "border-b-gray-300", "border-t-gray-300"],
-    [TileType.None]: ["bg-blue-400", "border-b-blue-400", "border-t-blue-400"],
+    [TileType.Fog]: ["bg-stone-400", "border-b-stone-400", "border-t-stone-400"],
+    [TileType.None]: ["bg-slate-600", "border-b-slate-600", "border-t-slate-600"],
     [TileType.Gold]: [
-        "bg-purple-700",
-        "border-b-purple-700",
-        "border-t-purple-700",
+        "bg-amber-500",
+        "border-b-amber-500",
+        "border-t-amber-500",
     ],
     [TileType.Random]: [
-        "bg-pink-300",
-        "border-b-pink-300",
-        "border-t-pink-300",
+        "bg-rose-400",
+        "border-b-rose-400",
+        "border-t-rose-400",
     ],
 };
 
@@ -538,16 +538,13 @@ const Index: NextPage = () => {
     return (
         <main>
             <Header />
-            <div className="flex flex-row w-full bg-black bg-opacity-70 backdrop-blur-lg">
-                <div className="mx-4 mt-4 h-[85vh] overflow-auto basis-1/2 xl:basis-2/3 p-4">
-                    <div>
-                        <h2
-                            className="ml-4 text-4xl font-bold mt-1 text-white mb-1"
-                            style={{ fontVariant: "small-caps" }}
-                        >
+            <div className="ui-page ui-fade-in">
+                <div className="ui-grid gap-4 mt-4 sm:mt-6 xl:grid-cols-[minmax(0,2fr),minmax(300px,1fr)]">
+                    <section className="ui-panel ui-panel-pad h-[78vh] overflow-auto">
+                        <h1 className="ui-title ui-title-lg small-caps mb-3">
                             Clash Map Editor
-                        </h2>
-                        <div className="ml-4 text-white m-4 text-sm">
+                        </h1>
+                        <div className="ui-text-muted mb-5">
                             Click on a hex to cycle through tile options. Right
                             click to reset to random or fog.
                             <br />
@@ -665,11 +662,10 @@ const Index: NextPage = () => {
                                 ))}
                             </div>
                         ))}
-                    </div>
-                </div>
-                <div className="pt-1 my-12 basis-1/2 xl:basis-1/3 h-[85vh] overflow-auto text-white">
-                    <div className="w-1/2 ml-4 mb-3">
-                        <h2 className="text-xl mt-1 text-white mb-2">
+                    </section>
+                    <aside className="ui-panel ui-panel-pad h-[78vh] overflow-auto text-[color:var(--ui-ivory)]">
+                    <div className="mb-6">
+                        <h2 className="ui-title ui-title-md mb-2">
                             Choose Map to Edit
                         </h2>
                         <Combobox
@@ -677,9 +673,9 @@ const Index: NextPage = () => {
                             onChange={(value) => setSelectedMap(value as any)}
                         >
                             <div className="relative mt-1">
-                                <div className="relative w-full text-left bg-white rounded-md shadow-md cursor-default focus:outline-none focus-visible:ring-2 focus-visible:ring-opacity-75 focus-visible:ring-white focus-visible:ring-offset-teal-300 focus-visible:ring-offset-2 sm:text-sm overflow-hidden">
+                                <div className="relative w-full text-left rounded-md shadow-md cursor-default overflow-hidden border border-[rgba(231,222,206,0.2)] bg-[rgba(24,20,18,0.92)]">
                                     <Combobox.Input
-                                        className="w-full border-none focus:ring-0 py-2 pl-3 pr-10 text-lg leading-5 text-gray-900"
+                                        className="ui-input !rounded-none !border-none !bg-transparent py-2 pl-3 pr-10 text-base leading-5 text-[color:var(--ui-ivory)]"
                                         autoComplete="off"
                                         onChange={(event: any) =>
                                             setMapQuery(event.target.value)
@@ -687,7 +683,7 @@ const Index: NextPage = () => {
                                     />
                                     <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
                                         <ChevronUpDownIcon
-                                            className="w-5 h-5 text-gray-400"
+                                            className="w-5 h-5 text-[rgba(244,239,228,0.7)]"
                                             aria-hidden="true"
                                         />
                                     </Combobox.Button>
@@ -699,10 +695,10 @@ const Index: NextPage = () => {
                                     leaveTo="opacity-0"
                                     afterLeave={() => setMapQuery("")}
                                 >
-                                    <Combobox.Options className="absolute w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                                    <Combobox.Options className="absolute z-10 w-full py-1 mt-1 overflow-auto text-base bg-[rgba(24,20,18,0.98)] rounded-md shadow-lg max-h-60 border border-[rgba(231,222,206,0.2)] focus:outline-none sm:text-sm">
                                         {filteredMaps.length === 0 &&
                                         mapQuery !== "" ? (
-                                            <div className="cursor-default select-none relative py-2 px-4 text-gray-700">
+                                            <div className="cursor-default select-none relative py-2 px-4 text-[color:var(--ui-ivory-soft)]">
                                                 Nothing found.
                                             </div>
                                         ) : (
@@ -712,8 +708,8 @@ const Index: NextPage = () => {
                                                     className={(obj: any) =>
                                                         `select-none relative py-1 pl-10 pr-4 cursor-pointer ${
                                                             obj.active
-                                                                ? "text-white bg-indigo-600"
-                                                                : "text-gray-900"
+                                                                ? "text-[color:var(--ui-ivory)] bg-[rgba(122,31,36,0.72)]"
+                                                                : "text-[color:var(--ui-ivory-soft)]"
                                                         }`
                                                     }
                                                     value={map}
@@ -733,8 +729,8 @@ const Index: NextPage = () => {
                                                                 <span
                                                                     className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
                                                                         obj.active
-                                                                            ? "text-white"
-                                                                            : "text-indigo-600"
+                                                                            ? "text-[color:var(--ui-gold-soft)]"
+                                                                            : "text-[color:var(--ui-gold-soft)]"
                                                                     }`}
                                                                 >
                                                                     <CheckIcon
@@ -754,14 +750,14 @@ const Index: NextPage = () => {
                         </Combobox>
                     </div>
                     <div>
-                            <h2 className="ml-4 text-xl mt-1">
+                            <h2 className="ui-title ui-title-md">
                                 Map Attributes
                             </h2>
 
-                            <div className="m-3 mt-2">
-                                <div className="text-base ml-1 mb-1">Name</div>
+                            <div className="mt-3">
+                                <div className="text-sm mb-1">Name</div>
                                 <input
-                                    className="w-full p-2 border-2 border-gray-400 text-black rounded-lg mb-2"
+                                    className="ui-input mb-3"
                                     type="text"
                                     value={map.name}
                                     onChange={(e) =>
@@ -769,78 +765,78 @@ const Index: NextPage = () => {
                                     }
                                 />
                                 <button
-                                    className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg mr-4 w-1/3 mb-4"
+                                    className="ui-button ui-button-primary max-w-[180px] mb-4"
                                     onClick={generateJSON}
                                 >
                                     Save
                                 </button>
                                 <br />
 
-                                <div className="text-base ml-1 mb-2">
+                                <div className="text-sm mb-2">
                                     Map Size
                                 </div>
                                 <button
-                                    className="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg mr-4 mb-2 w-1/3"
+                                    className="ui-button ui-button-secondary max-w-[180px] mr-2 mb-2"
                                     onClick={addRow}
                                 >
                                     Add Row
                                 </button>
                                 <button
-                                    className="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg mr-4 mb-2 w-1/3"
+                                    className="ui-button ui-button-ghost max-w-[180px] mr-2 mb-2"
                                     onClick={delRow}
                                 >
                                     Delete Row
                                 </button>
                                 <br />
                                 <button
-                                    className="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg mr-4 mb-2 w-1/3"
+                                    className="ui-button ui-button-secondary max-w-[180px] mr-2 mb-2"
                                     onClick={addCol}
                                 >
                                     Add Column
                                 </button>
                                 <button
-                                    className="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg mr-4 mb-2 w-1/3"
+                                    className="ui-button ui-button-ghost max-w-[180px] mr-2 mb-2"
                                     onClick={delCol}
                                 >
                                     Delete Column
                                 </button>
                             </div>
 
-                            <h2 className="ml-4 text-xl mt-1">
+                            <h2 className="ui-title ui-title-md mt-5">
                                 Number Distribution
                                 <span
                                     className={classNames(
                                         numNumbers() !==
                                             numTilesThatNeedNumber()
-                                            ? "bg-red-500"
-                                            : "bg-green-700",
-                                        "px-3 py-1 mx-3 my-2 rounded-lg text-lg",
+                                            ? "ui-pill warn"
+                                            : "ui-pill ok",
+                                        "mx-2",
                                     )}
                                 >
                                     {numNumbers()} / {numTilesThatNeedNumber()}
                                 </span>
-                                <div className="text-white mt-1 mb-2 text-sm font-normal">
+                                <div className="ui-text-muted mt-1 mb-2 font-normal">
                                     Select the number distribution for all hexes
                                     except desert and sea.
                                 </div>
                             </h2>
 
                             <button
-                                className="bg-green-800 hover:bg-green-900 text-white py-2 rounded-lg mr-4 w-1/3 m-4 my-2 text-sm"
+                                className="ui-button ui-button-secondary max-w-[180px] my-2"
                                 onClick={autoNumbers}
                             >
                                 Auto Distribute
                             </button>
 
-                            <ul className="text-white ml-8">
+                            <ul className="ml-1">
                                 {Object.keys(numbers).map((x) => (
-                                    <li key={x} className="m-3">
-                                        <span className="mr-2 inline-block w-[50px] text-right pr-1">
+                                    <li key={x} className="my-3 flex items-center gap-3">
+                                        <span className="inline-block w-[56px] text-right text-sm">
                                             {x}
                                         </span>
                                         <input
                                             type="range"
-                                            className="px-2 rounded-lg form-range appearance-none h-5 p-0 bg-white focus:outline-none focus:ring-0 focus:shadow-none"
+                                            className="flex-1 accent-[color:var(--ui-gold)]"
                                             min="0"
                                             max={numTilesThatNeedNumber()}
                                             step="1"
@@ -849,41 +845,41 @@ const Index: NextPage = () => {
                                                 changeNumber(e, Number(x))
                                             }
                                         />
-                                        <span className="text-white ml-3">
+                                        <span className="text-sm min-w-[24px]">
                                             {(numbers as any)[x]}
                                         </span>
                                     </li>
                                 ))}
                             </ul>
 
-                            <h2 className="ml-4 text-xl mt-5">
+                            <h2 className="ui-title ui-title-md mt-6">
                                 Random Tile Distribution
                                 <span
                                     className={classNames(
                                         numRandomTilesSelected() !==
                                             numRandomTiles()
-                                            ? "bg-red-500"
-                                            : "bg-green-700",
-                                        "px-3 py-1 mx-3 my-2 rounded-lg text-lg",
+                                            ? "ui-pill warn"
+                                            : "ui-pill ok",
+                                        "mx-2",
                                     )}
                                 >
                                     {numRandomTilesSelected()} /{" "}
                                     {numRandomTiles()}
                                 </span>
-                                <div className="text-white mt-1 mb-2 text-sm font-normal">
+                                <div className="ui-text-muted mt-1 mb-2 font-normal">
                                     Select the tile distribution for all random
                                     and fog tiles.
                                 </div>
                             </h2>
 
                             <button
-                                className="bg-green-800 hover:bg-green-900 text-white py-2 rounded-lg mr-4 w-1/3 m-4 my-2 text-sm"
+                                className="ui-button ui-button-secondary max-w-[180px] my-2"
                                 onClick={autoTiles}
                             >
                                 Auto Distribute
                             </button>
 
-                            <ul className="text-white ml-8">
+                            <ul className="ml-1">
                                 {Object.keys(TileTypeToClass)
                                     .filter(
                                         (x) =>
@@ -893,8 +889,8 @@ const Index: NextPage = () => {
                                         // Number(x) !== TileType.Sea, // No seafarers for now
                                     )
                                     .map((x) => (
-                                        <li key={x} className="m-3">
-                                            <span className="mr-2 inline-block w-[50px] text-right pr-3">
+                                        <li key={x} className="my-3 flex items-center gap-3">
+                                            <span className="inline-block w-[56px] text-right text-sm">
                                                 {
                                                     TileType[
                                                         Number(x) as TileType
@@ -903,7 +899,7 @@ const Index: NextPage = () => {
                                             </span>
                                             <input
                                                 type="range"
-                                                className="px-2 rounded-lg form-range appearance-none h-5 p-0 bg-white focus:outline-none focus:ring-0 focus:shadow-none"
+                                                className="flex-1 accent-[color:var(--ui-gold)]"
                                                 min="0"
                                                 max={numTilesThatNeedNumber()}
                                                 step="1"
@@ -912,39 +908,39 @@ const Index: NextPage = () => {
                                                     changeTile(e, Number(x))
                                                 }
                                             />
-                                            <span className="text-white ml-3">
+                                            <span className="text-sm min-w-[24px]">
                                                 {(tiles as any)[x]}
                                             </span>
                                         </li>
                                     ))}
                             </ul>
 
-                            <h2 className="ml-4 text-xl mt-5">
+                            <h2 className="ui-title ui-title-md mt-6">
                                 Port Distribution
                                 <span
                                     className={classNames(
                                         numPortsSelected() > 15
-                                            ? "bg-red-500"
-                                            : "bg-green-700",
-                                        "px-3 py-1 mx-3 my-2 rounded-lg text-lg",
+                                            ? "ui-pill warn"
+                                            : "ui-pill ok",
+                                        "mx-2",
                                     )}
                                 >
                                     {numPortsSelected()} / 15
                                 </span>
-                                <div className="text-white mt-1 mb-2 text-sm font-normal">
+                                <div className="ui-text-muted mt-1 mb-2 font-normal">
                                     Select the port distribution for all ports.
                                 </div>
                             </h2>
 
-                            <ul className="text-white ml-8">
+                            <ul className="ml-1">
                                 {Object.keys(ports).map((x) => (
-                                    <li key={x} className="m-3">
-                                        <span className="mr-2 inline-block w-[50px] text-right pr-3">
+                                    <li key={x} className="my-3 flex items-center gap-3">
+                                        <span className="inline-block w-[56px] text-right text-sm">
                                             {PortType[Number(x) as PortType]}
                                         </span>
                                         <input
                                             type="range"
-                                            className="px-2 rounded-lg form-range appearance-none h-5 p-0 bg-white focus:outline-none focus:ring-0 focus:shadow-none"
+                                            className="flex-1 accent-[color:var(--ui-gold)]"
                                             min="0"
                                             max={15}
                                             step="1"
@@ -953,13 +949,14 @@ const Index: NextPage = () => {
                                                 changePort(e, Number(x))
                                             }
                                         />
-                                        <span className="text-white ml-3">
+                                        <span className="text-sm min-w-[24px]">
                                             {(ports as any)[x]}
                                         </span>
                                     </li>
                                 ))}
                             </ul>
                     </div>
+                    </aside>
                 </div>
             </div>
         </main>

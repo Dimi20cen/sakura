@@ -6,27 +6,27 @@ const Index: NextPage = () => {
     return (
         <main>
             <Header />
-
-            <div className="text-4xl">
-                <div className="flex min-h-[85vh] overflow-auto">
-                    <div className="w-full flex flex-col md:h-[60vh]">
-                        <div className="basis-full"></div>
-                        <div className="basis-auto w-11/12 sm:w-3/4 md:w-[420px] m-auto md:mr-24">
-                            <Link href="/sp">
-                                <button className="w-full p-3 sm:p-4 text-2xl sm:text-3xl my-1 text-white bg-black bg-opacity-70 hover:bg-green-700 backdrop-blur rounded-lg small-caps">
-                                    Single Player
-                                </button>
-                            </Link>
-                            <Link href="/lobby">
-                                <button className="w-full p-3 sm:p-4 text-2xl sm:text-3xl my-1 text-white bg-black bg-opacity-70 hover:bg-red-700 backdrop-blur rounded-lg small-caps">
-                                    Multiplayer
-                                </button>
-                            </Link>
-
-                            <div className="h-12"></div>
-                        </div>
+            <div className="ui-page ui-fade-in">
+                <section className="ui-panel ui-panel-pad mt-8 sm:mt-12 max-w-2xl mx-auto">
+                    <div className="space-y-4 text-center">
+                        <h1 className="ui-title ui-title-lg">Clash</h1>
+                        <p className="ui-text-muted">
+                            Choose how you want to play.
+                        </p>
                     </div>
-                </div>
+                    <div className="ui-grid gap-3 mt-6 sm:mt-8">
+                        <Link href="/sp">
+                            <button className="ui-button ui-button-secondary">
+                                Start Solo
+                            </button>
+                        </Link>
+                        <Link href="/lobby">
+                            <button className="ui-button ui-button-primary">
+                                Multiplayer
+                            </button>
+                        </Link>
+                    </div>
+                </section>
             </div>
         </main>
     );

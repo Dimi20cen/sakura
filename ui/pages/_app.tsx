@@ -90,8 +90,8 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
                 <meta name="apple-mobile-web-app-capable" content="yes" />
                 <meta name="application-name" content="Clash" />
                 <meta name="apple-mobile-web-app-title" content="Clash" />
-                <meta name="theme-color" content="#3A62BE" />
-                <meta name="msapplication-navbutton-color" content="#3A62BE" />
+                <meta name="theme-color" content="#251916" />
+                <meta name="msapplication-navbutton-color" content="#251916" />
                 <meta
                     name="apple-mobile-web-app-status-bar-style"
                     content="black-translucent"
@@ -144,9 +144,8 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
 
             <SessionProvider session={session}>
                 <Provider store={store}>
-                    <div className="h-screen w-full bg-gradient-to-r from-sky-400 to-blue-800">
-                        <div className="absolute h-full w-full bg-[url('/assets/clash-background.png')] bg-cover bg-center opacity-100"></div>
-                        <div className="absolute h-full w-full">
+                    <div className="ui-shell">
+                        <div className="ui-content">
                             <Component {...pageProps} />
                         </div>
                     </div>

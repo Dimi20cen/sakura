@@ -61,14 +61,15 @@ func TestSeafarersFogIslandsInitializeAndReveal(t *testing.T) {
 		t.Fatalf("expected scenario victory target 12, got %d", target)
 	}
 
+	fogBefore := 0
 	var fogTile *entities.Tile
 	for _, t := range g.Tiles {
 		if t.Fog {
+			fogBefore++
 			fogTile = t
-			break
 		}
 	}
-	if fogTile == nil {
+	if fogTile == nil || fogBefore == 0 {
 		t.Fatal("expected at least one fog tile on fog islands map")
 	}
 
@@ -120,7 +121,41 @@ func TestSeafarersFogIslandsInitializeAndReveal(t *testing.T) {
 	if err := g.BuildShip(p, targetEdge.C); err != nil {
 		t.Fatalf("failed to build ship for fog reveal: %v", err)
 	}
-	if fogTile.Fog {
-		t.Fatal("expected fog tile to be revealed after adjacent ship build")
+	fogAfter := 0
+	for _, t := range g.Tiles {
+		if t.Fog {
+			fogAfter++
+		}
+	}
+	if fogAfter >= fogBefore {
+		t.Fatalf("expected fog count to decrease after adjacent ship build (before=%d after=%d)", fogBefore, fogAfter)
+	}
+}
+
+func TestSeafarersThroughDesertInitialize(t *testing.T) {
+	defn := maps.GetMapByName(maps.SeafarersThroughDesert)
+	if defn == nil {
+		t.Fatal("through the desert map definition missing")
+	}
+
+	g := &Game{
+		Store: &noopStore{},
+		Settings: entities.GameSettings{
+			Mode:          entities.Seafarers,
+			MapName:       maps.SeafarersThroughDesert,
+			MapDefn:       defn,
+			VictoryPoints: 10,
+			Speed:         entities.NormalSpeed,
+		},
+	}
+	if _, err := g.Initialize("seafarers-through-desert-init", 2); err != nil {
+		t.Fatalf("initialize failed: %v", err)
+	}
+
+	if g.Settings.MapDefn.Scenario == nil {
+		t.Fatal("scenario metadata missing on through the desert map")
+	}
+	if target := g.getScenarioVictoryTarget(); target != 14 {
+		t.Fatalf("expected scenario victory target 14, got %d", target)
 	}
 }

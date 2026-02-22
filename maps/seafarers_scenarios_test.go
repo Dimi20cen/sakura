@@ -4,8 +4,8 @@ import "testing"
 
 func TestScenarioStubMapNamesCount(t *testing.T) {
 	stubs := ScenarioStubMapNames()
-	if len(stubs) != 6 {
-		t.Fatalf("expected 6 seafarers scenario stubs, got %d", len(stubs))
+	if len(stubs) != 5 {
+		t.Fatalf("expected 5 seafarers scenario stubs, got %d", len(stubs))
 	}
 }
 
@@ -40,6 +40,9 @@ func TestGetSeafarersScenarioCatalog(t *testing.T) {
 	if catalog[2].Title != SeafarersFogIslands || catalog[2].Placeholder || catalog[2].VictoryPoints != 12 {
 		t.Fatalf("expected third catalog entry to be non-placeholder fog islands")
 	}
+	if catalog[3].Title != SeafarersThroughDesert || catalog[3].Placeholder || catalog[3].VictoryPoints != 14 {
+		t.Fatalf("expected fourth catalog entry to be non-placeholder through the desert")
+	}
 }
 
 func TestGetMapByNameSeafarersFourIslandsIsPlayable(t *testing.T) {
@@ -65,5 +68,18 @@ func TestGetMapByNameSeafarersFogIslandsIsPlayable(t *testing.T) {
 	}
 	if defn.Scenario.VictoryPoints != 12 {
 		t.Fatalf("expected fog islands victory points override 12, got %d", defn.Scenario.VictoryPoints)
+	}
+}
+
+func TestGetMapByNameSeafarersThroughDesertIsPlayable(t *testing.T) {
+	defn := GetMapByName(SeafarersThroughDesert)
+	if defn == nil {
+		t.Fatal("expected through the desert map")
+	}
+	if defn.Scenario == nil || defn.Scenario.Placeholder {
+		t.Fatal("expected through the desert map to be non-placeholder with scenario metadata")
+	}
+	if defn.Scenario.VictoryPoints != 14 {
+		t.Fatalf("expected through the desert victory points override 14, got %d", defn.Scenario.VictoryPoints)
 	}
 }

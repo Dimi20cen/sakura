@@ -20,7 +20,6 @@ const (
 // and map-loading integration but not yet full rules parity.
 func ScenarioStubMapNames() []string {
 	return []string{
-		SeafarersThroughDesert,
 		SeafarersForgottenTribe,
 		SeafarersClothForCatan,
 		SeafarersPirateIslands,
@@ -37,7 +36,7 @@ func getSeafarersScenarioMapByName(name string) *entities.MapDefinition {
 	case SeafarersFogIslands:
 		return getSeafarersFogIslandsMap()
 	case SeafarersThroughDesert:
-		key = "seafarers_through_the_desert"
+		return getSeafarersThroughDesertMap()
 	case SeafarersForgottenTribe:
 		key = "seafarers_forgotten_tribe"
 	case SeafarersClothForCatan:
@@ -158,6 +157,59 @@ func getSeafarersFogIslandsMap() *entities.MapDefinition {
 	}
 }
 
+func getSeafarersThroughDesertMap() *entities.MapDefinition {
+	return &entities.MapDefinition{
+		Name:  SeafarersThroughDesert,
+		Order: []bool{false, true, false, true, false},
+		Ports: []entities.PortType{
+			entities.PortTypeAny,
+			entities.PortTypeAny,
+			entities.PortTypeAny,
+			entities.PortTypeWood,
+			entities.PortTypeBrick,
+			entities.PortTypeWheat,
+			entities.PortTypeWool,
+			entities.PortTypeOre,
+		},
+		Numbers: []uint16{2, 3, 3, 4, 4, 5, 5, 6, 8, 9, 10, 10, 11, 12},
+		// First-pass map: one large island separated by a desert strip, with outer sea and
+		// additional islands represented by random land positions.
+		RandomTiles: []entities.TileType{
+			entities.TileTypeDesert,
+			entities.TileTypeDesert,
+			entities.TileTypeWood,
+			entities.TileTypeWood,
+			entities.TileTypeBrick,
+			entities.TileTypeBrick,
+			entities.TileTypeWool,
+			entities.TileTypeWool,
+			entities.TileTypeWheat,
+			entities.TileTypeWheat,
+			entities.TileTypeOre,
+			entities.TileTypeOre,
+			entities.TileTypeGold,
+			entities.TileTypeGold,
+			entities.TileTypeWood,
+			entities.TileTypeWheat,
+		},
+		Map: [][]int{
+			{int(entities.TileTypeNone), int(entities.TileTypeRandom), int(entities.TileTypeRandom), int(entities.TileTypeRandom), int(entities.TileTypeNone)},
+			{int(entities.TileTypeRandom), int(entities.TileTypeSea), int(entities.TileTypeRandom), int(entities.TileTypeSea), int(entities.TileTypeRandom)},
+			{int(entities.TileTypeRandom), int(entities.TileTypeSea), int(entities.TileTypeDesert), int(entities.TileTypeSea), int(entities.TileTypeRandom)},
+			{int(entities.TileTypeRandom), int(entities.TileTypeSea), int(entities.TileTypeRandom), int(entities.TileTypeSea), int(entities.TileTypeRandom)},
+			{int(entities.TileTypeNone), int(entities.TileTypeRandom), int(entities.TileTypeRandom), int(entities.TileTypeRandom), int(entities.TileTypeNone)},
+		},
+		Scenario: &entities.ScenarioMetadata{
+			Expansion:       "Seafarers",
+			Key:             "seafarers_through_the_desert",
+			Title:           SeafarersThroughDesert,
+			Placeholder:     false,
+			VictoryPoints:   14,
+			VictoryRuleText: "If you have 14 or more VPs at any point during your turn, you win.",
+		},
+	}
+}
+
 func GetSeafarersScenarioCatalog() []*entities.ScenarioMetadata {
 	makeMeta := func(key, title string, placeholder bool, victoryPoints int, victoryText string) *entities.ScenarioMetadata {
 		if victoryText == "" {
@@ -177,7 +229,7 @@ func GetSeafarersScenarioCatalog() []*entities.ScenarioMetadata {
 		makeMeta("seafarers_heading_for_new_shores", SeafarersHeadingForNewShores, false, 12, "If you have 12 or more VPs at any point during your turn, you win."),
 		makeMeta("seafarers_four_islands", SeafarersFourIslands, false, 12, "If you have 12 or more VPs at any point during your turn, you win."),
 		makeMeta("seafarers_fog_islands", SeafarersFogIslands, false, 12, "If you have 12 or more VPs at any point during your turn, you win."),
-		makeMeta("seafarers_through_the_desert", SeafarersThroughDesert, true, 0, ""),
+		makeMeta("seafarers_through_the_desert", SeafarersThroughDesert, false, 14, "If you have 14 or more VPs at any point during your turn, you win."),
 		makeMeta("seafarers_forgotten_tribe", SeafarersForgottenTribe, true, 0, ""),
 		makeMeta("seafarers_cloth_for_catan", SeafarersClothForCatan, true, 0, ""),
 		makeMeta("seafarers_pirate_islands", SeafarersPirateIslands, true, 0, ""),

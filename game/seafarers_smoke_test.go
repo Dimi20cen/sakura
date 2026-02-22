@@ -494,6 +494,12 @@ func TestSeafarersFogIslandsStyleDiscoveryByShip(t *testing.T) {
 	g.InitPhase = false
 	g.DiceState = 1
 	p.CurrentHand.UpdateResources(10, 10, 10, 10, 10)
+	for _, tile := range g.Tiles {
+		if tile.Type != entities.TileTypeSea {
+			g.Robber.Move(tile)
+			break
+		}
+	}
 
 	if err := g.BuildShip(p, targetEdge.C); err != nil {
 		t.Fatalf("failed to build ship on fog-adjacent edge: %v", err)

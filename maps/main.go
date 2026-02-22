@@ -42,6 +42,7 @@ func GetOfficialMapNames() []string {
 		BaseMapName,
 		SeafarersHeadingForNewShores,
 		SeafarersFourIslands,
+		SeafarersFogIslands,
 	}
 }
 

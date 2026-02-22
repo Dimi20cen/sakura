@@ -38,19 +38,19 @@ This document tracks parity between the implemented Seafarers mode and the offic
 ## Implementation Plan (Recommended Order)
 
 1. `Phase 1`: Scenario data model and map onboarding
-- [ ] Extend map/scenario definition with scenario metadata (custom win condition, setup constraints, optional mechanics).
+- [x] Extend map/scenario definition with scenario metadata (custom win condition, setup constraints, optional mechanics).
 - [ ] Add official built-in map definitions for scenarios 2-8.
 - [ ] Add New World variant configuration schema.
 
 2. `Phase 2`: Scenario runtime hooks
-- [ ] Add setup-time hooks (placement constraints, starting assets, marker placement).
-- [ ] Add turn/event hooks (production modifiers, pirate/robber variants, custom interactions).
-- [ ] Add scenario-specific victory evaluators.
+- [x] Add setup-time hooks (placement constraints, starting assets, marker placement).
+- [x] Add turn/event hooks (production modifiers, pirate/robber variants, custom interactions).
+- [x] Add scenario-specific victory evaluators.
 
 3. `Phase 3`: Scenario-by-scenario delivery
-- [ ] Scenario 2: The Four Islands.
-- [ ] Scenario 3: The Fog Islands (official map + variable setup path).
-- [ ] Scenario 4: Through the Desert.
+- [x] Scenario 2: The Four Islands.
+- [x] Scenario 3: The Fog Islands (official map + variable setup path).
+- [x] Scenario 4: Through the Desert.
 - [ ] Scenario 5: The Forgotten Tribe.
 - [ ] Scenario 6: Cloth for Catan.
 - [ ] Scenario 7: The Pirate Islands.

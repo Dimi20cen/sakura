@@ -5,8 +5,11 @@ This document describes the currently implemented Seafarers scope.
 ## Scope
 
 - New standalone game mode: `Seafarers` (`Mode = 3`)
-- One official built-in scenario:
+- Built-in Seafarers scenarios currently available:
   - `Seafarers - Heading for New Shores`
+  - `Seafarers - The Four Islands`
+  - `Seafarers - The Fog Islands`
+  - `Seafarers - Through the Desert`
 - Core mechanics:
   - Ships
   - Ship movement
@@ -27,13 +30,15 @@ This document describes the currently implemented Seafarers scope.
 
 ### Roads
 
-- In Seafarers, roads are restricted to land edges (non-water edges).
-- Road placement on water edges is rejected.
+- Roads are allowed on land/coastal edges.
+- Roads are rejected on pure-sea edges.
+- Ships and roads do not share the same edge (edge occupancy rule).
 
 ### Ship Movement
 
 - Exactly one ship move per turn.
-- Only before dice roll (`DiceState == 0`).
+- During action phase (after dice roll).
+- A ship built this turn cannot be moved this turn.
 - Ship must be open-ended/movable.
 - Destination must be a valid ship build edge.
 
@@ -41,7 +46,7 @@ This document describes the currently implemented Seafarers scope.
 
 - Robber can be moved to sea tiles in Seafarers (acts as pirate).
 - Pirate blocks ship usage on adjacent edges (build/move destination checks).
-- Steal flow remains adjacency-based via selected robber/pirate tile placements.
+- Pirate steal targets players with ships on the pirate sea hex.
 
 ### Longest Trade Route
 
@@ -54,21 +59,27 @@ This document describes the currently implemented Seafarers scope.
 - Built-in official map names now include:
   - `Base`
   - `Seafarers - Heading for New Shores`
+  - `Seafarers - The Four Islands`
+  - `Seafarers - The Fog Islands`
+  - `Seafarers - Through the Desert`
 - Server resolves maps from DB first, then built-ins as fallback.
+
+### Important lobby note
+
+- If `Complexity = Seafarers` but `Map Name = Base`, ships are not buildable because the base map has no sea hexes.
+- To use ships, choose a Seafarers map.
 
 ## Validation
 
 ### Automated smoke test
 
 - File: `game/seafarers_smoke_test.go`
-- Test: `TestSeafarersSmokeBuildShipAndMoveShip`
-- Covers:
-  - Seafarers init
-  - Coastal settlement setup
-  - Ship build success
-  - Road-on-water rejection
-  - Move ship pre/post dice constraints
-  - One-move-per-turn enforcement
+- Key scenario tests:
+  - `TestSeafarersSmokeBuildShipAndMoveShip`
+  - `TestSeafarersPirateStealsFromShip`
+  - `TestSeafarersScriptedMultiplayerSmoke`
+  - `TestSeafarersFogIslandsInitializeAndReveal`
+  - `TestSeafarersThroughDesertSettlementRegionBonus`
 
 ### Full test run
 

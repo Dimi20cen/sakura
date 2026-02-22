@@ -1,13 +1,13 @@
 import { NextPage } from "next";
 import Header from "../components/header";
 
-import tileTex0 from "../public/assets/tile-tex/0.jpg";
-import tileTex1 from "../public/assets/tile-tex/1.jpg";
-import tileTex2 from "../public/assets/tile-tex/2.jpg";
-import tileTex3 from "../public/assets/tile-tex/3.jpg";
-import tileTex4 from "../public/assets/tile-tex/4.jpg";
-import tileTex5 from "../public/assets/tile-tex/5.jpg";
-import tileTex21 from "../public/assets/tile-tex/21.jpg";
+import tileTex0 from "../public/assets/tile-tex/desert.webp";
+import tileTex1 from "../public/assets/tile-tex/wood.webp";
+import tileTex2 from "../public/assets/tile-tex/brick.webp";
+import tileTex3 from "../public/assets/tile-tex/wool.webp";
+import tileTex4 from "../public/assets/tile-tex/wheat.webp";
+import tileTex5 from "../public/assets/tile-tex/ore.webp";
+import tileTex21 from "../public/assets/tile-tex/gold.webp";
 import tileTexFog from "../public/assets/tile-tex/fog.jpg";
 
 import port1 from "../public/assets/ports/1.png";
@@ -18,11 +18,11 @@ import port5 from "../public/assets/ports/5.png";
 import port6 from "../public/assets/ports/6.png";
 
 import cards0 from "../public/assets/cards/0.jpg";
-import cards1 from "../public/assets/cards/1.jpg";
-import cards2 from "../public/assets/cards/2.jpg";
-import cards3 from "../public/assets/cards/3.jpg";
-import cards4 from "../public/assets/cards/4.jpg";
-import cards5 from "../public/assets/cards/5.jpg";
+import cards1 from "../public/assets/cards/wood.webp";
+import cards2 from "../public/assets/cards/brick.webp";
+import cards3 from "../public/assets/cards/wool.webp";
+import cards4 from "../public/assets/cards/wheat.webp";
+import cards5 from "../public/assets/cards/ore.webp";
 import cards6 from "../public/assets/cards/6.jpg";
 import cards7 from "../public/assets/cards/7.jpg";
 import cards8 from "../public/assets/cards/8.jpg";

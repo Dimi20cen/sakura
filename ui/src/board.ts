@@ -271,29 +271,13 @@ export async function renderTile(tile: UITile) {
     const c = tile.Center;
     const SIDE_HALF = 300;
     const HEX_DIAG = 229;
-    const S3B2 = Math.sqrt(3) / 2;
     const texType = tile.Fog ? assets.TILE_TEX.FOG : tile.Type;
 
     const hex = new PIXI.Graphics()
         .beginTextureFill({
             texture: PIXI.Assets.get(assets.tileTex[texType].src),
         })
-        .drawPolygon(
-            SIDE_HALF,
-            SIDE_HALF - HEX_DIAG,
-            SIDE_HALF + HEX_DIAG * S3B2,
-            SIDE_HALF - HEX_DIAG / 2,
-            SIDE_HALF + HEX_DIAG * S3B2,
-            SIDE_HALF + HEX_DIAG / 2,
-            SIDE_HALF,
-            SIDE_HALF + HEX_DIAG,
-            SIDE_HALF - HEX_DIAG * S3B2,
-            SIDE_HALF + HEX_DIAG / 2,
-            SIDE_HALF - HEX_DIAG * S3B2,
-            SIDE_HALF - HEX_DIAG / 2,
-            SIDE_HALF,
-            SIDE_HALF - HEX_DIAG,
-        )
+        .drawPolygon(getHexPolygonPoints(SIDE_HALF, HEX_DIAG))
         .endFill();
 
     const tileSprite = new PIXI.Sprite();
@@ -310,6 +294,11 @@ export async function renderTile(tile: UITile) {
     tileSprite.anchor.y = 0.5;
     tileSprite.x = fc.x;
     tileSprite.y = fc.y;
+
+    // Keep border in code so flat texture assets remain clean.
+    const tileBorder = new PIXI.Sprite(getHexBorderTexture(SIDE_HALF, HEX_DIAG));
+    tileBorder.anchor.set(0.5);
+    tileSprite.addChild(tileBorder);
 
     {
         // Number token
@@ -593,6 +582,46 @@ export function renderPort(port: IPort) {
 
 /** Reusable highlight circle drawing */
 let highlightCircle: PIXI.RenderTexture;
+let hexBorderTexture: PIXI.RenderTexture;
+
+function getHexPolygonPoints(sideHalf: number, hexDiag: number) {
+    const s3b2 = Math.sqrt(3) / 2;
+    return [
+        sideHalf,
+        sideHalf - hexDiag,
+        sideHalf + hexDiag * s3b2,
+        sideHalf - hexDiag / 2,
+        sideHalf + hexDiag * s3b2,
+        sideHalf + hexDiag / 2,
+        sideHalf,
+        sideHalf + hexDiag,
+        sideHalf - hexDiag * s3b2,
+        sideHalf + hexDiag / 2,
+        sideHalf - hexDiag * s3b2,
+        sideHalf - hexDiag / 2,
+        sideHalf,
+        sideHalf - hexDiag,
+    ];
+}
+
+function getHexBorderTexture(sideHalf: number, hexDiag: number) {
+    if (!hexBorderTexture || hexBorderTexture.destroyed) {
+        const border = new PIXI.Graphics()
+            .lineStyle({
+                width: 14,
+                color: 0x1a1a1a,
+                alpha: 0.5,
+                join: PIXI.LINE_JOIN.ROUND,
+            })
+            .drawPolygon(getHexPolygonPoints(sideHalf, hexDiag));
+
+        hexBorderTexture = canvas.app.generateRenderTexture(border, {
+            width: 2 * sideHalf,
+            height: 2 * sideHalf,
+        });
+    }
+    return hexBorderTexture;
+}
 
 /**
  * Create a highlight circle sprite

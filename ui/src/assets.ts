@@ -73,27 +73,30 @@ export function assignTexture(
 }
 
 /************************* Tile Textures *******************************/
-import tileTex0 from "../public/assets/tile-tex/0.jpg";
-import tileTex1 from "../public/assets/tile-tex/1.jpg";
-import tileTex2 from "../public/assets/tile-tex/2.jpg";
-import tileTex3 from "../public/assets/tile-tex/3.jpg";
-import tileTex4 from "../public/assets/tile-tex/4.jpg";
-import tileTex5 from "../public/assets/tile-tex/5.jpg";
-import tileTex21 from "../public/assets/tile-tex/21.jpg";
+import tileTexDesert from "../public/assets/tile-tex/desert.webp";
+import tileTexWood from "../public/assets/tile-tex/wood.webp";
+import tileTexBrick from "../public/assets/tile-tex/brick.webp";
+import tileTexWool from "../public/assets/tile-tex/wool.webp";
+import tileTexWheat from "../public/assets/tile-tex/wheat.webp";
+import tileTexOre from "../public/assets/tile-tex/ore.webp";
+import tileTexGold from "../public/assets/tile-tex/gold.webp";
+import tileTexSea from "../public/assets/tile-tex/sea.webp";
 import tileTexFog from "../public/assets/tile-tex/fog.jpg";
 
 export enum TILE_TEX {
+    SEA = 7,
     FOG = 114,
 }
 export const tileTex: { [key: number]: StaticImageData } = {
-    0: tileTex0,
-    1: tileTex1,
-    2: tileTex2,
-    3: tileTex3,
-    4: tileTex4,
-    5: tileTex5,
-    21: tileTex21,
+    0: tileTexDesert,
+    1: tileTexWood,
+    2: tileTexBrick,
+    3: tileTexWool,
+    4: tileTexWheat,
+    5: tileTexOre,
+    21: tileTexGold,
 };
+tileTex[TILE_TEX.SEA] = tileTexSea;
 tileTex[TILE_TEX.FOG] = tileTexFog;
 
 /************************* Roads *******************************/
@@ -456,11 +459,11 @@ export const diceEvent: { [key: number]: StaticImageData } = {
 /****************** Cards *********************************************/
 
 import cards0 from "../public/assets/cards/0.jpg";
-import cards1 from "../public/assets/cards/1.jpg";
-import cards2 from "../public/assets/cards/2.jpg";
-import cards3 from "../public/assets/cards/3.jpg";
-import cards4 from "../public/assets/cards/4.jpg";
-import cards5 from "../public/assets/cards/5.jpg";
+import cards1 from "../public/assets/cards/wood.webp";
+import cards2 from "../public/assets/cards/brick.webp";
+import cards3 from "../public/assets/cards/wool.webp";
+import cards4 from "../public/assets/cards/wheat.webp";
+import cards5 from "../public/assets/cards/ore.webp";
 import cards6 from "../public/assets/cards/6.jpg";
 import cards7 from "../public/assets/cards/7.jpg";
 import cards8 from "../public/assets/cards/8.jpg";

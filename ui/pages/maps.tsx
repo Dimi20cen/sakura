@@ -5,11 +5,12 @@ import useSWR from "swr";
 import { ICoordinate } from "../tsg";
 import { classNames } from "../utils/styles";
 import { PortType, TileType } from "../src/entities";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, PointerEvent, WheelEvent, useEffect, useMemo, useRef, useState } from "react";
 import { Combobox, Transition } from "@headlessui/react";
 import { useAnonymousAuth } from "../hooks/auth";
 import { basicFetcher } from "../utils";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/24/solid";
+import { ArrowPathIcon, QuestionMarkCircleIcon, TrashIcon } from "@heroicons/react/24/outline";
 
 type IEdgeCoordinate = { C1: ICoordinate; C2: ICoordinate };
 
@@ -22,6 +23,14 @@ type Map = {
     tiles: number[];
     map: number[][];
 };
+
+const edgeKey = (ec: IEdgeCoordinate) => {
+    const a = `${ec.C1.X},${ec.C1.Y}`;
+    const b = `${ec.C2.X},${ec.C2.Y}`;
+    return a < b ? `${a}|${b}` : `${b}|${a}`;
+};
+
+const ADD_NEW_MAP_KEY = "__add_new_map__";
 
 const cloneMap = (map: Map): Map => JSON.parse(JSON.stringify(map));
 
@@ -96,9 +105,19 @@ const TileTypeToClass = {
 const Index: NextPage = () => {
     const [map, setMap] = useState(initMap);
     const [token] = useAnonymousAuth();
-    const { data } = useSWR([`/api/maps`, token ?? null], basicFetcher);
+    const { data, mutate } = useSWR([`/api/maps`, token ?? null], basicFetcher);
     const [selectedMap, setSelectedMap] = useState(initMap);
     const [resetSnapshot, setResetSnapshot] = useState<Map>(cloneMap(initMap));
+    const [zoom, setZoom] = useState(1);
+    const [pan, setPan] = useState({ x: 24, y: 24 });
+    const [isPanning, setIsPanning] = useState(false);
+    const panStartRef = useRef<{
+        x: number;
+        y: number;
+        originX: number;
+        originY: number;
+    } | null>(null);
+    const suppressClickUntilRef = useRef(0);
 
     if (global.window !== undefined) {
         (window as any).setMap = setMap;
@@ -115,7 +134,7 @@ const Index: NextPage = () => {
                 if (res?.map?.map) {
                     const loadedMap = cloneMap(res.map.map);
                     setMap(loadedMap);
-                    setResetSnapshot(loadedMap);
+                    setResetSnapshot(cloneMap(loadedMap));
                     setNumbers(getInitNum(loadedMap));
                     setTiles(getInitTiles(loadedMap));
                     setPorts(getInitPorts(loadedMap));
@@ -156,15 +175,68 @@ const Index: NextPage = () => {
     }, [resetSnapshot]);
 
     const [mapQuery, setMapQuery] = useState("");
+    const [distributionMenu, setDistributionMenu] = useState<
+        "numbers" | "tiles" | "ports"
+    >("numbers");
+    const [showEditorHelp, setShowEditorHelp] = useState(false);
+    const selectableMaps =
+        (data?.maps?.filter(
+            (n: Map) =>
+                n?.name &&
+                n.name !== "--- Community Maps ---" &&
+                n.name !== "",
+        ) as Map[]) || [];
     const filteredMaps =
         (mapQuery === ""
-            ? data?.maps
-            : data?.maps?.filter((n: Map) =>
+            ? selectableMaps
+            : selectableMaps.filter((n: Map) =>
                   n.name
                       .toLowerCase()
                       .replace(/\s+/g, "")
                       .includes(mapQuery.toLowerCase().replace(/\s+/g, "")),
               )) || [];
+    const mapOptions = [
+        ...filteredMaps,
+        {
+            name: ADD_NEW_MAP_KEY,
+        } as Map,
+    ];
+
+    const handleSelectMap = (value: Map) => {
+        if (!value) {
+            return;
+        }
+
+        if (value.name === ADD_NEW_MAP_KEY) {
+            const nextName = window
+                .prompt("Name your new map")
+                ?.trim();
+            if (!nextName) {
+                return;
+            }
+
+            const exists = selectableMaps.some(
+                (m) => m.name.toLowerCase() === nextName.toLowerCase(),
+            );
+            if (exists) {
+                alert("A map with that name already exists");
+                return;
+            }
+
+            const nextMap = cloneMap(initMap);
+            nextMap.name = nextName;
+            setSelectedMap(nextMap);
+            setMap(nextMap);
+            setResetSnapshot(cloneMap(nextMap));
+            setNumbers(getInitNum(nextMap));
+            setTiles(getInitTiles(nextMap));
+            setPorts(getInitPorts(nextMap));
+            setMapQuery("");
+            return;
+        }
+
+        setSelectedMap(value);
+    };
 
     const cycleTileType = (y: number, x: number, force?: TileType) => {
         if (force) {
@@ -288,9 +360,47 @@ const Index: NextPage = () => {
         setPorts({ ...ports });
     };
 
+    const autoPorts = () => {
+        const target = map.port_coordinates.length;
+        const next = {
+            [PortType.Wood]: 0,
+            [PortType.Brick]: 0,
+            [PortType.Wool]: 0,
+            [PortType.Wheat]: 0,
+            [PortType.Ore]: 0,
+            [PortType.Any]: 0,
+        };
+
+        if (target <= 0) {
+            setPorts(next);
+            return;
+        }
+
+        const weightedOrder: PortType[] = [
+            PortType.Any,
+            PortType.Any,
+            PortType.Any,
+            PortType.Any,
+            PortType.Wood,
+            PortType.Brick,
+            PortType.Wool,
+            PortType.Wheat,
+            PortType.Ore,
+        ];
+
+        // Seed with the classic 4x Any + one of each resource distribution.
+        for (let i = 0; i < target; i++) {
+            const port = weightedOrder[i % weightedOrder.length];
+            next[port] += 1;
+        }
+
+        setPorts(next);
+    };
+
     const numPortsSelected = () => {
         return Object.values(ports).reduce((a, b) => a + b, 0);
     };
+    const numPortSlots = map.port_coordinates.length;
 
     const addRow = () => {
         const colCount =
@@ -337,7 +447,7 @@ const Index: NextPage = () => {
             return;
         }
 
-        if (numPortsSelected() > 15) {
+        if (numPortsSelected() > numPortSlots) {
             alert("Too many ports");
             return;
         }
@@ -402,9 +512,56 @@ const Index: NextPage = () => {
                 if (data.error) {
                     alert(data.error);
                 } else {
+                    setResetSnapshot(cloneMap(map));
+                    mutate();
                     alert("Successfully saved map");
                 }
             });
+    };
+
+    const deleteCurrentMap = async () => {
+        if (!map?.name) {
+            return;
+        }
+
+        const confirmed = window.confirm(
+            `Delete map "${map.name}"? This cannot be undone.`,
+        );
+        if (!confirmed) {
+            return;
+        }
+
+        const authToken =
+            token || (typeof window !== "undefined"
+                ? localStorage.getItem("auth")
+                : null);
+        if (!authToken) {
+            alert("Auth token is still loading. Please try again in a second.");
+            return;
+        }
+
+        const res = await fetch(`/api/maps/${encodeURIComponent(map.name)}`, {
+            method: "DELETE",
+            headers: {
+                Authorization: authToken,
+            },
+        });
+
+        const body = await res.json().catch(() => ({}));
+        if (!res.ok || body?.error) {
+            alert(body?.error || "Failed to delete map");
+            return;
+        }
+
+        await mutate();
+        const fallback = cloneMap(initMap);
+        setSelectedMap(fallback);
+        setMap(fallback);
+        setResetSnapshot(cloneMap(fallback));
+        setNumbers(getInitNum(fallback));
+        setTiles(getInitTiles(fallback));
+        setPorts(getInitPorts(fallback));
+        alert("Map deleted");
     };
 
     const autoNumbers = () => {
@@ -504,8 +661,42 @@ const Index: NextPage = () => {
         return getEdgeCoordinates(getTileCoordinate(y, x));
     };
 
+    const beachEdgeKeys = useMemo(() => {
+        const counts = new Map<string, number>();
+
+        for (let y = 0; y < map.map.length; y++) {
+            for (let x = 0; x < map.map[y].length; x++) {
+                if (map.map[y][x] === TileType.None) {
+                    continue;
+                }
+                const edges = gec(y, x);
+                for (const ec of edges) {
+                    const key = edgeKey(ec);
+                    counts.set(key, (counts.get(key) || 0) + 1);
+                }
+            }
+        }
+
+        const beach = new Set<string>();
+        counts.forEach((count, key) => {
+            if (count === 1) {
+                beach.add(key);
+            }
+        });
+
+        return beach;
+    }, [map]);
+
+    const isBeachEdge = (ec: IEdgeCoordinate) => beachEdgeKeys.has(edgeKey(ec));
+
     const addPort = (e: any, ec: IEdgeCoordinate) => {
         e.stopPropagation();
+        if (Date.now() < suppressClickUntilRef.current) {
+            return;
+        }
+        if (!isBeachEdge(ec)) {
+            return;
+        }
 
         if (hasPort(ec)) {
             map.port_coordinates = map.port_coordinates.filter(
@@ -545,7 +736,97 @@ const Index: NextPage = () => {
     };
 
     const hpc = (y: number, x: number, loc: number) => {
-        return hasPort(gec(y, x)[loc]) ? styles.hasport : "";
+        const ec = gec(y, x)[loc];
+        if (!isBeachEdge(ec)) {
+            return styles.portdisabled;
+        }
+        return hasPort(ec) ? styles.hasport : "";
+    };
+
+    const minZoom = 0.6;
+    const maxZoom = 2;
+    const zoomStep = 0.1;
+
+    const increaseZoom = () => {
+        setZoom((prev) => Math.min(maxZoom, Number((prev + zoomStep).toFixed(2))));
+    };
+
+    const decreaseZoom = () => {
+        setZoom((prev) => Math.max(minZoom, Number((prev - zoomStep).toFixed(2))));
+    };
+
+    const onWheelZoom = (e: WheelEvent<HTMLDivElement>) => {
+        e.preventDefault();
+
+        const rect = e.currentTarget.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+
+        const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
+        const nextZoom = Math.min(
+            maxZoom,
+            Math.max(minZoom, Number((zoom * zoomFactor).toFixed(3))),
+        );
+
+        if (nextZoom === zoom) {
+            return;
+        }
+
+        const worldX = (mouseX - pan.x) / zoom;
+        const worldY = (mouseY - pan.y) / zoom;
+        const nextPanX = mouseX - worldX * nextZoom;
+        const nextPanY = mouseY - worldY * nextZoom;
+
+        setZoom(nextZoom);
+        setPan({ x: nextPanX, y: nextPanY });
+    };
+
+    const shouldSuppressClick = () => Date.now() < suppressClickUntilRef.current;
+
+    const startPan = (e: PointerEvent<HTMLDivElement>) => {
+        if (e.button !== 0) {
+            return;
+        }
+        const target = e.target as HTMLElement | null;
+        if (
+            target?.closest(`.${styles.hex}`) ||
+            target?.closest(`.${styles.port}`)
+        ) {
+            return;
+        }
+        panStartRef.current = {
+            x: e.clientX,
+            y: e.clientY,
+            originX: pan.x,
+            originY: pan.y,
+        };
+        setIsPanning(true);
+        e.currentTarget.setPointerCapture(e.pointerId);
+    };
+
+    const movePan = (e: PointerEvent<HTMLDivElement>) => {
+        if (!panStartRef.current) {
+            return;
+        }
+        const dx = e.clientX - panStartRef.current.x;
+        const dy = e.clientY - panStartRef.current.y;
+        if (Math.abs(dx) + Math.abs(dy) > 4) {
+            suppressClickUntilRef.current = Date.now() + 120;
+        }
+        setPan({
+            x: panStartRef.current.originX + dx,
+            y: panStartRef.current.originY + dy,
+        });
+    };
+
+    const endPan = (e: PointerEvent<HTMLDivElement>) => {
+        if (panStartRef.current) {
+            panStartRef.current = null;
+            setIsPanning(false);
+        }
+        if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+            e.currentTarget.releasePointerCapture(e.pointerId);
+        }
     };
 
     return (
@@ -553,364 +834,492 @@ const Index: NextPage = () => {
             <Header />
             <div className="ui-page ui-fade-in">
                 <div className="ui-grid gap-4 mt-4 sm:mt-6 xl:grid-cols-[minmax(0,2fr),minmax(300px,1fr)]">
-                    <section className="ui-panel ui-panel-pad h-[78vh] overflow-auto">
-                        <h1 className="ui-title ui-title-lg small-caps mb-3">
-                            Clash Map Editor
-                        </h1>
-                        <div className="ui-text-muted mb-5">
-                            Click on a hex to cycle through tile options. Right
-                            click to reset to random or fog.
-                            <br />
-                            Click on edge dots to assign port locations.
-                            <br />
-                            Press R to reset the map to the last loaded version.
-                        </div>
-                        {map.map.map((row, y) => (
-                            <div
-                                key={y}
-                                className={classNames(
-                                    styles.hexrow,
-                                    y % 2 == 1 ? styles.even : "",
-                                    "whitespace-nowrap",
-                                )}
-                            >
-                                {row.map((tile, x) => (
+                    <section className="ui-panel ui-panel-pad h-[78vh] overflow-hidden flex flex-col">
+                        <div className="flex items-start justify-between gap-3 mb-3">
+                            <div className="relative">
+                                <div className="flex items-center gap-2">
+                                    <h1 className="ui-title ui-title-lg small-caps">
+                                        Map Editor
+                                    </h1>
                                     <button
-                                        key={x}
-                                        className={classNames(styles.hex)}
-                                        onClick={() => cycleTileType(y, x)}
-                                        onContextMenu={(e) => {
-                                            e.preventDefault();
-                                            cycleTileType(
-                                                y,
-                                                x,
-                                                tile == TileType.None
-                                                    ? TileType.Random
-                                                    : tile == TileType.Fog
-                                                    ? TileType.None
-                                                    : TileType.Fog,
-                                            );
-                                        }}
+                                        type="button"
+                                        className="ui-button ui-button-ghost !w-8 !h-8 !min-h-0 !p-0"
+                                        onClick={() =>
+                                            setShowEditorHelp((v) => !v)
+                                        }
+                                        aria-label="Show editor help"
+                                        title="Show editor help"
                                     >
-                                        <div
-                                            className={classNames(
-                                                styles.top,
-                                                TileTypeToClass[
-                                                    tile as TileType
-                                                ][1],
-                                            )}
-                                        ></div>
-                                        <div
-                                            className={classNames(
-                                                styles.middle,
-                                                TileTypeToClass[
-                                                    tile as TileType
-                                                ][0],
-                                            )}
-                                        >
-                                            <div className="text-xl pt-3">
-                                                {tile !== TileType.None
-                                                    ? TileType[tile]
-                                                    : "-"}
-                                            </div>
-
-                                            <div
-                                                className={`${styles.port} ${
-                                                    styles.tr
-                                                } ${hpc(y, x, 0)}`}
-                                                onClick={(e) =>
-                                                    addPort(e, gec(y, x)[0])
-                                                }
-                                            ></div>
-                                            <div
-                                                className={`${styles.port} ${
-                                                    styles.r
-                                                } ${hpc(y, x, 1)}`}
-                                                onClick={(e) =>
-                                                    addPort(e, gec(y, x)[1])
-                                                }
-                                            ></div>
-                                            <div
-                                                className={`${styles.port} ${
-                                                    styles.br
-                                                } ${hpc(y, x, 2)}`}
-                                                onClick={(e) =>
-                                                    addPort(e, gec(y, x)[2])
-                                                }
-                                            ></div>
-                                            <div
-                                                className={`${styles.port} ${
-                                                    styles.bl
-                                                } ${hpc(y, x, 3)}`}
-                                                onClick={(e) =>
-                                                    addPort(e, gec(y, x)[3])
-                                                }
-                                            ></div>
-                                            <div
-                                                className={`${styles.port} ${
-                                                    styles.l
-                                                } ${hpc(y, x, 4)}`}
-                                                onClick={(e) =>
-                                                    addPort(e, gec(y, x)[4])
-                                                }
-                                            ></div>
-                                            <div
-                                                className={`${styles.port} ${
-                                                    styles.tl
-                                                } ${hpc(y, x, 5)}`}
-                                                onClick={(e) =>
-                                                    addPort(e, gec(y, x)[5])
-                                                }
-                                            ></div>
-                                        </div>
-                                        <div
-                                            className={classNames(
-                                                styles.bottom,
-                                                TileTypeToClass[
-                                                    tile as TileType
-                                                ][2],
-                                            )}
-                                        ></div>
+                                        <QuestionMarkCircleIcon className="h-5 w-5" />
                                     </button>
+                                </div>
+                                {showEditorHelp && (
+                                    <div className="absolute left-0 top-11 z-20 w-[320px] rounded-lg border border-[rgba(231,222,206,0.2)] bg-[rgba(20,16,14,0.96)] px-3 py-2 text-sm text-[color:var(--ui-ivory-soft)] shadow-[var(--ui-shadow-soft)]">
+                                        <div>Left click changes tile resource.</div>
+                                        <div>Right click resets to Random or Fog.</div>
+                                        <div>Left click edge dots assigns port locations.</div>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <button
+                                    type="button"
+                                    className="ui-button ui-button-ghost !w-10 !h-10 !min-h-0 !p-0 text-xl"
+                                    onClick={decreaseZoom}
+                                    disabled={zoom <= minZoom}
+                                    aria-label="Zoom out"
+                                    title="Zoom out"
+                                >
+                                    -
+                                </button>
+                                <span className="text-sm min-w-[56px] text-center">
+                                    {Math.round(zoom * 100)}%
+                                </span>
+                                <button
+                                    type="button"
+                                    className="ui-button ui-button-ghost !w-10 !h-10 !min-h-0 !p-0 text-xl"
+                                    onClick={increaseZoom}
+                                    disabled={zoom >= maxZoom}
+                                    aria-label="Zoom in"
+                                    title="Zoom in"
+                                >
+                                    +
+                                </button>
+                            </div>
+                        </div>
+                        <div
+                            className={classNames(
+                                "relative flex-1 min-h-0 rounded-xl border border-[rgba(231,222,206,0.14)] bg-[rgba(16,12,10,0.45)] overflow-hidden",
+                                isPanning ? "cursor-grabbing" : "cursor-grab",
+                            )}
+                            style={{ touchAction: "none" }}
+                            onPointerDown={startPan}
+                            onPointerMove={movePan}
+                            onPointerUp={endPan}
+                            onPointerCancel={endPan}
+                            onWheel={onWheelZoom}
+                        >
+                            <div
+                                className="absolute left-0 top-0 origin-top-left transition-transform duration-75"
+                                style={{
+                                    transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
+                                }}
+                            >
+                                {map.map.map((row, y) => (
+                                    <div
+                                        key={y}
+                                        className={classNames(
+                                            styles.hexrow,
+                                            y % 2 == 1 ? styles.even : "",
+                                            "whitespace-nowrap",
+                                        )}
+                                    >
+                                        {row.map((tile, x) => (
+                                            <button
+                                                key={x}
+                                                className={classNames(styles.hex)}
+                                                onClick={() => {
+                                                    if (shouldSuppressClick()) {
+                                                        return;
+                                                    }
+                                                    cycleTileType(y, x);
+                                                }}
+                                                onContextMenu={(e) => {
+                                                    e.preventDefault();
+                                                    if (shouldSuppressClick()) {
+                                                        return;
+                                                    }
+                                                    cycleTileType(
+                                                        y,
+                                                        x,
+                                                        tile == TileType.None
+                                                            ? TileType.Random
+                                                            : tile == TileType.Fog
+                                                              ? TileType.None
+                                                              : TileType.Fog,
+                                                    );
+                                                }}
+                                            >
+                                                <div
+                                                    className={classNames(
+                                                        styles.top,
+                                                        TileTypeToClass[
+                                                            tile as TileType
+                                                        ][1],
+                                                    )}
+                                                ></div>
+                                                <div
+                                                    className={classNames(
+                                                        styles.middle,
+                                                        TileTypeToClass[
+                                                            tile as TileType
+                                                        ][0],
+                                                    )}
+                                                >
+                                                    <div className="text-xl pt-3">
+                                                        {tile !== TileType.None
+                                                            ? TileType[tile]
+                                                            : "-"}
+                                                    </div>
+
+                                                    <div
+                                                        className={`${styles.port} ${
+                                                            styles.tr
+                                                        } ${hpc(y, x, 0)}`}
+                                                        onClick={(e) =>
+                                                            addPort(
+                                                                e,
+                                                                gec(y, x)[0],
+                                                            )
+                                                        }
+                                                    ></div>
+                                                    <div
+                                                        className={`${styles.port} ${
+                                                            styles.r
+                                                        } ${hpc(y, x, 1)}`}
+                                                        onClick={(e) =>
+                                                            addPort(
+                                                                e,
+                                                                gec(y, x)[1],
+                                                            )
+                                                        }
+                                                    ></div>
+                                                    <div
+                                                        className={`${styles.port} ${
+                                                            styles.br
+                                                        } ${hpc(y, x, 2)}`}
+                                                        onClick={(e) =>
+                                                            addPort(
+                                                                e,
+                                                                gec(y, x)[2],
+                                                            )
+                                                        }
+                                                    ></div>
+                                                    <div
+                                                        className={`${styles.port} ${
+                                                            styles.bl
+                                                        } ${hpc(y, x, 3)}`}
+                                                        onClick={(e) =>
+                                                            addPort(
+                                                                e,
+                                                                gec(y, x)[3],
+                                                            )
+                                                        }
+                                                    ></div>
+                                                    <div
+                                                        className={`${styles.port} ${
+                                                            styles.l
+                                                        } ${hpc(y, x, 4)}`}
+                                                        onClick={(e) =>
+                                                            addPort(
+                                                                e,
+                                                                gec(y, x)[4],
+                                                            )
+                                                        }
+                                                    ></div>
+                                                    <div
+                                                        className={`${styles.port} ${
+                                                            styles.tl
+                                                        } ${hpc(y, x, 5)}`}
+                                                        onClick={(e) =>
+                                                            addPort(
+                                                                e,
+                                                                gec(y, x)[5],
+                                                            )
+                                                        }
+                                                    ></div>
+                                                </div>
+                                                <div
+                                                    className={classNames(
+                                                        styles.bottom,
+                                                        TileTypeToClass[
+                                                            tile as TileType
+                                                        ][2],
+                                                    )}
+                                                ></div>
+                                            </button>
+                                        ))}
+                                    </div>
                                 ))}
                             </div>
-                        ))}
+                        </div>
                     </section>
                     <aside className="ui-panel ui-panel-pad h-[78vh] overflow-auto text-[color:var(--ui-ivory)]">
-                    <div className="mb-6">
-                        <h2 className="ui-title ui-title-md mb-2">
-                            Choose Map to Edit
-                        </h2>
-                        <Combobox
-                            value={selectedMap.name}
-                            onChange={(value) => setSelectedMap(value as any)}
-                        >
-                            <div className="relative mt-1">
-                                <div className="relative w-full text-left rounded-md shadow-md cursor-default overflow-hidden border border-[rgba(231,222,206,0.2)] bg-[rgba(24,20,18,0.92)]">
-                                    <Combobox.Input
-                                        className="ui-input !rounded-none !border-none !bg-transparent py-2 pl-3 pr-10 text-base leading-5 text-[color:var(--ui-ivory)]"
-                                        autoComplete="off"
-                                        onChange={(event: any) =>
-                                            setMapQuery(event.target.value)
-                                        }
-                                    />
-                                    <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
-                                        <ChevronUpDownIcon
-                                            className="w-5 h-5 text-[rgba(244,239,228,0.7)]"
-                                            aria-hidden="true"
-                                        />
-                                    </Combobox.Button>
-                                </div>
-                                <Transition
-                                    as={Fragment}
-                                    leave="transition ease-in duration-100"
-                                    leaveFrom="opacity-100"
-                                    leaveTo="opacity-0"
-                                    afterLeave={() => setMapQuery("")}
-                                >
-                                    <Combobox.Options className="absolute z-10 w-full py-1 mt-1 overflow-auto text-base bg-[rgba(24,20,18,0.98)] rounded-md shadow-lg max-h-60 border border-[rgba(231,222,206,0.2)] focus:outline-none sm:text-sm">
-                                        {filteredMaps.length === 0 &&
-                                        mapQuery !== "" ? (
-                                            <div className="cursor-default select-none relative py-2 px-4 text-[color:var(--ui-ivory-soft)]">
-                                                Nothing found.
+                    <div className="space-y-4">
+                            <div className="rounded-xl border border-[rgba(231,222,206,0.14)] bg-[rgba(24,20,18,0.52)] px-2.5 py-2.5">
+                                <div>
+                                    <div>
+                                        <div className="flex items-center justify-between gap-2 mb-1.5">
+                                            <div className="text-xs uppercase tracking-[0.06em] text-[color:var(--ui-ivory-soft)]">
+                                                Select Map
                                             </div>
-                                        ) : (
-                                            filteredMaps.map((map: Map) => (
-                                                <Combobox.Option
-                                                    key={map.name}
-                                                    className={(obj: any) =>
-                                                        `select-none relative py-1 pl-10 pr-4 cursor-pointer ${
-                                                            obj.active
-                                                                ? "text-[color:var(--ui-ivory)] bg-[rgba(122,31,36,0.72)]"
-                                                                : "text-[color:var(--ui-ivory-soft)]"
-                                                        }`
-                                                    }
-                                                    value={map}
+                                            <div className="flex items-center gap-2">
+                                                <button
+                                                    type="button"
+                                                    className="ui-button ui-button-ghost !w-8 !h-8 !min-h-0 !p-0"
+                                                    onClick={resetMap}
+                                                    aria-label="Reset map"
+                                                    title="Reset map"
                                                 >
-                                                    {(obj: any) => (
-                                                        <>
-                                                            <span
-                                                                className={`block truncate text-left ${
-                                                                    obj.selected
-                                                                        ? "font-medium"
-                                                                        : "font-normal"
-                                                                }`}
-                                                            >
-                                                                {map.name}
-                                                            </span>
-                                                            {obj.selected ? (
-                                                                <span
-                                                                    className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
-                                                                        obj.active
-                                                                            ? "text-[color:var(--ui-gold-soft)]"
-                                                                            : "text-[color:var(--ui-gold-soft)]"
-                                                                    }`}
-                                                                >
-                                                                    <CheckIcon
-                                                                        className="w-5 h-5"
-                                                                        aria-hidden="true"
-                                                                    />
-                                                                </span>
-                                                            ) : null}
-                                                        </>
-                                                    )}
-                                                </Combobox.Option>
-                                            ))
-                                        )}
-                                    </Combobox.Options>
-                                </Transition>
-                            </div>
-                        </Combobox>
-                    </div>
-                    <div>
-                            <h2 className="ui-title ui-title-md">
-                                Map Attributes
-                            </h2>
-
-                            <div className="mt-3">
-                                <div className="text-sm mb-1">Name</div>
-                                <input
-                                    className="ui-input mb-3"
-                                    type="text"
-                                    value={map.name}
-                                    onChange={(e) =>
-                                        setMap({ ...map, name: e.target.value })
-                                    }
-                                />
-                                <button
-                                    className="ui-button ui-button-primary max-w-[180px] mb-4"
-                                    onClick={generateJSON}
-                                >
-                                    Save
-                                </button>
-                                <br />
-
-                                <div className="text-sm mb-2">
-                                    Map Size
-                                </div>
-                                <button
-                                    className="ui-button ui-button-secondary max-w-[180px] mr-2 mb-2"
-                                    onClick={addRow}
-                                >
-                                    Add Row
-                                </button>
-                                <button
-                                    className="ui-button ui-button-ghost max-w-[180px] mr-2 mb-2"
-                                    onClick={delRow}
-                                    disabled={map.map.length <= 1}
-                                >
-                                    Delete Row
-                                </button>
-                                <br />
-                                <button
-                                    className="ui-button ui-button-secondary max-w-[180px] mr-2 mb-2"
-                                    onClick={addCol}
-                                >
-                                    Add Column
-                                </button>
-                                <button
-                                    className="ui-button ui-button-ghost max-w-[180px] mr-2 mb-2"
-                                    onClick={delCol}
-                                    disabled={map.map.every((row) => row.length <= 1)}
-                                >
-                                    Delete Column
-                                </button>
-                            </div>
-
-                            <h2 className="ui-title ui-title-md mt-5">
-                                Number Distribution
-                                <span
-                                    className={classNames(
-                                        numNumbers() !==
-                                            numTilesThatNeedNumber()
-                                            ? "ui-pill warn"
-                                            : "ui-pill ok",
-                                        "mx-2",
-                                    )}
-                                >
-                                    {numNumbers()} / {numTilesThatNeedNumber()}
-                                </span>
-                                <div className="ui-text-muted mt-1 mb-2 font-normal">
-                                    Select the number distribution for all hexes
-                                    except desert and sea.
-                                </div>
-                            </h2>
-
-                            <button
-                                className="ui-button ui-button-secondary max-w-[180px] my-2"
-                                onClick={autoNumbers}
-                            >
-                                Auto Distribute
-                            </button>
-
-                            <ul className="ml-1">
-                                {Object.keys(numbers).map((x) => (
-                                    <li key={x} className="my-3 flex items-center gap-3">
-                                        <span className="inline-block w-[56px] text-right text-sm">
-                                            {x}
-                                        </span>
-                                        <input
-                                            type="range"
-                                            className="flex-1 accent-[color:var(--ui-gold)]"
-                                            min="0"
-                                            max={numTilesThatNeedNumber()}
-                                            step="1"
-                                            value={(numbers as any)[x]}
-                                            onInput={(e) =>
-                                                changeNumber(e, Number(x))
+                                                    <ArrowPathIcon className="h-4 w-4" />
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className="ui-button ui-button-ghost !w-8 !h-8 !min-h-0 !p-0"
+                                                    onClick={deleteCurrentMap}
+                                                    aria-label="Delete map"
+                                                    title="Delete map"
+                                                >
+                                                    <TrashIcon className="h-4 w-4" />
+                                                </button>
+                                                <button
+                                                    className="ui-button ui-button-primary !w-auto !h-8 !min-h-0 px-3"
+                                                    onClick={generateJSON}
+                                                >
+                                                    Save
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <Combobox
+                                            value={selectedMap}
+                                            onChange={(value) =>
+                                                handleSelectMap(value as Map)
                                             }
-                                        />
-                                        <span className="text-sm min-w-[24px]">
-                                            {(numbers as any)[x]}
-                                        </span>
-                                    </li>
-                                ))}
-                            </ul>
+                                        >
+                                            <div className="relative mt-1">
+                                                <div className="relative w-full text-left rounded-md shadow-md cursor-default overflow-hidden border border-[rgba(231,222,206,0.2)] bg-[rgba(24,20,18,0.92)]">
+                                                    <Combobox.Input
+                                                        className="ui-input !rounded-none !border-none !bg-transparent !h-10 py-1.5 pl-3 pr-10 text-base leading-5 text-[color:var(--ui-ivory)]"
+                                                        autoComplete="off"
+                                                        displayValue={(selected: Map) =>
+                                                            selected?.name || ""
+                                                        }
+                                                        onChange={(event: any) =>
+                                                            setMapQuery(event.target.value)
+                                                        }
+                                                    />
+                                                    <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
+                                                        <ChevronUpDownIcon
+                                                            className="w-5 h-5 text-[rgba(244,239,228,0.7)]"
+                                                            aria-hidden="true"
+                                                        />
+                                                    </Combobox.Button>
+                                                </div>
+                                                <Transition
+                                                    as={Fragment}
+                                                    leave="transition ease-in duration-100"
+                                                    leaveFrom="opacity-100"
+                                                    leaveTo="opacity-0"
+                                                    afterLeave={() => setMapQuery("")}
+                                                >
+                                                    <Combobox.Options className="absolute z-10 w-full py-1 mt-1 overflow-auto text-base bg-[rgba(24,20,18,0.98)] rounded-md shadow-lg max-h-60 border border-[rgba(231,222,206,0.2)] focus:outline-none sm:text-sm">
+                                                        {filteredMaps.length === 0 &&
+                                                        mapQuery !== "" ? (
+                                                            <div className="cursor-default select-none relative py-2 px-4 text-[color:var(--ui-ivory-soft)]">
+                                                                Nothing found.
+                                                            </div>
+                                                        ) : (
+                                                            mapOptions.map((map: Map) => (
+                                                                <Combobox.Option
+                                                                    key={map.name}
+                                                                    className={(obj: any) =>
+                                                                        `select-none relative py-1 pl-10 pr-4 cursor-pointer ${
+                                                                            obj.active
+                                                                                ? "text-[color:var(--ui-ivory)] bg-[rgba(122,31,36,0.72)]"
+                                                                                : "text-[color:var(--ui-ivory-soft)]"
+                                                                        }`
+                                                                    }
+                                                                    value={map}
+                                                                >
+                                                                    {(obj: any) => (
+                                                                        <>
+                                                                            <span
+                                                                                className={`block truncate text-left ${
+                                                                                    obj.selected
+                                                                                        ? "font-medium"
+                                                                                        : "font-normal"
+                                                                                }`}
+                                                                            >
+                                                                                {map.name ===
+                                                                                ADD_NEW_MAP_KEY
+                                                                                    ? "+ Add New Map"
+                                                                                    : map.name}
+                                                                            </span>
+                                                                            {obj.selected ? (
+                                                                                <span
+                                                                                    className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
+                                                                                        obj.active
+                                                                                            ? "text-[color:var(--ui-gold-soft)]"
+                                                                                            : "text-[color:var(--ui-gold-soft)]"
+                                                                                    }`}
+                                                                                >
+                                                                                    <CheckIcon
+                                                                                        className="w-5 h-5"
+                                                                                        aria-hidden="true"
+                                                                                    />
+                                                                                </span>
+                                                                            ) : null}
+                                                                        </>
+                                                                    )}
+                                                                </Combobox.Option>
+                                                            ))
+                                                        )}
+                                                    </Combobox.Options>
+                                                </Transition>
+                                            </div>
+                                        </Combobox>
+                                    </div>
+                                </div>
 
-                            <h2 className="ui-title ui-title-md mt-6">
-                                Random Tile Distribution
-                                <span
-                                    className={classNames(
-                                        numRandomTilesSelected() !==
-                                            numRandomTiles()
-                                            ? "ui-pill warn"
-                                            : "ui-pill ok",
+                                <div className="grid gap-2.5 sm:grid-cols-2 mt-3">
+                                    <div className="rounded-lg border border-[rgba(231,222,206,0.16)] bg-[rgba(18,14,12,0.5)] px-2.5 py-2">
+                                        <div className="text-xs uppercase tracking-[0.06em] text-[color:var(--ui-ivory-soft)] mb-2">
+                                            Rows
+                                        </div>
+                                        <div className="flex items-center justify-between gap-2">
+                                            <button
+                                                type="button"
+                                                className="ui-button ui-button-ghost !w-8 !h-8 !min-h-0 !p-0 text-lg"
+                                                onClick={delRow}
+                                                disabled={map.map.length <= 1}
+                                                aria-label="Decrease rows"
+                                            >
+                                                -
+                                            </button>
+                                            <span className="text-lg font-semibold min-w-[28px] text-center">
+                                                {map.map.length}
+                                            </span>
+                                            <button
+                                                type="button"
+                                                className="ui-button ui-button-secondary !w-8 !h-8 !min-h-0 !p-0 text-lg"
+                                                onClick={addRow}
+                                                aria-label="Increase rows"
+                                            >
+                                                +
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div className="rounded-lg border border-[rgba(231,222,206,0.16)] bg-[rgba(18,14,12,0.5)] px-2.5 py-2">
+                                        <div className="text-xs uppercase tracking-[0.06em] text-[color:var(--ui-ivory-soft)] mb-2">
+                                            Columns
+                                        </div>
+                                        <div className="flex items-center justify-between gap-2">
+                                            <button
+                                                type="button"
+                                                className="ui-button ui-button-ghost !w-8 !h-8 !min-h-0 !p-0 text-lg"
+                                                onClick={delCol}
+                                                disabled={map.map.every((row) => row.length <= 1)}
+                                                aria-label="Decrease columns"
+                                            >
+                                                -
+                                            </button>
+                                            <span className="text-lg font-semibold min-w-[28px] text-center">
+                                                {map.map[0]?.length || 0}
+                                            </span>
+                                            <button
+                                                type="button"
+                                                className="ui-button ui-button-secondary !w-8 !h-8 !min-h-0 !p-0 text-lg"
+                                                onClick={addCol}
+                                                aria-label="Increase columns"
+                                            >
+                                                +
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="rounded-xl border border-[rgba(231,222,206,0.14)] bg-[rgba(24,20,18,0.52)] px-3 py-3">
+                                <div className="flex items-center justify-between gap-2 mb-2">
+                                    <h2 className="ui-title ui-title-md !mb-0">
+                                        Distribution
+                                    </h2>
+                                    <span
+                                        className={classNames(
+                                            distributionMenu === "numbers"
+                                                ? numNumbers() !== numTilesThatNeedNumber()
+                                                    ? "ui-pill warn"
+                                                    : "ui-pill ok"
+                                                : distributionMenu === "tiles"
+                                              ? numRandomTilesSelected() !==
+                                                numRandomTiles()
+                                                  ? "ui-pill warn"
+                                                  : "ui-pill ok"
+                                                  : numPortsSelected() > numPortSlots
+                                                    ? "ui-pill warn"
+                                                    : "ui-pill ok",
                                         "mx-2",
                                     )}
                                 >
-                                    {numRandomTilesSelected()} /{" "}
-                                    {numRandomTiles()}
-                                </span>
-                                <div className="ui-text-muted mt-1 mb-2 font-normal">
-                                    Select the tile distribution for all random
-                                    and fog tiles.
+                                        {distributionMenu === "numbers"
+                                            ? `${numNumbers()} / ${numTilesThatNeedNumber()}`
+                                            : distributionMenu === "tiles"
+                                              ? `${numRandomTilesSelected()} / ${numRandomTiles()}`
+                                              : `${numPortsSelected()} / ${numPortSlots}`}
+                                    </span>
                                 </div>
-                            </h2>
 
-                            <button
-                                className="ui-button ui-button-secondary max-w-[180px] my-2"
-                                onClick={autoTiles}
-                            >
-                                Auto Distribute
-                            </button>
+                                <div className="rounded-xl border border-[rgba(231,222,206,0.16)] bg-[rgba(18,14,12,0.5)] p-1 grid grid-cols-3 gap-1 mb-3">
+                                    <button
+                                        className={classNames(
+                                            "ui-button !h-8 !min-h-0 !text-sm",
+                                            distributionMenu === "numbers"
+                                                ? "ui-button-secondary"
+                                                : "ui-button-ghost !border-transparent",
+                                        )}
+                                        onClick={() => setDistributionMenu("numbers")}
+                                    >
+                                        Numbers
+                                    </button>
+                                    <button
+                                        className={classNames(
+                                            "ui-button !h-8 !min-h-0 !text-sm",
+                                            distributionMenu === "tiles"
+                                                ? "ui-button-secondary"
+                                                : "ui-button-ghost !border-transparent",
+                                        )}
+                                        onClick={() => setDistributionMenu("tiles")}
+                                    >
+                                        Tiles
+                                    </button>
+                                    <button
+                                        className={classNames(
+                                            "ui-button !h-8 !min-h-0 !text-sm",
+                                            distributionMenu === "ports"
+                                                ? "ui-button-secondary"
+                                                : "ui-button-ghost !border-transparent",
+                                        )}
+                                        onClick={() => setDistributionMenu("ports")}
+                                    >
+                                        Ports
+                                    </button>
+                                </div>
 
-                            <ul className="ml-1">
-                                {Object.keys(TileTypeToClass)
-                                    .filter(
-                                        (x) =>
-                                            Number(x) !== TileType.Random &&
-                                            Number(x) !== TileType.None &&
-                                            Number(x) !== TileType.Fog,
-                                        // Number(x) !== TileType.Sea, // No seafarers for now
-                                    )
-                                    .map((x) => (
-                                        <li key={x} className="my-3 flex items-center gap-3">
-                                            <span className="inline-block w-[56px] text-right text-sm">
-                                                {
-                                                    TileType[
-                                                        Number(x) as TileType
-                                                    ]
-                                                }
+                                <div className="mb-3">
+                                    <button
+                                        className="ui-button ui-button-secondary !h-9 min-w-[168px]"
+                                        onClick={
+                                            distributionMenu === "numbers"
+                                                ? autoNumbers
+                                                : distributionMenu === "tiles"
+                                                  ? autoTiles
+                                                  : autoPorts
+                                        }
+                                    >
+                                        Auto Fill
+                                    </button>
+                                </div>
+
+                            {distributionMenu === "numbers" && (
+                                <ul className="ml-0 space-y-2">
+                                    {Object.keys(numbers).map((x) => (
+                                        <li
+                                            key={x}
+                                            className="rounded-lg border border-[rgba(231,222,206,0.14)] bg-[rgba(18,14,12,0.42)] px-2.5 py-2"
+                                        >
+                                            <div className="flex items-center gap-2.5">
+                                            <span className="inline-block w-[30px] text-right text-sm">
+                                                {x}
                                             </span>
                                             <input
                                                 type="range"
@@ -918,58 +1327,114 @@ const Index: NextPage = () => {
                                                 min="0"
                                                 max={numTilesThatNeedNumber()}
                                                 step="1"
-                                                value={(tiles as any)[x]}
+                                                value={(numbers as any)[x]}
                                                 onInput={(e) =>
-                                                    changeTile(e, Number(x))
+                                                    changeNumber(e, Number(x))
                                                 }
                                             />
-                                            <span className="text-sm min-w-[24px]">
-                                                {(tiles as any)[x]}
-                                            </span>
+                                            <input
+                                                type="number"
+                                                className="ui-input !h-8 !px-2 !py-1 !text-sm !w-[56px]"
+                                                min={0}
+                                                max={numTilesThatNeedNumber()}
+                                                value={(numbers as any)[x]}
+                                                onChange={(e) =>
+                                                    changeNumber(e, Number(x))
+                                                }
+                                            />
+                                            </div>
                                         </li>
                                     ))}
-                            </ul>
+                                </ul>
+                            )}
 
-                            <h2 className="ui-title ui-title-md mt-6">
-                                Port Distribution
-                                <span
-                                    className={classNames(
-                                        numPortsSelected() > 15
-                                            ? "ui-pill warn"
-                                            : "ui-pill ok",
-                                        "mx-2",
-                                    )}
-                                >
-                                    {numPortsSelected()} / 15
-                                </span>
-                                <div className="ui-text-muted mt-1 mb-2 font-normal">
-                                    Select the port distribution for all ports.
-                                </div>
-                            </h2>
+                            {distributionMenu === "tiles" && (
+                                <ul className="ml-0 space-y-2">
+                                    {Object.keys(TileTypeToClass)
+                                        .filter(
+                                            (x) =>
+                                                Number(x) !== TileType.Random &&
+                                                Number(x) !== TileType.None &&
+                                                Number(x) !== TileType.Fog,
+                                        )
+                                        .map((x) => (
+                                            <li
+                                                key={x}
+                                                className="rounded-lg border border-[rgba(231,222,206,0.14)] bg-[rgba(18,14,12,0.42)] px-2.5 py-2"
+                                            >
+                                                <div className="flex items-center gap-2.5">
+                                                <span className="inline-block w-[56px] text-right text-sm">
+                                                    {
+                                                        TileType[
+                                                            Number(x) as TileType
+                                                        ]
+                                                    }
+                                                </span>
+                                                <input
+                                                    type="range"
+                                                    className="flex-1 accent-[color:var(--ui-gold)]"
+                                                    min="0"
+                                                    max={numTilesThatNeedNumber()}
+                                                    step="1"
+                                                    value={(tiles as any)[x]}
+                                                    onInput={(e) =>
+                                                        changeTile(e, Number(x))
+                                                    }
+                                                />
+                                                <input
+                                                    type="number"
+                                                    className="ui-input !h-8 !px-2 !py-1 !text-sm !w-[56px]"
+                                                    min={0}
+                                                    max={numTilesThatNeedNumber()}
+                                                    value={(tiles as any)[x]}
+                                                    onChange={(e) =>
+                                                        changeTile(e, Number(x))
+                                                    }
+                                                />
+                                                </div>
+                                            </li>
+                                        ))}
+                                </ul>
+                            )}
 
-                            <ul className="ml-1">
-                                {Object.keys(ports).map((x) => (
-                                    <li key={x} className="my-3 flex items-center gap-3">
-                                        <span className="inline-block w-[56px] text-right text-sm">
-                                            {PortType[Number(x) as PortType]}
-                                        </span>
-                                        <input
-                                            type="range"
-                                            className="flex-1 accent-[color:var(--ui-gold)]"
-                                            min="0"
-                                            max={15}
-                                            step="1"
-                                            value={(ports as any)[x]}
-                                            onInput={(e) =>
-                                                changePort(e, Number(x))
-                                            }
-                                        />
-                                        <span className="text-sm min-w-[24px]">
-                                            {(ports as any)[x]}
-                                        </span>
-                                    </li>
-                                ))}
-                            </ul>
+                            {distributionMenu === "ports" && (
+                                <ul className="ml-0 space-y-2">
+                                    {Object.keys(ports).map((x) => (
+                                        <li
+                                            key={x}
+                                            className="rounded-lg border border-[rgba(231,222,206,0.14)] bg-[rgba(18,14,12,0.42)] px-2.5 py-2"
+                                        >
+                                            <div className="flex items-center gap-2.5">
+                                            <span className="inline-block w-[56px] text-right text-sm">
+                                                {PortType[Number(x) as PortType]}
+                                            </span>
+                                            <input
+                                                type="range"
+                                                className="flex-1 accent-[color:var(--ui-gold)]"
+                                                min="0"
+                                                max={numPortSlots}
+                                                step="1"
+                                                value={(ports as any)[x]}
+                                                onInput={(e) =>
+                                                    changePort(e, Number(x))
+                                                }
+                                            />
+                                            <input
+                                                type="number"
+                                                className="ui-input !h-8 !px-2 !py-1 !text-sm !w-[56px]"
+                                                min={0}
+                                                max={numPortSlots}
+                                                value={(ports as any)[x]}
+                                                onChange={(e) =>
+                                                    changePort(e, Number(x))
+                                                }
+                                            />
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                            </div>
                     </div>
                     </aside>
                 </div>

@@ -58,9 +58,9 @@ const Header: FunctionComponent<{
                                 <Image
                                     src="/icon.png"
                                     alt="Clash"
-                                    height="52"
-                                    width="52"
-                                    className="h-auto w-auto sm:h-12 cursor-pointer rounded-full"
+                                    height={64}
+                                    width={64}
+                                    className="h-14 w-14 sm:h-16 sm:w-16 cursor-pointer rounded-full"
                                 />
                             </Link>
                         </div>
@@ -120,8 +120,8 @@ const Header: FunctionComponent<{
                                     <Image
                                         src="/icon.png"
                                         alt="Clash"
-                                        height="52"
-                                        width="52"
+                                        height={64}
+                                        width={64}
                                         className="rounded-full"
                                     />
                                 </div>

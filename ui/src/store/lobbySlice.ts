@@ -50,6 +50,11 @@ function getOrderFromToken(players: LobbyPlayerState[], fallback: number) {
     }
 }
 
+function canHostStart(players: LobbyPlayerState[]) {
+    // Host (order 0) starts the match; only non-host players need to be ready.
+    return players.filter((p) => p.Order !== 0).every((p) => p.Ready);
+}
+
 const lobbySlice = createSlice({
     name: "lobby",
     initialState: getInitialLobbyState(),
@@ -76,7 +81,7 @@ const lobbySlice = createSlice({
                     state.order = order;
                     state.ready =
                         players.find((p) => p.Order === order)?.Ready ?? false;
-                    state.canStart = players.every((p) => p.Ready);
+                    state.canStart = canHostStart(players);
                     return;
                 }
                 case MSG_RES_TYPE.LOBBY_GAME_STARTED:

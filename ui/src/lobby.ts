@@ -14,6 +14,11 @@ export const DISPLAY_GAME_MODE = {
     [GAME_MODE.Seafarers]: "Seafarers",
 };
 
+function canHostStart(players: LobbyPlayerState[]) {
+    // Host (order 0) starts the match; only non-host players need to be ready.
+    return players.filter((p) => p.Order !== 0).every((p) => p.Ready);
+}
+
 export type LobbyState = {
     players: LobbyPlayerState[];
     maxPlayers: number;
@@ -44,7 +49,7 @@ export const lobbyReducer = (
                 ready:
                     players.find((p) => p.Order === state.order)?.Ready ??
                     false,
-                canStart: players.every((p) => p.Ready),
+                canStart: canHostStart(players),
             };
 
             const token = localStorage.getItem("auth");

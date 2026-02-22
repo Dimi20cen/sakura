@@ -27,9 +27,9 @@ const selectClasses =
 const labelClasses =
     "block text-[color:var(--ui-ivory-soft)] text-xs uppercase tracking-[0.08em] mb-2";
 const settingCardClasses =
-    "rounded-xl px-3 py-2.5 bg-[rgba(42,34,31,0.72)] border border-[rgba(231,222,206,0.16)]";
+    "rounded-xl px-3 py-2.5 bg-[rgba(34,28,25,0.62)] border border-[rgba(231,222,206,0.14)]";
 const valueControlClasses =
-    "rounded-lg px-3 py-2.5 bg-[rgba(21,18,15,0.52)] border border-[rgba(231,222,206,0.2)] text-[color:var(--ui-ivory)]";
+    "rounded-lg px-3 py-2.5 bg-[rgba(20,17,14,0.45)] border border-[rgba(231,222,206,0.18)] text-[color:var(--ui-ivory)]";
 const stepperButtonClasses =
     "p-1.5 rounded-md hover:bg-[rgba(183,148,90,0.2)] disabled:opacity-40 transition-colors";
 const rangeInputClasses =
@@ -78,6 +78,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
 
     const mapOptions = lobbyState.settingsOptions?.MapName || [];
     const [showTimerInfo, setShowTimerInfo] = useState(false);
+    const [showGameOptions, setShowGameOptions] = useState(false);
 
     const changeMode: ChangeEventHandler<HTMLSelectElement> = (event) => {
         const mode = Number(event.target.value);
@@ -219,56 +220,6 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
         );
     }
 
-    function getCheckBox(text: string, setting: keyof IGameSettings) {
-        const changeVal: ChangeEventHandler<HTMLInputElement> = (event) => {
-            sendSettings({
-                ...lobbyState.settings,
-                [setting]: Boolean(event.target.checked),
-            });
-        };
-
-        return (
-            <div className="p-1 basis-full lg:basis-1/2">
-                <div
-                    className={classNames(
-                        `${settingCardClasses} transition-colors duration-200`,
-                        lobbyState.settings[setting]
-                            ? "bg-[rgba(122,31,36,0.46)] border-[rgba(183,148,90,0.42)]"
-                            : "",
-                    )}
-                >
-                    <div className="flex justify-center">
-                        <div className="w-full">
-                            <input
-                                className={classNames(
-                                    "h-4 w-4 rounded-sm bg-[color:var(--ui-ivory)] checked:bg-[color:var(--ui-gold)] checked:border-[color:var(--ui-gold)]",
-                                    "transition duration-200 align-top bg-no-repeat bg-center bg-contain float-left mt-1.5 mr-2",
-                                    lobbyState.order === 0
-                                        ? "cursor-pointer"
-                                        : "",
-                                )}
-                                type="checkbox"
-                                aria-label={text}
-                                checked={
-                                    lobbyState.settings[setting] as boolean
-                                }
-                                id={setting}
-                                disabled={lobbyState.order !== 0}
-                                onChange={changeVal}
-                            />
-                            <label
-                                className="block text-sm text-left text-[color:var(--ui-ivory)] cursor-pointer"
-                                htmlFor={setting}
-                            >
-                                {text}
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
     function getAdvancedCheckBox(
         text: string,
         setting: keyof IAdvancedSettings,
@@ -281,7 +232,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
         };
 
         return (
-            <div className="p-1 basis-full lg:basis-1/3">
+            <div className="min-w-0">
                 <div
                     className={classNames(
                         `${settingCardClasses} px-4 pt-3 pb-2 transition-colors duration-200`,
@@ -329,199 +280,68 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                 <div className="ui-grid xl:grid-cols-[minmax(0,3fr),minmax(280px,1fr)] gap-4 lg:h-[calc(100vh-116px)]">
                 <div className="basis-full min-h-0">
                     <div className="ui-panel ui-panel-pad text-center flex flex-col lg:overflow-y-auto lg:h-full">
-                        <div>
-                            <div className="basis-auto m-1 text-[color:var(--ui-ivory)] text-2xl p-2 pb-3">
+                        <div className="space-y-3">
+                            <div className="text-[color:var(--ui-ivory)] text-2xl pt-1">
                                 Game Settings
                             </div>
 
-                            <div className="flex flex-col lg:flex-row mt-1">
-                                <div className="basis-full lg:basis-1/2 rounded-xl m-1">
-                                    {/* Game mode selection */}
-                                    <div className={settingCardClasses}>
-                                        <div className="w-full">
-                                            <label className={labelClasses} htmlFor="gameMode">
-                                                Mode
-                                            </label>
-                                            <select
-                                                className={selectClasses}
-                                                aria-label="Game Mode"
-                                                id="gameMode"
-                                                onChange={changeMode}
-                                                disabled={
-                                                    lobbyState.order !== 0
-                                                }
-                                                value={lobbyState.settings.Mode}
-                                            >
-                                                <option value={GAME_MODE.Base}>
-                                                    Basic
-                                                </option>
-                                                <option
-                                                    value={
-                                                        GAME_MODE.CitiesAndKnights
-                                                    }
-                                                >
-                                                    Wonders &amp; Warriors
-                                                </option>
-                                                <option
-                                                    value={GAME_MODE.Seafarers}
-                                                >
-                                                    Seafarers
-                                                </option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="basis-full lg:basis-1/2 rounded-xl m-1">
-                                    {/* Map selection */}
-                                    <div className={settingCardClasses}>
-                                        <label className={labelClasses} htmlFor="mapName">
-                                            Map Name
-                                        </label>
-                                        <select
-                                            id="mapName"
-                                            className={selectClasses}
-                                            aria-label="Map Name"
-                                            disabled={lobbyState.order !== 0}
-                                            onChange={(event) =>
-                                                changeMap(event.target.value)
+                            <div className="grid gap-2.5 sm:grid-cols-2">
+                                <div className={settingCardClasses}>
+                                    <label className={labelClasses} htmlFor="gameMode">
+                                        Mode
+                                    </label>
+                                    <select
+                                        className={selectClasses}
+                                        aria-label="Game Mode"
+                                        id="gameMode"
+                                        onChange={changeMode}
+                                        disabled={lobbyState.order !== 0}
+                                        value={lobbyState.settings.Mode}
+                                    >
+                                        <option value={GAME_MODE.Base}>
+                                            Basic
+                                        </option>
+                                        <option
+                                            value={
+                                                GAME_MODE.CitiesAndKnights
                                             }
-                                            value={lobbyState.settings.MapName}
                                         >
-                                            {mapOptions.map((name: string) => (
-                                                <option key={name} value={name}>
-                                                    {name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
+                                            Wonders &amp; Warriors
+                                        </option>
+                                        <option
+                                            value={GAME_MODE.Seafarers}
+                                        >
+                                            Seafarers
+                                        </option>
+                                    </select>
+                                </div>
+                                <div className={settingCardClasses}>
+                                    <label className={labelClasses} htmlFor="mapName">
+                                        Map
+                                    </label>
+                                    <select
+                                        id="mapName"
+                                        className={selectClasses}
+                                        aria-label="Map Name"
+                                        disabled={lobbyState.order !== 0}
+                                        onChange={(event) =>
+                                            changeMap(event.target.value)
+                                        }
+                                        value={lobbyState.settings.MapName}
+                                    >
+                                        {mapOptions.map((name: string) => (
+                                            <option key={name} value={name}>
+                                                {name}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
 
-                            <div className="flex flex-col lg:flex-row mt-1 mb-2">
-                                {getCheckBox("Private Game", "Private")}
-                                {getCheckBox("Creative Mode", "CreativeMode")}
-                            </div>
-
-                            <div className="flex flex-col lg:flex-row md:mt-2">
-                                <div className="basis-full lg:basis-1/4 rounded-xl m-1">
-                                    {/* Max Player */}
-                                    <div className={settingCardClasses}>
-                                        <div className="w-full">
-                                            <label className={labelClasses} htmlFor="maxplayers-control">
-                                                Max Players
-                                            </label>
-                                            <div
-                                                id="maxplayers-control"
-                                                className={classNames(
-                                                    valueControlClasses,
-                                                    lobbyState.order !== 0
-                                                        ? "opacity-70"
-                                                        : "",
-                                                )}
-                                            >
-                                                <div className="flex items-center justify-between">
-                                                    <button
-                                                        type="button"
-                                                        aria-label="Decrease max players"
-                                                        className={stepperButtonClasses}
-                                                        disabled={
-                                                            lobbyState.order !==
-                                                                0 ||
-                                                            lobbyState.settings
-                                                                .MaxPlayers <=
-                                                                minPlayers
-                                                        }
-                                                        onClick={() =>
-                                                            setMaxPlayers(
-                                                                Math.max(
-                                                                    minPlayers,
-                                                                    lobbyState
-                                                                        .settings
-                                                                        .MaxPlayers -
-                                                                        1,
-                                                                ),
-                                                            )
-                                                        }
-                                                    >
-                                                        <ChevronLeftIcon className="w-5 h-5" />
-                                                    </button>
-                                                    <span className="text-3xl font-semibold leading-none min-w-[5.5rem]">
-                                                        {
-                                                            lobbyState.settings
-                                                                .MaxPlayers
-                                                        }
-                                                        /{maxPlayersLimit}
-                                                    </span>
-                                                    <button
-                                                        type="button"
-                                                        aria-label="Increase max players"
-                                                        className={stepperButtonClasses}
-                                                        disabled={
-                                                            lobbyState.order !==
-                                                                0 ||
-                                                            lobbyState.settings
-                                                                .MaxPlayers >=
-                                                                maxPlayersLimit
-                                                        }
-                                                        onClick={() =>
-                                                            setMaxPlayers(
-                                                                Math.min(
-                                                                    maxPlayersLimit,
-                                                                    lobbyState
-                                                                        .settings
-                                                                        .MaxPlayers +
-                                                                        1,
-                                                                ),
-                                                            )
-                                                        }
-                                                    >
-                                                        <ChevronRightIcon className="w-5 h-5" />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="basis-full lg:basis-1/4 rounded-xl m-1">
-                                    {/* Discard limit selection */}
-                                    <div className={settingCardClasses}>
-                                        <div className="w-full">
-                                            <label className={labelClasses} htmlFor="discardlimit">
-                                                Discard Limit (
-                                                {
-                                                    lobbyState.settings
-                                                        .DiscardLimit
-                                                }
-                                                )
-                                            </label>
-                                            <input
-                                                className={rangeInputClasses}
-                                                aria-label="Discard Limit"
-                                                id="discardlimit"
-                                                type="range"
-                                                min={minDiscardLimit}
-                                                max={maxDiscardLimit}
-                                                step={1}
-                                                onChange={changeDiscard}
-                                                disabled={
-                                                    lobbyState.order !== 0
-                                                }
-                                                value={
-                                                    lobbyState.settings
-                                                        .DiscardLimit
-                                                }
-                                            />
-                                            <div className="flex justify-between text-xs text-[rgba(244,239,228,0.7)] mt-1.5">
-                                                <span>{minDiscardLimit}</span>
-                                                <span>{maxDiscardLimit}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="basis-full lg:basis-1/4 rounded-xl m-1">
-                                    {/* Victory Point selection */}
-                                    <div className={settingCardClasses}>
-                                        <div className="w-full">
+                            <div className="grid gap-2.5 sm:grid-cols-2">
+                                {/* Victory Point selection */}
+                                <div className={settingCardClasses}>
+                                    <div className="w-full">
                                             <label className={labelClasses} htmlFor="victoryPoint">
                                                 Victory Points (
                                                 {
@@ -551,13 +371,11 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                                 <span>{minVictoryPoints}</span>
                                                 <span>{maxVictoryPoints}</span>
                                             </div>
-                                        </div>
                                     </div>
                                 </div>
-                                <div className="basis-full lg:basis-1/4 rounded-xl m-1">
-                                    {/* Turn timer selection */}
-                                    <div className={settingCardClasses}>
-                                        <div className="w-full">
+                                {/* Turn timer selection */}
+                                <div className={settingCardClasses}>
+                                    <div className="w-full">
                                             <div className="flex items-center justify-center gap-1 mb-2">
                                                 <label className={labelClasses + " !mb-0"} htmlFor="turnTimerControl">
                                                     Turn Timer
@@ -597,7 +415,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                                 >
                                                     <ChevronLeftIcon className="w-5 h-5" />
                                                 </button>
-                                                <span className="text-3xl font-semibold leading-none min-w-[5.5rem]">
+                                                <span className="text-2xl font-semibold leading-none min-w-[4.75rem]">
                                                     {selectedTimer.label}
                                                 </span>
                                                 <button
@@ -617,17 +435,192 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                                     <ChevronRightIcon className="w-5 h-5" />
                                                 </button>
                                             </div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
 
+                            <div className={settingCardClasses}>
+                                <div className="flex items-center justify-between gap-3">
+                                    <div className={labelClasses + " !mb-0"}>
+                                        Extra Options
+                                    </div>
+                                    <button
+                                        type="button"
+                                        className="ui-button ui-button-ghost !w-auto !h-8 !min-h-0 !px-3 text-xs uppercase tracking-[0.08em]"
+                                        onClick={() =>
+                                            setShowGameOptions((current) => !current)
+                                        }
+                                    >
+                                        {showGameOptions ? "Hide" : "Show"}
+                                    </button>
+                                </div>
+                                {showGameOptions && (
+                                    <div className="space-y-3 pt-3">
+                                        <div className="flex flex-wrap gap-2">
+                                            <label
+                                                htmlFor="Private"
+                                                className={classNames(
+                                                    "inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm cursor-pointer transition-colors duration-200",
+                                                    lobbyState.settings.Private
+                                                        ? "bg-[rgba(122,31,36,0.42)] border-[rgba(183,148,90,0.5)] text-[color:var(--ui-ivory)]"
+                                                        : "bg-[rgba(20,17,14,0.45)] border-[rgba(231,222,206,0.18)] text-[color:var(--ui-ivory-soft)]",
+                                                    lobbyState.order !== 0
+                                                        ? "opacity-70 cursor-not-allowed"
+                                                        : "",
+                                                )}
+                                            >
+                                                <input
+                                                    className="h-3.5 w-3.5 rounded-sm border-[rgba(231,222,206,0.45)] bg-[color:var(--ui-ivory)] checked:bg-[color:var(--ui-gold)] checked:border-[color:var(--ui-gold)]"
+                                                    type="checkbox"
+                                                    id="Private"
+                                                    aria-label="Private Game"
+                                                    checked={lobbyState.settings.Private}
+                                                    disabled={lobbyState.order !== 0}
+                                                    onChange={(event) =>
+                                                        sendSettings({
+                                                            ...lobbyState.settings,
+                                                            Private: Boolean(event.target.checked),
+                                                        })
+                                                    }
+                                                />
+                                                <span>Private Game</span>
+                                            </label>
+                                            <label
+                                                htmlFor="CreativeMode"
+                                                className={classNames(
+                                                    "inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm cursor-pointer transition-colors duration-200",
+                                                    lobbyState.settings.CreativeMode
+                                                        ? "bg-[rgba(122,31,36,0.42)] border-[rgba(183,148,90,0.5)] text-[color:var(--ui-ivory)]"
+                                                        : "bg-[rgba(20,17,14,0.45)] border-[rgba(231,222,206,0.18)] text-[color:var(--ui-ivory-soft)]",
+                                                    lobbyState.order !== 0
+                                                        ? "opacity-70 cursor-not-allowed"
+                                                        : "",
+                                                )}
+                                            >
+                                                <input
+                                                    className="h-3.5 w-3.5 rounded-sm border-[rgba(231,222,206,0.45)] bg-[color:var(--ui-ivory)] checked:bg-[color:var(--ui-gold)] checked:border-[color:var(--ui-gold)]"
+                                                    type="checkbox"
+                                                    id="CreativeMode"
+                                                    aria-label="Creative Mode"
+                                                    checked={lobbyState.settings.CreativeMode}
+                                                    disabled={lobbyState.order !== 0}
+                                                    onChange={(event) =>
+                                                        sendSettings({
+                                                            ...lobbyState.settings,
+                                                            CreativeMode: Boolean(event.target.checked),
+                                                        })
+                                                    }
+                                                />
+                                                <span>Creative Mode</span>
+                                            </label>
+                                        </div>
+                                        <div className="grid gap-2.5 sm:grid-cols-2">
+                                            <div>
+                                                <label className={labelClasses} htmlFor="maxplayers-control">
+                                                    Max Players
+                                                </label>
+                                                <div
+                                                    id="maxplayers-control"
+                                                    className={classNames(
+                                                        valueControlClasses,
+                                                        lobbyState.order !== 0
+                                                            ? "opacity-70"
+                                                            : "",
+                                                    )}
+                                                >
+                                                    <div className="flex items-center justify-between">
+                                                        <button
+                                                            type="button"
+                                                            aria-label="Decrease max players"
+                                                            className={stepperButtonClasses}
+                                                            disabled={
+                                                                lobbyState.order !==
+                                                                    0 ||
+                                                                lobbyState.settings
+                                                                    .MaxPlayers <=
+                                                                    minPlayers
+                                                            }
+                                                            onClick={() =>
+                                                                setMaxPlayers(
+                                                                    Math.max(
+                                                                        minPlayers,
+                                                                        lobbyState
+                                                                            .settings
+                                                                            .MaxPlayers -
+                                                                            1,
+                                                                    ),
+                                                                )
+                                                            }
+                                                        >
+                                                            <ChevronLeftIcon className="w-5 h-5" />
+                                                        </button>
+                                                        <span className="text-2xl font-semibold leading-none min-w-[4.75rem]">
+                                                            {
+                                                                lobbyState.settings
+                                                                    .MaxPlayers
+                                                            }
+                                                            /{maxPlayersLimit}
+                                                        </span>
+                                                        <button
+                                                            type="button"
+                                                            aria-label="Increase max players"
+                                                            className={stepperButtonClasses}
+                                                            disabled={
+                                                                lobbyState.order !==
+                                                                    0 ||
+                                                                lobbyState.settings
+                                                                    .MaxPlayers >=
+                                                                    maxPlayersLimit
+                                                            }
+                                                            onClick={() =>
+                                                                setMaxPlayers(
+                                                                    Math.min(
+                                                                        maxPlayersLimit,
+                                                                        lobbyState
+                                                                            .settings
+                                                                            .MaxPlayers +
+                                                                            1,
+                                                                    ),
+                                                                )
+                                                            }
+                                                        >
+                                                            <ChevronRightIcon className="w-5 h-5" />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label className={labelClasses} htmlFor="discardlimit">
+                                                    Discard Limit ({lobbyState.settings.DiscardLimit})
+                                                </label>
+                                                <input
+                                                    className={rangeInputClasses}
+                                                    aria-label="Discard Limit"
+                                                    id="discardlimit"
+                                                    type="range"
+                                                    min={minDiscardLimit}
+                                                    max={maxDiscardLimit}
+                                                    step={1}
+                                                    onChange={changeDiscard}
+                                                    disabled={lobbyState.order !== 0}
+                                                    value={lobbyState.settings.DiscardLimit}
+                                                />
+                                                <div className="flex justify-between text-xs text-[rgba(244,239,228,0.7)] mt-1.5">
+                                                    <span>{minDiscardLimit}</span>
+                                                    <span>{maxDiscardLimit}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
                             {lobbyState.settings.Advanced && (
                                 <>
-                                    <div className="basis-auto rounded-xl m-1 text-[color:var(--ui-ivory)] text-2xl font-bold p-3 pb-3">
+                                    <div className="text-[color:var(--ui-ivory)] text-xl font-semibold pt-1">
                                         Advanced Settings
                                     </div>
-                                    <div className="flex flex-col lg:flex-row md:mt-2">
+                                    <div className="grid gap-2.5 lg:grid-cols-3">
                                         {getAdvancedCheckBox(
                                             "Re-roll on 7",
                                             "RerollOn7",
@@ -637,49 +630,47 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                             )}
                         </div>
 
-                        <div className="basis-auto mt-6">
-                            {/* Ready selection */}
-                            <div
-                                className={classNames(
-                                    "w-3/4 sm:w-1/2 md:w-3/4 lg:w-3/4 xl:w-1/2 px-5 py-3 rounded-xl my-3 mx-auto border transition-colors duration-200",
-                                    lobbyState.ready
-                                        ? "bg-[rgba(88,44,48,0.58)] border-[rgba(183,148,90,0.45)]"
-                                        : "bg-[rgba(61,42,35,0.62)] border-[rgba(231,222,206,0.18)]",
-                                )}
-                            >
-                                <label
-                                    className="w-full flex items-center gap-3 cursor-pointer text-left text-[color:var(--ui-ivory)]"
-                                    htmlFor="ready"
+                        <div className="basis-auto mt-5">
+                            {lobbyState.order === 0 ? (
+                                <button
+                                    disabled={!lobbyState.canStart}
+                                    className={classNames(
+                                        "ui-button w-full sm:w-3/4 xl:w-2/3 h-12 text-xl rounded-xl",
+                                        lobbyState.canStart
+                                            ? "ui-button-primary"
+                                            : "bg-stone-700 opacity-40",
+                                    )}
+                                    onClick={startGame}
                                 >
-                                    <input
-                                        className="h-5 w-5 rounded-sm border-[rgba(231,222,206,0.45)] bg-[color:var(--ui-ivory)]
+                                    Start Game
+                                </button>
+                            ) : (
+                                <div
+                                    className={classNames(
+                                        "w-full sm:w-3/4 xl:w-2/3 px-5 py-3 rounded-xl my-2 mx-auto border transition-colors duration-200",
+                                        lobbyState.ready
+                                            ? "bg-[rgba(88,44,48,0.58)] border-[rgba(183,148,90,0.45)]"
+                                            : "bg-[rgba(61,42,35,0.62)] border-[rgba(231,222,206,0.18)]",
+                                    )}
+                                >
+                                    <label
+                                        className="w-full flex items-center gap-3 cursor-pointer text-left text-[color:var(--ui-ivory)]"
+                                        htmlFor="ready"
+                                    >
+                                        <input
+                                            className="h-5 w-5 rounded-sm border-[rgba(231,222,206,0.45)] bg-[color:var(--ui-ivory)]
                                                    checked:bg-[color:var(--ui-gold)] checked:border-[color:var(--ui-gold)]
                                                    focus:ring-2 focus:ring-[rgba(183,148,90,0.45)] focus:ring-offset-0"
-                                        type="checkbox"
-                                        aria-label="Ready to play"
-                                        checked={lobbyState.ready}
-                                        id="ready"
-                                        onChange={changeReady}
-                                    />
-                                    <span className="text-[1.95rem] leading-none">Ready</span>
-                                </label>
-                            </div>
-
-                            <button
-                                disabled={
-                                    lobbyState.order != 0 ||
-                                    !lobbyState.canStart
-                                }
-                                className={classNames(
-                                    "ui-button w-3/4 sm:w-1/2 md:w-3/4 lg:w-3/4 xl:w-1/2 h-12 text-xl rounded-xl",
-                                    lobbyState.order == 0 && lobbyState.canStart
-                                        ? "ui-button-primary"
-                                        : "bg-stone-700 opacity-40",
-                                )}
-                                onClick={startGame}
-                            >
-                                Start Game
-                            </button>
+                                            type="checkbox"
+                                            aria-label="Ready to play"
+                                            checked={lobbyState.ready}
+                                            id="ready"
+                                            onChange={changeReady}
+                                        />
+                                        <span className="text-[1.6rem] leading-none">Ready</span>
+                                    </label>
+                                </div>
+                            )}
                         </div>
                     </div>
 

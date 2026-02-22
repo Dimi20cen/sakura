@@ -23,9 +23,17 @@ import { useLobbySession } from "../hooks/lobbySession";
 import Image from "next/legacy/image";
 
 const selectClasses =
-    "ui-input form-select appearance-none block w-full !py-1.5 !text-[15px] !font-normal";
+    "ui-input form-select appearance-none block w-full !h-11 !py-2 !text-[15px] !font-normal";
 const labelClasses =
-    "block text-[color:var(--ui-ivory-soft)] text-sm uppercase tracking-[0.06em] mb-0.5";
+    "block text-[color:var(--ui-ivory-soft)] text-xs uppercase tracking-[0.08em] mb-2";
+const settingCardClasses =
+    "rounded-xl px-3 py-2.5 bg-[rgba(42,34,31,0.72)] border border-[rgba(231,222,206,0.16)]";
+const valueControlClasses =
+    "rounded-lg px-3 py-2.5 bg-[rgba(21,18,15,0.52)] border border-[rgba(231,222,206,0.2)] text-[color:var(--ui-ivory)]";
+const stepperButtonClasses =
+    "p-1.5 rounded-md hover:bg-[rgba(183,148,90,0.2)] disabled:opacity-40 transition-colors";
+const rangeInputClasses =
+    "w-full h-2 rounded-lg appearance-none cursor-pointer accent-[color:var(--ui-gold)] disabled:opacity-40";
 const turnTimerOptions = [
     { value: "15s", label: "15s" },
     { value: "30s", label: "30s" },
@@ -223,17 +231,17 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
             <div className="p-1 basis-full lg:basis-1/2">
                 <div
                     className={classNames(
-                        "px-3 py-2 rounded-lg border transition-colors duration-200",
+                        `${settingCardClasses} transition-colors duration-200`,
                         lobbyState.settings[setting]
                             ? "bg-[rgba(122,31,36,0.46)] border-[rgba(183,148,90,0.42)]"
-                            : "bg-[rgba(42,34,31,0.62)] border-[rgba(231,222,206,0.14)]",
+                            : "",
                     )}
                 >
                     <div className="flex justify-center">
                         <div className="w-full">
                             <input
                                 className={classNames(
-                                    "rounded-sm bg-[color:var(--ui-ivory)] checked:bg-[color:var(--ui-gold)] checked:border-[color:var(--ui-gold)]",
+                                    "h-4 w-4 rounded-sm bg-[color:var(--ui-ivory)] checked:bg-[color:var(--ui-gold)] checked:border-[color:var(--ui-gold)]",
                                     "transition duration-200 align-top bg-no-repeat bg-center bg-contain float-left mt-1.5 mr-2",
                                     lobbyState.order === 0
                                         ? "cursor-pointer"
@@ -276,17 +284,17 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
             <div className="p-1 basis-full lg:basis-1/3">
                 <div
                     className={classNames(
-                        "px-4 pt-3 pb-2 rounded-xl border transition-colors duration-200",
+                        `${settingCardClasses} px-4 pt-3 pb-2 transition-colors duration-200`,
                         lobbyState.advanced[setting]
                             ? "bg-[rgba(122,31,36,0.62)] border-[rgba(183,148,90,0.55)]"
-                            : "bg-[rgba(42,34,31,0.82)] border-[rgba(231,222,206,0.18)]",
+                            : "",
                     )}
                 >
                     <div className="flex justify-center">
                         <div className="w-full">
                             <input
                                 className={classNames(
-                                    "rounded-sm bg-[color:var(--ui-ivory)] checked:bg-[color:var(--ui-gold)] checked:border-[color:var(--ui-gold)]",
+                                    "h-4 w-4 rounded-sm bg-[color:var(--ui-ivory)] checked:bg-[color:var(--ui-gold)] checked:border-[color:var(--ui-gold)]",
                                     "transition duration-200 align-top bg-no-repeat bg-center bg-contain float-left mt-1.5 mr-2",
                                     lobbyState.order === 0
                                         ? "cursor-pointer"
@@ -329,7 +337,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                             <div className="flex flex-col lg:flex-row mt-1">
                                 <div className="basis-full lg:basis-1/2 rounded-xl m-1">
                                     {/* Game mode selection */}
-                                    <div className="flex justify-center">
+                                    <div className={settingCardClasses}>
                                         <div className="w-full">
                                             <label className={labelClasses} htmlFor="gameMode">
                                                 Mode
@@ -365,7 +373,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                 </div>
                                 <div className="basis-full lg:basis-1/2 rounded-xl m-1">
                                     {/* Map selection */}
-                                    <div className="w-full">
+                                    <div className={settingCardClasses}>
                                         <label className={labelClasses} htmlFor="mapName">
                                             Map Name
                                         </label>
@@ -397,7 +405,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                             <div className="flex flex-col lg:flex-row md:mt-2">
                                 <div className="basis-full lg:basis-1/4 rounded-xl m-1">
                                     {/* Max Player */}
-                                    <div className="flex justify-center">
+                                    <div className={settingCardClasses}>
                                         <div className="w-full">
                                             <label className={labelClasses} htmlFor="maxplayers-control">
                                                 Max Players
@@ -405,7 +413,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                             <div
                                                 id="maxplayers-control"
                                                 className={classNames(
-                                                    "rounded-md px-4 py-1.5 bg-[rgba(42,34,31,0.85)] border border-[rgba(231,222,206,0.2)] text-[color:var(--ui-ivory)]",
+                                                    valueControlClasses,
                                                     lobbyState.order !== 0
                                                         ? "opacity-70"
                                                         : "",
@@ -415,7 +423,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                                     <button
                                                         type="button"
                                                         aria-label="Decrease max players"
-                                                        className="p-1 rounded-md hover:bg-[rgba(183,148,90,0.2)] disabled:opacity-40"
+                                                        className={stepperButtonClasses}
                                                         disabled={
                                                             lobbyState.order !==
                                                                 0 ||
@@ -437,7 +445,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                                     >
                                                         <ChevronLeftIcon className="w-5 h-5" />
                                                     </button>
-                                                    <span className="text-3xl font-semibold leading-none">
+                                                    <span className="text-3xl font-semibold leading-none min-w-[5.5rem]">
                                                         {
                                                             lobbyState.settings
                                                                 .MaxPlayers
@@ -447,7 +455,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                                     <button
                                                         type="button"
                                                         aria-label="Increase max players"
-                                                        className="p-1 rounded-md hover:bg-[rgba(183,148,90,0.2)] disabled:opacity-40"
+                                                        className={stepperButtonClasses}
                                                         disabled={
                                                             lobbyState.order !==
                                                                 0 ||
@@ -476,7 +484,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                 </div>
                                 <div className="basis-full lg:basis-1/4 rounded-xl m-1">
                                     {/* Discard limit selection */}
-                                    <div className="flex justify-center">
+                                    <div className={settingCardClasses}>
                                         <div className="w-full">
                                             <label className={labelClasses} htmlFor="discardlimit">
                                                 Discard Limit (
@@ -487,7 +495,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                                 )
                                             </label>
                                             <input
-                                                className="w-full h-2 rounded-lg appearance-none cursor-pointer accent-[color:var(--ui-gold)] disabled:opacity-40"
+                                                className={rangeInputClasses}
                                                 aria-label="Discard Limit"
                                                 id="discardlimit"
                                                 type="range"
@@ -503,7 +511,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                                         .DiscardLimit
                                                 }
                                             />
-                                            <div className="flex justify-between text-xs text-[rgba(244,239,228,0.7)] mt-1">
+                                            <div className="flex justify-between text-xs text-[rgba(244,239,228,0.7)] mt-1.5">
                                                 <span>{minDiscardLimit}</span>
                                                 <span>{maxDiscardLimit}</span>
                                             </div>
@@ -512,7 +520,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                 </div>
                                 <div className="basis-full lg:basis-1/4 rounded-xl m-1">
                                     {/* Victory Point selection */}
-                                    <div className="flex justify-center">
+                                    <div className={settingCardClasses}>
                                         <div className="w-full">
                                             <label className={labelClasses} htmlFor="victoryPoint">
                                                 Victory Points (
@@ -523,7 +531,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                                 )
                                             </label>
                                             <input
-                                                className="w-full h-2 rounded-lg appearance-none cursor-pointer accent-[color:var(--ui-gold)] disabled:opacity-40"
+                                                className={rangeInputClasses}
                                                 aria-label="Victory Points"
                                                 id="victoryPoint"
                                                 type="range"
@@ -539,7 +547,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                                         .VictoryPoints
                                                 }
                                             />
-                                            <div className="flex justify-between text-xs text-[rgba(244,239,228,0.7)] mt-1">
+                                            <div className="flex justify-between text-xs text-[rgba(244,239,228,0.7)] mt-1.5">
                                                 <span>{minVictoryPoints}</span>
                                                 <span>{maxVictoryPoints}</span>
                                             </div>
@@ -548,9 +556,9 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                 </div>
                                 <div className="basis-full lg:basis-1/4 rounded-xl m-1">
                                     {/* Turn timer selection */}
-                                    <div className="flex justify-center">
+                                    <div className={settingCardClasses}>
                                         <div className="w-full">
-                                            <div className="flex items-center justify-center gap-1 mb-1">
+                                            <div className="flex items-center justify-center gap-1 mb-2">
                                                 <label className={labelClasses + " !mb-0"} htmlFor="turnTimerControl">
                                                     Turn Timer
                                                 </label>
@@ -566,7 +574,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                             <div
                                                 id="turnTimerControl"
                                                 className={classNames(
-                                                    "rounded-md px-4 py-1.5 bg-[rgba(42,34,31,0.85)] border border-[rgba(231,222,206,0.2)] text-[color:var(--ui-ivory)]",
+                                                    valueControlClasses,
                                                     "flex items-center justify-between",
                                                     lobbyState.order !== 0 ? "opacity-70" : "",
                                                 )}
@@ -574,7 +582,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                                 <button
                                                     type="button"
                                                     aria-label="Decrease turn timer"
-                                                    className="p-1 rounded-md hover:bg-[rgba(183,148,90,0.2)] disabled:opacity-40"
+                                                    className={stepperButtonClasses}
                                                     disabled={lobbyState.order !== 0}
                                                     onClick={() =>
                                                         changeSpeed(
@@ -589,13 +597,13 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                                 >
                                                     <ChevronLeftIcon className="w-5 h-5" />
                                                 </button>
-                                                <span className="text-3xl font-semibold leading-none">
+                                                <span className="text-3xl font-semibold leading-none min-w-[5.5rem]">
                                                     {selectedTimer.label}
                                                 </span>
                                                 <button
                                                     type="button"
                                                     aria-label="Increase turn timer"
-                                                    className="p-1 rounded-md hover:bg-[rgba(183,148,90,0.2)] disabled:opacity-40"
+                                                    className={stepperButtonClasses}
                                                     disabled={lobbyState.order !== 0}
                                                     onClick={() =>
                                                         changeSpeed(
@@ -633,7 +641,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                             {/* Ready selection */}
                             <div
                                 className={classNames(
-                                    "w-3/4 sm:w-1/2 md:w-3/4 lg:w-3/4 xl:w-1/2 px-5 py-3 rounded-xl my-3 mx-auto border",
+                                    "w-3/4 sm:w-1/2 md:w-3/4 lg:w-3/4 xl:w-1/2 px-5 py-3 rounded-xl my-3 mx-auto border transition-colors duration-200",
                                     lobbyState.ready
                                         ? "bg-[rgba(88,44,48,0.58)] border-[rgba(183,148,90,0.45)]"
                                         : "bg-[rgba(61,42,35,0.62)] border-[rgba(231,222,206,0.18)]",
@@ -653,7 +661,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                         id="ready"
                                         onChange={changeReady}
                                     />
-                                    <span className="text-[2rem] leading-none">Ready</span>
+                                    <span className="text-[1.95rem] leading-none">Ready</span>
                                 </label>
                             </div>
 

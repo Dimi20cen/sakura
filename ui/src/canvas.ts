@@ -262,6 +262,9 @@ const resize = () => {
  * @returns The height of the canvas
  */
 export function getHeight() {
+    if (!app?.view || !app?.renderer) {
+        return 800;
+    }
     return app.view.height / app.renderer.resolution;
 }
 
@@ -269,6 +272,9 @@ export function getHeight() {
  * @returns The width of the canvas
  */
 export function getWidth() {
+    if (!app?.view || !app?.renderer) {
+        return 1200;
+    }
     return app.view.width / app.renderer.resolution;
 }
 

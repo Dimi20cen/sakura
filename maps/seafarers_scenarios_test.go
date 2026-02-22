@@ -83,3 +83,26 @@ func TestGetMapByNameSeafarersThroughDesertIsPlayable(t *testing.T) {
 		t.Fatalf("expected through the desert victory points override 14, got %d", defn.Scenario.VictoryPoints)
 	}
 }
+
+func TestOfficialMapNamesIncludeCurrentSeafarersSet(t *testing.T) {
+	names := GetOfficialMapNames()
+	required := map[string]bool{
+		BaseMapName:                  false,
+		SeafarersHeadingForNewShores: false,
+		SeafarersFourIslands:         false,
+		SeafarersFogIslands:          false,
+		SeafarersThroughDesert:       false,
+	}
+
+	for _, n := range names {
+		if _, ok := required[n]; ok {
+			required[n] = true
+		}
+	}
+
+	for name, found := range required {
+		if !found {
+			t.Fatalf("expected official map list to include %q", name)
+		}
+	}
+}

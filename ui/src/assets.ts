@@ -110,6 +110,7 @@ import roadGreen from "../public/assets/tile-tex/road-green.png";
 import roadYellow from "../public/assets/tile-tex/road-yellow.png";
 import roadPlum from "../public/assets/tile-tex/road-plum.png";
 import roadCyan from "../public/assets/tile-tex/road-cyan.png";
+import shipTokenS from "../public/assets/ships/ship-token.png";
 
 export enum ROAD {
     ROAD = "road",
@@ -129,6 +130,7 @@ road[ROAD.BEACH] = roadBeach;
 road[ROAD.ROAD] = roadRoad;
 road[ROAD.ISLAND_R] = roadIslandR;
 road[ROAD.ISLAND_L] = roadIslandL;
+export const shipToken = shipTokenS;
 
 /******************** House *******************************************/
 
@@ -355,14 +357,14 @@ import btnNo from "../public/assets/buttons/no.png";
 import btnSettlement from "../public/assets/buttons/settlement.png";
 import btnCity from "../public/assets/buttons/city.png";
 import btnRoad from "../public/assets/buttons/road.png";
-import btnShip from "../public/assets/buttons/road.png";
+import btnShip from "../public/assets/buttons/ship.png";
 import btnDevelopmentCard from "../public/assets/buttons/dcard.png";
 import btnKnightBox from "../public/assets/buttons/knight.png";
 import btnKnightBuild from "../public/assets/buttons/knight_build.png";
 import btnKnightActivate from "../public/assets/buttons/knight_activate.png";
 import btnKnightRobber from "../public/assets/buttons/knight_robber.png";
 import btnKnightMove from "../public/assets/buttons/knight_move.png";
-import btnMoveShip from "../public/assets/buttons/knight_move.png";
+import btnMoveShip from "../public/assets/buttons/move_ship.png";
 import btnCityImprove from "../public/assets/buttons/improve.png";
 import btnCityImprovePaper from "../public/assets/buttons/improve_paper.jpg";
 import btnCityImproveCloth from "../public/assets/buttons/improve_cloth.jpg";

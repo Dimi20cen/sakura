@@ -477,10 +477,10 @@ export function renderEdgePlacement(ep: IEdgePlacement, removed = false) {
     // Generate sprite with correct color
     const roadSprite = new PIXI.Sprite();
     const color = hexToUrlString(ep.Owner.Color);
-    assets.assignTexture(roadSprite, assets.road[color]);
-    if (isShip) {
-        roadSprite.tint = 0x6ea8ff;
-    }
+    assets.assignTexture(
+        roadSprite,
+        isShip ? assets.shipToken : assets.road[color],
+    );
     roadSprite.anchor.x = 0.5;
     roadSprite.anchor.y = 0.5;
     roadContainer.addChild(roadSprite);
@@ -500,22 +500,19 @@ export function renderEdgePlacement(ep: IEdgePlacement, removed = false) {
         (((-60 * (1 - ep.Location.Orientation)) % 360) * Math.PI) / 180.0;
 
     const shadow = new PIXI.Sprite();
-    assets.assignTexture(shadow, assets.road[color]);
-    if (isShip) {
-        shadow.tint = 0x3f6aa8;
-    }
+    assets.assignTexture(shadow, isShip ? assets.shipToken : assets.road[color]);
     shadow.anchor.x = roadSprite.anchor.x;
     shadow.anchor.y = roadSprite.anchor.y;
     shadow.x = 6;
     shadow.y = 8;
-    shadow.tint = 0x666666;
+    shadow.tint = isShip ? 0x4b5563 : 0x666666;
     shadow.rotation = roadSprite.rotation;
 
     roadContainer.addChild(shadow);
     roadContainer.addChild(roadSprite);
 
     container.addChild(roadContainer);
-    roadContainer.scale.set((isShip ? 22 : 25) / roadSprite.texture.width);
+    roadContainer.scale.set((isShip ? 26 : 25) / roadSprite.texture.width);
 
     if (isInitComplete) {
         anim.requestTranslationAnimation([roadContainer], 4);

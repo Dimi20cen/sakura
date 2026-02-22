@@ -5,7 +5,11 @@ import * as ws from "./ws";
 import * as state from "./state";
 import * as assets from "./assets";
 import * as windows from "./windows";
-import { computeActionBarPosition, computeSpecialBuildPosition } from "./hudLayout";
+import {
+    computeActionBarPosition,
+    computeDicePosition,
+    computeSpecialBuildPosition,
+} from "./hudLayout";
 import { BuildableType, CardType } from "./entities";
 import CommandHub from "./commands";
 import { PlayerSecretState } from "../tsg";
@@ -20,6 +24,7 @@ export let container: PIXI.Container;
 
 /** Secondary button container */
 let container1: PIXI.Container;
+let seafarersShipContainer: PIXI.Container | null = null;
 let turnTimerContainer: PIXI.Container | null = null;
 let turnTimerText: PIXI.Text | null = null;
 let turnTimerDebugText: PIXI.Text | null = null;
@@ -66,7 +71,7 @@ const C_HEIGHT = 90;
 const actionBarWidth = () =>
     BUTTON_Y * 2 +
     BUTTON_X_DELTA *
-        (state.settings.Mode == state.GameMode.Seafarers ? 5 : 4) +
+        4 +
     BUTTON_WIDTH;
 
 function formatSeconds(seconds: number) {
@@ -145,6 +150,21 @@ export function relayout() {
     if (container1 && !container1.destroyed) {
         container1.x = container.x + BUTTON_X_DELTA * 1 - 18;
         container1.y = container.y - C_HEIGHT - 10;
+    }
+
+    if (seafarersShipContainer && !seafarersShipContainer.destroyed) {
+        const dicePos = computeDicePosition({
+            canvasWidth: canvas.getWidth(),
+            canvasHeight: canvas.getHeight(),
+            diceWidth: 138,
+            diceHeight: 64,
+            actionBarTop: container.y,
+            playerPanel: state.getPlayerPanelBounds(),
+        });
+        const gap = 10;
+        seafarersShipContainer.x =
+            dicePos.x - seafarersShipContainer.width - gap;
+        seafarersShipContainer.y = container.y - C_HEIGHT - 10;
     }
 
     if (buttons.knightBox?.container && !buttons.knightBox.container.destroyed) {
@@ -571,6 +591,29 @@ export function render(commandHub: CommandHub) {
     }
 
     if (state.settings.Mode == state.GameMode.Seafarers) {
+        seafarersShipContainer = new PIXI.Container();
+        seafarersShipContainer.addChild(
+            windows.getWindowSprite(
+                BUTTON_X_DELTA * 1 + BUTTON_WIDTH + 2 * BUTTON_Y,
+                C_HEIGHT,
+            ),
+        );
+        seafarersShipContainer.zIndex = 1300;
+        seafarersShipContainer.visible = !ws.isSpectator();
+        const dicePos = computeDicePosition({
+            canvasWidth: canvas.getWidth(),
+            canvasHeight: canvas.getHeight(),
+            diceWidth: 138,
+            diceHeight: 64,
+            actionBarTop: container.y,
+            playerPanel: state.getPlayerPanelBounds(),
+        });
+        const gap = 10;
+        seafarersShipContainer.x =
+            dicePos.x - seafarersShipContainer.width - gap;
+        seafarersShipContainer.y = container.y - C_HEIGHT - 10;
+        canvas.app.stage.addChild(seafarersShipContainer);
+
         buttons.buildShip = getButtonSprite(
             ButtonType.Ship,
             BUTTON_WIDTH,
@@ -581,11 +624,11 @@ export function render(commandHub: CommandHub) {
         buttons.buildShip.interactive = true;
         buttons.buildShip.cursor = "pointer";
         buttons.buildShip.reactDisable = true;
-        buttons.buildShip.x = BUTTON_Y + BUTTON_X_DELTA * 4;
+        buttons.buildShip.x = BUTTON_Y + BUTTON_X_DELTA * 0;
         buttons.buildShip.y = BUTTON_Y;
         buttons.buildShip.zIndex = 10;
         buttons.buildShip.onClick(rerenderAnd(commandHub.buildShip));
-        container.addChild(buttons.buildShip);
+        seafarersShipContainer.addChild(buttons.buildShip);
         const cs = getCountSprite(COUNT_WIDTH, COUNT_HEIGHT, COUNT_FONTSIZE);
         buttonCounts[ButtonType.Ship] = cs;
         cs.sprite.anchor.x = 1;
@@ -612,16 +655,7 @@ export function render(commandHub: CommandHub) {
         buttons.moveShip.y = BUTTON_Y;
         buttons.moveShip.zIndex = 10;
         buttons.moveShip.onClick(rerenderAnd(commandHub.moveShip));
-        container1 = new PIXI.Container();
-        container1.addChild(
-            windows.getWindowSprite(BUTTON_X_DELTA + BUTTON_WIDTH + 2 * BUTTON_Y, C_HEIGHT),
-        );
-        container1.x = container.x + BUTTON_X_DELTA * 1 - 18;
-        container1.y = container.y - C_HEIGHT - 10;
-        container1.zIndex = 1300;
-        container1.visible = !ws.isSpectator();
-        container1.addChild(buttons.moveShip);
-        canvas.app.stage.addChild(container1);
+        seafarersShipContainer.addChild(buttons.moveShip);
         buttons.moveShip.tooltip = new windows.TooltipHandler(
             buttons.moveShip,
             "Move one open-ended ship before rolling dice",
@@ -946,8 +980,7 @@ export function render(commandHub: CommandHub) {
 
     // End Turn
     {
-        const endTurnSlot =
-            state.settings.Mode == state.GameMode.Seafarers ? 5 : 4;
+        const endTurnSlot = 4;
         buttons.endTurn = getButtonSprite(
             ButtonType.EndTurn,
             BUTTON_WIDTH,

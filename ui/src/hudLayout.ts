@@ -135,6 +135,7 @@ type HandPositionInput = {
 
 export function computeHandWidth(canvasWidth: number) {
     const rightRailX = getRightRailX(canvasWidth);
+    // Reserve space for the action bar and timer lane.
     const actionBarWidth =
         HUD_LAYOUT_PRESET.actionBarInnerOffset +
         HUD_LAYOUT_PRESET.actionBarButtonSpacing * 5;

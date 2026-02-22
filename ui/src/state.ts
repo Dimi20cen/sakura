@@ -382,12 +382,19 @@ export function renderGameState(gs: GameState, commandHub: CommandHub) {
                 assets.ICON.ROAD,
                 "Length of the longest road of this player",
             );
+            const knightTooltip =
+                settings.Mode == GameMode.CitiesAndKnights
+                    ? "Active number of Warriors with allegiance to this player"
+                    : "Number of played Knight cards (Largest Army progress)";
             spriteset.knights = createText(
                 baseX + 190,
                 40,
                 assets.ICON.KNIGHT,
-                "Active number of Warriors with allegiance to this player",
+                knightTooltip,
             );
+            const showKnightStat = settings.Mode != GameMode.Seafarers;
+            spriteset.knights.img.visible = showKnightStat;
+            spriteset.knights.text.visible = showKnightStat;
             spriteset.cards = createText(
                 baseX + 72,
                 66,
@@ -443,7 +450,15 @@ export function renderGameState(gs: GameState, commandHub: CommandHub) {
         const p = players[state.Order];
         p.victoryPoint.text.text = `${vp}`;
         p.road.text.text = `${state.LongestRoad}`;
-        p.knights.text.text = `${state.Knights}`;
+        if (settings.Mode == GameMode.Seafarers) {
+            p.knights.text.text = "";
+            p.knights.img.visible = false;
+            p.knights.text.visible = false;
+        } else {
+            p.knights.text.text = `${state.Knights}`;
+            p.knights.img.visible = true;
+            p.knights.text.visible = true;
+        }
         p.cards.text.text = `${state.NumCards}`;
         p.dcard.text.text = `${state.NumDevelopmentCards}`;
         p.bg.visible = state.Current;

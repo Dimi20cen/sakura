@@ -18,8 +18,6 @@ let eventDiceSprite: PIXI.Sprite;
 let eventDiceInner: PIXI.Sprite;
 let diceContainer: PIXI.Container;
 
-let stopFlashTimer: number = 0;
-
 function updateDicePosition() {
     if (!diceContainer || diceContainer.destroyed) {
         return;
@@ -74,7 +72,6 @@ function getBorder(s: number) {
  */
 function rollDice() {
     setFlashing(false);
-    stopFlashTimer = window.setTimeout(() => setFlashing(true), 2000);
     getCommandHub().rollDice();
 }
 
@@ -169,12 +166,11 @@ let flashing = false;
  * @param flash True to flash the dice, false to stop flashing
  */
 export function setFlashing(flash: boolean) {
-    redDiceInner.interactive = flash;
-
-    if (stopFlashTimer) {
-        window.clearTimeout(stopFlashTimer);
-        stopFlashTimer = 0;
+    if (!redDiceInner || !whiteDiceInner) {
+        return;
     }
+
+    redDiceInner.interactive = flash;
 
     if (flash) {
         if (!flashing) {

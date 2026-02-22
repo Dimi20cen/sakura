@@ -16,12 +16,14 @@ func (g *Game) CanBuildImprovement(p *entities.Player, ct entities.CardType) err
 		return errors.New("no such improvement")
 	}
 
-	haveQ := p.CurrentHand.GetCardDeck(ct).Quantity
-	if p.UsingDevCard == entities.ProgressPaperCrane {
-		haveQ++
-	}
-	if haveQ <= int16(p.Improvements[int(ct)]) {
-		return errors.New("not enough commodity cards")
+	if !g.IsCreativeMode() {
+		haveQ := p.CurrentHand.GetCardDeck(ct).Quantity
+		if p.UsingDevCard == entities.ProgressPaperCrane {
+			haveQ++
+		}
+		if haveQ <= int16(p.Improvements[int(ct)]) {
+			return errors.New("not enough commodity cards")
+		}
 	}
 
 	if p.Improvements[int(ct)] >= 5 {
@@ -80,7 +82,9 @@ func (g *Game) BuildCityImprovement(p *entities.Player, ct entities.CardType) er
 	if p.UsingDevCard == entities.ProgressPaperCrane {
 		quantity--
 	}
-	g.MoveCards(int(p.Order), -1, ct, quantity, true, false)
+	if !g.IsCreativeMode() {
+		g.MoveCards(int(p.Order), -1, ct, quantity, true, false)
+	}
 	p.Improvements[int(ct)] += 1
 
 	g.j.WCityImprove(p, ct, p.Improvements[int(ct)])

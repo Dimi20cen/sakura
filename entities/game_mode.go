@@ -29,6 +29,7 @@ type GameSettings struct {
 	SpecialBuild  bool
 	MaxPlayers    int
 	EnableKarma   bool
+	CreativeMode  bool
 	Speed         string
 	Advanced      bool
 	MapDefn       *MapDefinition `json:"-" msgpack:"-"`

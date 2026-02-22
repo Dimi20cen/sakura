@@ -24,6 +24,7 @@ export const getInitialLobbyState = (): LobbyState => ({
         SpecialBuild: false,
         MaxPlayers: 4,
         EnableKarma: true,
+        CreativeMode: false,
         Speed: "normal",
         Advanced: false,
     },

@@ -318,6 +318,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
 
                             <div className="flex flex-col lg:flex-row mb-4 md:mb-0">
                                 {getCheckBox("Enable Karma", "EnableKarma")}
+                                {getCheckBox("Creative Mode", "CreativeMode")}
                                 {getCheckBox("Advanced", "Advanced")}
                             </div>
 

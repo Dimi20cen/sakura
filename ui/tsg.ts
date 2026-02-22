@@ -9,6 +9,7 @@ VictoryPoints: number;
 SpecialBuild: boolean;
 MaxPlayers: number;
 EnableKarma: boolean;
+CreativeMode: boolean;
 Speed: string;
 Advanced: boolean;
 }
@@ -22,6 +23,7 @@ public VictoryPoints: number;
 public SpecialBuild: boolean;
 public MaxPlayers: number;
 public EnableKarma: boolean;
+public CreativeMode: boolean;
 public Speed: string;
 public Advanced: boolean;
 
@@ -34,6 +36,7 @@ this.VictoryPoints = input.VictoryPoints;
 this.SpecialBuild = input.SpecialBuild;
 this.MaxPlayers = input.MaxPlayers;
 this.EnableKarma = input.EnableKarma;
+this.CreativeMode = input.CreativeMode;
 this.Speed = input.Speed;
 this.Advanced = input.Advanced;
 }
@@ -48,6 +51,7 @@ out.VictoryPoints = this.VictoryPoints;
 out.SpecialBuild = this.SpecialBuild;
 out.MaxPlayers = this.MaxPlayers;
 out.EnableKarma = this.EnableKarma;
+out.CreativeMode = this.CreativeMode;
 out.Speed = this.Speed;
 out.Advanced = this.Advanced;
 return out; }

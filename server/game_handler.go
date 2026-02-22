@@ -26,7 +26,7 @@ func (ws *WsClient) handleGame(msg map[string]interface{}) {
 		switch msg["o"] { // Object type
 		case "s": // Settlement
 			vertices := ws.Player.GetBuildLocationsSettlement(ws.Hub.Game.Graph, false, false)
-			if len(vertices) == 0 || ws.Player.CanBuild(entities.BTSettlement) != nil {
+			if len(vertices) == 0 || (!ws.Hub.Game.IsCreativeMode() && ws.Player.CanBuild(entities.BTSettlement) != nil) {
 				ws.Hub.Game.SendError(errors.New("nowhere to build or cannot build"), ws.Player)
 				return
 			}
@@ -58,7 +58,7 @@ func (ws *WsClient) handleGame(msg map[string]interface{}) {
 
 		case "c": // City
 			vertices := ws.Player.GetBuildLocationsCity(ws.Hub.Game.Graph)
-			if len(vertices) == 0 || ws.Player.CanBuild(entities.BTCity) != nil {
+			if len(vertices) == 0 || (!ws.Hub.Game.IsCreativeMode() && ws.Player.CanBuild(entities.BTCity) != nil) {
 				ws.Hub.Game.SendError(errors.New("nowhere to build or cannot build"), ws.Player)
 				return
 			}
@@ -89,7 +89,7 @@ func (ws *WsClient) handleGame(msg map[string]interface{}) {
 
 		case "r": // Road
 			edges := ws.Player.GetBuildLocationsRoad(ws.Hub.Game.Graph, false)
-			if len(edges) == 0 || ws.Player.CanBuild(entities.BTRoad) != nil {
+			if len(edges) == 0 || (!ws.Hub.Game.IsCreativeMode() && ws.Player.CanBuild(entities.BTRoad) != nil) {
 				ws.Hub.Game.SendError(errors.New("nowhere to build or cannot build"), ws.Player)
 				return
 			}
@@ -137,7 +137,8 @@ func (ws *WsClient) handleGame(msg map[string]interface{}) {
 
 			vertices := ws.Player.GetBuildLocationsKnight(ws.Hub.Game.Graph, true)
 			if len(vertices) == 0 ||
-				(ws.Player.CanBuild(entities.BTKnight1) != nil &&
+				(!ws.Hub.Game.IsCreativeMode() &&
+					ws.Player.CanBuild(entities.BTKnight1) != nil &&
 					ws.Player.CanBuild(entities.BTKnight2) != nil &&
 					ws.Player.CanBuild(entities.BTKnight3) != nil) {
 
@@ -252,7 +253,7 @@ func (ws *WsClient) handleGame(msg map[string]interface{}) {
 			}
 
 			vertices := ws.Player.GetBuildLocationsWall(ws.Hub.Game.Graph)
-			if len(vertices) == 0 || ws.Player.CanBuild(entities.BTWall) != nil {
+			if len(vertices) == 0 || (!ws.Hub.Game.IsCreativeMode() && ws.Player.CanBuild(entities.BTWall) != nil) {
 				ws.Hub.Game.SendError(errors.New("nowhere to build or cannot build"), ws.Player)
 				return
 			}
@@ -287,7 +288,7 @@ func (ws *WsClient) handleGame(msg map[string]interface{}) {
 			}
 
 			edges := ws.Player.GetBuildLocationsShip(ws.Hub.Game.Graph)
-			if len(edges) == 0 || ws.Player.CanBuild(entities.BTShip) != nil {
+			if len(edges) == 0 || (!ws.Hub.Game.IsCreativeMode() && ws.Player.CanBuild(entities.BTShip) != nil) {
 				ws.Hub.Game.SendError(errors.New("nowhere to build or cannot build"), ws.Player)
 				return
 			}

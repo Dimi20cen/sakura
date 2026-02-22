@@ -177,7 +177,7 @@ func (ws *WsClient) handleLobby(msg map[string]interface{}) {
 		}
 
 		numPlayers := atomic.LoadInt32(&ws.Hub.NumClients)
-		if numPlayers < 2 {
+		if numPlayers < 2 && !ws.Hub.Game.Settings.CreativeMode {
 			log.Println("not enough players to start game")
 			ws.sendLobbyMessage(&entities.Message{
 				Type: entities.MessageTypeError,

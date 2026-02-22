@@ -59,6 +59,7 @@ func (s *Server) NewWsHub(id string) *WsHub {
 				VictoryPoints: 10,
 				MaxPlayers:    4,
 				EnableKarma:   true,
+				CreativeMode:  false,
 				Speed:         entities.NormalSpeed,
 				Advanced:      false,
 			},

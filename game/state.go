@@ -93,20 +93,29 @@ func (g *Game) GetPlayerSecretState(p *entities.Player) entities.PlayerSecretSta
 	busy := commonBusy || g.DiceState == 0
 
 	actions := entities.AllowedActionsMap{
-		BuildSettlement:    !busy && p.CanBuild(entities.BTSettlement) == nil && len(p.GetBuildLocationsSettlement(g.Graph, false, false)) > 0,
-		BuildCity:          !busy && p.CanBuild(entities.BTCity) == nil && len(p.GetBuildLocationsCity(g.Graph)) > 0,
-		BuildRoad:          !busy && p.CanBuild(entities.BTRoad) == nil && len(p.GetBuildLocationsRoad(g.Graph, false)) > 0,
-		BuildShip:          !busy && p.CanBuild(entities.BTShip) == nil && len(p.GetBuildLocationsShip(g.Graph)) > 0,
-		MoveShip:           !commonBusy && g.DiceState == 0 && g.Mode == entities.Seafarers && !p.ShipMoved && len(g.GetMovableShips(p)) > 0,
-		BuyDevelopmentCard: !busy && p.CanBuyDevelopmentCard(),
-		Trade:              !busy && !g.SpecialBuildPhase,
-		EndTurn:            !busy && g.CanEndTurn() == nil,
+		BuildSettlement: !busy && g.ensureCanBuild(p, entities.BTSettlement) == nil &&
+			len(p.GetBuildLocationsSettlement(g.Graph, false, false)) > 0,
+		BuildCity: !busy && g.ensureCanBuild(p, entities.BTCity) == nil &&
+			len(p.GetBuildLocationsCity(g.Graph)) > 0,
+		BuildRoad: !busy && g.ensureCanBuild(p, entities.BTRoad) == nil &&
+			len(p.GetBuildLocationsRoad(g.Graph, false)) > 0,
+		BuildShip: !busy && g.ensureCanBuild(p, entities.BTShip) == nil &&
+			len(p.GetBuildLocationsShip(g.Graph)) > 0,
+		MoveShip: !commonBusy && g.DiceState == 0 && g.Mode == entities.Seafarers &&
+			!p.ShipMoved && len(g.GetMovableShips(p)) > 0,
+		BuyDevelopmentCard: !busy &&
+			(g.IsCreativeMode() || p.CanBuyDevelopmentCard()),
+		Trade:   !busy && !g.SpecialBuildPhase,
+		EndTurn: !busy && g.CanEndTurn() == nil,
 
-		BuildKnight:    !busy && (p.CanBuild(entities.BTKnight1) == nil || p.CanBuild(entities.BTKnight2) == nil || p.CanBuild(entities.BTKnight3) == nil),
-		ActivateKnight: !busy && p.CurrentHand.HasResources(0, 0, 0, 1, 0) && len(p.GetActivateLocationsKnight(g.Graph)) > 0,
-		RobberKnight:   !busy && !g.SpecialBuildPhase && g.KnightChaseRobber(p, true) == nil,
-		MoveKnight:     !busy && !g.SpecialBuildPhase && g.KnightMove(p, true) == nil,
-		BuildWall:      !busy && p.CanBuild(entities.BTWall) == nil && len(p.GetBuildLocationsWall(g.Graph)) > 0,
+		BuildKnight: !busy && (g.ensureCanBuild(p, entities.BTKnight1) == nil ||
+			g.ensureCanBuild(p, entities.BTKnight2) == nil ||
+			g.ensureCanBuild(p, entities.BTKnight3) == nil),
+		ActivateKnight: !busy && (g.IsCreativeMode() || p.CurrentHand.HasResources(0, 0, 0, 1, 0)) &&
+			len(p.GetActivateLocationsKnight(g.Graph)) > 0,
+		RobberKnight: !busy && !g.SpecialBuildPhase && g.KnightChaseRobber(p, true) == nil,
+		MoveKnight:   !busy && !g.SpecialBuildPhase && g.KnightMove(p, true) == nil,
+		BuildWall:    !busy && g.ensureCanBuild(p, entities.BTWall) == nil && len(p.GetBuildLocationsWall(g.Graph)) > 0,
 
 		ImprovePaper: p.ChoosingProgressCard || (!busy || p.UsingDevCard == entities.ProgressPaperCrane) && (g.CanBuildImprovement(p, entities.CardTypePaper) == nil),
 		ImproveCloth: p.ChoosingProgressCard || (!busy || p.UsingDevCard == entities.ProgressPaperCrane) && (g.CanBuildImprovement(p, entities.CardTypeCloth) == nil),

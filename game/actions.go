@@ -10,6 +10,22 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
+func (g *Game) IsCreativeMode() bool {
+	return g.Settings.CreativeMode
+}
+
+func (g *Game) ensureCanBuild(player *entities.Player, t entities.BuildableType) error {
+	if !g.IsCreativeMode() {
+		return player.CanBuild(t)
+	}
+
+	left, ok := player.BuildablesLeft[t]
+	if !ok || left <= 0 {
+		return errors.New("not enough pieces left to build")
+	}
+	return nil
+}
+
 // Checks if the player is current and no other players have pending actions
 func (g *Game) EnsureCurrentPlayer(player *entities.Player) error {
 	if player != g.CurrentPlayer {
@@ -46,7 +62,7 @@ func (g *Game) BuildSettlement(player *entities.Player, coordinates entities.Coo
 		return err
 	}
 
-	if err := player.CanBuild(entities.BTSettlement); !init && err != nil {
+	if err := g.ensureCanBuild(player, entities.BTSettlement); !init && err != nil {
 		return err
 	}
 
@@ -63,7 +79,7 @@ func (g *Game) BuildSettlement(player *entities.Player, coordinates entities.Coo
 		return errors.New("cannot build settlement here")
 	}
 
-	if !init {
+	if !init && !g.IsCreativeMode() {
 		g.MoveCards(int(player.Order), -1, entities.CardTypeWood, 1, false, false)
 		g.MoveCards(int(player.Order), -1, entities.CardTypeBrick, 1, false, false)
 		g.MoveCards(int(player.Order), -1, entities.CardTypeWool, 1, false, false)
@@ -105,7 +121,7 @@ func (g *Game) BuildCity(player *entities.Player, coordinates entities.Coordinat
 		return err
 	}
 
-	if err := player.CanBuild(entities.BTCity); !init && err != nil {
+	if err := g.ensureCanBuild(player, entities.BTCity); !init && err != nil {
 		return err
 	}
 
@@ -130,7 +146,7 @@ func (g *Game) BuildCity(player *entities.Player, coordinates entities.Coordinat
 		return errors.New("cannot build city here")
 	}
 
-	if !init {
+	if !init && !g.IsCreativeMode() {
 		g.MoveCards(int(player.Order), -1, entities.CardTypeOre, 3, false, false)
 		g.MoveCards(int(player.Order), -1, entities.CardTypeWheat, 2, false, false)
 	}
@@ -175,7 +191,7 @@ func (g *Game) BuildRoad(player *entities.Player, c entities.EdgeCoordinate) err
 		return err
 	}
 
-	if err := player.CanBuild(entities.BTRoad); !init && err != nil {
+	if err := g.ensureCanBuild(player, entities.BTRoad); !init && err != nil {
 		return err
 	}
 
@@ -192,7 +208,7 @@ func (g *Game) BuildRoad(player *entities.Player, c entities.EdgeCoordinate) err
 		return errors.New("cannot build road here")
 	}
 
-	if !init {
+	if !init && !g.IsCreativeMode() {
 		g.MoveCards(int(player.Order), -1, entities.CardTypeWood, 1, false, false)
 		g.MoveCards(int(player.Order), -1, entities.CardTypeBrick, 1, false, false)
 	}
@@ -291,7 +307,7 @@ func (g *Game) BuildShip(player *entities.Player, c entities.EdgeCoordinate) err
 		return err
 	}
 
-	if err := player.CanBuild(entities.BTShip); !init && err != nil {
+	if err := g.ensureCanBuild(player, entities.BTShip); !init && err != nil {
 		return err
 	}
 
@@ -319,8 +335,10 @@ func (g *Game) BuildShip(player *entities.Player, c entities.EdgeCoordinate) err
 		return errors.New("pirate blocks this edge")
 	}
 
-	g.MoveCards(int(player.Order), -1, entities.CardTypeWood, 1, false, false)
-	g.MoveCards(int(player.Order), -1, entities.CardTypeWool, 1, false, false)
+	if !g.IsCreativeMode() {
+		g.MoveCards(int(player.Order), -1, entities.CardTypeWood, 1, false, false)
+		g.MoveCards(int(player.Order), -1, entities.CardTypeWool, 1, false, false)
+	}
 
 	err = player.BuildAtEdge(e, entities.BTShip)
 	if err != nil {
@@ -561,13 +579,15 @@ func (g *Game) BuyDevelopmentCard(player *entities.Player) error {
 		return err
 	}
 
-	if !player.CanBuyDevelopmentCard() || g.Bank.DevelopmentCardCursor >= len(g.Bank.DevelopmentCardOrder[0]) {
+	if (!g.IsCreativeMode() && !player.CanBuyDevelopmentCard()) || g.Bank.DevelopmentCardCursor >= len(g.Bank.DevelopmentCardOrder[0]) {
 		return errors.New("cannot buy development card")
 	}
 
-	g.MoveCards(int(player.Order), -1, entities.CardTypeWool, 1, true, false)
-	g.MoveCards(int(player.Order), -1, entities.CardTypeWheat, 1, true, false)
-	g.MoveCards(int(player.Order), -1, entities.CardTypeOre, 1, true, false)
+	if !g.IsCreativeMode() {
+		g.MoveCards(int(player.Order), -1, entities.CardTypeWool, 1, true, false)
+		g.MoveCards(int(player.Order), -1, entities.CardTypeWheat, 1, true, false)
+		g.MoveCards(int(player.Order), -1, entities.CardTypeOre, 1, true, false)
+	}
 
 	developmentCardType := g.Bank.DevelopmentCardOrder[0][g.Bank.DevelopmentCardCursor]
 	g.Bank.DevelopmentCardCursor++
@@ -611,7 +631,7 @@ func (g *Game) BuildKnight(player *entities.Player, coordinates entities.Coordin
 		}
 	}
 
-	if err := player.CanBuild(knightType); err != nil {
+	if err := g.ensureCanBuild(player, knightType); err != nil {
 		return err
 	}
 
@@ -628,8 +648,10 @@ func (g *Game) BuildKnight(player *entities.Player, coordinates entities.Coordin
 		return errors.New("cannot build warrior here")
 	}
 
-	g.MoveCards(int(player.Order), -1, entities.CardTypeWool, 1, false, false)
-	g.MoveCards(int(player.Order), -1, entities.CardTypeOre, 1, false, false)
+	if !g.IsCreativeMode() {
+		g.MoveCards(int(player.Order), -1, entities.CardTypeWool, 1, false, false)
+		g.MoveCards(int(player.Order), -1, entities.CardTypeOre, 1, false, false)
+	}
 
 	isActivated := false
 	if vertex.Placement != nil {
@@ -693,11 +715,13 @@ func (g *Game) ActivateKnight(player *entities.Player, coordinates entities.Coor
 		return errors.New("cannot activate warrior here")
 	}
 
-	if !player.CurrentHand.HasResources(0, 0, 0, 1, 0) {
+	if !g.IsCreativeMode() && !player.CurrentHand.HasResources(0, 0, 0, 1, 0) {
 		return errors.New("not enough resources")
 	}
 
-	g.MoveCards(int(player.Order), -1, entities.CardTypeWheat, 1, true, false)
+	if !g.IsCreativeMode() {
+		g.MoveCards(int(player.Order), -1, entities.CardTypeWheat, 1, true, false)
+	}
 
 	g.setKnightActive(vertex, true, false)
 	g.SendPlayerSecret(player)
@@ -732,7 +756,7 @@ func (g *Game) BuildWall(player *entities.Player, coordinates entities.Coordinat
 		return err
 	}
 
-	if err := player.CanBuild(entities.BTWall); err != nil {
+	if err := g.ensureCanBuild(player, entities.BTWall); err != nil {
 		return err
 	}
 
@@ -754,7 +778,9 @@ func (g *Game) BuildWall(player *entities.Player, coordinates entities.Coordinat
 		return errors.New("cannot build fence here")
 	}
 
-	g.MoveCards(int(player.Order), -1, entities.CardTypeBrick, 2, false, false)
+	if !g.IsCreativeMode() {
+		g.MoveCards(int(player.Order), -1, entities.CardTypeBrick, 2, false, false)
+	}
 	player.BuildablesLeft[entities.BTWall]--
 	vertex.Placement.(*entities.City).Wall = true
 	g.j.WBuildWall(player, vertex)

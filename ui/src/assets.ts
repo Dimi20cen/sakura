@@ -27,8 +27,13 @@ export function assignTexture(
     s: StaticImageData,
     done?: () => void,
 ) {
+    const spriteAlive = () => !sprite.destroyed;
+
     // Helper to set texture
     const setTexture = (tex: PIXI.Texture) => {
+        if (!spriteAlive()) {
+            return;
+        }
         sprite.texture = tex;
         canvas.app.markDirty();
         let node: PIXI.Container = sprite;
@@ -50,7 +55,12 @@ export function assignTexture(
     const g = new PIXI.Graphics();
     g.beginFill(0xffffff, 0.1);
     g.drawRect(0, 0, s.width, s.height);
+    if (!spriteAlive()) {
+        g.destroy();
+        return;
+    }
     sprite.texture = canvas.app.generateRenderTexture(g);
+    g.destroy();
 
     let fullLoaded = false;
     if (s.blurDataURL?.startsWith("data:")) {
@@ -58,14 +68,14 @@ export function assignTexture(
             width: s.width,
             height: s.height,
         }).then((tex) => {
-            if (!fullLoaded) {
+            if (!fullLoaded && spriteAlive()) {
                 sprite.texture = tex;
                 canvas.app.markDirty();
             }
         });
     }
 
-    // Requet texture
+    // Request texture
     getTexture(s).then((tex) => {
         fullLoaded = true;
         setTexture(tex);

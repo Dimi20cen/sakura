@@ -59,6 +59,9 @@ const lobbySlice = createSlice({
     name: "lobby",
     initialState: getInitialLobbyState(),
     reducers: {
+        resetLobbyState() {
+            return getInitialLobbyState();
+        },
         setSettings(state, action: PayloadAction<IGameSettings>) {
             state.settings = action.payload;
         },
@@ -120,5 +123,6 @@ const lobbySlice = createSlice({
     },
 });
 
-export const { setSettings, setAdvanced, applyWsMessage } = lobbySlice.actions;
+export const { resetLobbyState, setSettings, setAdvanced, applyWsMessage } =
+    lobbySlice.actions;
 export default lobbySlice.reducer;

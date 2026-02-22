@@ -7,7 +7,7 @@ import { useAppDispatch, useAppSelector } from "../src/store/hooks";
 import { SOCKET_STATE } from "../src/sock";
 import { createLobbyCommands } from "../src/commands/index";
 import { setServer, setSocketState } from "../src/store/connectionSlice";
-import { applyWsMessage } from "../src/store/lobbySlice";
+import { applyWsMessage, resetLobbyState } from "../src/store/lobbySlice";
 
 export function useLobbySession(gameId: string | undefined) {
     const [token] = useAnonymousAuth();
@@ -18,6 +18,10 @@ export function useLobbySession(gameId: string | undefined) {
     const socketState = useAppSelector((state) => state.connection.socketState);
 
     const transportRef = useRef<TransportClient | null>(null);
+
+    useEffect(() => {
+        dispatch(resetLobbyState());
+    }, [dispatch, gameId]);
 
     useEffect(() => {
         dispatch(setServer({ gameExists, gameServer }));

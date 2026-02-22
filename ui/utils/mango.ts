@@ -181,8 +181,10 @@ export const setMap = async (name: string, user: string, map: any) => {
             throw new Error("Map is too large");
         }
 
-        const maps = await mapsList(user);
-        if (!existingMap && maps.length >= 20) {
+        validateMapPayload(name, map);
+
+        const userMapCount = await collection.countDocuments({ creator: user });
+        if (!existingMap && userMapCount >= 20) {
             throw new Error("You have too many maps");
         }
 
@@ -198,6 +200,103 @@ export const setMap = async (name: string, user: string, map: any) => {
             { upsert: true },
         );
     }
+};
+
+const isInt = (v: unknown): v is number =>
+    typeof v === "number" && Number.isInteger(v);
+
+const isBool = (v: unknown): v is boolean => typeof v === "boolean";
+
+const validTileType = (t: number) =>
+    t === 0 || t === 1 || t === 2 || t === 3 || t === 4 || t === 5 || t === 6 || t === 8 || t === 9 || t === 21;
+
+const validRandomTileType = (t: number) =>
+    t === 0 || t === 1 || t === 2 || t === 3 || t === 4 || t === 5 || t === 21;
+
+const validPortType = (p: number) => p >= 1 && p <= 6;
+
+const validateMapPayload = (name: string, map: any) => {
+    if (!map || typeof map !== "object") {
+        throw new Error("Invalid map payload");
+    }
+
+    if (typeof name !== "string" || name.trim().length === 0) {
+        throw new Error("Map name cannot be empty");
+    }
+
+    if (!Array.isArray(map.map) || map.map.length === 0) {
+        throw new Error("Map must include at least one row");
+    }
+
+    const totalTiles = map.map.reduce((acc: number, row: unknown) => {
+        if (!Array.isArray(row) || row.length === 0) {
+            throw new Error("Map rows must be non-empty arrays");
+        }
+
+        row.forEach((tile) => {
+            if (!isInt(tile) || !validTileType(tile)) {
+                throw new Error("Map contains invalid tile type");
+            }
+        });
+
+        return acc + row.length;
+    }, 0);
+
+    if (totalTiles < 5) {
+        throw new Error("Map must include at least 5 tiles");
+    }
+
+    if (!Array.isArray(map.order) || map.order.length !== map.map.length) {
+        throw new Error("Map row offsets are invalid");
+    }
+    if (!map.order.every((v: unknown) => isBool(v))) {
+        throw new Error("Map row offsets are invalid");
+    }
+
+    if (!Array.isArray(map.numbers)) {
+        throw new Error("Map numbers are invalid");
+    }
+    map.numbers.forEach((n: unknown) => {
+        if (!isInt(n) || n < 2 || n > 12 || n === 7) {
+            throw new Error("Map numbers are invalid");
+        }
+    });
+
+    if (!Array.isArray(map.tiles)) {
+        throw new Error("Map random tiles are invalid");
+    }
+    map.tiles.forEach((t: unknown) => {
+        if (!isInt(t) || !validRandomTileType(t)) {
+            throw new Error("Map random tiles are invalid");
+        }
+    });
+
+    if (!Array.isArray(map.ports)) {
+        throw new Error("Map ports are invalid");
+    }
+    map.ports.forEach((p: unknown) => {
+        if (!isInt(p) || !validPortType(p)) {
+            throw new Error("Map ports are invalid");
+        }
+    });
+
+    if (!Array.isArray(map.port_coordinates)) {
+        throw new Error("Map port coordinates are invalid");
+    }
+
+    map.port_coordinates.forEach((edge: any) => {
+        if (
+            !edge ||
+            !edge.C1 ||
+            !edge.C2 ||
+            !isInt(edge.C1.X) ||
+            !isInt(edge.C1.Y) ||
+            !isInt(edge.C2.X) ||
+            !isInt(edge.C2.Y)
+        ) {
+            throw new Error("Map port coordinates are invalid");
+        }
+    });
 };
 
 export const getGame = async (gameId: string) => {

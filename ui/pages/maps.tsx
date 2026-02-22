@@ -293,21 +293,34 @@ const Index: NextPage = () => {
     };
 
     const addRow = () => {
-        map.map.push(new Array(map.map[0].length).fill(TileType.None));
+        const colCount =
+            map.map.length > 0 && map.map[0].length > 0 ? map.map[0].length : 1;
+        map.map.push(new Array(colCount).fill(TileType.None));
         setMap({ ...map });
     };
 
     const addCol = () => {
+        if (map.map.length === 0) {
+            map.map.push([TileType.None]);
+            setMap({ ...map });
+            return;
+        }
         map.map.forEach((row) => row.push(TileType.None));
         setMap({ ...map });
     };
 
     const delRow = () => {
+        if (map.map.length <= 1) {
+            return;
+        }
         map.map.pop();
         setMap({ ...map });
     };
 
     const delCol = () => {
+        if (map.map.every((row) => row.length <= 1)) {
+            return;
+        }
         map.map.forEach((row) => row.pop());
         setMap({ ...map });
     };
@@ -784,6 +797,7 @@ const Index: NextPage = () => {
                                 <button
                                     className="ui-button ui-button-ghost max-w-[180px] mr-2 mb-2"
                                     onClick={delRow}
+                                    disabled={map.map.length <= 1}
                                 >
                                     Delete Row
                                 </button>
@@ -797,6 +811,7 @@ const Index: NextPage = () => {
                                 <button
                                     className="ui-button ui-button-ghost max-w-[180px] mr-2 mb-2"
                                     onClick={delCol}
+                                    disabled={map.map.every((row) => row.length <= 1)}
                                 >
                                     Delete Column
                                 </button>

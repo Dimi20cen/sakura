@@ -65,6 +65,10 @@ func generateMapInner(g *Game, defn *entities.MapDefinition) error {
 		}
 	}
 
+	if len(defn.Order) != len(defn.Map) {
+		return errors.New("invalid map row offsets")
+	}
+
 	startX, startY, odd := 2, 3, true
 	dispStartX := 3.0
 

@@ -79,6 +79,7 @@ type (
 		Key             string `json:"key,omitempty"`
 		Title           string `json:"title,omitempty"`
 		Placeholder     bool   `json:"placeholder,omitempty"`
+		VictoryPoints   int    `json:"victory_points,omitempty"`
 		VictoryRuleText string `json:"victory_rule_text,omitempty"`
 	}
 )

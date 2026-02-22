@@ -268,7 +268,8 @@ func (g *Game) CheckForVictory() {
 		return
 	}
 
-	if g.GetVictoryPoints(g.CurrentPlayer, false) >= g.Settings.VictoryPoints {
+	winner := g.getScenarioVictoryWinner()
+	if winner != nil {
 		firstCheck := !g.GameOver
 		g.GameOver = true
 		g.SetExtraVictoryPoints()
@@ -280,7 +281,7 @@ func (g *Game) CheckForVictory() {
 
 		message := entities.GameOverMessage{
 			Players: make([]*entities.PlayerState, 0),
-			Winner:  g.CurrentPlayer.Order,
+			Winner:  winner.Order,
 		}
 
 		for _, p := range g.Players {
@@ -319,7 +320,7 @@ func (g *Game) CheckForVictory() {
 
 		gameState := g.GenerateStoreGameState()
 		if gameState != nil {
-			gameState.Winner = int(g.CurrentPlayer.Order)
+			gameState.Winner = int(winner.Order)
 			serialized, err := msgpack.Marshal(gameState)
 			if err != nil {
 				log.Println("error serializing game: ", err)

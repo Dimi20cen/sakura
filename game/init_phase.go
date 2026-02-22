@@ -41,6 +41,7 @@ func (g *Game) startInitPhase() {
 				AllowedVertices = append(AllowedVertices, v)
 			}
 		}
+		AllowedVertices = g.applyInitVertexScenarioHooks(p, AllowedVertices)
 		if len(AllowedVertices) == 0 {
 			return
 		}
@@ -147,6 +148,7 @@ func (g *Game) startInitPhase() {
 				}
 			}
 		}
+		AllowedEdges = g.applyInitEdgeScenarioHooks(p, AllowedEdges)
 		if len(AllowedEdges) == 0 {
 			return
 		}
@@ -212,6 +214,7 @@ func (g *Game) startInitPhase() {
 
 	g.resetTimeLeft()
 	g.CurrentPlayer.TimeLeft = g.TimerVals.DiceRoll
+	g.onScenarioTurnStart(g.CurrentPlayer)
 
 	g.InitPhase = false
 	g.j.WSetInitPhase(g.InitPhase)

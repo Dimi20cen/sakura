@@ -77,6 +77,7 @@ func (g *Game) RollDiceWith(redRoll int, whiteRoll int) (*entities.DieRollState,
 	g.j.WRollDice(redRoll, whiteRoll)
 
 	roll := redRoll + whiteRoll
+	g.onScenarioDiceRolled(roll)
 	dieRollState := &entities.DieRollState{RedRoll: redRoll, WhiteRoll: whiteRoll}
 	dieRollState.PlayerHandDeltas = make([]*entities.Hand, 0)
 

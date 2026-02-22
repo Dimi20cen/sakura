@@ -62,7 +62,8 @@ type (
 		OfferCounter  int
 		CurrentOffers []*entities.TradeOffer
 
-		DiceStats *entities.DiceStats
+		DiceStats     *entities.DiceStats
+		ScenarioHooks ScenarioHookSet
 
 		mutex       sync.Mutex
 		ActionMutex sync.Mutex
@@ -194,6 +195,7 @@ func (game *Game) Initialize(id string, numPlayers uint16) (*Game, error) {
 	if game.Settings.MapDefn == nil {
 		game.Settings.MapDefn = maps.GetBaseMap()
 	}
+	game.configureScenarioHooks()
 
 	// Initialize graph
 	err := generateNewMap(game)

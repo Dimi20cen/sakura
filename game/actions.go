@@ -1217,6 +1217,7 @@ func (g *Game) EndTurn(player *entities.Player) error {
 		g.EndTurnResetDevelopmentCards()
 		g.CurrentPlayer.ResetTurnState()
 		g.CurrentPlayer.TimeLeft = g.TimerVals.DiceRoll
+		g.onScenarioTurnStart(g.CurrentPlayer)
 	} else {
 		g.CurrentPlayer.TimeLeft = g.TimerVals.SpecialBuild
 	}

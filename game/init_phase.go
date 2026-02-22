@@ -46,7 +46,7 @@ func (g *Game) startInitPhase() {
 			return
 		}
 
-		exp, err := g.BlockForAction(p, g.TimerVals.InitVert, &entities.PlayerAction{
+		exp, err := g.BlockForAction(p, g.TimerVals.SettlementPlacement, &entities.PlayerAction{
 			Type:    entities.PlayerActionTypeChooseVertex,
 			Message: "Choose location for settlement",
 			Data: &entities.PlayerActionChooseVertex{
@@ -94,7 +94,7 @@ func (g *Game) startInitPhase() {
 						continue
 					}
 
-					expGold, errGold := g.BlockForAction(p, g.TimerVals.InitVert, &entities.PlayerAction{
+					expGold, errGold := g.BlockForAction(p, g.TimerVals.SettlementPlacement, &entities.PlayerAction{
 						Type:    entities.PlayerActionTypeSelectCards,
 						Message: "Choose a resource for starting gold",
 						Data: entities.PlayerActionSelectCards{
@@ -157,7 +157,7 @@ func (g *Game) startInitPhase() {
 		if g.Mode == entities.Seafarers {
 			msg = "Choose location for road/ship"
 		}
-		exp, err := g.BlockForAction(p, g.TimerVals.InitEdge, &entities.PlayerAction{
+		exp, err := g.BlockForAction(p, g.TimerVals.RoadPlacement, &entities.PlayerAction{
 			Type:    entities.PlayerActionTypeChooseEdge,
 			Message: msg,
 			Data: &entities.PlayerActionChooseEdge{
@@ -213,7 +213,7 @@ func (g *Game) startInitPhase() {
 	}
 
 	g.resetTimeLeft()
-	g.setCurrentPlayerTimeLeft(g.TimerVals.DiceRoll)
+	g.setCurrentPlayerTimeLeft(g.TimerVals.Dice)
 	g.onScenarioTurnStart(g.CurrentPlayer)
 
 	g.InitPhase = false

@@ -316,10 +316,10 @@ func (g *Game) RollDice7(state *entities.DieRollState) {
 		return
 	}
 
-	g.MoveRobberInteractive()
+	g.MoveRobberInteractive(g.TimerVals.PlaceRobber)
 	if g.Robber.Tile.Type == entities.TileTypeDesert && g.Settings.Advanced && g.AdvancedSettings.RerollOn7 {
 		g.DiceState = 0
-		g.setCurrentPlayerTimeLeft(g.TimerVals.DiceRoll)
+		g.setCurrentPlayerTimeLeft(g.TimerVals.Dice)
 		g.BroadcastState()
 		g.SendPlayerSecret(g.CurrentPlayer)
 		return
@@ -363,7 +363,7 @@ func (g *Game) DiscardHalfCards(players []*entities.Player, force bool) {
 					return
 				}
 
-				exp, err := g.BlockForAction(p, g.TimerVals.DiscardCards, &entities.PlayerAction{
+				exp, err := g.BlockForAction(p, g.TimerVals.SelectCardsToDiscard, &entities.PlayerAction{
 					Type:    entities.PlayerActionTypeSelectCards,
 					Data:    action,
 					Message: "Discard " + strconv.Itoa(q) + " cards",
@@ -418,7 +418,7 @@ func (g *Game) DiscardHalfCards(players []*entities.Player, force bool) {
 	g.TickerPause = false
 }
 
-func (g *Game) MoveRobberInteractive() error {
+func (g *Game) MoveRobberInteractive(timeout int) error {
 	// Move the robber
 	tiles := make([]*entities.Tile, 0)
 	for _, t := range g.Graph.Tiles {
@@ -437,7 +437,11 @@ func (g *Game) MoveRobberInteractive() error {
 	}
 
 	// Get coordinate of tile
-	exp, err := g.BlockForAction(g.CurrentPlayer, g.TimerVals.PlaceRobber, &entities.PlayerAction{
+	if timeout <= 0 {
+		timeout = g.TimerVals.PlaceRobber
+	}
+
+	exp, err := g.BlockForAction(g.CurrentPlayer, timeout, &entities.PlayerAction{
 		Type:    entities.PlayerActionTypeChooseTile,
 		Data:    robberAction,
 		Message: "Choose a position for the robber/pirate",
@@ -500,7 +504,7 @@ func (g *Game) StealCardWithRobber() error {
 
 	// Get order of player
 	if len(stealChoicesSlice) > 1 {
-		exp, err := g.BlockForAction(g.CurrentPlayer, g.TimerVals.ChoosePlayer, &entities.PlayerAction{
+		exp, err := g.BlockForAction(g.CurrentPlayer, g.TimerVals.SelectWhoToRob, &entities.PlayerAction{
 			Type: entities.PlayerActionTypeChoosePlayer,
 			Data: entities.PlayerActionChoosePlayer{
 				Choices: stealChoices,
@@ -582,7 +586,7 @@ func (g *Game) GiveGold(calls []GoldCall) {
 				return
 			}
 
-			exp, err := g.BlockForAction(p, g.TimerVals.DiscardCards, &entities.PlayerAction{
+			exp, err := g.BlockForAction(p, g.TimerVals.SelectCardsToDiscard, &entities.PlayerAction{
 				Type:    entities.PlayerActionTypeSelectCards,
 				Data:    action,
 				Message: "Choose " + strconv.Itoa(action.Quantity) + " card(s) to receive",

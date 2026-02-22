@@ -20,7 +20,7 @@ func (g *Game) UseProgressPaperAlchemist(p *entities.Player, dry bool) error {
 	g.BroadcastDevCardUse(entities.ProgressPaperAlchemist, 0, -1)
 	defer func() { g.BroadcastDevCardUse(entities.ProgressPaperAlchemist, 500, -1) }()
 
-	exp, err := g.BlockForAction(p, g.TimerVals.DiscardCards, &entities.PlayerAction{
+	exp, err := g.BlockForAction(p, g.TimerVals.SelectCardsToDiscard, &entities.PlayerAction{
 		Type: entities.PlayerActionTypeChooseDice,
 	})
 	if err != nil {
@@ -58,7 +58,7 @@ func (g *Game) UseProgressPaperCrane(p *entities.Player, dry bool) error {
 		return nil
 	}
 
-	exp, err := g.BlockForAction(p, g.TimerVals.DiscardCards, &entities.PlayerAction{
+	exp, err := g.BlockForAction(p, g.TimerVals.SelectCardsToDiscard, &entities.PlayerAction{
 		Type:    entities.PlayerActionTypeChooseImprovement,
 		Message: "Choose town improvement to complete",
 	})
@@ -107,7 +107,7 @@ func (g *Game) UseProgressPaperEngineer(p *entities.Player, dry bool) error {
 	p.UsingDevCard = entities.ProgressPaperEngineer
 	defer func() { p.UsingDevCard = orig }()
 
-	res, err := g.BlockForAction(p, g.TimerVals.DiscardCards, &entities.PlayerAction{
+	res, err := g.BlockForAction(p, g.TimerVals.SelectCardsToDiscard, &entities.PlayerAction{
 		Type:    entities.PlayerActionTypeChooseVertex,
 		Message: "Choose location for fence",
 		Data:    entities.PlayerActionChooseVertex{Allowed: vertices},
@@ -157,7 +157,7 @@ func (g *Game) UseProgressPaperInventor(p *entities.Player, dry bool) error {
 		}
 	}
 
-	exp, err := g.BlockForAction(g.CurrentPlayer, g.TimerVals.DiscardCards, &entities.PlayerAction{
+	exp, err := g.BlockForAction(g.CurrentPlayer, g.TimerVals.SelectCardsToDiscard, &entities.PlayerAction{
 		Type:    entities.PlayerActionTypeChooseTile,
 		Message: "Choose first number to swap",
 		Data: &entities.PlayerActionChooseTile{
@@ -194,7 +194,7 @@ func (g *Game) UseProgressPaperInventor(p *entities.Player, dry bool) error {
 		}
 	}
 
-	exp, err = g.BlockForAction(g.CurrentPlayer, g.TimerVals.DiscardCards, &entities.PlayerAction{
+	exp, err = g.BlockForAction(g.CurrentPlayer, g.TimerVals.SelectCardsToDiscard, &entities.PlayerAction{
 		Type:    entities.PlayerActionTypeChooseTile,
 		Message: "Choose second number to swap",
 		Data: &entities.PlayerActionChooseTile{
@@ -251,7 +251,7 @@ func (g *Game) UseProgressPaperMedicine(p *entities.Player, dry bool) error {
 		return nil
 	}
 
-	res, err := g.BlockForAction(p, g.TimerVals.DiscardCards, &entities.PlayerAction{
+	res, err := g.BlockForAction(p, g.TimerVals.SelectCardsToDiscard, &entities.PlayerAction{
 		Type:    entities.PlayerActionTypeChooseVertex,
 		Message: "Choose location for town",
 		Data:    entities.PlayerActionChooseVertex{Allowed: vertices},
@@ -471,7 +471,7 @@ func (g *Game) UseProgressPaperSmith(p *entities.Player, dry bool) error {
 	g.BroadcastDevCardUse(entities.ProgressPaperSmith, 0, -1)
 	defer func() { g.BroadcastDevCardUse(entities.ProgressPaperSmith, 500, -1) }()
 
-	res, err := g.BlockForAction(p, g.TimerVals.DiscardCards, &entities.PlayerAction{
+	res, err := g.BlockForAction(p, g.TimerVals.SelectCardsToDiscard, &entities.PlayerAction{
 		Type:    entities.PlayerActionTypeChooseVertex,
 		Message: "Choose warrior to upgrade",
 		Data:    entities.PlayerActionChooseVertex{Allowed: vertices1},
@@ -510,7 +510,7 @@ func (g *Game) UseProgressPaperSmith(p *entities.Player, dry bool) error {
 		return nil
 	}
 
-	res, err = g.BlockForAction(p, g.TimerVals.DiscardCards, &entities.PlayerAction{
+	res, err = g.BlockForAction(p, g.TimerVals.SelectCardsToDiscard, &entities.PlayerAction{
 		Type:      entities.PlayerActionTypeChooseVertex,
 		Message:   "Choose warrior to upgrade",
 		CanCancel: true,

@@ -44,7 +44,7 @@ func (g *Game) UseDevelopmentCard(player *entities.Player, developmentCardType e
 		useCard()
 		g.BroadcastDevCardUse(thisDeck.Type, 0, -1)
 		g.SetExtraVictoryPoints()
-		g.MoveRobberInteractive()
+		g.MoveRobberInteractive(g.TimerVals.DevCardNonTurnStatePlaceRobber)
 		g.StealCardWithRobber()
 		g.CheckForVictory()
 		g.BroadcastDevCardUse(thisDeck.Type, 500, -1)
@@ -54,7 +54,7 @@ func (g *Game) UseDevelopmentCard(player *entities.Player, developmentCardType e
 		g.BroadcastDevCardUse(thisDeck.Type, 0, -1)
 
 		AllowedTypes := []int{1, 2, 3, 4, 5}
-		res, err := g.BlockForAction(player, g.TimerVals.UseDevCard, &entities.PlayerAction{
+		res, err := g.BlockForAction(player, g.TimerVals.DevCardSelect1ResourceForMonopoly, &entities.PlayerAction{
 			Type:    entities.PlayerActionTypeSelectCards,
 			Message: "Choose type of resource to steal",
 			Data: entities.PlayerActionSelectCards{
@@ -125,7 +125,7 @@ func (g *Game) UseDevelopmentCard(player *entities.Player, developmentCardType e
 		useCard()
 		g.BroadcastDevCardUse(thisDeck.Type, 0, -1)
 
-		res, err := g.BlockForAction(player, g.TimerVals.UseDevCard, &entities.PlayerAction{
+		res, err := g.BlockForAction(player, g.TimerVals.DevCardSelect2ResourcesForYearOfPlenty, &entities.PlayerAction{
 			Type:    entities.PlayerActionTypeSelectCards,
 			Message: "Choose type of resources to take",
 			Data: entities.PlayerActionSelectCards{
@@ -187,7 +187,7 @@ func (g *Game) UseDevelopmentCard(player *entities.Player, developmentCardType e
 }
 
 func (g *Game) UseDevRoadBuilding(player *entities.Player, types []entities.BuildableType) {
-	buildOne := func() {
+	buildOne := func(timeout int) {
 		roadLocations := player.GetBuildLocationsRoad(g.Graph, false)
 		shipLocations := make([]*entities.Edge, 0)
 		if g.Mode == entities.Seafarers && player.BuildablesLeft[entities.BTShip] > 0 {
@@ -221,7 +221,7 @@ func (g *Game) UseDevRoadBuilding(player *entities.Player, types []entities.Buil
 			return
 		}
 
-		res, err := g.BlockForAction(player, g.TimerVals.UseDevCard, &entities.PlayerAction{
+		res, err := g.BlockForAction(player, timeout, &entities.PlayerAction{
 			Type:    entities.PlayerActionTypeChooseEdge,
 			Message: "Choose position for road/ship",
 			Data: entities.PlayerActionChooseEdge{
@@ -268,8 +268,12 @@ func (g *Game) UseDevRoadBuilding(player *entities.Player, types []entities.Buil
 		player.UsingDevCard = orig
 	}
 
-	for range types {
-		buildOne()
+	for i := range types {
+		timeout := g.TimerVals.DevCardPlace2MoreRoadBuilding
+		if i > 0 {
+			timeout = g.TimerVals.DevCardPlace1MoreRoadBuilding
+		}
+		buildOne(timeout)
 	}
 }
 

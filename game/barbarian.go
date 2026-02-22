@@ -127,7 +127,7 @@ func (g *Game) BarbarianDistributeProgressCards(players []*entities.Player) {
 
 	for _, p := range players {
 		p.ChoosingProgressCard = true
-		exp, err := g.BlockForAction(p, g.TimerVals.DiscardCards, &entities.PlayerAction{
+		exp, err := g.BlockForAction(p, g.TimerVals.SelectCardsToDiscard, &entities.PlayerAction{
 			Type:    entities.PlayerActionTypeChooseImprovement,
 			Message: "Choose type of action card to receive",
 		})
@@ -222,7 +222,7 @@ func (g *Game) BarbarianDestruction(players []*entities.Player) {
 				return
 			}
 
-			exp, err := g.BlockForAction(p, g.TimerVals.DiscardCards, &entities.PlayerAction{
+			exp, err := g.BlockForAction(p, g.TimerVals.SelectCardsToDiscard, &entities.PlayerAction{
 				Type: entities.PlayerActionTypeChooseVertex,
 				Data: &entities.PlayerActionChooseVertex{
 					Allowed: vertices,

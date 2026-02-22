@@ -9,6 +9,7 @@ This folder contains practical, project-specific docs for running and understand
 - [Environment Variables](./ENVIRONMENT.md): backend/frontend env reference with required values.
 - [Architecture](./ARCHITECTURE.md): how backend, frontend, MongoDB, and websockets fit together.
 - [Catan Timers Log](./CATAN_TIMERS_LOG.md): imported timer matrix and in-game speed mapping.
+- [Catan Timers Source JSON](./data/catan_timers.json): source data used for timer tier import and mapping.
 - [Seafarers MVP](./SEAFARERS_MVP.md): implemented Seafarers scope, rules, and validation notes.
 - [Seafarers Parity Checklist](./SEAFARERS_PARITY_CHECKLIST.md): scenario-by-scenario completion status and rollout plan.
 - [UI Migration Checklist](./UI_MIGRATION_CHECKLIST.md): architecture migration status + parity checklist.

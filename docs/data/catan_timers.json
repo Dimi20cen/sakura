@@ -1,0 +1,133 @@
+{
+  "General": {
+    "Turn": {
+      "Very Fast": "30",
+      "Fast": "60",
+      "Normal": "120",
+      "Slow": "240",
+      "Very Slow": "200 min"
+    }
+  },
+  "Game Setup": {
+    "SettlementPlacement": {
+      "Very Fast": "60",
+      "Fast": "120",
+      "Normal": "180",
+      "Slow": "360",
+      "Very Slow": "300 min"
+    },
+    "RoadPlacement": {
+      "Very Fast": "15",
+      "Fast": "30",
+      "Normal": "45",
+      "Slow": "90",
+      "Very Slow": "75 min"
+    }
+  },
+  "Game Events": {
+    "Dice": {
+      "Very Fast": "10",
+      "Fast": "10",
+      "Normal": "20",
+      "Slow": "60",
+      "Very Slow": "50 min"
+    }
+  },
+  "Roll 7": {
+    "PlaceRobber": {
+      "Very Fast": "15",
+      "Fast": "20",
+      "Normal": "40",
+      "Slow": "80",
+      "Very Slow": "50 min"
+    },
+    "SelectWhoToRob": {
+      "Very Fast": "10",
+      "Fast": "20",
+      "Normal": "40",
+      "Slow": "80",
+      "Very Slow": "50 min"
+    },
+    "SelectCardsToDiscard": {
+      "Very Fast": "20",
+      "Fast": "20",
+      "Normal": "40",
+      "Slow": "80",
+      "Very Slow": "50 min"
+    }
+  },
+  "Action Bonuses": {
+    "PlaceRoad": {
+      "Very Fast": "5",
+      "Fast": "10",
+      "Normal": "20",
+      "Slow": "60",
+      "Very Slow": "50 min"
+    },
+    "PlaceSettlement": {
+      "Very Fast": "5",
+      "Fast": "10",
+      "Normal": "20",
+      "Slow": "60",
+      "Very Slow": "50 min"
+    },
+    "PlaceCity": {
+      "Very Fast": "5",
+      "Fast": "10",
+      "Normal": "20",
+      "Slow": "60",
+      "Very Slow": "50 min"
+    },
+    "NonTurnStateBoughtDevelopmentCard": {
+      "Very Fast": "5",
+      "Fast": "10",
+      "Normal": "20",
+      "Slow": "60",
+      "Very Slow": "50 min"
+    },
+    "NonTurnStateAcceptingTrade": {
+      "Very Fast": "10",
+      "Fast": "10",
+      "Normal": "20",
+      "Slow": "60",
+      "Very Slow": "50 min"
+    }
+  },
+  "Dev Card Bonuses": {
+    "NonTurnStatePlaceRobber": {
+      "Very Fast": "10",
+      "Fast": "20",
+      "Normal": "40",
+      "Slow": "60",
+      "Very Slow": "50 min"
+    },
+    "Place2MoreRoadBuilding": {
+      "Very Fast": "10",
+      "Fast": "20",
+      "Normal": "40",
+      "Slow": "60",
+      "Very Slow": "50 min"
+    },
+    "Place1MoreRoadBuilding": {
+      "Very Fast": "10",
+      "Fast": "20",
+      "Normal": "40",
+      "Slow": "60",
+      "Very Slow": "50 min"
+    },
+    "Select2ResourcesForYearOfPlenty": {
+      "Very Fast": "10",
+      "Fast": "20",
+      "Normal": "40",
+      "Slow": "60",
+      "Very Slow": "50 min"
+    },
+    "Select1ResourceForMonopoly": {
+      "Very Fast": "10",
+      "Fast": "20",
+      "Normal": "40",
+      "Slow": "60",
+      "Very Slow": "50 min"
+    }
+  }
+}

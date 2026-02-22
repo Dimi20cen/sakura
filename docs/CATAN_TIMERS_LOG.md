@@ -1,6 +1,9 @@
 # Catan Timers Log
 
-Source imported from local reference:
+Source file in repo:
+- `docs/data/catan_timers.json`
+
+Original local import source:
 - `/home/dim/Downloads/catan/catan_timers.json`
 
 Imported on:
@@ -35,6 +38,24 @@ Imported on:
 - Normal: `20s`
 - Slow: `60s`
 - Very Slow: `50m`
+
+Runtime behavior:
+
+- Action bonus timers are additive in gameplay. When a matching action succeeds,
+  the configured bonus seconds are added to the current player's remaining time.
+- The implementation maps to the source categories in `docs/data/catan_timers.json`:
+  - `Action Bonuses`:
+    - `PlaceRoad`
+    - `PlaceSettlement`
+    - `PlaceCity`
+    - `NonTurnStateBoughtDevelopmentCard`
+    - `NonTurnStateAcceptingTrade`
+  - `Dev Card Bonuses`:
+    - `NonTurnStatePlaceRobber`
+    - `Place2MoreRoadBuilding`
+    - `Place1MoreRoadBuilding`
+    - `Select2ResourcesForYearOfPlenty`
+    - `Select1ResourceForMonopoly`
 
 ## Timer Sync Protocol
 

@@ -142,7 +142,7 @@ func (g *Game) BuildCityImprovement(p *entities.Player, ct entities.CardType) er
 				}
 			}
 
-			exp, err := g.BlockForAction(p, g.TimerVals.UseDevCard, &entities.PlayerAction{
+			exp, err := g.BlockForAction(p, g.TimerVals.ActionBonusPlaceCity, &entities.PlayerAction{
 				Type:    entities.PlayerActionTypeChooseVertex,
 				Message: "Choose town to place wonder",
 				Data:    entities.PlayerActionChooseVertex{Allowed: vertices},

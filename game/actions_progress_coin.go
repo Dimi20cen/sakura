@@ -23,7 +23,7 @@ func (g *Game) UseProgressCoinBishop(p *entities.Player, dry bool) error {
 	defer func() { g.BroadcastDevCardUse(entities.ProgressCoinBishop, 500, -1) }()
 
 	stolen := make([]bool, len(g.Players))
-	g.MoveRobberInteractive()
+	g.MoveRobberInteractive(g.TimerVals.DevCardNonTurnStatePlaceRobber)
 	for _, vp := range g.Graph.GetTilePlacements(g.Robber.Tile) {
 		owner := vp.GetOwner()
 		if owner == p || stolen[owner.Order] {
@@ -100,7 +100,7 @@ func (g *Game) UseProgressCoinDeserter(p *entities.Player, dry bool) error {
 		}
 	}
 
-	exp, err = g.BlockForAction(g.Players[stoleOrder], g.TimerVals.DiscardCards, &entities.PlayerAction{
+	exp, err = g.BlockForAction(g.Players[stoleOrder], g.TimerVals.SelectCardsToDiscard, &entities.PlayerAction{
 		Type:    entities.PlayerActionTypeChooseVertex,
 		Message: "Choose warrior to remove",
 		Data:    entities.PlayerActionChooseVertex{Allowed: vertices},
@@ -136,7 +136,7 @@ func (g *Game) UseProgressCoinDeserter(p *entities.Player, dry bool) error {
 
 	buildLocations := p.GetBuildLocationsKnight(g.Graph, false)
 	if p.BuildablesLeft[level] > 0 && len(buildLocations) > 0 && (level != entities.BTKnight3 || p.Improvements[int(entities.CardTypeCoin)] >= 3) {
-		exp, err = g.BlockForAction(p, g.TimerVals.DiscardCards, &entities.PlayerAction{
+		exp, err = g.BlockForAction(p, g.TimerVals.SelectCardsToDiscard, &entities.PlayerAction{
 			Type:    entities.PlayerActionTypeChooseVertex,
 			Message: "Choose position for warrior",
 			Data:    entities.PlayerActionChooseVertex{Allowed: buildLocations},
@@ -228,7 +228,7 @@ func (g *Game) UseProgressCoinDiplomat(p *entities.Player, dry bool) error {
 	g.BroadcastDevCardUse(entities.ProgressCoinDiplomat, 0, -1)
 	defer func() { g.BroadcastDevCardUse(entities.ProgressCoinDiplomat, 500, -1) }()
 
-	exp, err := g.BlockForAction(p, g.TimerVals.UseDevCard, &entities.PlayerAction{
+	exp, err := g.BlockForAction(p, g.TimerVals.DevCardSelect1ResourceForMonopoly, &entities.PlayerAction{
 		Type:    entities.PlayerActionTypeChooseEdge,
 		Message: "Choose road to remove",
 		Data: entities.PlayerActionChooseEdge{
@@ -371,7 +371,7 @@ func (g *Game) UseProgressCoinWedding(p *entities.Player, dry bool) error {
 				return
 			}
 
-			exp, err := g.BlockForAction(stoleFrom, g.TimerVals.DiscardCards, &entities.PlayerAction{
+			exp, err := g.BlockForAction(stoleFrom, g.TimerVals.SelectCardsToDiscard, &entities.PlayerAction{
 				Type:    entities.PlayerActionTypeSelectCards,
 				Data:    action,
 				Message: "Choose " + strconv.Itoa(q) + " cards to give to " + p.Username,
@@ -548,7 +548,7 @@ func (g *Game) UseProgressCoinSpy(p *entities.Player, dry bool) error {
 		hand[deck.Type] = int(deck.Quantity)
 	}
 
-	exp, err = g.BlockForAction(p, g.TimerVals.UseDevCard, &entities.PlayerAction{
+	exp, err = g.BlockForAction(p, g.TimerVals.DevCardSelect1ResourceForMonopoly, &entities.PlayerAction{
 		Type:    entities.PlayerActionTypeSelectCards,
 		Message: "Choose action card to steal",
 		Data: entities.PlayerActionSelectCards{
@@ -613,7 +613,7 @@ func (g *Game) DiscardProgressCard(p *entities.Player) error {
 		hand[deck.Type] = int(deck.Quantity)
 	}
 
-	exp, err := g.BlockForAction(p, g.TimerVals.DiscardCards, &entities.PlayerAction{
+	exp, err := g.BlockForAction(p, g.TimerVals.SelectCardsToDiscard, &entities.PlayerAction{
 		Type:    entities.PlayerActionTypeSelectCards,
 		Message: "Choose action card to discard",
 		Data: entities.PlayerActionSelectCards{

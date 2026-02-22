@@ -113,7 +113,7 @@ func (g *Game) UseProgressClothCommercialHarbor(p *entities.Player, dry bool) er
 		getting := make([]int, 9)
 		getting[resource] = 1
 
-		exp, err = g.BlockForAction(stoleFrom, g.TimerVals.DiscardCards, &entities.PlayerAction{
+		exp, err = g.BlockForAction(stoleFrom, g.TimerVals.SelectCardsToDiscard, &entities.PlayerAction{
 			Type:    entities.PlayerActionTypeSelectCards,
 			Message: "Choose type of commodity to give",
 			Data: entities.PlayerActionSelectCards{
@@ -294,7 +294,7 @@ func (g *Game) UseProgressClothMerchant(p *entities.Player, dry bool) error {
 		return errors.New("nowhere to place merchant")
 	}
 
-	exp, err := g.BlockForAction(g.CurrentPlayer, g.TimerVals.DiscardCards, &entities.PlayerAction{
+	exp, err := g.BlockForAction(g.CurrentPlayer, g.TimerVals.SelectCardsToDiscard, &entities.PlayerAction{
 		Type:    entities.PlayerActionTypeChooseTile,
 		Message: "Choose position for merchant",
 		Data: &entities.PlayerActionChooseTile{

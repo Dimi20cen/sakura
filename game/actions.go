@@ -51,6 +51,20 @@ func (g *Game) ensureNotSpecialBuildPhase() error {
 	return nil
 }
 
+func (g *Game) applyCurrentPlayerTimerBonus(player *entities.Player, seconds int) {
+	if seconds <= 0 || player == nil || g.CurrentPlayer == nil {
+		return
+	}
+	if g.CurrentPlayer != player || g.IsInitPhase() {
+		return
+	}
+	current := g.CurrentPlayer.TimeLeft
+	if current < 0 {
+		current = 0
+	}
+	g.setCurrentPlayerTimeLeft(current + seconds)
+}
+
 func (g *Game) BuildSettlement(player *entities.Player, coordinates entities.Coordinate) error {
 	init := g.IsInitPhase()
 
@@ -105,6 +119,7 @@ func (g *Game) BuildSettlement(player *entities.Player, coordinates entities.Coo
 	})
 
 	g.j.WVertexBuild(vertex, false)
+	g.applyCurrentPlayerTimerBonus(player, g.TimerVals.ActionBonusPlaceSettlement)
 
 	g.CheckForVictory()
 
@@ -175,6 +190,7 @@ func (g *Game) BuildCity(player *entities.Player, coordinates entities.Coordinat
 	})
 
 	g.j.WVertexBuild(vertex, false)
+	g.applyCurrentPlayerTimerBonus(player, g.TimerVals.ActionBonusPlaceCity)
 
 	g.CheckForVictory()
 
@@ -243,6 +259,7 @@ func (g *Game) BuildRoad(player *entities.Player, c entities.EdgeCoordinate) err
 	})
 
 	g.j.WEdgeBuild(e)
+	g.applyCurrentPlayerTimerBonus(player, g.TimerVals.ActionBonusPlaceRoad)
 
 	g.CheckForVictory()
 
@@ -272,7 +289,7 @@ func (g *Game) chooseDiscoveryGoldCardType(player *entities.Player) entities.Car
 		return available[rand.Intn(len(available))]
 	}
 
-	exp, err := g.BlockForAction(player, g.TimerVals.UseDevCard, &entities.PlayerAction{
+	exp, err := g.BlockForAction(player, g.TimerVals.DevCardSelect1ResourceForMonopoly, &entities.PlayerAction{
 		Type:    entities.PlayerActionTypeSelectCards,
 		Message: "Choose a resource for discovered gold",
 		Data: entities.PlayerActionSelectCards{
@@ -429,6 +446,7 @@ func (g *Game) BuildShip(player *entities.Player, c entities.EdgeCoordinate) err
 		Data: e.Placement,
 	})
 	g.j.WEdgeBuild(e)
+	g.applyCurrentPlayerTimerBonus(player, g.TimerVals.ActionBonusPlaceRoad)
 	g.CheckForVictory()
 
 	return nil
@@ -686,6 +704,12 @@ func (g *Game) BuyDevelopmentCard(player *entities.Player) error {
 
 	g.SendPlayerSecret(player)
 	g.BroadcastState()
+	if g.SpecialBuildPhase {
+		g.applyCurrentPlayerTimerBonus(
+			player,
+			g.TimerVals.ActionBonusNonTurnStateBoughtDevelopmentCard,
+		)
+	}
 
 	g.CheckForVictory()
 
@@ -952,7 +976,7 @@ func (g *Game) KnightChaseRobber(player *entities.Player, dry bool) error {
 		Data: v.Placement,
 	})
 
-	g.MoveRobberInteractive()
+	g.MoveRobberInteractive(g.TimerVals.PlaceRobber)
 	g.StealCardWithRobber()
 
 	return nil
@@ -1102,7 +1126,7 @@ func (g *Game) DisplaceKnightInteractive(k *entities.Knight) {
 		return
 	}
 
-	exp, err := g.BlockForAction(k.GetOwner(), g.TimerVals.DiscardCards, &entities.PlayerAction{
+	exp, err := g.BlockForAction(k.GetOwner(), g.TimerVals.SelectCardsToDiscard, &entities.PlayerAction{
 		Type:      entities.PlayerActionTypeChooseVertex,
 		Message:   "Choose location for warrior",
 		Data:      entities.PlayerActionChooseVertex{Allowed: vertices},
@@ -1228,10 +1252,10 @@ func (g *Game) EndTurn(player *entities.Player) error {
 		g.DiceState = 0
 		g.EndTurnResetDevelopmentCards()
 		g.CurrentPlayer.ResetTurnState()
-		g.setCurrentPlayerTimeLeft(g.TimerVals.DiceRoll)
+		g.setCurrentPlayerTimeLeft(g.TimerVals.Dice)
 		g.onScenarioTurnStart(g.CurrentPlayer)
 	} else {
-		g.setCurrentPlayerTimeLeft(g.TimerVals.SpecialBuild)
+		g.setCurrentPlayerTimeLeft(g.TimerVals.ActionBonusPlaceRoad)
 	}
 
 	// Previous player
@@ -1619,6 +1643,12 @@ func (g *Game) AcceptOffer(offerId int, player *entities.Player) error {
 	offer.Acceptances[player.Order] = 1
 
 	g.BroadcastMessage(g.GetTradeOfferMessage(offer))
+	if g.SpecialBuildPhase {
+		g.applyCurrentPlayerTimerBonus(
+			player,
+			g.TimerVals.ActionBonusNonTurnStateAcceptingTrade,
+		)
+	}
 
 	return nil
 }
@@ -1682,6 +1712,12 @@ func (g *Game) CloseOffer(offerId int, player *entities.Player, acceptingPlayerO
 
 	g.Trade(player, g.Players[acceptingPlayerOrder], nil, offer.Details)
 	g.CurrentOffers = make([]*entities.TradeOffer, 0)
+	if g.SpecialBuildPhase {
+		g.applyCurrentPlayerTimerBonus(
+			player,
+			g.TimerVals.ActionBonusNonTurnStateAcceptingTrade,
+		)
+	}
 	return nil
 }
 

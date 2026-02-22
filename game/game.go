@@ -114,103 +114,170 @@ type (
 	}
 
 	TimerValues struct {
-		DiceRoll     int
-		Turn         int
-		DiscardCards int
-		PlaceRobber  int
-		ChoosePlayer int
-		InitVert     int
-		InitEdge     int
-		UseDevCard   int
-		SpecialBuild int
+		// General
+		Turn int
+
+		// Game setup
+		SettlementPlacement int
+		RoadPlacement       int
+
+		// Game events
+		Dice int
+
+		// Roll 7
+		PlaceRobber          int
+		SelectWhoToRob       int
+		SelectCardsToDiscard int
+
+		// Action bonuses
+		ActionBonusPlaceRoad                         int
+		ActionBonusPlaceSettlement                   int
+		ActionBonusPlaceCity                         int
+		ActionBonusNonTurnStateBoughtDevelopmentCard int
+		ActionBonusNonTurnStateAcceptingTrade        int
+
+		// Dev card bonuses
+		DevCardNonTurnStatePlaceRobber         int
+		DevCardPlace2MoreRoadBuilding          int
+		DevCardPlace1MoreRoadBuilding          int
+		DevCardSelect2ResourcesForYearOfPlenty int
+		DevCardSelect1ResourceForMonopoly      int
 	}
 )
 
 func timerValuesForSpeed(speed string) TimerValues {
 	s := strings.ToLower(strings.TrimSpace(speed))
 	s = strings.ReplaceAll(s, " ", "")
-	// Timings are aligned with catan_timers.json.
-	// 15s is an extra fast option requested for turn timer UX; other action timers
-	// use the "Very Fast" tier values.
+	// Timings are aligned with docs/data/catan_timers.json.
+	// 15s is an extra-fast local option: it only changes the turn timer and
+	// keeps all other categories at the Very Fast tier.
 	switch s {
 	case entities.Speed15s:
 		return TimerValues{
-			DiceRoll:     10,
-			Turn:         15,
-			DiscardCards: 20,
-			PlaceRobber:  15,
-			ChoosePlayer: 10,
-			InitVert:     60,
-			InitEdge:     15,
-			UseDevCard:   10,
-			SpecialBuild: 5,
+			Turn:                       15,
+			SettlementPlacement:        60,
+			RoadPlacement:              15,
+			Dice:                       10,
+			PlaceRobber:                15,
+			SelectWhoToRob:             10,
+			SelectCardsToDiscard:       20,
+			ActionBonusPlaceRoad:       5,
+			ActionBonusPlaceSettlement: 5,
+			ActionBonusPlaceCity:       5,
+			ActionBonusNonTurnStateBoughtDevelopmentCard: 5,
+			ActionBonusNonTurnStateAcceptingTrade:        10,
+			DevCardNonTurnStatePlaceRobber:               10,
+			DevCardPlace2MoreRoadBuilding:                10,
+			DevCardPlace1MoreRoadBuilding:                10,
+			DevCardSelect2ResourcesForYearOfPlenty:       10,
+			DevCardSelect1ResourceForMonopoly:            10,
 		}
 	case entities.Speed30s:
 		return TimerValues{
-			DiceRoll:     10,
-			Turn:         30,
-			DiscardCards: 20,
-			PlaceRobber:  15,
-			ChoosePlayer: 10,
-			InitVert:     60,
-			InitEdge:     15,
-			UseDevCard:   10,
-			SpecialBuild: 5,
+			Turn:                       30,
+			SettlementPlacement:        60,
+			RoadPlacement:              15,
+			Dice:                       10,
+			PlaceRobber:                15,
+			SelectWhoToRob:             10,
+			SelectCardsToDiscard:       20,
+			ActionBonusPlaceRoad:       5,
+			ActionBonusPlaceSettlement: 5,
+			ActionBonusPlaceCity:       5,
+			ActionBonusNonTurnStateBoughtDevelopmentCard: 5,
+			ActionBonusNonTurnStateAcceptingTrade:        10,
+			DevCardNonTurnStatePlaceRobber:               10,
+			DevCardPlace2MoreRoadBuilding:                10,
+			DevCardPlace1MoreRoadBuilding:                10,
+			DevCardSelect2ResourcesForYearOfPlenty:       10,
+			DevCardSelect1ResourceForMonopoly:            10,
 		}
-	case entities.Speed120s:
-		return TimerValues{
-			DiceRoll:     20,
-			Turn:         120,
-			DiscardCards: 40,
-			PlaceRobber:  40,
-			ChoosePlayer: 40,
-			InitVert:     180,
-			InitEdge:     45,
-			UseDevCard:   40,
-			SpecialBuild: 20,
-		}
-	case entities.Speed200m, "200min":
-		return TimerValues{
-			DiceRoll:     3000,
-			Turn:         12000,
-			DiscardCards: 3000,
-			PlaceRobber:  3000,
-			ChoosePlayer: 3000,
-			InitVert:     18000,
-			InitEdge:     4500,
-			UseDevCard:   3000,
-			SpecialBuild: 3000,
-		}
-	case entities.SlowSpeed, "240s":
-		return TimerValues{
-			DiceRoll:     60,
-			Turn:         240,
-			DiscardCards: 80,
-			PlaceRobber:  80,
-			ChoosePlayer: 80,
-			InitVert:     360,
-			InitEdge:     90,
-			UseDevCard:   60,
-			SpecialBuild: 60,
-		}
-	case entities.FastSpeed:
-		fallthrough
 	case entities.Speed60s:
 		fallthrough
 	case entities.NormalSpeed:
 		fallthrough
-	default:
+	case entities.FastSpeed:
 		return TimerValues{
-			DiceRoll:     10,
-			Turn:         60,
-			DiscardCards: 20,
-			PlaceRobber:  20,
-			ChoosePlayer: 20,
-			InitVert:     120,
-			InitEdge:     30,
-			UseDevCard:   20,
-			SpecialBuild: 10,
+			Turn:                       60,
+			SettlementPlacement:        120,
+			RoadPlacement:              30,
+			Dice:                       10,
+			PlaceRobber:                20,
+			SelectWhoToRob:             20,
+			SelectCardsToDiscard:       20,
+			ActionBonusPlaceRoad:       10,
+			ActionBonusPlaceSettlement: 10,
+			ActionBonusPlaceCity:       10,
+			ActionBonusNonTurnStateBoughtDevelopmentCard: 10,
+			ActionBonusNonTurnStateAcceptingTrade:        10,
+			DevCardNonTurnStatePlaceRobber:               20,
+			DevCardPlace2MoreRoadBuilding:                20,
+			DevCardPlace1MoreRoadBuilding:                20,
+			DevCardSelect2ResourcesForYearOfPlenty:       20,
+			DevCardSelect1ResourceForMonopoly:            20,
 		}
+	case entities.Speed120s:
+		return TimerValues{
+			Turn:                       120,
+			SettlementPlacement:        180,
+			RoadPlacement:              45,
+			Dice:                       20,
+			PlaceRobber:                40,
+			SelectWhoToRob:             40,
+			SelectCardsToDiscard:       40,
+			ActionBonusPlaceRoad:       20,
+			ActionBonusPlaceSettlement: 20,
+			ActionBonusPlaceCity:       20,
+			ActionBonusNonTurnStateBoughtDevelopmentCard: 20,
+			ActionBonusNonTurnStateAcceptingTrade:        20,
+			DevCardNonTurnStatePlaceRobber:               40,
+			DevCardPlace2MoreRoadBuilding:                40,
+			DevCardPlace1MoreRoadBuilding:                40,
+			DevCardSelect2ResourcesForYearOfPlenty:       40,
+			DevCardSelect1ResourceForMonopoly:            40,
+		}
+	case entities.Speed200m, "200min":
+		return TimerValues{
+			Turn:                       12000,
+			SettlementPlacement:        18000,
+			RoadPlacement:              4500,
+			Dice:                       3000,
+			PlaceRobber:                3000,
+			SelectWhoToRob:             3000,
+			SelectCardsToDiscard:       3000,
+			ActionBonusPlaceRoad:       3000,
+			ActionBonusPlaceSettlement: 3000,
+			ActionBonusPlaceCity:       3000,
+			ActionBonusNonTurnStateBoughtDevelopmentCard: 3000,
+			ActionBonusNonTurnStateAcceptingTrade:        3000,
+			DevCardNonTurnStatePlaceRobber:               3000,
+			DevCardPlace2MoreRoadBuilding:                3000,
+			DevCardPlace1MoreRoadBuilding:                3000,
+			DevCardSelect2ResourcesForYearOfPlenty:       3000,
+			DevCardSelect1ResourceForMonopoly:            3000,
+		}
+	case "240s", entities.SlowSpeed:
+		return TimerValues{
+			Turn:                       240,
+			SettlementPlacement:        360,
+			RoadPlacement:              90,
+			Dice:                       60,
+			PlaceRobber:                80,
+			SelectWhoToRob:             80,
+			SelectCardsToDiscard:       80,
+			ActionBonusPlaceRoad:       60,
+			ActionBonusPlaceSettlement: 60,
+			ActionBonusPlaceCity:       60,
+			ActionBonusNonTurnStateBoughtDevelopmentCard: 60,
+			ActionBonusNonTurnStateAcceptingTrade:        60,
+			DevCardNonTurnStatePlaceRobber:               60,
+			DevCardPlace2MoreRoadBuilding:                60,
+			DevCardPlace1MoreRoadBuilding:                60,
+			DevCardSelect2ResourcesForYearOfPlenty:       60,
+			DevCardSelect1ResourceForMonopoly:            60,
+		}
+	default:
+		return timerValuesForSpeed(entities.Speed60s)
 	}
 }
 

@@ -90,3 +90,9 @@
     opacity: 1;
     border-color: rgba(231, 222, 206, 0.55);
 }
+
+.portdisabled {
+    opacity: 0.06;
+    cursor: default;
+    pointer-events: none;
+}

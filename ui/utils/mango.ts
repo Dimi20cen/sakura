@@ -173,9 +173,6 @@ export const setMap = async (name: string, user: string, map: any) => {
     const collection = await getMapsCollection();
     if (collection) {
         const existingMap = await collection.findOne({ name });
-        if (existingMap && user !== existingMap.creator) {
-            throw new Error("Another map with this name already exists");
-        }
 
         if (JSON.stringify(map).length > 8000) {
             throw new Error("Map is too large");
@@ -199,6 +196,18 @@ export const setMap = async (name: string, user: string, map: any) => {
             },
             { upsert: true },
         );
+    }
+};
+
+export const deleteMap = async (name: string, _user: string) => {
+    const collection = await getMapsCollection();
+    if (collection) {
+        const existingMap = await collection.findOne({ name });
+        if (!existingMap) {
+            throw new Error("Map not found");
+        }
+
+        await collection.deleteOne({ name });
     }
 };
 

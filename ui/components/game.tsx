@@ -317,16 +317,16 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                             Basic
                                         </option>
                                         <option
+                                            value={GAME_MODE.Seafarers}
+                                        >
+                                            Seafarers
+                                        </option>
+                                        <option
                                             value={
                                                 GAME_MODE.CitiesAndKnights
                                             }
                                         >
                                             Wonders &amp; Warriors
-                                        </option>
-                                        <option
-                                            value={GAME_MODE.Seafarers}
-                                        >
-                                            Seafarers
                                         </option>
                                     </select>
                                 </div>

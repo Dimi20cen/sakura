@@ -105,9 +105,13 @@ const TileTypeToClass = {
 const Index: NextPage = () => {
     const [map, setMap] = useState(initMap);
     const [token] = useAnonymousAuth();
-    const { data, mutate } = useSWR([`/api/maps`, token ?? null], basicFetcher);
+    const { data, mutate } = useSWR(token ? [`/api/maps`, token] : null, basicFetcher);
     const [selectedMap, setSelectedMap] = useState(initMap);
     const [resetSnapshot, setResetSnapshot] = useState<Map>(cloneMap(initMap));
+    const [statusMessage, setStatusMessage] = useState<{
+        tone: "ok" | "warn";
+        text: string;
+    } | null>(null);
     const [zoom, setZoom] = useState(1);
     const [pan, setPan] = useState({ x: 24, y: 24 });
     const [isPanning, setIsPanning] = useState(false);
@@ -119,28 +123,43 @@ const Index: NextPage = () => {
     } | null>(null);
     const suppressClickUntilRef = useRef(0);
 
-    if (global.window !== undefined) {
-        (window as any).setMap = setMap;
-    }
+    useEffect(() => {
+        if (
+            process.env.NODE_ENV !== "production" &&
+            typeof window !== "undefined"
+        ) {
+            (window as any).setMap = setMap;
+        }
+    }, []);
 
     // Fetch map on change of selected map
     useEffect(() => {
-        if (token) {
-            (async () => {
-                const res = await basicFetcher([
-                    `/api/maps/${selectedMap.name}`,
-                    token,
-                ]);
-                if (res?.map?.map) {
-                    const loadedMap = cloneMap(res.map.map);
-                    setMap(loadedMap);
-                    setResetSnapshot(cloneMap(loadedMap));
-                    setNumbers(getInitNum(loadedMap));
-                    setTiles(getInitTiles(loadedMap));
-                    setPorts(getInitPorts(loadedMap));
-                }
-            })();
+        if (!token) {
+            return;
         }
+        let isStale = false;
+
+        (async () => {
+            const res = await basicFetcher([
+                `/api/maps/${selectedMap.name}`,
+                token,
+            ]);
+            if (isStale) {
+                return;
+            }
+            if (res?.map?.map) {
+                const loadedMap = cloneMap(res.map.map);
+                setMap(loadedMap);
+                setResetSnapshot(cloneMap(loadedMap));
+                setNumbers(getInitNum(loadedMap));
+                setTiles(getInitTiles(loadedMap));
+                setPorts(getInitPorts(loadedMap));
+            }
+        })();
+
+        return () => {
+            isStale = true;
+        };
     }, [selectedMap, token]);
 
     const resetMap = () => {
@@ -219,7 +238,10 @@ const Index: NextPage = () => {
                 (m) => m.name.toLowerCase() === nextName.toLowerCase(),
             );
             if (exists) {
-                alert("A map with that name already exists");
+                setStatusMessage({
+                    tone: "warn",
+                    text: "A map with that name already exists.",
+                });
                 return;
             }
 
@@ -438,22 +460,28 @@ const Index: NextPage = () => {
     const generateJSON = () => {
         // validate
         if (numNumbers() != numTilesThatNeedNumber()) {
-            alert("Incorrect number distribution");
+            setStatusMessage({
+                tone: "warn",
+                text: "Incorrect number distribution.",
+            });
             return;
         }
 
         if (numRandomTilesSelected() != numRandomTiles()) {
-            alert("Incorrect random tiles distribution");
+            setStatusMessage({
+                tone: "warn",
+                text: "Incorrect random tiles distribution.",
+            });
             return;
         }
 
         if (numPortsSelected() > numPortSlots) {
-            alert("Too many ports");
+            setStatusMessage({ tone: "warn", text: "Too many ports." });
             return;
         }
 
         if (map.map.flat().length <= 5) {
-            alert("Too few hex tiles");
+            setStatusMessage({ tone: "warn", text: "Too few hex tiles." });
             return;
         }
 
@@ -495,7 +523,10 @@ const Index: NextPage = () => {
                 ? localStorage.getItem("auth")
                 : null);
         if (!authToken) {
-            alert("Auth token is still loading. Please try again in a second.");
+            setStatusMessage({
+                tone: "warn",
+                text: "Auth token is still loading. Please try again in a second.",
+            });
             return;
         }
 
@@ -510,11 +541,14 @@ const Index: NextPage = () => {
             .then((res) => res.json())
             .then((data) => {
                 if (data.error) {
-                    alert(data.error);
+                    setStatusMessage({ tone: "warn", text: data.error });
                 } else {
                     setResetSnapshot(cloneMap(map));
                     mutate();
-                    alert("Successfully saved map");
+                    setStatusMessage({
+                        tone: "ok",
+                        text: "Successfully saved map.",
+                    });
                 }
             });
     };
@@ -536,7 +570,10 @@ const Index: NextPage = () => {
                 ? localStorage.getItem("auth")
                 : null);
         if (!authToken) {
-            alert("Auth token is still loading. Please try again in a second.");
+            setStatusMessage({
+                tone: "warn",
+                text: "Auth token is still loading. Please try again in a second.",
+            });
             return;
         }
 
@@ -549,7 +586,10 @@ const Index: NextPage = () => {
 
         const body = await res.json().catch(() => ({}));
         if (!res.ok || body?.error) {
-            alert(body?.error || "Failed to delete map");
+            setStatusMessage({
+                tone: "warn",
+                text: body?.error || "Failed to delete map.",
+            });
             return;
         }
 
@@ -561,7 +601,7 @@ const Index: NextPage = () => {
         setNumbers(getInitNum(fallback));
         setTiles(getInitTiles(fallback));
         setPorts(getInitPorts(fallback));
-        alert("Map deleted");
+        setStatusMessage({ tone: "ok", text: "Map deleted." });
     };
 
     const autoNumbers = () => {
@@ -1046,6 +1086,18 @@ const Index: NextPage = () => {
                     </section>
                     <aside className="ui-panel ui-panel-pad h-[78vh] overflow-auto text-[color:var(--ui-ivory)]">
                     <div className="space-y-4">
+                            {statusMessage ? (
+                                <div
+                                    className={classNames(
+                                        "rounded-md border px-3 py-2 text-sm",
+                                        statusMessage.tone === "ok"
+                                            ? "border-[rgba(183,221,184,0.4)] bg-[rgba(33,94,49,0.35)] text-[#b7ddb8]"
+                                            : "border-[rgba(242,180,185,0.4)] bg-[rgba(122,31,36,0.4)] text-[#f2b4b9]",
+                                    )}
+                                >
+                                    {statusMessage.text}
+                                </div>
+                            ) : null}
                             <div className="rounded-xl border border-[rgba(231,222,206,0.14)] bg-[rgba(24,20,18,0.52)] px-2.5 py-2.5">
                                 <div>
                                     <div>

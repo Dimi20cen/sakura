@@ -9,15 +9,17 @@ const Index: NextPage = () => {
             <div className="ui-page ui-fade-in">
                 <section className="ui-panel ui-panel-pad mt-8 sm:mt-12 max-w-2xl mx-auto">
                     <div className="ui-grid gap-3">
-                        <Link href="/sp">
-                            <button className="ui-button ui-button-secondary">
-                                Start Solo
-                            </button>
+                        <Link
+                            href="/sp"
+                            className="ui-button ui-button-secondary"
+                        >
+                            Start Solo
                         </Link>
-                        <Link href="/lobby">
-                            <button className="ui-button ui-button-primary">
-                                Multiplayer
-                            </button>
+                        <Link
+                            href="/lobby"
+                            className="ui-button ui-button-primary"
+                        >
+                            Multiplayer
                         </Link>
                     </div>
                 </section>

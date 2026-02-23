@@ -77,17 +77,22 @@ async function getGameStatesCollection() {
 }
 
 export const gamesList = async (stage: string, userId?: string) => {
-    const qStage = stage === "playing" ? 1 : 0;
+    const qStage =
+        stage === "playing" ? 1 : stage === "open" ? 0 : undefined;
     const collection = await getGamesCollection();
     if (collection) {
+        const query: Record<string, unknown> = {
+            private: false,
+            updatedAt: {
+                $gte: new Date(Date.now() - 5 * 60 * 1000),
+            },
+        };
+        if (typeof qStage === "number") {
+            query.stage = qStage;
+        }
+
         const games = await collection
-            .find({
-                stage: qStage,
-                private: false,
-                updatedAt: {
-                    $gte: new Date(Date.now() - 5 * 60 * 1000),
-                },
-            })
+            .find(query)
             .project({
                 _id: 0,
                 id: 1,
@@ -107,10 +112,11 @@ export const gamesList = async (stage: string, userId?: string) => {
             const participantIds = Array.isArray(game.participant_ids)
                 ? game.participant_ids
                 : [];
+            const isOpenGame = game.stage === 0;
             const reconnectable = Boolean(
                 userId &&
-                    ((qStage === 0 && game.host_id === userId) ||
-                        (qStage === 1 &&
+                    ((isOpenGame && game.host_id === userId) ||
+                        (!isOpenGame &&
                             (game.host_id === userId ||
                                 participantIds.includes(userId)))),
             );

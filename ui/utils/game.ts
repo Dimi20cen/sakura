@@ -3,7 +3,7 @@ import { basicFetcher } from ".";
 export const getServers = async (): Promise<string[]> => {
     const servers = await basicFetcher([`/api/servers`, null]);
     if (!servers.servers || !servers.servers.length) {
-        alert("No servers available :(");
+        console.error("No servers available");
         return [];
     }
     return servers.servers.map((s: any) => s.url);

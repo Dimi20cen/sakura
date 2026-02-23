@@ -3,6 +3,12 @@ import { jwtDecode } from "jwt-decode";
 
 export const isBrowser: boolean = typeof window !== "undefined";
 
+type AnonymousAuthResult = {
+    token: string | null;
+    redirectToProfile?: string;
+    error?: string;
+};
+
 export function getIdFromToken(token: string | null): string | null {
     if (!token) {
         return null;
@@ -21,9 +27,9 @@ export function getUsernameFromToken(token: string | null): string | null {
     return decoded.username;
 }
 
-export const anonymousAuth = async (): Promise<any> => {
+export const anonymousAuth = async (): Promise<AnonymousAuthResult> => {
     let res;
-    let servers;
+    let servers: string[] | undefined;
 
     const selectedProfile = localStorage.getItem("profileUsername");
     const token = localStorage.getItem("auth");
@@ -36,9 +42,12 @@ export const anonymousAuth = async (): Promise<any> => {
         };
 
         servers = await getServers();
+        if (!servers.length) {
+            return { token: null, error: "Could not find any servers" };
+        }
         res = await fetch(`${servers[0]}/verify`, options);
         if (res.status === 200) {
-            return;
+            return { token };
         }
     }
 
@@ -48,8 +57,10 @@ export const anonymousAuth = async (): Promise<any> => {
         window.location.pathname !== "/choose-profile"
     ) {
         const returnTo = `${window.location.pathname}${window.location.search}`;
-        window.location.href = `/choose-profile?returnTo=${encodeURIComponent(returnTo)}`;
-        return;
+        return {
+            token: null,
+            redirectToProfile: `/choose-profile?returnTo=${encodeURIComponent(returnTo)}`,
+        };
     }
 
     if (!servers) {
@@ -57,8 +68,7 @@ export const anonymousAuth = async (): Promise<any> => {
     }
 
     if (!servers.length) {
-        alert("Could not find any servers");
-        return;
+        return { token: null, error: "Could not find any servers" };
     }
 
     if (selectedProfile) {
@@ -77,7 +87,10 @@ export const anonymousAuth = async (): Promise<any> => {
 
     if (isBrowser && data?.token) {
         localStorage.setItem("auth", data.token);
+        return { token: data.token };
     }
+
+    return { token: null, error: data?.error || "Could not authenticate" };
 };
 
 export const basicFetcher = async ([url, token]: [

@@ -1,17 +1,16 @@
-import { FunctionComponent } from "react";
 import { decode } from "@msgpack/msgpack";
+import { FunctionComponent, useEffect, useMemo, useState } from "react";
+import Error from "next/error";
 import { useRouter } from "next/router";
 import useSWR from "swr";
-import Error from "next/error";
-import { useEffect, useState } from "react";
-import { basicFetcher, getIdFromToken } from "../utils";
-import { classNames } from "../utils/styles";
-import { useAnonymousAuth } from "../hooks/auth";
-import { createGame } from "../utils/game";
-import { white as spinner } from "./spinner";
-import Header from "./header";
 import { GameSettings } from "../tsg";
 import { DISPLAY_GAME_MODE, GAME_MODE } from "../src/lobby";
+import { useAnonymousAuth } from "../hooks/auth";
+import { basicFetcher, getIdFromToken } from "../utils";
+import { createGame } from "../utils/game";
+import { classNames } from "../utils/styles";
+import Header from "./header";
+import { white as spinner } from "./spinner";
 
 const textClass = classNames(
     "px-3 sm:px-6 py-3 text-center text-xs sm:text-sm uppercase tracking-[0.08em] font-semibold text-[color:var(--ui-ivory-soft)]",
@@ -29,166 +28,165 @@ type LobbyGame = {
     reconnectable?: boolean;
 };
 
+type ParsedLobbyGame = LobbyGame & {
+    parsedSettings: GameSettings;
+};
+
+const parseGameSettings = (settings: string): GameSettings | null => {
+    try {
+        return new GameSettings(decode(Buffer.from(settings, "base64")));
+    } catch {
+        return null;
+    }
+};
+
 const renderGame = (
-    games: LobbyGame[],
+    games: ParsedLobbyGame[],
     selectedGameId: string,
     handleRowClick: (gameId: string) => () => void,
 ) => {
-    return games.map((game: LobbyGame) => {
-        if (!game.settings) {
-            return null;
-        }
-        try {
-            const { id, settings } = game;
-            const gameSettings = new GameSettings(
-                decode(Buffer.from(settings, "base64")),
-            );
-            return (
-                <tr
-                    key={id}
-                    onClick={handleRowClick(id)}
-                    className={classNames(
-                        "cursor-pointer ui-panel",
-                        selectedGameId === id
-                            ? "bg-[rgba(122,31,36,0.62)] border-[rgba(183,148,90,0.55)] shadow-[0_8px_20px_rgba(122,31,36,0.35)]"
-                            : "bg-[rgba(38,31,28,0.78)] border-[rgba(231,222,206,0.12)]",
-                    )}
-                >
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-center text-sm sm:text-base text-[color:var(--ui-ivory)]">
-                        {DISPLAY_GAME_MODE[gameSettings.Mode as GAME_MODE]}
-                    </td>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-center text-sm sm:text-base text-[color:var(--ui-ivory)]">
-                        {game.host}
-                    </td>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-center text-sm sm:text-base text-[color:var(--ui-ivory)]">
-                        {[...Array(gameSettings.MaxPlayers)].map(
-                            (_, i: number) => (
-                                <span
-                                    key={i}
-                                    className={classNames(
-                                        game.active_players > i
-                                            ? "text-[color:var(--ui-gold-soft)]"
-                                            : "text-[rgba(244,239,228,0.45)]",
-                                        "text-sm mr-1",
-                                    )}
-                                >
-                                    &#x2B24;
-                                </span>
-                            ),
-                        )}
-                    </td>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-center text-sm sm:text-base text-[color:var(--ui-ivory)]">
-                        {gameSettings.MapName}
-                    </td>
-                </tr>
-            );
-        } catch {
-            return null;
-        }
+    return games.map((game) => {
+        const { id, parsedSettings } = game;
+        return (
+            <tr
+                key={id}
+                onClick={handleRowClick(id)}
+                className={classNames(
+                    "cursor-pointer ui-panel",
+                    selectedGameId === id
+                        ? "bg-[rgba(122,31,36,0.62)] border-[rgba(183,148,90,0.55)] shadow-[0_8px_20px_rgba(122,31,36,0.35)]"
+                        : "bg-[rgba(38,31,28,0.78)] border-[rgba(231,222,206,0.12)]",
+                )}
+            >
+                <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-center text-sm sm:text-base text-[color:var(--ui-ivory)]">
+                    {DISPLAY_GAME_MODE[parsedSettings.Mode as GAME_MODE]}
+                </td>
+                <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-center text-sm sm:text-base text-[color:var(--ui-ivory)]">
+                    {game.host}
+                </td>
+                <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-center text-sm sm:text-base text-[color:var(--ui-ivory)]">
+                    {[...Array(parsedSettings.MaxPlayers)].map((_, i: number) => (
+                        <span
+                            key={i}
+                            className={classNames(
+                                game.active_players > i
+                                    ? "text-[color:var(--ui-gold-soft)]"
+                                    : "text-[rgba(244,239,228,0.45)]",
+                                "text-sm mr-1",
+                            )}
+                        >
+                            &#x2B24;
+                        </span>
+                    ))}
+                </td>
+                <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-center text-sm sm:text-base text-[color:var(--ui-ivory)]">
+                    {parsedSettings.MapName}
+                </td>
+            </tr>
+        );
     });
 };
 
 const renderGameCards = (
-    games: LobbyGame[],
+    games: ParsedLobbyGame[],
     selectedGameId: string,
     handleRowClick: (gameId: string) => () => void,
 ) => {
-    return games.map((game: LobbyGame) => {
-        if (!game.settings) {
-            return null;
-        }
-        try {
-            const { id, settings } = game;
-            const gameSettings = new GameSettings(
-                decode(Buffer.from(settings, "base64")),
-            );
-            return (
-                <button
-                    key={id}
-                    onClick={handleRowClick(id)}
-                    className={classNames(
-                        "ui-panel w-full rounded-xl border px-4 py-3 text-left transition-colors duration-200",
-                        selectedGameId === id
-                            ? "bg-[rgba(122,31,36,0.62)] border-[rgba(183,148,90,0.55)]"
-                            : "bg-[rgba(38,31,28,0.78)] border-[rgba(231,222,206,0.12)]",
-                    )}
-                >
-                    <div className="flex items-center justify-between text-sm">
-                        <span className="text-[color:var(--ui-ivory)] font-semibold">
-                            {DISPLAY_GAME_MODE[gameSettings.Mode as GAME_MODE]}
-                        </span>
-                        <span className="text-[color:var(--ui-ivory-soft)]">
-                            {gameSettings.MapName}
-                        </span>
-                    </div>
-                    <div className="mt-2 flex items-center justify-between text-sm">
-                        <span className="text-[color:var(--ui-ivory-soft)]">
-                            Host: {game.host}
-                        </span>
-                        <span className="text-[color:var(--ui-ivory)]">
-                            {[...Array(gameSettings.MaxPlayers)].map(
-                                (_, i: number) => (
-                                    <span
-                                        key={i}
-                                        className={classNames(
-                                            game.active_players > i
-                                                ? "text-[color:var(--ui-gold-soft)]"
-                                                : "text-[rgba(244,239,228,0.45)]",
-                                            "text-sm mr-1",
-                                        )}
-                                    >
-                                        &#x2B24;
-                                    </span>
-                                ),
-                            )}
-                        </span>
-                    </div>
-                </button>
-            );
-        } catch {
-            return null;
-        }
+    return games.map((game) => {
+        const { id, parsedSettings } = game;
+        return (
+            <button
+                key={id}
+                onClick={handleRowClick(id)}
+                className={classNames(
+                    "ui-panel w-full rounded-xl border px-4 py-3 text-left transition-colors duration-200",
+                    selectedGameId === id
+                        ? "bg-[rgba(122,31,36,0.62)] border-[rgba(183,148,90,0.55)]"
+                        : "bg-[rgba(38,31,28,0.78)] border-[rgba(231,222,206,0.12)]",
+                )}
+            >
+                <div className="flex items-center justify-between text-sm">
+                    <span className="text-[color:var(--ui-ivory)] font-semibold">
+                        {DISPLAY_GAME_MODE[parsedSettings.Mode as GAME_MODE]}
+                    </span>
+                    <span className="text-[color:var(--ui-ivory-soft)]">
+                        {parsedSettings.MapName}
+                    </span>
+                </div>
+                <div className="mt-2 flex items-center justify-between text-sm">
+                    <span className="text-[color:var(--ui-ivory-soft)]">
+                        Host: {game.host}
+                    </span>
+                    <span className="text-[color:var(--ui-ivory)]">
+                        {[...Array(parsedSettings.MaxPlayers)].map((_, i: number) => (
+                            <span
+                                key={i}
+                                className={classNames(
+                                    game.active_players > i
+                                        ? "text-[color:var(--ui-gold-soft)]"
+                                        : "text-[rgba(244,239,228,0.45)]",
+                                    "text-sm mr-1",
+                                )}
+                            >
+                                &#x2B24;
+                            </span>
+                        ))}
+                    </span>
+                </div>
+            </button>
+        );
     });
 };
 
 const GameList: FunctionComponent = () => {
     const [token] = useAnonymousAuth();
-    const { data, error } = useSWR(["/api/games", token ?? null], basicFetcher);
-    const { data: sData, error: sError } = useSWR(
-        ["/api/games?stage=playing", token ?? null],
+    const { data, error } = useSWR(
+        token ? ["/api/games", token] : null,
         basicFetcher,
     );
     const [selectedGameId, setSelectedGameId] = useState("");
     const [lastGameId, setLastGameId] = useState("");
     const [lastGameProfileId, setLastGameProfileId] = useState("");
     const [currentProfileId, setCurrentProfileId] = useState("");
+    const [actionError, setActionError] = useState("");
 
     const router = useRouter();
 
     useEffect(() => {
         if (typeof window !== "undefined") {
             setLastGameId(localStorage.getItem("lastGameId") || "");
-            setLastGameProfileId(
-                localStorage.getItem("lastGameProfileId") || "",
-            );
+            setLastGameProfileId(localStorage.getItem("lastGameProfileId") || "");
             setCurrentProfileId(getIdFromToken(localStorage.getItem("auth")) || "");
         }
     }, [token]);
 
     const handleRowClick = (gameId: string) => () => {
+        setActionError("");
         setSelectedGameId(gameId);
     };
 
-    const allGames: LobbyGame[] = (() => {
-        const map = new Map<string, LobbyGame>();
-        (data?.games || []).forEach((g: LobbyGame) => map.set(g.id, g));
-        (sData?.games || []).forEach((g: LobbyGame) => map.set(g.id, g));
-        return Array.from(map.values());
-    })();
+    const allGames = useMemo<ParsedLobbyGame[]>(() => {
+        const rawGames = Array.isArray(data?.games) ? (data.games as LobbyGame[]) : [];
+        return rawGames
+            .map((g) => {
+                const parsedSettings = g.settings ? parseGameSettings(g.settings) : null;
+                if (!parsedSettings) {
+                    return null;
+                }
+                return {
+                    ...g,
+                    parsedSettings,
+                };
+            })
+            .filter((g): g is ParsedLobbyGame => Boolean(g));
+    }, [data?.games]);
 
-    const selectedGame = allGames.find((g) => g.id === selectedGameId);
+    const selectedGame = useMemo(
+        () => allGames.find((g) => g.id === selectedGameId),
+        [allGames, selectedGameId],
+    );
 
-    const canReconnect = (game?: LobbyGame) => {
+    const canReconnect = (game?: ParsedLobbyGame) => {
         if (!game) {
             return false;
         }
@@ -214,36 +212,44 @@ const GameList: FunctionComponent = () => {
 
     const handleGameAction = () => {
         if (!selectedGameId) {
-            alert("Select a game first.");
+            setActionError("Select a game first.");
             return;
         }
+        setActionError("");
         router.push(`/${selectedGameId}`);
     };
 
     const handleHostGame = async () => {
-        const [createData, _] = await createGame(token!);
+        setActionError("");
+        if (!token) {
+            setActionError("Authentication is still loading. Try again in a second.");
+            return;
+        }
+
+        const [createData] = await createGame(token);
         if (!createData) {
             return;
         }
         if (createData.error) {
-            console.error(createData.error);
+            setActionError(createData.error);
             return;
         }
         router.push(`/${createData.id}`);
     };
 
-    if (error || sError) {
+    if (error) {
         console.error(error);
-        console.error(sError);
         return (
             <>
                 <Header />
-                <Error statusCode={500} />;
+                <Error statusCode={500} />
             </>
         );
     }
-    if (data && data.error) return <Error statusCode={data.status} />;
-    if (!data || !sData)
+    if (data && data.error) {
+        return <Error statusCode={data.status} />;
+    }
+    if (!token || !data) {
         return (
             <>
                 <Header />
@@ -252,6 +258,7 @@ const GameList: FunctionComponent = () => {
                 </div>
             </>
         );
+    }
 
     return (
         <>
@@ -262,8 +269,7 @@ const GameList: FunctionComponent = () => {
                         <div className="mb-3 sm:mb-4">
                             <h1 className="ui-title ui-title-lg">Lobby</h1>
                             <p className="ui-text-muted">
-                                Select an active match to join, reconnect, or
-                                spectate.
+                                Select an active match to join, reconnect, or spectate.
                             </p>
                         </div>
                         <div className="-mx-2 px-2">
@@ -349,9 +355,7 @@ const GameList: FunctionComponent = () => {
                     {selectedGame ? (
                         <div className="w-full max-w-xs sm:max-w-sm mx-auto ui-fade-in">
                             <button
-                                className={classNames(
-                                    "ui-button ui-button-primary",
-                                )}
+                                className={classNames("ui-button ui-button-primary")}
                                 onClick={handleGameAction}
                             >
                                 {getActionLabel()}
@@ -360,14 +364,17 @@ const GameList: FunctionComponent = () => {
                     ) : null}
                     <div className="w-full max-w-xs sm:max-w-sm mx-auto">
                         <button
-                            className={classNames(
-                                "ui-button ui-button-secondary",
-                            )}
+                            className={classNames("ui-button ui-button-secondary")}
                             onClick={handleHostGame}
                         >
                             Create Room
                         </button>
                     </div>
+                    {actionError ? (
+                        <div className="w-full max-w-lg mx-auto rounded-md border border-[rgba(242,180,185,0.4)] bg-[rgba(122,31,36,0.4)] px-3 py-2 text-sm text-[#f2b4b9]">
+                            {actionError}
+                        </div>
+                    ) : null}
                 </div>
             </div>
         </>

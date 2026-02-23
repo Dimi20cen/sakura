@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/router";
 import { useAnonymousAuth } from "./auth";
 import { useGameServer } from "./gameServer";
 import { createTransportClient, TransportClient } from "../src/net/transport";
@@ -24,6 +25,7 @@ export function useGameSession(gameId: string, order: number) {
     const [token] = useAnonymousAuth();
     const [gameServer, gameExists] = useGameServer(gameId || "");
     const [init, setInit] = useState(false);
+    const router = useRouter();
 
     const dispatch = useAppDispatch();
     const socketState = useAppSelector((state) => state.game.socketState);
@@ -99,7 +101,7 @@ export function useGameSession(gameId: string, order: number) {
                         }
 
                         if (event.payload.message.includes("E74")) {
-                            window.location.href = "/lobby";
+                            router.replace("/lobby");
                         }
                         return;
                     default:
@@ -123,7 +125,7 @@ export function useGameSession(gameId: string, order: number) {
             transport.disconnect();
             transportRef.current = null;
         };
-    }, [dispatch, gameExists, gameId, gameServer, init, order, token]);
+    }, [dispatch, gameExists, gameId, gameServer, init, order, router, token]);
 
     const controls = useMemo(
         () => ({

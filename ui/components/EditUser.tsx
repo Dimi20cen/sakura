@@ -71,7 +71,7 @@ async function confirmUsername(
         const servers = await getServers();
 
         if (!servers.length) {
-            alert("Could not find any servers");
+            console.error("Could not find any servers");
             return;
         }
 

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef } from "react";
+import { useRouter } from "next/router";
 import { useAnonymousAuth } from "./auth";
 import { useGameServer } from "./gameServer";
 import { createTransportClient, TransportClient } from "../src/net/transport";
@@ -13,6 +14,7 @@ export function useLobbySession(gameId: string | undefined) {
     const [token] = useAnonymousAuth();
     const [gameServer, gameExists] = useGameServer(gameId || "");
     const dispatch = useAppDispatch();
+    const router = useRouter();
 
     const lobbyState = useAppSelector((state) => state.lobby);
     const socketState = useAppSelector((state) => state.connection.socketState);
@@ -58,9 +60,9 @@ export function useLobbySession(gameId: string | undefined) {
                         return;
                     case "session":
                         if (event.payload.message.includes("E74")) {
-                            window.location.href = "/lobby";
+                            router.replace("/lobby");
                         }
-                        alert(event.payload.message);
+                        console.error(event.payload.message);
                         if (event.payload.type === "end") {
                             transport.disconnect(1000, "Client closed connection");
                         }
@@ -85,7 +87,7 @@ export function useLobbySession(gameId: string | undefined) {
             transport.disconnect();
             transportRef.current = null;
         };
-    }, [dispatch, gameExists, gameId, gameServer, token]);
+    }, [dispatch, gameExists, gameId, gameServer, router, token]);
 
     const commands = useMemo(() => {
         if (!transportRef.current) {

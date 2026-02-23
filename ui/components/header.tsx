@@ -7,7 +7,7 @@ import {
 } from "react";
 import { Popover, Transition } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
-import Image from "next/legacy/image";
+import Image from "next/image";
 import Link from "next/link";
 import { classNames } from "../utils/styles";
 import ReconnectingWebSocket from "reconnecting-websocket";
@@ -43,7 +43,7 @@ const Header: FunctionComponent<{
     }, []);
 
     return (
-        <Popover className="relative border-b border-[rgba(231,222,206,0.12)] bg-[rgba(20,16,14,0.66)] backdrop-blur">
+        <Popover className="relative z-[1200] border-b border-[rgba(231,222,206,0.12)] bg-[rgba(20,16,14,0.66)] backdrop-blur">
             <div
                 className="absolute inset-0 z-30 pointer-events-none"
                 aria-hidden="true"
@@ -89,8 +89,8 @@ const Header: FunctionComponent<{
                                 <Image
                                     src={profileIcon}
                                     alt="Profile"
-                                    width="42"
-                                    height="42"
+                                    width={42}
+                                    height={42}
                                     className="rounded-full"
                                 />
                             </Link>
@@ -111,9 +111,13 @@ const Header: FunctionComponent<{
             >
                 <Popover.Panel
                     focus
-                    className="absolute z-30 top-0 inset-x-0 p-2 transition transform origin-top-right md:hidden"
+                    className="fixed z-[1300] top-0 inset-x-0 p-2 transition transform origin-top-right md:hidden"
                 >
-                    <div className="rounded-2xl shadow-[var(--ui-shadow)] bg-[rgba(23,19,17,0.97)] border border-[rgba(231,222,206,0.14)] divide-y divide-[rgba(231,222,206,0.12)]">
+                    <div
+                        className="fixed inset-0 bg-[rgba(9,7,6,0.52)] backdrop-blur-[2px]"
+                        aria-hidden="true"
+                    />
+                    <div className="relative rounded-2xl shadow-[var(--ui-shadow)] bg-[rgba(23,19,17,0.97)] border border-[rgba(231,222,206,0.14)] divide-y divide-[rgba(231,222,206,0.12)]">
                         <div className="pt-3 pb-3 px-5 sm:pb-3">
                             <div className="flex items-center justify-between">
                                 <div className="">
@@ -156,8 +160,8 @@ const Header: FunctionComponent<{
                                     <Image
                                         src={profileIcon}
                                         alt="Profile"
-                                        width="34"
-                                        height="34"
+                                        width={34}
+                                        height={34}
                                         className="rounded-full"
                                     />
                                     Profile

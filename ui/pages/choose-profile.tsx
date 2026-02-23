@@ -1,7 +1,7 @@
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
-import Image from "next/legacy/image";
+import Image from "next/image";
 import Header from "../components/header";
 import { getServers } from "../utils/game";
 
@@ -100,8 +100,8 @@ const ChooseProfile: NextPage = () => {
                                         <Image
                                             src={profile.icon}
                                             alt={profile.username}
-                                            layout="fill"
-                                            objectFit="cover"
+                                            fill
+                                            style={{ objectFit: "cover" }}
                                         />
                                     </span>
                                     <span className="text-sm sm:text-base font-semibold text-left text-[color:var(--ui-ivory)] break-all">

@@ -73,6 +73,7 @@ export function initialize() {
         edges: {},
         ports: new Array<IPort>(),
         robber: undefined,
+        pirate: undefined,
     };
     edgePlacements = {};
     vertexPlacements = {};
@@ -401,12 +402,12 @@ export function renderVertexPlacement(vp: IVertexPlacement, removed = false) {
     switch (vp.Type) {
         case VertexPlacementType.Settlement:
             assets.assignTexture(sprite, assets.house[urlColor]);
-            sprite.scale.set(50 / sprite.width);
+            sprite.scale.set(45 / sprite.width);
             break;
 
         case VertexPlacementType.City:
             assets.assignTexture(sprite, assets.city[urlColor]);
-            sprite.scale.set(70 / sprite.width);
+            sprite.scale.set(60 / sprite.width);
 
             if (vp.Wall) {
                 const wallSprite = new PIXI.Sprite();
@@ -498,6 +499,8 @@ export function renderEdgePlacement(ep: IEdgePlacement, removed = false) {
     roadContainer.zIndex = 90;
     roadSprite.rotation =
         (((-60 * (1 - ep.Location.Orientation)) % 360) * Math.PI) / 180.0;
+    // Make road pieces thicker without changing their length.
+    roadSprite.scale.x = 1.25;
 
     const shadow = new PIXI.Sprite();
     assets.assignTexture(shadow, isShip ? assets.shipToken : assets.road[color]);
@@ -507,6 +510,7 @@ export function renderEdgePlacement(ep: IEdgePlacement, removed = false) {
     shadow.y = 8;
     shadow.tint = isShip ? 0x4b5563 : 0x666666;
     shadow.rotation = roadSprite.rotation;
+    shadow.scale.x = 1.25;
 
     roadContainer.addChild(shadow);
     roadContainer.addChild(roadSprite);
@@ -889,16 +893,18 @@ export function resetTileHighlights() {
  * Initialize and/or animate the robber to a different tile
  * @param tile Tile to move the robber to
  */
-export async function setRobberTile(tile: UITile) {
+export async function setRobberTile(tile?: UITile) {
     if (!tile) {
+        if (board.robber) {
+            board.robber.visible = false;
+            canvas.app.markDirty();
+        }
         return;
     }
 
     if (!board.robber) {
         board.robber = new PIXI.Sprite();
-        assets.assignTexture(board.robber, assets.robber);
         board.robber.zIndex = 1100;
-        board.robber.scale.set(70 / board.robber.width);
         board.robber.anchor.x = 0.8;
         board.robber.anchor.y = 1;
         container.addChild(board.robber);
@@ -906,11 +912,56 @@ export async function setRobberTile(tile: UITile) {
         board.robber.y = 500;
     }
 
+    assets.assignTexture(board.robber, assets.robber, () => {
+        if (!board.robber) {
+            return;
+        }
+        board.robber.scale.set(35 / board.robber.texture.width);
+    });
+    board.robber.visible = true;
+
     const fc = canvas.getScaled(getDispCoord(tile.Center));
     board.robber.targetX = fc.x - 15;
     board.robber.targetY = fc.y + 30;
     anim.requestTranslationAnimation([board.robber], 8);
+    canvas.app.markDirty();
+}
 
+/**
+ * Initialize and/or animate the pirate to a different tile
+ * @param tile Tile to move the pirate to
+ */
+export async function setPirateTile(tile?: UITile) {
+    if (!tile) {
+        if (board.pirate) {
+            board.pirate.visible = false;
+            canvas.app.markDirty();
+        }
+        return;
+    }
+
+    if (!board.pirate) {
+        board.pirate = new PIXI.Sprite();
+        board.pirate.zIndex = 1095;
+        board.pirate.anchor.x = 0.5;
+        board.pirate.anchor.y = 0.8;
+        container.addChild(board.pirate);
+        board.pirate.x = 500;
+        board.pirate.y = 500;
+    }
+
+    assets.assignTexture(board.pirate, assets.pirate, () => {
+        if (!board.pirate) {
+            return;
+        }
+        board.pirate.scale.set(52 / board.pirate.texture.width);
+    });
+    board.pirate.visible = true;
+
+    const fc = canvas.getScaled(getDispCoord(tile.Center));
+    board.pirate.targetX = fc.x;
+    board.pirate.targetY = fc.y + 22;
+    anim.requestTranslationAnimation([board.pirate], 8);
     canvas.app.markDirty();
 }
 

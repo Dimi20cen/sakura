@@ -83,6 +83,7 @@ TimerPhaseId: number;
 TimerEndsAtMs: number;
 ServerNowMs: number;
 Robber: Robber /* entities.Robber */;
+Pirate: Pirate /* entities.Pirate */;
 PlayerStates: PlayerState /* []*entities.PlayerState */[];
 BankWood: number;
 BankBrick: number;
@@ -103,6 +104,7 @@ public TimerPhaseId: number;
 public TimerEndsAtMs: number;
 public ServerNowMs: number;
 public Robber: Robber /* entities.Robber */;
+public Pirate: Pirate /* entities.Pirate */;
 public PlayerStates: PlayerState /* []*entities.PlayerState */[];
 public BankWood: number;
 public BankBrick: number;
@@ -122,6 +124,7 @@ this.TimerPhaseId = input.tp;
 this.TimerEndsAtMs = input.te;
 this.ServerNowMs = input.ts;
 this.Robber = input.r ? new Robber(input.r) : input.r;
+this.Pirate = input.pr ? new Pirate(input.pr) : input.pr;
 this.PlayerStates = input.p?.map((v: any) => v ? new PlayerState(v) : undefined);
 this.BankWood = input.bw;
 this.BankBrick = input.bb;
@@ -143,6 +146,7 @@ out.tp = this.TimerPhaseId;
 out.te = this.TimerEndsAtMs;
 out.ts = this.ServerNowMs;
 out.r = this.Robber?.encode?.();
+out.pr = this.Pirate?.encode?.();
 out.p = this.PlayerStates?.map((v: any) => v?.encode?.());
 out.bw = this.BankWood;
 out.bb = this.BankBrick;
@@ -226,6 +230,23 @@ return out; }
 
 export type TileType = number;
 export type ITileType = number;
+export type IPirate = {
+Tile: Tile /* entities.Tile */;
+}
+
+export class Pirate implements IPirate { 
+public Tile: Tile /* entities.Tile */;
+
+constructor(input: any) {
+this.Tile = input.t ? new Tile(input.t) : input.t;
+}
+
+public encode() {
+const out: any = {};
+out.t = this.Tile?.encode?.();
+return out; }
+}
+
 export type IPlayerState = {
 Id: string;
 Username: string;
@@ -1080,3 +1101,4 @@ out.g = this.GameOver;
 out.w = this.Winner;
 return out; }
 }
+

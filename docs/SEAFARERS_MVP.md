@@ -44,7 +44,10 @@ This document describes the currently implemented Seafarers scope.
 
 ### Pirate
 
-- Robber can be moved to sea tiles in Seafarers (acts as pirate).
+- Seafarers uses two persistent tokens:
+  - Robber on land hexes
+  - Pirate on sea hexes
+- On a `7` or Knight card, the acting player moves either token by choosing a valid land/sea tile.
 - Pirate blocks ship usage on adjacent edges (build/move destination checks).
 - Pirate steal targets players with ships on the pirate sea hex.
 
@@ -77,6 +80,7 @@ This document describes the currently implemented Seafarers scope.
 - Key scenario tests:
   - `TestSeafarersSmokeBuildShipAndMoveShip`
   - `TestSeafarersPirateStealsFromShip`
+  - `TestSeafarersHasSeparateRobberAndPirateTokens`
   - `TestSeafarersScriptedMultiplayerSmoke`
   - `TestSeafarersFogIslandsInitializeAndReveal`
   - `TestSeafarersThroughDesertSettlementRegionBonus`

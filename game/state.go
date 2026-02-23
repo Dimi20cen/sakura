@@ -41,6 +41,7 @@ func (g *Game) GetGameState() *entities.GameState {
 		TimerEndsAtMs:      timerEndsAtMs,
 		ServerNowMs:        serverNowMs,
 		Robber:             g.Robber,
+		Pirate:             g.Pirate,
 		Merchant:           g.Merchant,
 		PlayerStates:       playerStates,
 		BankWood:           g.Bank.Hand.GetCardDeck(entities.CardTypeWood).Quantity,

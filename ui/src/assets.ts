@@ -144,12 +144,12 @@ export const shipToken = shipTokenS;
 
 /******************** House *******************************************/
 
-import houseRed from "../public/assets/house/house-red.png";
-import houseBlue from "../public/assets/house/house-blue.png";
-import houseGreen from "../public/assets/house/house-green.png";
-import houseYellow from "../public/assets/house/house-yellow.png";
-import housePlum from "../public/assets/house/house-plum.png";
-import houseCyan from "../public/assets/house/house-cyan.png";
+import houseRed from "../public/assets/city/city-red.png";
+import houseBlue from "../public/assets/city/city-blue.png";
+import houseGreen from "../public/assets/city/city-green.png";
+import houseYellow from "../public/assets/city/city-yellow.png";
+import housePlum from "../public/assets/city/city-plum.png";
+import houseCyan from "../public/assets/city/city-cyan.png";
 
 export const house: { [key: string]: StaticImageData } = {
     red: houseRed,
@@ -162,12 +162,12 @@ export const house: { [key: string]: StaticImageData } = {
 
 /******************** City *******************************************/
 
-import cityRed from "../public/assets/city/city-red.png";
-import cityBlue from "../public/assets/city/city-blue.png";
-import cityGreen from "../public/assets/city/city-green.png";
-import cityYellow from "../public/assets/city/city-yellow.png";
-import cityPlum from "../public/assets/city/city-plum.png";
-import cityCyan from "../public/assets/city/city-cyan.png";
+import cityRed from "../public/assets/house/house-red.png";
+import cityBlue from "../public/assets/house/house-blue.png";
+import cityGreen from "../public/assets/house/house-green.png";
+import cityYellow from "../public/assets/house/house-yellow.png";
+import cityPlum from "../public/assets/house/house-plum.png";
+import cityCyan from "../public/assets/house/house-cyan.png";
 
 export const city: { [key: string]: StaticImageData } = {
     red: cityRed,
@@ -267,6 +267,8 @@ export const wall = wallS;
 
 import robberS from "../public/assets/robber.png";
 export const robber = robberS;
+import pirateS from "../public/assets/pirate.png";
+export const pirate = pirateS;
 
 import bankS from "../public/assets/bank.png";
 export const bank = bankS;

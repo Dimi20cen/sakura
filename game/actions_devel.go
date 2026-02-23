@@ -44,8 +44,11 @@ func (g *Game) UseDevelopmentCard(player *entities.Player, developmentCardType e
 		useCard()
 		g.BroadcastDevCardUse(thisDeck.Type, 0, -1)
 		g.SetExtraVictoryPoints()
-		g.MoveRobberInteractive(g.TimerVals.DevCardNonTurnStatePlaceRobber)
-		g.StealCardWithRobber()
+		tile, err := g.MoveRobberOrPirateInteractive(g.TimerVals.DevCardNonTurnStatePlaceRobber)
+		if err != nil {
+			return err
+		}
+		_ = g.StealCardAtTile(tile)
 		g.CheckForVictory()
 		g.BroadcastDevCardUse(thisDeck.Type, 500, -1)
 

@@ -110,7 +110,8 @@ export function handleGameRuntimeMessage(msg: WsResponse) {
             );
             state.renderGameState(gs, getCommandHub());
             relayoutHUD();
-            board.setRobberTile(gs.Robber.Tile);
+            board.setRobberTile(gs.Robber?.Tile);
+            board.setPirateTile(gs.Pirate?.Tile);
             board.setMerchantTile(gs.Merchant);
             resourceBank.syncFromGameState(gs);
             return;

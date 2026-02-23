@@ -125,6 +125,7 @@ const (
 	JSetAdvancedSettings   = 1009
 
 	JSetRobber       = 1101
+	JSetPirate       = 1112
 	JVertexBuild     = 1102
 	JEdgeBuild       = 1103
 	JCityImprove     = 1104
@@ -160,6 +161,8 @@ func (j *Journal) play(e *JournalEntry) {
 		j.PSetTileType(e)
 	case JSetRobber:
 		j.PSetRobber(e)
+	case JSetPirate:
+		j.PSetPirate(e)
 	case JVertexBuild:
 		j.PVertexBuild(e)
 	case JEdgeBuild:
@@ -263,6 +266,20 @@ func (j *Journal) PSetRobber(e *JournalEntry) {
 
 func (j *Journal) WSetRobber(tile *entities.Tile) {
 	j.Write(JournalEntry{Type: JSetRobber, Fields: []interface{}{tile.Center}})
+}
+
+func (j *Journal) PSetPirate(e *JournalEntry) {
+	var center entities.Coordinate
+	mapstructure.Decode(e.Fields[0], &center)
+	tile := j.g.Tiles[center]
+	if j.g.Pirate == nil {
+		j.g.Pirate = &entities.Pirate{Tile: tile}
+	}
+	j.g.Pirate.Move(tile)
+}
+
+func (j *Journal) WSetPirate(tile *entities.Tile) {
+	j.Write(JournalEntry{Type: JSetPirate, Fields: []interface{}{tile.Center}})
 }
 
 func (j *Journal) PVertexBuild(e *JournalEntry) {

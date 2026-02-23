@@ -14,6 +14,7 @@ This document tracks parity between the implemented Seafarers mode and the offic
 | Area | Status | Notes |
 |---|---|---|
 | Ships (build/move) | `Implemented` | Includes open-end checks and one move per turn. |
+| Robber + Pirate dual-token flow | `Implemented` | Both tokens persist on the map in Seafarers; on `7`/Knight the player moves either token by tile choice. |
 | Pirate on sea | `Implemented` | Pirate blocks adjacent edges and steals from ships on sea hex. |
 | Longest Route (roads + ships) | `Implemented` | Includes road/ship transition via own building and tie-safe holder logic. |
 | Road Building card in Seafarers | `Implemented` | Supports `2 roads`, `2 ships`, or `1+1`. |

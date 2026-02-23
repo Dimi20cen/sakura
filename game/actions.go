@@ -369,11 +369,11 @@ func (g *Game) RevealFogAdjacentToEdge(player *entities.Player, edge *entities.E
 }
 
 func (g *Game) IsSeaRobberBlockingEdge(e *entities.Edge) bool {
-	if g.Mode != entities.Seafarers || g.Robber == nil || g.Robber.Tile == nil || g.Robber.Tile.Type != entities.TileTypeSea {
+	if g.Mode != entities.Seafarers || g.Pirate == nil || g.Pirate.Tile == nil || g.Pirate.Tile.Type != entities.TileTypeSea {
 		return false
 	}
 	for _, t := range e.AdjacentTiles {
-		if t == g.Robber.Tile {
+		if t == g.Pirate.Tile {
 			return true
 		}
 	}

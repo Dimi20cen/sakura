@@ -32,6 +32,7 @@ type (
 		Spectators           []*entities.Player
 		CurrentPlayer        *entities.Player
 		Robber               *entities.Robber
+		Pirate               *entities.Pirate
 		Merchant             *entities.Merchant
 		MerchantFleets       [9]int
 		BarbarianPosition    int
@@ -425,6 +426,7 @@ func (game *Game) InitGraph() {
 		Edges:    game.Edges,
 	}
 	game.Robber = &entities.Robber{}
+	game.Pirate = &entities.Pirate{}
 	game.CurrentOffers = make([]*entities.TradeOffer, 0)
 }
 

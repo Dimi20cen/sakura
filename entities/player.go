@@ -53,6 +53,7 @@ type (
 		TimerEndsAtMs      int64          `msgpack:"te"`
 		ServerNowMs        int64          `msgpack:"ts"`
 		Robber             *Robber        `msgpack:"r"`
+		Pirate             *Pirate        `msgpack:"pr"`
 		PlayerStates       []*PlayerState `msgpack:"p"`
 		BankWood           int16          `msgpack:"bw"`
 		BankBrick          int16          `msgpack:"bb"`

@@ -138,12 +138,6 @@ func TestSeafarersSmokeBuildShipAndMoveShip(t *testing.T) {
 	g.InitPhase = false
 	g.DiceState = 1
 	p.CurrentHand.UpdateResources(10, 10, 10, 10, 10)
-	for _, tile := range g.Tiles {
-		if tile.Type != entities.TileTypeSea {
-			g.Robber.Move(tile)
-			break
-		}
-	}
 
 	shipLocs := p.GetBuildLocationsShip(g.Graph)
 	if len(shipLocs) < 2 {
@@ -158,8 +152,8 @@ func TestSeafarersSmokeBuildShipAndMoveShip(t *testing.T) {
 	}
 	if firstShipEdge == nil {
 		for _, tile := range g.Tiles {
-			if tile.Type != entities.TileTypeSea {
-				g.Robber.Move(tile)
+			if tile.Type == entities.TileTypeSea && (g.Pirate == nil || g.Pirate.Tile != tile) {
+				g.Pirate.Move(tile)
 				break
 			}
 		}
@@ -178,6 +172,10 @@ func TestSeafarersSmokeBuildShipAndMoveShip(t *testing.T) {
 	}
 	if firstShipEdge.Placement == nil || firstShipEdge.Placement.GetType() != entities.BTShip {
 		t.Fatal("ship placement type mismatch after build")
+	}
+	// Keep this movement smoke focused on ship rules, not pirate blocking.
+	if g.Pirate != nil {
+		g.Pirate.Tile = nil
 	}
 	if got := len(g.GetMovableShips(p)); got != 0 {
 		t.Fatalf("newly built ship must not be movable this turn, got %d movable ships", got)
@@ -300,8 +298,8 @@ func TestSeafarersPirateStealsFromShip(t *testing.T) {
 	}
 	p1.CurrentHand.UpdateCards(entities.CardTypeWood, 1)
 
-	g.Robber.Move(seaTile)
-	if err := g.StealCardWithRobber(); err != nil {
+	g.Pirate.Move(seaTile)
+	if err := g.StealCardAtTile(seaTile); err != nil {
 		t.Fatalf("steal with pirate returned error: %v", err)
 	}
 
@@ -310,6 +308,61 @@ func TestSeafarersPirateStealsFromShip(t *testing.T) {
 	}
 	if got := p1.CurrentHand.GetCardDeck(entities.CardTypeWood).Quantity; got != 0 {
 		t.Fatalf("expected victim to lose wood, got %d", got)
+	}
+}
+
+func TestSeafarersHasSeparateRobberAndPirateTokens(t *testing.T) {
+	defn := maps.GetMapByName(maps.SeafarersHeadingForNewShores)
+	if defn == nil {
+		t.Fatal("seafarers map definition missing")
+	}
+
+	g := &Game{
+		Store: &noopStore{},
+		Settings: entities.GameSettings{
+			Mode:          entities.Seafarers,
+			MapName:       maps.SeafarersHeadingForNewShores,
+			MapDefn:       defn,
+			VictoryPoints: 12,
+			Speed:         entities.NormalSpeed,
+		},
+	}
+	if _, err := g.Initialize("dual-token-seafarers", 2); err != nil {
+		t.Fatalf("initialize failed: %v", err)
+	}
+	stopTickerForTest(g)
+
+	if g.Robber == nil || g.Robber.Tile == nil {
+		t.Fatal("expected robber tile to be initialized")
+	}
+	if g.Pirate == nil || g.Pirate.Tile == nil {
+		t.Fatal("expected pirate tile to be initialized")
+	}
+	if g.Robber.Tile.Type == entities.TileTypeSea {
+		t.Fatal("expected robber to start on land")
+	}
+	if g.Pirate.Tile.Type != entities.TileTypeSea {
+		t.Fatal("expected pirate to start on sea")
+	}
+
+	robberTile := g.Robber.Tile
+	var newSeaTile *entities.Tile
+	for _, tile := range g.Tiles {
+		if tile.Type == entities.TileTypeSea && tile != g.Pirate.Tile {
+			newSeaTile = tile
+			break
+		}
+	}
+	if newSeaTile == nil {
+		t.Fatal("expected at least two sea tiles to move pirate")
+	}
+
+	g.Pirate.Move(newSeaTile)
+	if g.Robber.Tile != robberTile {
+		t.Fatal("moving pirate should not move robber")
+	}
+	if g.Pirate.Tile != newSeaTile {
+		t.Fatal("expected pirate to move to selected sea tile")
 	}
 }
 
@@ -399,12 +452,6 @@ func TestSeafarersCoastalRoadAllowed(t *testing.T) {
 	}
 	if coastalRoad == nil {
 		t.Fatal("no coastal road edge found")
-	}
-	for _, tile := range g.Tiles {
-		if tile.Type != entities.TileTypeSea {
-			g.Robber.Move(tile)
-			break
-		}
 	}
 	if err := g.BuildRoad(p, coastalRoad.C); err != nil {
 		t.Fatalf("expected road build on coastal edge to succeed: %v", err)
@@ -529,11 +576,8 @@ func TestSeafarersFogIslandsStyleDiscoveryByShip(t *testing.T) {
 	g.InitPhase = false
 	g.DiceState = 1
 	p.CurrentHand.UpdateResources(10, 10, 10, 10, 10)
-	for _, tile := range g.Tiles {
-		if tile.Type != entities.TileTypeSea {
-			g.Robber.Move(tile)
-			break
-		}
+	if g.Pirate != nil {
+		g.Pirate.Tile = nil
 	}
 
 	if err := g.BuildShip(p, targetEdge.C); err != nil {
@@ -603,8 +647,8 @@ func TestSeafarersScriptedMultiplayerSmoke(t *testing.T) {
 	}
 	if firstShip == nil {
 		for _, tile := range g.Tiles {
-			if tile.Type != entities.TileTypeSea {
-				g.Robber.Move(tile)
+			if tile.Type == entities.TileTypeSea && (g.Pirate == nil || g.Pirate.Tile != tile) {
+				g.Pirate.Move(tile)
 				break
 			}
 		}
@@ -666,8 +710,8 @@ func TestSeafarersScriptedMultiplayerSmoke(t *testing.T) {
 		t.Fatalf("failed to place p1 ship for pirate smoke leg: %v", err)
 	}
 	p1.CurrentHand.UpdateCards(entities.CardTypeBrick, 1)
-	g.Robber.Move(seaTile)
-	if err := g.StealCardWithRobber(); err != nil {
+	g.Pirate.Move(seaTile)
+	if err := g.StealCardAtTile(seaTile); err != nil {
 		t.Fatalf("pirate steal failed in scripted smoke: %v", err)
 	}
 	if p0.CurrentHand.GetCardDeck(entities.CardTypeBrick).Quantity == 0 {

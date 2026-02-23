@@ -13,7 +13,7 @@ import (
 var done map[string]bool
 
 func isPrimitive(ftn string) string {
-	if ftn == "int" || ftn == "int16" || ftn == "int32" || ftn == "uint" || ftn == "uint16" || ftn == "uint32" {
+	if ftn == "int" || ftn == "int16" || ftn == "int32" || ftn == "int64" || ftn == "uint" || ftn == "uint16" || ftn == "uint32" || ftn == "uint64" {
 		return "number"
 	} else if ftn == "bool" {
 		return "boolean"

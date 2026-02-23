@@ -11,6 +11,7 @@ export type IBoard = {
     tiles: { [key: string]: UITile };
     ports: IPort[];
     robber?: anim.TranslatableSprite;
+    pirate?: anim.TranslatableSprite;
     merchant?: anim.TranslatableSprite;
 };
 

@@ -316,8 +316,11 @@ func (g *Game) RollDice7(state *entities.DieRollState) {
 		return
 	}
 
-	g.MoveRobberInteractive(g.TimerVals.PlaceRobber)
-	if g.Robber.Tile.Type == entities.TileTypeDesert && g.Settings.Advanced && g.AdvancedSettings.RerollOn7 {
+	movedTile, err := g.MoveRobberOrPirateInteractive(g.TimerVals.PlaceRobber)
+	if err != nil {
+		return
+	}
+	if movedTile != nil && movedTile.Type == entities.TileTypeDesert && g.Settings.Advanced && g.AdvancedSettings.RerollOn7 {
 		g.DiceState = 0
 		g.setCurrentPlayerTimeLeft(g.TimerVals.Dice)
 		g.BroadcastState()
@@ -325,7 +328,7 @@ func (g *Game) RollDice7(state *entities.DieRollState) {
 		return
 	}
 
-	g.StealCardWithRobber()
+	_ = g.StealCardAtTile(movedTile)
 }
 
 func (g *Game) GetDiscardLimit(p *entities.Player) int16 {
@@ -418,18 +421,45 @@ func (g *Game) DiscardHalfCards(players []*entities.Player, force bool) {
 	g.TickerPause = false
 }
 
-func (g *Game) MoveRobberInteractive(timeout int) error {
-	// Move the robber
+func (g *Game) MoveRobberOrPirateInteractive(timeout int) (*entities.Tile, error) {
+	// Move the robber (or the pirate in Seafarers).
 	tiles := make([]*entities.Tile, 0)
 	for _, t := range g.Graph.Tiles {
-		if g.Mode != entities.Seafarers && t.Type == entities.TileTypeSea {
+		if t.Fog {
 			continue
 		}
-		if (g.Robber.Tile != t ||
-			(g.Robber.Tile.Type == entities.TileTypeDesert && g.Settings.Advanced && g.AdvancedSettings.RerollOn7)) &&
-			!t.Fog {
+
+		if g.Mode != entities.Seafarers {
+			if t.Type == entities.TileTypeSea {
+				continue
+			}
+			if g.Robber.Tile != t ||
+				(g.Robber.Tile != nil &&
+					g.Robber.Tile.Type == entities.TileTypeDesert &&
+					g.Settings.Advanced &&
+					g.AdvancedSettings.RerollOn7) {
+				tiles = append(tiles, t)
+			}
+			continue
+		}
+
+		if t.Type == entities.TileTypeSea {
+			if g.Pirate == nil || g.Pirate.Tile != t {
+				tiles = append(tiles, t)
+			}
+			continue
+		}
+
+		if g.Robber.Tile != t ||
+			(g.Robber.Tile != nil &&
+				g.Robber.Tile.Type == entities.TileTypeDesert &&
+				g.Settings.Advanced &&
+				g.AdvancedSettings.RerollOn7) {
 			tiles = append(tiles, t)
 		}
+	}
+	if len(tiles) == 0 {
+		return nil, errors.New("no valid tile for robber/pirate")
 	}
 
 	robberAction := &entities.PlayerActionChooseTile{
@@ -447,7 +477,7 @@ func (g *Game) MoveRobberInteractive(timeout int) error {
 		Message: "Choose a position for the robber/pirate",
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	var resp entities.Coordinate
@@ -457,20 +487,40 @@ func (g *Game) MoveRobberInteractive(timeout int) error {
 	if selTile == nil {
 		selTile = g.ai.GetRobberTile(g.CurrentPlayer, robberAction.Allowed)
 	}
+	if selTile == nil {
+		return nil, errors.New("no selected tile for robber/pirate")
+	}
 
-	g.Robber.Move(selTile)
-	g.j.WSetRobber(selTile)
+	if g.Mode == entities.Seafarers && selTile.Type == entities.TileTypeSea {
+		if g.Pirate == nil {
+			g.Pirate = &entities.Pirate{}
+		}
+		g.Pirate.Move(selTile)
+		g.j.WSetPirate(selTile)
+	} else {
+		g.Robber.Move(selTile)
+		g.j.WSetRobber(selTile)
+	}
 	g.BroadcastState()
-	return nil
+	return selTile, nil
 }
 
-func (g *Game) StealCardWithRobber() error {
+func (g *Game) MoveRobberInteractive(timeout int) error {
+	_, err := g.MoveRobberOrPirateInteractive(timeout)
+	return err
+}
+
+func (g *Game) StealCardAtTile(tile *entities.Tile) error {
+	if tile == nil {
+		return nil
+	}
+
 	// Check if anyone to steal from
 	stealChoicesSlice := make([]*entities.Player, 0)
 	stealChoices := make([]bool, len(g.Players))
 
-	if g.Mode == entities.Seafarers && g.Robber.Tile != nil && g.Robber.Tile.Type == entities.TileTypeSea {
-		for _, ec := range g.Robber.Tile.GetEdgeCoordinates() {
+	if g.Mode == entities.Seafarers && tile.Type == entities.TileTypeSea {
+		for _, ec := range tile.GetEdgeCoordinates() {
 			e, err := g.Graph.GetEdge(ec)
 			if err != nil || e == nil || e.Placement == nil || e.Placement.GetType() != entities.BTShip {
 				continue
@@ -483,7 +533,7 @@ func (g *Game) StealCardWithRobber() error {
 			}
 		}
 	} else {
-		for _, vp := range g.Graph.GetTilePlacements(g.Robber.Tile) {
+		for _, vp := range g.Graph.GetTilePlacements(tile) {
 			if vp.GetType() != entities.BTSettlement && vp.GetType() != entities.BTCity {
 				continue
 			}
@@ -532,6 +582,10 @@ func (g *Game) StealCardWithRobber() error {
 
 	g.stealRandomCard(g.CurrentPlayer, g.Players[stoleOrder])
 	return nil
+}
+
+func (g *Game) StealCardWithRobber() error {
+	return g.StealCardAtTile(g.Robber.Tile)
 }
 
 func (g *Game) stealRandomCard(stealer *entities.Player, victim *entities.Player) {

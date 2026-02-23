@@ -4,10 +4,18 @@ type (
 	Robber struct {
 		Tile *Tile `msgpack:"t"`
 	}
+
+	Pirate struct {
+		Tile *Tile `msgpack:"t"`
+	}
 )
 
 func (r *Robber) Move(tile *Tile) {
 	r.Tile = tile
+}
+
+func (p *Pirate) Move(tile *Tile) {
+	p.Tile = tile
 }
 
 type (

@@ -47,18 +47,32 @@ func (g *Game) assignNumbers(allNumbers []uint16) {
 			tileCoords[t.Center] = t
 			allTileCoords[t.Center] = t
 		} else {
-			if !t.Fog {
+			if !t.Fog && t.Type == entities.TileTypeDesert {
 				g.Robber.Move(t)
 				g.j.WSetRobber(t)
+			}
+			if !t.Fog && g.Mode == entities.Seafarers && t.Type == entities.TileTypeSea && g.Pirate.Tile == nil {
+				g.Pirate.Move(t)
+				g.j.WSetPirate(t)
 			}
 		}
 	}
 
 	if g.Robber.Tile == nil {
 		for _, t := range g.Tiles {
-			if !t.Fog {
+			if !t.Fog && t.Type != entities.TileTypeSea {
 				g.Robber.Move(t)
 				g.j.WSetRobber(t)
+				break
+			}
+		}
+	}
+
+	if g.Mode == entities.Seafarers && g.Pirate.Tile == nil {
+		for _, t := range g.Tiles {
+			if !t.Fog && t.Type == entities.TileTypeSea {
+				g.Pirate.Move(t)
+				g.j.WSetPirate(t)
 				break
 			}
 		}

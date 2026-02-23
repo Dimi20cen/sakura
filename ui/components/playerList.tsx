@@ -11,7 +11,7 @@ import {
     sendMessage,
     WsMessage,
 } from "../src/sock";
-import botImage from "../public/assets/bot.png";
+import botImage from "../public/assets/shared/ui/bot.png";
 
 const playerRowClass = (self: boolean, ready: boolean) => {
     let base =

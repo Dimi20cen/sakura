@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "notes": "Legacy-to-current asset path hints for agent-guided migrations and replacements.",
+  "path_prefix_aliases": {
+    "ui/public/assets/profile-icons/": "ui/public/assets/shared/profile-icons/",
+    "ui/public/assets/avatars/": "ui/public/assets/shared/avatars/",
+    "ui/public/assets/icons/": "ui/public/assets/shared/icons/",
+    "ui/public/assets/sound/": "ui/public/assets/shared/sound/",
+    "ui/public/assets/buttons/": "ui/public/assets/shared/buttons/",
+    "ui/public/assets/dice/": "ui/public/assets/shared/dice/",
+    "ui/public/assets/ships/": "ui/public/assets/seafarers/pieces/ships/",
+    "ui/public/assets/knight/": "ui/public/assets/cities-knights/pieces/knight/",
+    "ui/public/assets/merchant/": "ui/public/assets/cities-knights/pieces/merchant/",
+    "ui/public/assets/tile-tex/": "ui/public/assets/base/board/textures/",
+    "ui/public/assets/house/": "ui/public/assets/base/pieces/house/",
+    "ui/public/assets/city/": "ui/public/assets/base/pieces/city/",
+    "ui/public/assets/number-tokens/": "ui/public/assets/base/tokens/number-tokens/",
+    "ui/public/assets/ports/": "ui/public/assets/base/tokens/ports/",
+    "ui/public/assets/cards/": "ui/public/assets/base/cards/decks/"
+  },
+  "file_aliases": {
+    "ui/public/assets/pirate.png": "ui/public/assets/seafarers/pieces/pirate.png",
+    "ui/public/assets/sea.jpg": "ui/public/assets/seafarers/board/sea.jpg",
+    "ui/public/assets/barbarian/track.png": "ui/public/assets/cities-knights/board/barbarian/track.png",
+    "ui/public/assets/barbarian/ship.png": "ui/public/assets/cities-knights/board/barbarian/ship.png",
+    "ui/public/assets/city/m-6.png": "ui/public/assets/cities-knights/city-improvements/m-6.png",
+    "ui/public/assets/city/m-7.png": "ui/public/assets/cities-knights/city-improvements/m-7.png",
+    "ui/public/assets/city/m-8.png": "ui/public/assets/cities-knights/city-improvements/m-8.png",
+    "ui/public/assets/city/w.png": "ui/public/assets/cities-knights/city-improvements/w.png",
+    "ui/public/assets/tile-tex/sea.webp": "ui/public/assets/seafarers/textures/sea.webp",
+    "ui/public/assets/tile-tex/fog.jpg": "ui/public/assets/seafarers/textures/fog.jpg",
+    "ui/public/assets/tile-tex/island-l.png": "ui/public/assets/seafarers/textures/island-l.png",
+    "ui/public/assets/tile-tex/island-r.png": "ui/public/assets/seafarers/textures/island-r.png",
+    "ui/public/assets/tile-tex/beach.png": "ui/public/assets/seafarers/textures/beach.png",
+    "ui/public/assets/robber.png": "ui/public/assets/shared/ui/robber.png",
+    "ui/public/assets/bank.png": "ui/public/assets/shared/ui/bank.png",
+    "ui/public/assets/settings.png": "ui/public/assets/shared/ui/settings.png",
+    "ui/public/assets/bot.png": "ui/public/assets/shared/ui/bot.png",
+    "ui/public/assets/spectate.png": "ui/public/assets/shared/ui/spectate.png",
+    "ui/public/assets/timing-rules.png": "ui/public/assets/shared/ui/timing-rules.png"
+  }
+}

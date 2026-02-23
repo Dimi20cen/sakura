@@ -122,10 +122,10 @@ export function relayout() {
 }
 
 const profileAvatarByUsername: Record<string, string> = {
-    jethro7194: "/assets/profile-icons/jethro.png",
-    kopstiklapsa: "/assets/profile-icons/kopsetinklapsa.png",
-    staxtoputa: "/assets/profile-icons/staxtoputa.png",
-    giorgaros: "/assets/profile-icons/giorgaros.png",
+    jethro7194: "/assets/shared/profile-icons/jethro.png",
+    kopstiklapsa: "/assets/shared/profile-icons/kopsetinklapsa.png",
+    staxtoputa: "/assets/shared/profile-icons/staxtoputa.png",
+    giorgaros: "/assets/shared/profile-icons/giorgaros.png",
 };
 
 /**
@@ -605,7 +605,7 @@ export function getPlayerAvatarSprite(order: number, rendered?: () => void) {
     const cstr = hexToUrlString(color);
 
     const variant = Math.ceil((randInt / 10000) * 5);
-    const avatarPath = customAvatar || `/assets/avatars/${cstr}/${variant}.jpg`;
+    const avatarPath = customAvatar || `/assets/shared/avatars/${cstr}/${variant}.jpg`;
 
     PIXI.Texture.fromURL(avatarPath)
         .then((t) => {

@@ -83,15 +83,15 @@ export function assignTexture(
 }
 
 /************************* Tile Textures *******************************/
-import tileTexDesert from "../public/assets/tile-tex/desert.webp";
-import tileTexWood from "../public/assets/tile-tex/wood.webp";
-import tileTexBrick from "../public/assets/tile-tex/brick.webp";
-import tileTexWool from "../public/assets/tile-tex/wool.webp";
-import tileTexWheat from "../public/assets/tile-tex/wheat.webp";
-import tileTexOre from "../public/assets/tile-tex/ore.webp";
-import tileTexGold from "../public/assets/tile-tex/gold.webp";
-import tileTexSea from "../public/assets/tile-tex/sea.webp";
-import tileTexFog from "../public/assets/tile-tex/fog.jpg";
+import tileTexDesert from "../public/assets/base/board/textures/desert.webp";
+import tileTexWood from "../public/assets/base/board/textures/wood.webp";
+import tileTexBrick from "../public/assets/base/board/textures/brick.webp";
+import tileTexWool from "../public/assets/base/board/textures/wool.webp";
+import tileTexWheat from "../public/assets/base/board/textures/wheat.webp";
+import tileTexOre from "../public/assets/base/board/textures/ore.webp";
+import tileTexGold from "../public/assets/base/board/textures/gold.webp";
+import tileTexSea from "../public/assets/seafarers/textures/sea.webp";
+import tileTexFog from "../public/assets/seafarers/textures/fog.jpg";
 
 export enum TILE_TEX {
     SEA = 7,
@@ -110,17 +110,17 @@ tileTex[TILE_TEX.SEA] = tileTexSea;
 tileTex[TILE_TEX.FOG] = tileTexFog;
 
 /************************* Roads *******************************/
-import roadBeach from "../public/assets/tile-tex/beach.png";
-import roadRoad from "../public/assets/tile-tex/road.png";
-import roadIslandR from "../public/assets/tile-tex/island-r.png";
-import roadIslandL from "../public/assets/tile-tex/island-l.png";
-import roadRed from "../public/assets/tile-tex/road-red.png";
-import roadBlue from "../public/assets/tile-tex/road-blue.png";
-import roadGreen from "../public/assets/tile-tex/road-green.png";
-import roadYellow from "../public/assets/tile-tex/road-yellow.png";
-import roadPlum from "../public/assets/tile-tex/road-plum.png";
-import roadCyan from "../public/assets/tile-tex/road-cyan.png";
-import shipTokenS from "../public/assets/ships/ship-token.png";
+import roadBeach from "../public/assets/seafarers/textures/beach.png";
+import roadRoad from "../public/assets/base/board/textures/road.png";
+import roadIslandR from "../public/assets/seafarers/textures/island-r.png";
+import roadIslandL from "../public/assets/seafarers/textures/island-l.png";
+import roadRed from "../public/assets/base/board/textures/road-red.png";
+import roadBlue from "../public/assets/base/board/textures/road-blue.png";
+import roadGreen from "../public/assets/base/board/textures/road-green.png";
+import roadYellow from "../public/assets/base/board/textures/road-yellow.png";
+import roadPlum from "../public/assets/base/board/textures/road-plum.png";
+import roadCyan from "../public/assets/base/board/textures/road-cyan.png";
+import shipTokenS from "../public/assets/seafarers/pieces/ships/ship-token.png";
 
 export enum ROAD {
     ROAD = "road",
@@ -144,12 +144,12 @@ export const shipToken = shipTokenS;
 
 /******************** House *******************************************/
 
-import houseRed from "../public/assets/city/city-red.png";
-import houseBlue from "../public/assets/city/city-blue.png";
-import houseGreen from "../public/assets/city/city-green.png";
-import houseYellow from "../public/assets/city/city-yellow.png";
-import housePlum from "../public/assets/city/city-plum.png";
-import houseCyan from "../public/assets/city/city-cyan.png";
+import houseRed from "../public/assets/base/pieces/city/city-red.png";
+import houseBlue from "../public/assets/base/pieces/city/city-blue.png";
+import houseGreen from "../public/assets/base/pieces/city/city-green.png";
+import houseYellow from "../public/assets/base/pieces/city/city-yellow.png";
+import housePlum from "../public/assets/base/pieces/city/city-plum.png";
+import houseCyan from "../public/assets/base/pieces/city/city-cyan.png";
 
 export const house: { [key: string]: StaticImageData } = {
     red: houseRed,
@@ -162,12 +162,12 @@ export const house: { [key: string]: StaticImageData } = {
 
 /******************** City *******************************************/
 
-import cityRed from "../public/assets/house/house-red.png";
-import cityBlue from "../public/assets/house/house-blue.png";
-import cityGreen from "../public/assets/house/house-green.png";
-import cityYellow from "../public/assets/house/house-yellow.png";
-import cityPlum from "../public/assets/house/house-plum.png";
-import cityCyan from "../public/assets/house/house-cyan.png";
+import cityRed from "../public/assets/base/pieces/house/house-red.png";
+import cityBlue from "../public/assets/base/pieces/house/house-blue.png";
+import cityGreen from "../public/assets/base/pieces/house/house-green.png";
+import cityYellow from "../public/assets/base/pieces/house/house-yellow.png";
+import cityPlum from "../public/assets/base/pieces/house/house-plum.png";
+import cityCyan from "../public/assets/base/pieces/house/house-cyan.png";
 
 export const city: { [key: string]: StaticImageData } = {
     red: cityRed,
@@ -180,26 +180,26 @@ export const city: { [key: string]: StaticImageData } = {
 
 /******************** Knight *******************************************/
 
-import knight1Red from "../public/assets/knight/1-red.png";
-import knight1Blue from "../public/assets/knight/1-blue.png";
-import knight1Green from "../public/assets/knight/1-green.png";
-import knight1Yellow from "../public/assets/knight/1-yellow.png";
-import knight1Plum from "../public/assets/knight/1-plum.png";
-import knight1Cyan from "../public/assets/knight/1-cyan.png";
-import knight2Red from "../public/assets/knight/2-red.png";
-import knight2Blue from "../public/assets/knight/2-blue.png";
-import knight2Green from "../public/assets/knight/2-green.png";
-import knight2Yellow from "../public/assets/knight/2-yellow.png";
-import knight2Plum from "../public/assets/knight/2-plum.png";
-import knight2Cyan from "../public/assets/knight/2-cyan.png";
-import knight3Red from "../public/assets/knight/3-red.png";
-import knight3Blue from "../public/assets/knight/3-blue.png";
-import knight3Green from "../public/assets/knight/3-green.png";
-import knight3Yellow from "../public/assets/knight/3-yellow.png";
-import knight3Plum from "../public/assets/knight/3-plum.png";
-import knight3Cyan from "../public/assets/knight/3-cyan.png";
+import knight1Red from "../public/assets/cities-knights/pieces/knight/1-red.png";
+import knight1Blue from "../public/assets/cities-knights/pieces/knight/1-blue.png";
+import knight1Green from "../public/assets/cities-knights/pieces/knight/1-green.png";
+import knight1Yellow from "../public/assets/cities-knights/pieces/knight/1-yellow.png";
+import knight1Plum from "../public/assets/cities-knights/pieces/knight/1-plum.png";
+import knight1Cyan from "../public/assets/cities-knights/pieces/knight/1-cyan.png";
+import knight2Red from "../public/assets/cities-knights/pieces/knight/2-red.png";
+import knight2Blue from "../public/assets/cities-knights/pieces/knight/2-blue.png";
+import knight2Green from "../public/assets/cities-knights/pieces/knight/2-green.png";
+import knight2Yellow from "../public/assets/cities-knights/pieces/knight/2-yellow.png";
+import knight2Plum from "../public/assets/cities-knights/pieces/knight/2-plum.png";
+import knight2Cyan from "../public/assets/cities-knights/pieces/knight/2-cyan.png";
+import knight3Red from "../public/assets/cities-knights/pieces/knight/3-red.png";
+import knight3Blue from "../public/assets/cities-knights/pieces/knight/3-blue.png";
+import knight3Green from "../public/assets/cities-knights/pieces/knight/3-green.png";
+import knight3Yellow from "../public/assets/cities-knights/pieces/knight/3-yellow.png";
+import knight3Plum from "../public/assets/cities-knights/pieces/knight/3-plum.png";
+import knight3Cyan from "../public/assets/cities-knights/pieces/knight/3-cyan.png";
 
-import knightDisabledS from "../public/assets/knight/disabled.png";
+import knightDisabledS from "../public/assets/cities-knights/pieces/knight/disabled.png";
 export const knightDisabled = knightDisabledS;
 
 export const knight: { [level: number]: { [color: string]: StaticImageData } } =
@@ -232,12 +232,12 @@ export const knight: { [level: number]: { [color: string]: StaticImageData } } =
 
 /******************************* Merchant *****************************/
 
-import merchantRed from "../public/assets/merchant/red.png";
-import merchantBlue from "../public/assets/merchant/blue.png";
-import merchantGreen from "../public/assets/merchant/green.png";
-import merchantYellow from "../public/assets/merchant/yellow.png";
-import merchantPlum from "../public/assets/merchant/plum.png";
-import merchantCyan from "../public/assets/merchant/cyan.png";
+import merchantRed from "../public/assets/cities-knights/pieces/merchant/red.png";
+import merchantBlue from "../public/assets/cities-knights/pieces/merchant/blue.png";
+import merchantGreen from "../public/assets/cities-knights/pieces/merchant/green.png";
+import merchantYellow from "../public/assets/cities-knights/pieces/merchant/yellow.png";
+import merchantPlum from "../public/assets/cities-knights/pieces/merchant/plum.png";
+import merchantCyan from "../public/assets/cities-knights/pieces/merchant/cyan.png";
 
 export const merchant: { [key: string]: StaticImageData } = {
     red: merchantRed,
@@ -250,9 +250,9 @@ export const merchant: { [key: string]: StaticImageData } = {
 
 /******************************* Metropolis ***************************/
 
-import metro6 from "../public/assets/city/m-6.png";
-import metro7 from "../public/assets/city/m-7.png";
-import metro8 from "../public/assets/city/m-8.png";
+import metro6 from "../public/assets/cities-knights/city-improvements/m-6.png";
+import metro7 from "../public/assets/cities-knights/city-improvements/m-7.png";
+import metro8 from "../public/assets/cities-knights/city-improvements/m-8.png";
 
 export const metropolis: { [key: number]: StaticImageData } = {
     6: metro6,
@@ -262,48 +262,48 @@ export const metropolis: { [key: number]: StaticImageData } = {
 
 /******************************* Other ********************************/
 
-import wallS from "../public/assets/city/w.png";
+import wallS from "../public/assets/cities-knights/city-improvements/w.png";
 export const wall = wallS;
 
-import robberS from "../public/assets/robber.png";
+import robberS from "../public/assets/shared/ui/robber.png";
 export const robber = robberS;
-import pirateS from "../public/assets/pirate.png";
+import pirateS from "../public/assets/seafarers/pieces/pirate.png";
 export const pirate = pirateS;
 
-import bankS from "../public/assets/bank.png";
+import bankS from "../public/assets/shared/ui/bank.png";
 export const bank = bankS;
 
-import settingsS from "../public/assets/settings.png";
+import settingsS from "../public/assets/shared/ui/settings.png";
 export const settings = settingsS;
 
-import botS from "../public/assets/bot.png";
+import botS from "../public/assets/shared/ui/bot.png";
 export const bot = botS;
 
-import spectateS from "../public/assets/spectate.png";
+import spectateS from "../public/assets/shared/ui/spectate.png";
 export const spectate = spectateS;
 
-import seaS from "../public/assets/sea.jpg";
+import seaS from "../public/assets/seafarers/board/sea.jpg";
 export const sea = seaS;
 
-import barbarianTrackS from "../public/assets/barbarian/track.png";
+import barbarianTrackS from "../public/assets/cities-knights/board/barbarian/track.png";
 export const barbarianTrack = barbarianTrackS;
-import barbarianShipS from "../public/assets/barbarian/ship.png";
+import barbarianShipS from "../public/assets/cities-knights/board/barbarian/ship.png";
 export const barbarianShip = barbarianShipS;
 
 /*************************** Number Tokens ****************************/
 
-import num0 from "../public/assets/number-tokens/0.png";
-import num1 from "../public/assets/number-tokens/1.png";
-import num2 from "../public/assets/number-tokens/2.png";
-import num3 from "../public/assets/number-tokens/3.png";
-import num4 from "../public/assets/number-tokens/4.png";
-import num5 from "../public/assets/number-tokens/5.png";
-import num6 from "../public/assets/number-tokens/6.png";
-import num8 from "../public/assets/number-tokens/8.png";
-import num9 from "../public/assets/number-tokens/9.png";
-import num10 from "../public/assets/number-tokens/10.png";
-import num11 from "../public/assets/number-tokens/11.png";
-import num12 from "../public/assets/number-tokens/12.png";
+import num0 from "../public/assets/base/tokens/number-tokens/0.png";
+import num1 from "../public/assets/base/tokens/number-tokens/1.png";
+import num2 from "../public/assets/base/tokens/number-tokens/2.png";
+import num3 from "../public/assets/base/tokens/number-tokens/3.png";
+import num4 from "../public/assets/base/tokens/number-tokens/4.png";
+import num5 from "../public/assets/base/tokens/number-tokens/5.png";
+import num6 from "../public/assets/base/tokens/number-tokens/6.png";
+import num8 from "../public/assets/base/tokens/number-tokens/8.png";
+import num9 from "../public/assets/base/tokens/number-tokens/9.png";
+import num10 from "../public/assets/base/tokens/number-tokens/10.png";
+import num11 from "../public/assets/base/tokens/number-tokens/11.png";
+import num12 from "../public/assets/base/tokens/number-tokens/12.png";
 
 export const numberTokens: { [key: number]: StaticImageData } = {
     0: num0,
@@ -322,11 +322,11 @@ export const numberTokens: { [key: number]: StaticImageData } = {
 
 /************************* Icons **************************************/
 
-import iconCards from "../public/assets/icons/cards.png";
-import iconDcard from "../public/assets/icons/dcard.png";
-import iconKnight from "../public/assets/icons/knight.png";
-import iconRoad from "../public/assets/icons/road.png";
-import iconVp from "../public/assets/icons/vp.png";
+import iconCards from "../public/assets/shared/icons/cards.png";
+import iconDcard from "../public/assets/shared/icons/dcard.png";
+import iconKnight from "../public/assets/shared/icons/knight.png";
+import iconRoad from "../public/assets/shared/icons/road.png";
+import iconVp from "../public/assets/shared/icons/vp.png";
 
 export enum ICON {
     CARDS = "cards",
@@ -346,12 +346,12 @@ export const icons: { [key in ICON]: StaticImageData } = {
 
 /************************* Icons **************************************/
 
-import port1 from "../public/assets/ports/1.png";
-import port2 from "../public/assets/ports/2.png";
-import port3 from "../public/assets/ports/3.png";
-import port4 from "../public/assets/ports/4.png";
-import port5 from "../public/assets/ports/5.png";
-import port6 from "../public/assets/ports/6.png";
+import port1 from "../public/assets/base/tokens/ports/1.png";
+import port2 from "../public/assets/base/tokens/ports/2.png";
+import port3 from "../public/assets/base/tokens/ports/3.png";
+import port4 from "../public/assets/base/tokens/ports/4.png";
+import port5 from "../public/assets/base/tokens/ports/5.png";
+import port6 from "../public/assets/base/tokens/ports/6.png";
 
 export const ports: { [key: number]: StaticImageData } = {
     1: port1,
@@ -364,29 +364,29 @@ export const ports: { [key: number]: StaticImageData } = {
 
 /************************* Buttons ************************************/
 
-import btnYes from "../public/assets/buttons/yes.png";
-import btnNo from "../public/assets/buttons/no.png";
-import btnSettlement from "../public/assets/buttons/settlement.png";
-import btnCity from "../public/assets/buttons/city.png";
-import btnRoad from "../public/assets/buttons/road.png";
-import btnShip from "../public/assets/buttons/ship.png";
-import btnDevelopmentCard from "../public/assets/buttons/dcard.png";
-import btnKnightBox from "../public/assets/buttons/knight.png";
-import btnKnightBuild from "../public/assets/buttons/knight_build.png";
-import btnKnightActivate from "../public/assets/buttons/knight_activate.png";
-import btnKnightRobber from "../public/assets/buttons/knight_robber.png";
-import btnKnightMove from "../public/assets/buttons/knight_move.png";
-import btnMoveShip from "../public/assets/buttons/move_ship.png";
-import btnCityImprove from "../public/assets/buttons/improve.png";
-import btnCityImprovePaper from "../public/assets/buttons/improve_paper.jpg";
-import btnCityImproveCloth from "../public/assets/buttons/improve_cloth.jpg";
-import btnCityImproveCoin from "../public/assets/buttons/improve_coin.jpg";
-import btnWall from "../public/assets/buttons/w.png";
-import btnEndTurn from "../public/assets/buttons/endturn.png";
-import btnSpecialBuild from "../public/assets/buttons/specialbuild.png";
-import btnEdit from "../public/assets/buttons/edit.png";
-import btnFullscreen from "../public/assets/buttons/fullscreen.png";
-import btnChat from "../public/assets/buttons/chat.png";
+import btnYes from "../public/assets/shared/buttons/yes.png";
+import btnNo from "../public/assets/shared/buttons/no.png";
+import btnSettlement from "../public/assets/shared/buttons/settlement.png";
+import btnCity from "../public/assets/shared/buttons/city.png";
+import btnRoad from "../public/assets/shared/buttons/road.png";
+import btnShip from "../public/assets/shared/buttons/ship.png";
+import btnDevelopmentCard from "../public/assets/shared/buttons/dcard.png";
+import btnKnightBox from "../public/assets/shared/buttons/knight.png";
+import btnKnightBuild from "../public/assets/shared/buttons/knight_build.png";
+import btnKnightActivate from "../public/assets/shared/buttons/knight_activate.png";
+import btnKnightRobber from "../public/assets/shared/buttons/knight_robber.png";
+import btnKnightMove from "../public/assets/shared/buttons/knight_move.png";
+import btnMoveShip from "../public/assets/shared/buttons/move_ship.png";
+import btnCityImprove from "../public/assets/shared/buttons/improve.png";
+import btnCityImprovePaper from "../public/assets/shared/buttons/improve_paper.jpg";
+import btnCityImproveCloth from "../public/assets/shared/buttons/improve_cloth.jpg";
+import btnCityImproveCoin from "../public/assets/shared/buttons/improve_coin.jpg";
+import btnWall from "../public/assets/shared/buttons/w.png";
+import btnEndTurn from "../public/assets/shared/buttons/endturn.png";
+import btnSpecialBuild from "../public/assets/shared/buttons/specialbuild.png";
+import btnEdit from "../public/assets/shared/buttons/edit.png";
+import btnFullscreen from "../public/assets/shared/buttons/fullscreen.png";
+import btnChat from "../public/assets/shared/buttons/chat.png";
 
 export const buttons: { [key in ButtonType]: StaticImageData } = {
     yes: btnYes,
@@ -415,12 +415,12 @@ export const buttons: { [key in ButtonType]: StaticImageData } = {
 };
 
 // Button backgrounds
-import buttonsBgRed from "../public/assets/buttons/bg/red.jpg";
-import buttonsBgBlue from "../public/assets/buttons/bg/blue.jpg";
-import buttonsBgGreen from "../public/assets/buttons/bg/green.jpg";
-import buttonsBgYellow from "../public/assets/buttons/bg/yellow.jpg";
-import buttonsBgPlum from "../public/assets/buttons/bg/plum.jpg";
-import buttonsBgCyan from "../public/assets/buttons/bg/cyan.jpg";
+import buttonsBgRed from "../public/assets/shared/buttons/bg/red.jpg";
+import buttonsBgBlue from "../public/assets/shared/buttons/bg/blue.jpg";
+import buttonsBgGreen from "../public/assets/shared/buttons/bg/green.jpg";
+import buttonsBgYellow from "../public/assets/shared/buttons/bg/yellow.jpg";
+import buttonsBgPlum from "../public/assets/shared/buttons/bg/plum.jpg";
+import buttonsBgCyan from "../public/assets/shared/buttons/bg/cyan.jpg";
 
 export const buttonsBg: { [key: string]: StaticImageData } = {
     red: buttonsBgRed,
@@ -432,22 +432,22 @@ export const buttonsBg: { [key: string]: StaticImageData } = {
 };
 
 /************************* Dice ************************************/
-import diceW1 from "../public/assets/dice/dice-1.png";
-import diceW2 from "../public/assets/dice/dice-2.png";
-import diceW3 from "../public/assets/dice/dice-3.png";
-import diceW4 from "../public/assets/dice/dice-4.png";
-import diceW5 from "../public/assets/dice/dice-5.png";
-import diceW6 from "../public/assets/dice/dice-6.png";
-import diceR1 from "../public/assets/dice/dice-1-r.png";
-import diceR2 from "../public/assets/dice/dice-2-r.png";
-import diceR3 from "../public/assets/dice/dice-3-r.png";
-import diceR4 from "../public/assets/dice/dice-4-r.png";
-import diceR5 from "../public/assets/dice/dice-5-r.png";
-import diceR6 from "../public/assets/dice/dice-6-r.png";
-import diceE1 from "../public/assets/dice/event-1.png";
-import diceE2 from "../public/assets/dice/event-2.png";
-import diceE3 from "../public/assets/dice/event-3.png";
-import diceE4 from "../public/assets/dice/event-4.png";
+import diceW1 from "../public/assets/shared/dice/dice-1.png";
+import diceW2 from "../public/assets/shared/dice/dice-2.png";
+import diceW3 from "../public/assets/shared/dice/dice-3.png";
+import diceW4 from "../public/assets/shared/dice/dice-4.png";
+import diceW5 from "../public/assets/shared/dice/dice-5.png";
+import diceW6 from "../public/assets/shared/dice/dice-6.png";
+import diceR1 from "../public/assets/shared/dice/dice-1-r.png";
+import diceR2 from "../public/assets/shared/dice/dice-2-r.png";
+import diceR3 from "../public/assets/shared/dice/dice-3-r.png";
+import diceR4 from "../public/assets/shared/dice/dice-4-r.png";
+import diceR5 from "../public/assets/shared/dice/dice-5-r.png";
+import diceR6 from "../public/assets/shared/dice/dice-6-r.png";
+import diceE1 from "../public/assets/shared/dice/event-1.png";
+import diceE2 from "../public/assets/shared/dice/event-2.png";
+import diceE3 from "../public/assets/shared/dice/event-3.png";
+import diceE4 from "../public/assets/shared/dice/event-4.png";
 
 export const diceWhite: { [key: number]: StaticImageData } = {
     1: diceW1,
@@ -476,61 +476,61 @@ export const diceEvent: { [key: number]: StaticImageData } = {
 
 /****************** Cards *********************************************/
 
-import cards0 from "../public/assets/cards/0.jpg";
-import cards1 from "../public/assets/cards/wood.webp";
-import cards2 from "../public/assets/cards/brick.webp";
-import cards3 from "../public/assets/cards/wool.webp";
-import cards4 from "../public/assets/cards/wheat.webp";
-import cards5 from "../public/assets/cards/ore.webp";
-import cards6 from "../public/assets/cards/6.jpg";
-import cards7 from "../public/assets/cards/7.jpg";
-import cards8 from "../public/assets/cards/8.jpg";
-import cards101 from "../public/assets/cards/101.jpg";
-import cards102 from "../public/assets/cards/102.jpg";
-import cards103 from "../public/assets/cards/103.jpg";
-import cards104 from "../public/assets/cards/104.jpg";
-import cards105 from "../public/assets/cards/105.jpg";
-import cards106 from "../public/assets/cards/106.jpg";
-import cards107 from "../public/assets/cards/107.jpg";
-import cards108 from "../public/assets/cards/108.jpg";
-import cards109 from "../public/assets/cards/109.jpg";
-import cards110 from "../public/assets/cards/110.jpg";
-import cards111 from "../public/assets/cards/111.jpg";
-import cards112 from "../public/assets/cards/112.jpg";
-import cards113 from "../public/assets/cards/113.jpg";
-import cards114 from "../public/assets/cards/114.jpg";
-import cards115 from "../public/assets/cards/115.jpg";
-import cards116 from "../public/assets/cards/116.jpg";
-import cards117 from "../public/assets/cards/117.jpg";
-import cards118 from "../public/assets/cards/118.jpg";
-import cards119 from "../public/assets/cards/119.jpg";
-import cards120 from "../public/assets/cards/120.jpg";
-import cards121 from "../public/assets/cards/121.jpg";
-import cards122 from "../public/assets/cards/122.jpg";
-import cards123 from "../public/assets/cards/123.jpg";
-import cards124 from "../public/assets/cards/124.jpg";
-import cards125 from "../public/assets/cards/125.jpg";
-import cards126 from "../public/assets/cards/126.jpg";
-import cards127 from "../public/assets/cards/127.jpg";
-import cards128 from "../public/assets/cards/128.jpg";
-import cards129 from "../public/assets/cards/129.jpg";
-import cards130 from "../public/assets/cards/130.jpg";
-import cards200 from "../public/assets/cards/200.jpg";
-import cards201 from "../public/assets/cards/201.jpg";
-import cards202 from "../public/assets/cards/202.jpg";
-import cards203 from "../public/assets/cards/203.jpg";
-import cards204 from "../public/assets/cards/204.jpg";
-import cards205 from "../public/assets/cards/205.jpg";
-import cards206 from "../public/assets/cards/206.jpg";
-import cards207 from "../public/assets/cards/207.jpg";
-import cards208 from "../public/assets/cards/208.jpg";
-import cards209 from "../public/assets/cards/209.jpg";
-import cards210 from "../public/assets/cards/210.jpg";
-import cards211 from "../public/assets/cards/211.jpg";
-import cards212 from "../public/assets/cards/212.jpg";
-import cards213 from "../public/assets/cards/213.jpg";
-import cards214 from "../public/assets/cards/214.jpg";
-import cards215 from "../public/assets/cards/215.jpg";
+import cards0 from "../public/assets/base/cards/decks/0.jpg";
+import cards1 from "../public/assets/base/cards/decks/wood.webp";
+import cards2 from "../public/assets/base/cards/decks/brick.webp";
+import cards3 from "../public/assets/base/cards/decks/wool.webp";
+import cards4 from "../public/assets/base/cards/decks/wheat.webp";
+import cards5 from "../public/assets/base/cards/decks/ore.webp";
+import cards6 from "../public/assets/base/cards/decks/6.jpg";
+import cards7 from "../public/assets/base/cards/decks/7.jpg";
+import cards8 from "../public/assets/base/cards/decks/8.jpg";
+import cards101 from "../public/assets/base/cards/decks/101.jpg";
+import cards102 from "../public/assets/base/cards/decks/102.jpg";
+import cards103 from "../public/assets/base/cards/decks/103.jpg";
+import cards104 from "../public/assets/base/cards/decks/104.jpg";
+import cards105 from "../public/assets/base/cards/decks/105.jpg";
+import cards106 from "../public/assets/base/cards/decks/106.jpg";
+import cards107 from "../public/assets/base/cards/decks/107.jpg";
+import cards108 from "../public/assets/base/cards/decks/108.jpg";
+import cards109 from "../public/assets/base/cards/decks/109.jpg";
+import cards110 from "../public/assets/base/cards/decks/110.jpg";
+import cards111 from "../public/assets/base/cards/decks/111.jpg";
+import cards112 from "../public/assets/base/cards/decks/112.jpg";
+import cards113 from "../public/assets/base/cards/decks/113.jpg";
+import cards114 from "../public/assets/base/cards/decks/114.jpg";
+import cards115 from "../public/assets/base/cards/decks/115.jpg";
+import cards116 from "../public/assets/base/cards/decks/116.jpg";
+import cards117 from "../public/assets/base/cards/decks/117.jpg";
+import cards118 from "../public/assets/base/cards/decks/118.jpg";
+import cards119 from "../public/assets/base/cards/decks/119.jpg";
+import cards120 from "../public/assets/base/cards/decks/120.jpg";
+import cards121 from "../public/assets/base/cards/decks/121.jpg";
+import cards122 from "../public/assets/base/cards/decks/122.jpg";
+import cards123 from "../public/assets/base/cards/decks/123.jpg";
+import cards124 from "../public/assets/base/cards/decks/124.jpg";
+import cards125 from "../public/assets/base/cards/decks/125.jpg";
+import cards126 from "../public/assets/base/cards/decks/126.jpg";
+import cards127 from "../public/assets/base/cards/decks/127.jpg";
+import cards128 from "../public/assets/base/cards/decks/128.jpg";
+import cards129 from "../public/assets/base/cards/decks/129.jpg";
+import cards130 from "../public/assets/base/cards/decks/130.jpg";
+import cards200 from "../public/assets/base/cards/decks/200.jpg";
+import cards201 from "../public/assets/base/cards/decks/201.jpg";
+import cards202 from "../public/assets/base/cards/decks/202.jpg";
+import cards203 from "../public/assets/base/cards/decks/203.jpg";
+import cards204 from "../public/assets/base/cards/decks/204.jpg";
+import cards205 from "../public/assets/base/cards/decks/205.jpg";
+import cards206 from "../public/assets/base/cards/decks/206.jpg";
+import cards207 from "../public/assets/base/cards/decks/207.jpg";
+import cards208 from "../public/assets/base/cards/decks/208.jpg";
+import cards209 from "../public/assets/base/cards/decks/209.jpg";
+import cards210 from "../public/assets/base/cards/decks/210.jpg";
+import cards211 from "../public/assets/base/cards/decks/211.jpg";
+import cards212 from "../public/assets/base/cards/decks/212.jpg";
+import cards213 from "../public/assets/base/cards/decks/213.jpg";
+import cards214 from "../public/assets/base/cards/decks/214.jpg";
+import cards215 from "../public/assets/base/cards/decks/215.jpg";
 
 export const cards: { [key: number]: StaticImageData } = {
     0: cards0,
@@ -609,11 +609,11 @@ export async function loadAssets() {
 
     // Sounds
     await Promise.all([
-        addSound("soundRing", "/assets/sound/ring.wav"),
-        addSound("soundTrade", "/assets/sound/trade.wav"),
-        addSound("soundDice", "/assets/sound/dice.wav"),
-        addSound("soundChat", "/assets/sound/chat.wav"),
-        addSound("soundPlayCard", "/assets/sound/playcard.wav"),
+        addSound("soundRing", "/assets/shared/sound/ring.wav"),
+        addSound("soundTrade", "/assets/shared/sound/trade.wav"),
+        addSound("soundDice", "/assets/shared/sound/dice.wav"),
+        addSound("soundChat", "/assets/shared/sound/chat.wav"),
+        addSound("soundPlayCard", "/assets/shared/sound/playcard.wav"),
     ]);
 
     // Progress by number of assets

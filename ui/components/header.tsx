@@ -16,17 +16,17 @@ const linkClass =
     "text-sm md:text-base font-semibold tracking-wide text-[color:var(--ui-ivory)] opacity-90 hover:opacity-100 hover:text-[color:var(--ui-gold-soft)] transition-colors duration-200";
 
 const profileIconByUsername: Record<string, string> = {
-    jethro7194: "/assets/profile-icons/jethro.png",
-    kopstiklapsa: "/assets/profile-icons/kopsetinklapsa.png",
-    staxtoputa: "/assets/profile-icons/staxtoputa.png",
-    giorgaros: "/assets/profile-icons/giorgaros.png",
+    jethro7194: "/assets/shared/profile-icons/jethro.png",
+    kopstiklapsa: "/assets/shared/profile-icons/kopsetinklapsa.png",
+    staxtoputa: "/assets/shared/profile-icons/staxtoputa.png",
+    giorgaros: "/assets/shared/profile-icons/giorgaros.png",
 };
 
 const Header: FunctionComponent<{
     socket?: MutableRefObject<ReconnectingWebSocket | null>;
 }> = ({ socket: _socket }) => {
     const [profileIcon, setProfileIcon] = useState(
-        "/assets/profile-icons/user-icon.jpeg",
+        "/assets/shared/profile-icons/user-icon.jpeg",
     );
 
     useEffect(() => {
@@ -38,7 +38,7 @@ const Header: FunctionComponent<{
         ).toLowerCase();
         setProfileIcon(
             profileIconByUsername[profileUsername] ||
-                "/assets/profile-icons/user-icon.jpeg",
+                "/assets/shared/profile-icons/user-icon.jpeg",
         );
     }, []);
 

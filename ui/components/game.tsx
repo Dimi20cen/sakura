@@ -339,7 +339,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                                 GAME_MODE.CitiesAndKnights
                                             }
                                         >
-                                            Wonders &amp; Warriors
+                                            Cities and Knights
                                         </option>
                                     </select>
                                 </div>
@@ -796,7 +796,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                         </div>
                         <div className="relative w-full min-h-[280px]">
                             <Image
-                                src="/assets/timing-rules.png"
+                                src="/assets/shared/ui/timing-rules.png"
                                 alt="Catan timer reference table"
                                 layout="responsive"
                                 width={1200}

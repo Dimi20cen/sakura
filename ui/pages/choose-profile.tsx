@@ -11,13 +11,13 @@ type ProfileOption = {
 };
 
 const profiles: ProfileOption[] = [
-    { username: "Jethro7194", icon: "/assets/profile-icons/jethro.png" },
+    { username: "Jethro7194", icon: "/assets/shared/profile-icons/jethro.png" },
     {
         username: "KopsTiKlapsa",
-        icon: "/assets/profile-icons/kopsetinklapsa.png",
+        icon: "/assets/shared/profile-icons/kopsetinklapsa.png",
     },
-    { username: "staxtoPUTA", icon: "/assets/profile-icons/staxtoputa.png" },
-    { username: "Giorgaros", icon: "/assets/profile-icons/giorgaros.png" },
+    { username: "staxtoPUTA", icon: "/assets/shared/profile-icons/staxtoputa.png" },
+    { username: "Giorgaros", icon: "/assets/shared/profile-icons/giorgaros.png" },
 ];
 
 const ChooseProfile: NextPage = () => {

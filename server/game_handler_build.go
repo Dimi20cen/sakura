@@ -8,6 +8,18 @@ import (
 )
 
 func (ws *WsClient) handleBuildOrBuyCommand(msg map[string]interface{}) {
+	if ws.handleBaseBuildOrBuyCommand(msg) {
+		return
+	}
+	if ws.handleCnkBuildOrBuyCommand(msg) {
+		return
+	}
+	if ws.handleSeafarersBuildOrBuyCommand(msg) {
+		return
+	}
+}
+
+func (ws *WsClient) handleBaseBuildOrBuyCommand(msg map[string]interface{}) bool {
 	switch msg["o"] { // Object type
 	case "s": // Settlement
 		ws.handleBuildSettlement()
@@ -17,6 +29,16 @@ func (ws *WsClient) handleBuildOrBuyCommand(msg map[string]interface{}) {
 		ws.handleBuildRoad()
 	case "dc": // Development card
 		ws.handleBuyDevelopmentCard()
+	case "udc": // Use Development card
+		ws.handleUseDevelopmentCard(msg)
+	default:
+		return false
+	}
+	return true
+}
+
+func (ws *WsClient) handleCnkBuildOrBuyCommand(msg map[string]interface{}) bool {
+	switch msg["o"] { // Object type
 	case "k": // Knight
 		ws.handleBuildKnight()
 	case "ka": // Knight Activate
@@ -29,13 +51,22 @@ func (ws *WsClient) handleBuildOrBuyCommand(msg map[string]interface{}) {
 		ws.handleCityImprovement(msg)
 	case "w": // Wall
 		ws.handleBuildWall()
+	default:
+		return false
+	}
+	return true
+}
+
+func (ws *WsClient) handleSeafarersBuildOrBuyCommand(msg map[string]interface{}) bool {
+	switch msg["o"] { // Object type
 	case "sh": // Ship
 		ws.handleBuildShip()
 	case "ms": // Move ship
 		ws.handleMoveShip()
-	case "udc": // Use Development card
-		ws.handleUseDevelopmentCard(msg)
+	default:
+		return false
 	}
+	return true
 }
 
 func (ws *WsClient) handleBuildSettlement() {

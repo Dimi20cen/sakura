@@ -1,6 +1,6 @@
 package game
 
-import "imperials/entities"
+import "sakura/entities"
 
 func (ai *AI) ChooseMerchantLocation(p *entities.Player, allowed []*entities.Tile) *entities.Tile {
 	maxCardTile := allowed[0]

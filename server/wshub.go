@@ -1,10 +1,10 @@
 package server
 
 import (
-	"imperials/entities"
-	"imperials/game"
-	"imperials/mango"
-	"imperials/maps"
+	"sakura/entities"
+	"sakura/game"
+	"sakura/mango"
+	"sakura/maps"
 	"log"
 	"sync"
 	"sync/atomic"

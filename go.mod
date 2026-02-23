@@ -1,4 +1,4 @@
-module imperials
+module sakura
 
 go 1.17
 

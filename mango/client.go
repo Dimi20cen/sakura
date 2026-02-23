@@ -9,7 +9,7 @@ import (
 
 var MangoClient *mongo.Client
 
-const MANGO_DATABASE = "imperials"
+const MANGO_DATABASE = "sakura"
 
 func GetClient() (*mongo.Client, error) {
 	if MangoClient != nil {

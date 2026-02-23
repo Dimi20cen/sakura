@@ -1,9 +1,9 @@
-# Imperials!
+# SAKURA!
 
 Open source game with mechanics similar to Catan.
 
-[![Website](https://img.shields.io/website?url=https%3A%2F%2Fimperials.radialapps.com&label=imperials.radialapps.com)](https://imperials.radialapps.com)
-[![Blog](https://img.shields.io/website?url=https%3A%2F%2Fblog.imperials.app&label=blog)](https://blog.imperials.app)
+[![Website](https://img.shields.io/website?url=https%3A%2F%2Fsakura.radialapps.com&label=sakura.radialapps.com)](https://sakura.radialapps.com)
+[![Blog](https://img.shields.io/website?url=https%3A%2F%2Fblog.sakura.app&label=blog)](https://blog.sakura.app)
 [![License](https://img.shields.io/badge/license-AGPLv3-red)](./LICENSE)
 
 ![screenshot](./screenshot.jpg)

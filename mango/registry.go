@@ -53,7 +53,7 @@ func (mr *MangoRegistry) Heartbeat(url string) error {
 }
 
 func (mr *MangoRegistry) CreateUser(id, username string) error {
-	return mr.CreateUserWithEmail(id, username, username+"@imperials.app")
+	return mr.CreateUserWithEmail(id, username, username+"@sakura.app")
 }
 
 func (mr *MangoRegistry) CreateUserWithEmail(id, username, email string) error {

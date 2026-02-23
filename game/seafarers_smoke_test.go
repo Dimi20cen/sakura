@@ -2,8 +2,8 @@ package game
 
 import (
 	"errors"
-	"imperials/entities"
-	"imperials/maps"
+	"sakura/entities"
+	"sakura/maps"
 	"testing"
 	"time"
 )

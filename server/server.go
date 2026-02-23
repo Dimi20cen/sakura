@@ -3,7 +3,7 @@ package server
 import (
 	"encoding/json"
 	"fmt"
-	"imperials/mango"
+	"sakura/mango"
 	"log"
 	"net/http"
 	"os"
@@ -78,7 +78,7 @@ func (s *Server) Run() {
 	n.UseHandler(r)
 
 	address := fmt.Sprintf("%s:%s", os.Getenv("HOST"), os.Getenv("PORT"))
-	log.Println("Starting the Imperial backend on", address)
+	log.Println("Starting the SAKURA backend on", address)
 	http.ListenAndServe(address, n)
 }
 
@@ -125,7 +125,7 @@ func (s *Server) registerUser(w http.ResponseWriter, r *http.Request) {
 	var claims jwt.MapClaims
 	mapstructure.Decode(r.Context().Value(ContextKey("claims")), &claims)
 
-	if claims["oauth"] != "google" || claims["iss"] != "urn:imperials:issuer" {
+	if claims["oauth"] != "google" || claims["iss"] != "urn:sakura:issuer" {
 		WriteJson(w, http.StatusNotFound, map[string]string{"error": "Invalid Auth token"})
 		return
 	}

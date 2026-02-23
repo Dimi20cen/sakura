@@ -56,25 +56,25 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
     return (
         <>
             <Head>
-                <title>Clash</title>
-                <meta name="title" content="Clash" />
-                <meta name="description" content="Strategize to imperialize" />
+                <title>SAKURA</title>
+                <meta name="title" content="SAKURA" />
+                <meta name="description" content="Strategize to conquer" />
 
                 <meta property="og:type" content="website" />
                 <meta property="og:url" content="http://localhost:3000/" />
-                <meta property="og:title" content="Clash" />
+                <meta property="og:title" content="SAKURA" />
                 <meta
                     property="og:description"
-                    content="Strategize to imperialize"
+                    content="Strategize to conquer"
                 />
                 <meta property="og:image" content="" />
 
                 <meta property="twitter:card" content="summary_large_image" />
                 <meta property="twitter:url" content="http://localhost:3000/" />
-                <meta property="twitter:title" content="Clash" />
+                <meta property="twitter:title" content="SAKURA" />
                 <meta
                     property="twitter:description"
-                    content="Strategize to imperialize"
+                    content="Strategize to conquer"
                 />
                 <meta property="twitter:image" content="" />
 
@@ -90,8 +90,8 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
                 <link rel="manifest" href="manifest.json" />
                 <meta name="mobile-web-app-capable" content="yes" />
                 <meta name="apple-mobile-web-app-capable" content="yes" />
-                <meta name="application-name" content="Clash" />
-                <meta name="apple-mobile-web-app-title" content="Clash" />
+                <meta name="application-name" content="SAKURA" />
+                <meta name="apple-mobile-web-app-title" content="SAKURA" />
                 <meta name="theme-color" content="#251916" />
                 <meta name="msapplication-navbutton-color" content="#251916" />
                 <meta

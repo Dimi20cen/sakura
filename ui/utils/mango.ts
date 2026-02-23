@@ -23,7 +23,7 @@ async function connectToDatabase() {
         process.exit(1);
     }
 
-    const db: mongoDB.Db = client.db("imperials");
+    const db: mongoDB.Db = client.db("sakura");
 
     const serversCollection: mongoDB.Collection = db.collection("servers");
     const usersCollection: mongoDB.Collection = db.collection("users");

@@ -1,6 +1,6 @@
 # Contributor License Agreement
 
-Thank you for your interest in contributing to Imperials!
+Thank you for your interest in contributing to SAKURA!
 
 1. I grant to the project owner and its successors or assigns (the "Maintainer") a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable license to reproduce, prepare derivative works of, publicly display, publicly perform, sublicense, and distribute my contributions and any derivative works created from them.
 

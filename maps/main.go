@@ -2,7 +2,7 @@ package maps
 
 import (
 	"encoding/json"
-	"imperials/entities"
+	"sakura/entities"
 )
 
 const (

@@ -6,8 +6,8 @@ export const encode = async (params: JWTEncodeParams): Promise<string> => {
     const jwt = await new jose.SignJWT(params.token!)
         .setProtectedHeader({ alg: "HS256" })
         .setIssuedAt()
-        .setIssuer("urn:imperials:issuer")
-        .setAudience("urn:imperials:audience")
+        .setIssuer("urn:sakura:issuer")
+        .setAudience("urn:sakura:audience")
         .sign(Buffer.from(process.env.NEXTAUTH_SECRET!, "utf8"));
 
     return jwt;
@@ -18,8 +18,8 @@ export const decode = async (params: JWTDecodeParams): Promise<JWT | null> => {
         params.token!,
         Buffer.from(process.env.NEXTAUTH_SECRET!, "utf8"),
         {
-            issuer: "urn:imperials:issuer",
-            audience: "urn:imperials:audience",
+            issuer: "urn:sakura:issuer",
+            audience: "urn:sakura:audience",
         },
     );
 

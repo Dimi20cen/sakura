@@ -1,6 +1,6 @@
 # UI (Next.js Frontend)
 
-This folder contains the Imperials frontend app.
+This folder contains the SAKURA frontend app.
 
 ## Prerequisites
 

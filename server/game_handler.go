@@ -2,7 +2,7 @@ package server
 
 import (
 	"errors"
-	"imperials/entities"
+	"sakura/entities"
 
 	"github.com/mitchellh/mapstructure"
 )

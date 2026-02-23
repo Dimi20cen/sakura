@@ -1,6 +1,6 @@
 package game
 
-import "imperials/entities"
+import "sakura/entities"
 
 type ScenarioHookSet struct {
 	FilterInitVertices func(g *Game, p *entities.Player, allowed []*entities.Vertex) []*entities.Vertex

@@ -52,15 +52,15 @@ const Header: FunctionComponent<{
                 <div className="ui-page !w-[min(1200px,100%-24px)] !py-0">
                     <div className="flex justify-between items-center py-3 md:py-4 md:justify-start md:space-x-10">
                     <div>
-                        <span className="sr-only">Clash</span>
-                        <div className="h-auto w-auto rounded-full border border-[rgba(231,222,206,0.25)] shadow-[var(--ui-shadow-soft)]">
+                        <span className="sr-only">SAKURA</span>
+                        <div className="h-auto w-auto rounded-tl-[38%] rounded-tr-[62%] rounded-br-[43%] rounded-bl-[57%] border border-[rgba(231,222,206,0.25)] shadow-[var(--ui-shadow-soft)] -rotate-3 p-2">
                             <Link href="/" passHref>
                                 <Image
                                     src="/icon.png"
-                                    alt="Clash"
+                                    alt="SAKURA"
                                     height={64}
                                     width={64}
-                                    className="h-14 w-14 sm:h-16 sm:w-16 cursor-pointer rounded-full"
+                                    className="h-[38px] w-[38px] sm:h-[43px] sm:w-[43px] cursor-pointer rotate-3"
                                 />
                             </Link>
                         </div>
@@ -123,10 +123,10 @@ const Header: FunctionComponent<{
                                 <div className="">
                                     <Image
                                         src="/icon.png"
-                                        alt="Clash"
+                                        alt="SAKURA"
                                         height={64}
                                         width={64}
-                                        className="rounded-full"
+                                        className="h-11 w-11"
                                     />
                                 </div>
                                 <div className="-mr-2">

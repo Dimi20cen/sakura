@@ -2,9 +2,9 @@ package server
 
 import (
 	"errors"
-	"imperials/entities"
-	"imperials/game"
-	"imperials/maps"
+	"sakura/entities"
+	"sakura/game"
+	"sakura/maps"
 	"testing"
 	"time"
 

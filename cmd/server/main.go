@@ -1,7 +1,7 @@
 package main
 
 import (
-	"imperials/server"
+	"sakura/server"
 
 	_ "github.com/joho/godotenv/autoload"
 )

@@ -13,10 +13,10 @@ COPY go.* ./
 RUN go mod download
 
 COPY . .
-RUN go build -o imperials ./cmd/server/main.go
+RUN go build -o sakura ./cmd/server/main.go
 
 FROM alpine:latest
 WORKDIR /app
-COPY --from=0 /app/imperials .
+COPY --from=0 /app/sakura .
 
-CMD ["/app/imperials"]
+CMD ["/app/sakura"]

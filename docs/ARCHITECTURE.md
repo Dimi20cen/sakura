@@ -1,6 +1,6 @@
 # Architecture Overview
 
-This document explains how Imperials components communicate in local development.
+This document explains how SAKURA components communicate in local development.
 
 ## High-Level Components
 

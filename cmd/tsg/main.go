@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"imperials/entities"
-	"imperials/game"
+	"sakura/entities"
+	"sakura/game"
 	"log"
 	"os"
 	"reflect"

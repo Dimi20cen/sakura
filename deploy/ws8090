@@ -4,7 +4,7 @@ limit_req_zone $binary_remote_addr zone=userlimit:10m rate=2r/s;
 server {
 	root /var/www/html;
 
-	server_name 1.imperials.app;
+	server_name 1.sakura.app;
 
     location /anon {
         limit_req zone=userlimit burst=2 nodelay;
@@ -27,8 +27,8 @@ server {
 
     listen [::]:443 ssl; # managed by Certbot
     listen 443 ssl; # managed by Certbot
-    ssl_certificate /etc/letsencrypt/live/imperials.app/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/imperials.app/privkey.pem; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/sakura.app/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/sakura.app/privkey.pem; # managed by Certbot
     include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
 

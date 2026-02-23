@@ -1,6 +1,6 @@
 # Quick Start
 
-This is the shortest path to run Imperials locally.
+This is the shortest path to run SAKURA locally.
 
 ## Prerequisites
 
@@ -12,8 +12,8 @@ This is the shortest path to run Imperials locally.
 ## 1. Clone and enter repo
 
 ```bash
-git clone <your-fork-or-repo-url> imperials
-cd imperials
+git clone <your-fork-or-repo-url> sakura
+cd sakura
 ```
 
 ## 2. Start MongoDB
@@ -33,11 +33,11 @@ docker compose up -d mongodb
 
 ## 3. Configure backend env
 
-Create `/path/to/imperials/.env`:
+Create `/path/to/sakura/.env`:
 
 ```env
 ENVIRONMENT=local
-MONGO_URL=mongodb://root:root@localhost:27017/imperials?authSource=admin
+MONGO_URL=mongodb://root:root@localhost:27017/sakura?authSource=admin
 HMAC_SECRET=replace-with-a-long-random-secret
 FRONTEND_URL=http://localhost:3000
 HOST=0.0.0.0
@@ -50,10 +50,10 @@ MONGO_PASSWORD=root
 
 ## 4. Configure frontend env
 
-Create `/path/to/imperials/ui/.env.local`:
+Create `/path/to/sakura/ui/.env.local`:
 
 ```env
-MONGO_URL=mongodb://root:root@localhost:27017/imperials?authSource=admin
+MONGO_URL=mongodb://root:root@localhost:27017/sakura?authSource=admin
 NEXTAUTH_SECRET=replace-with-a-second-long-random-secret
 NEXT_PUBLIC_ENVIRONMENT=local
 GOOGLE_ID=
@@ -84,7 +84,7 @@ go run cmd/server/main.go
 You should see logs including:
 
 - `Connected to MongoDB!`
-- `Starting the Imperial backend on 0.0.0.0:8090`
+- `Starting the SAKURA backend on 0.0.0.0:8090`
 
 ## 7. Run frontend
 

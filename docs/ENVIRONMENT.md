@@ -16,7 +16,7 @@ Used by Go services in `cmd/server/main.go`, `server/*`, and `mango/*`.
 | Variable | Example | Used for |
 | --- | --- | --- |
 | `ENVIRONMENT` | `local` | Chooses local vs production Mongo config path (`mango/config.go`) |
-| `MONGO_URL` | `mongodb://root:root@localhost:27017/imperials?authSource=admin` | MongoDB connection URI |
+| `MONGO_URL` | `mongodb://root:root@localhost:27017/sakura?authSource=admin` | MongoDB connection URI |
 | `HMAC_SECRET` | `long-random-string` | Signs and verifies backend JWTs (`server/jwt.go`) |
 | `FRONTEND_URL` | `http://localhost:3000` | CORS allowed origin (`server/server.go`) |
 | `HOST` | `0.0.0.0` | Backend bind host (`server/server.go`) |
@@ -30,7 +30,7 @@ Used by Go services in `cmd/server/main.go`, `server/*`, and `mango/*`.
 
 ```env
 ENVIRONMENT=local
-MONGO_URL=mongodb://root:root@localhost:27017/imperials?authSource=admin
+MONGO_URL=mongodb://root:root@localhost:27017/sakura?authSource=admin
 HMAC_SECRET=replace-with-a-long-random-secret
 FRONTEND_URL=http://localhost:3000
 HOST=0.0.0.0
@@ -49,7 +49,7 @@ Used by Next.js pages and API routes in `ui/*`.
 
 | Variable | Example | Used for |
 | --- | --- | --- |
-| `MONGO_URL` | `mongodb://root:root@localhost:27017/imperials?authSource=admin` | Next.js API routes that query MongoDB (`ui/utils/mango.ts`) |
+| `MONGO_URL` | `mongodb://root:root@localhost:27017/sakura?authSource=admin` | Next.js API routes that query MongoDB (`ui/utils/mango.ts`) |
 | `NEXTAUTH_SECRET` | `long-random-string` | NextAuth JWT encode/decode secret (`ui/utils/auth.ts`) |
 | `NEXT_PUBLIC_ENVIRONMENT` | `local` | Toggles production-only analytics/ads in `_app.tsx` |
 
@@ -64,7 +64,7 @@ Used by Next.js pages and API routes in `ui/*`.
 ### Example `ui/.env.local`
 
 ```env
-MONGO_URL=mongodb://root:root@localhost:27017/imperials?authSource=admin
+MONGO_URL=mongodb://root:root@localhost:27017/sakura?authSource=admin
 NEXTAUTH_SECRET=replace-with-another-long-random-secret
 NEXT_PUBLIC_ENVIRONMENT=local
 GOOGLE_ID=

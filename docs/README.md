@@ -1,6 +1,6 @@
-# Imperials Documentation
+# SAKURA Documentation
 
-This folder contains the canonical docs for running and understanding Imperials locally.
+This folder contains the canonical docs for running and understanding SAKURA locally.
 
 ## Contents
 

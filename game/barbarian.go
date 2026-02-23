@@ -1,7 +1,7 @@
 package game
 
 import (
-	"imperials/entities"
+	"sakura/entities"
 	"sync"
 
 	"github.com/mitchellh/mapstructure"

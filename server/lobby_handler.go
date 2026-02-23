@@ -1,8 +1,8 @@
 package server
 
 import (
-	"imperials/entities"
-	"imperials/maps"
+	"sakura/entities"
+	"sakura/maps"
 	"log"
 	"math/rand"
 	"sort"

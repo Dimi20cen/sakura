@@ -2,7 +2,7 @@ package server
 
 import (
 	"errors"
-	"imperials/entities"
+	"sakura/entities"
 	"unicode"
 
 	"github.com/Pallinder/go-randomdata"

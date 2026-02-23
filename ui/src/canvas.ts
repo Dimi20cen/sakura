@@ -59,7 +59,7 @@ export async function initialize(div: HTMLDivElement, done?: () => void) {
 
     app = newApp as any;
     app.dirty = true;
-    (<any>window).imperialsApp = newApp;
+    (<any>window).sakuraApp = newApp;
 
     window.addEventListener("resize", resize);
 
@@ -161,7 +161,7 @@ export async function initialize(div: HTMLDivElement, done?: () => void) {
  * @param done Callback when done
  */
 export function cleanup(done?: () => void) {
-    const wapp: AppType | undefined = (<any>window).imperialsApp;
+    const wapp: AppType | undefined = (<any>window).sakuraApp;
 
     try {
         wapp?.ticker.stop();

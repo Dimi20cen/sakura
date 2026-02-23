@@ -4,11 +4,11 @@ This guide walks through a clean local setup on Ubuntu 22.04/24.04.
 
 ## Overview
 
-Imperials has:
+SAKURA has:
 
 - A Go backend (`cmd/server/main.go`) running on `:8090`
 - A Next.js frontend (`ui`) running on `:3000`
-- A MongoDB database (`imperials` database)
+- A MongoDB database (`sakura` database)
 
 Backend and frontend both connect to MongoDB.
 
@@ -59,19 +59,19 @@ The frontend (`ui/package.json`) is built around Node 18 ecosystem. Node 18+ is 
 ## 5. Clone repo
 
 ```bash
-git clone <your-fork-or-repo-url> imperials
-cd imperials
+git clone <your-fork-or-repo-url> sakura
+cd sakura
 ```
 
 ## 6. Create environment files
 
 ### Root `.env`
 
-Create `/path/to/imperials/.env`:
+Create `/path/to/sakura/.env`:
 
 ```env
 ENVIRONMENT=local
-MONGO_URL=mongodb://root:root@localhost:27017/imperials?authSource=admin
+MONGO_URL=mongodb://root:root@localhost:27017/sakura?authSource=admin
 HMAC_SECRET=replace-with-a-long-random-secret
 FRONTEND_URL=http://localhost:3000
 HOST=0.0.0.0
@@ -84,10 +84,10 @@ MONGO_PASSWORD=root
 
 ### Frontend `ui/.env.local`
 
-Create `/path/to/imperials/ui/.env.local`:
+Create `/path/to/sakura/ui/.env.local`:
 
 ```env
-MONGO_URL=mongodb://root:root@localhost:27017/imperials?authSource=admin
+MONGO_URL=mongodb://root:root@localhost:27017/sakura?authSource=admin
 NEXTAUTH_SECRET=replace-with-another-long-random-secret
 NEXT_PUBLIC_ENVIRONMENT=local
 GOOGLE_ID=
@@ -124,7 +124,7 @@ go run cmd/server/main.go
 Expected logs include:
 
 - `Connected to MongoDB!`
-- `Starting the Imperial backend on 0.0.0.0:8090`
+- `Starting the SAKURA backend on 0.0.0.0:8090`
 
 ## 10. Start frontend
 

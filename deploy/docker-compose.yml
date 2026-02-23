@@ -10,12 +10,12 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_USER}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
-      - MONGO_INITDB_DATABASE=imperials
+      - MONGO_INITDB_DATABASE=sakura
     restart: always
 
   backend:
     container_name: backend
-    image: radialapps/imperials:backend-latest
+    image: radialapps/sakura:backend-latest
     pull_policy: always
     ports:
       - "127.0.0.1:8090:8090"
@@ -33,7 +33,7 @@ services:
 
   ui:
     container_name: ui
-    image: radialapps/imperials:ui-latest
+    image: radialapps/sakura:ui-latest
     pull_policy: always
     ports:
       - "127.0.0.1:3000:3000"

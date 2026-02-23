@@ -2,7 +2,7 @@ package game
 
 import (
 	"errors"
-	"imperials/entities"
+	"sakura/entities"
 
 	"github.com/mitchellh/mapstructure"
 )

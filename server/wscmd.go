@@ -1,7 +1,7 @@
 package server
 
 import (
-	"imperials/entities"
+	"sakura/entities"
 	"log"
 
 	"github.com/mitchellh/mapstructure"

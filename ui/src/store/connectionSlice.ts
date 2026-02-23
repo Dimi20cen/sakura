@@ -22,13 +22,30 @@ const connectionSlice = createSlice({
             state.gameExists = action.payload.gameExists;
             state.gameServer = action.payload.gameServer;
         },
+        setLobbyError(state, action: PayloadAction<string>) {
+            state.lastError = action.payload;
+        },
+        setLobbyDisconnected(state, action: PayloadAction<string>) {
+            state.disconnectedMessage = action.payload;
+        },
+        clearLobbyConnectionMessages(state) {
+            state.lastError = undefined;
+            state.disconnectedMessage = undefined;
+        },
         resetConnection() {
             return initialState;
         },
     },
 });
 
-export const { setSocketState, setServer, resetConnection } =
+export const {
+    setSocketState,
+    setServer,
+    setLobbyError,
+    setLobbyDisconnected,
+    clearLobbyConnectionMessages,
+    resetConnection,
+} =
     connectionSlice.actions;
 
 export default connectionSlice.reducer;

@@ -7,7 +7,13 @@ import { adaptWsResponse } from "../src/protocol/adapter";
 import { useAppDispatch, useAppSelector } from "../src/store/hooks";
 import { SOCKET_STATE } from "../src/sock";
 import { createLobbyCommands } from "../src/commands/index";
-import { setServer, setSocketState } from "../src/store/connectionSlice";
+import {
+    clearLobbyConnectionMessages,
+    setLobbyDisconnected,
+    setLobbyError,
+    setServer,
+    setSocketState,
+} from "../src/store/connectionSlice";
 import { applyWsMessage, resetLobbyState } from "../src/store/lobbySlice";
 
 export function useLobbySession(gameId: string | undefined) {
@@ -18,11 +24,16 @@ export function useLobbySession(gameId: string | undefined) {
 
     const lobbyState = useAppSelector((state) => state.lobby);
     const socketState = useAppSelector((state) => state.connection.socketState);
+    const lobbyError = useAppSelector((state) => state.connection.lastError);
+    const disconnectedMessage = useAppSelector(
+        (state) => state.connection.disconnectedMessage,
+    );
 
     const transportRef = useRef<TransportClient | null>(null);
 
     useEffect(() => {
         dispatch(resetLobbyState());
+        dispatch(clearLobbyConnectionMessages());
     }, [dispatch, gameId]);
 
     useEffect(() => {
@@ -63,7 +74,11 @@ export function useLobbySession(gameId: string | undefined) {
                             router.replace("/lobby");
                         }
                         if (event.payload.type === "error") {
-                            alert(event.payload.message);
+                            dispatch(setLobbyError(event.payload.message));
+                        } else {
+                            dispatch(
+                                setLobbyDisconnected(event.payload.message),
+                            );
                         }
                         console.error(event.payload.message);
                         if (event.payload.type === "end") {
@@ -104,6 +119,8 @@ export function useLobbySession(gameId: string | undefined) {
         socketState,
         gameExists,
         gameServer,
+        lobbyError,
+        disconnectedMessage,
         commands,
         socketRef: transportRef.current?.socketRef,
         disconnect: () => transportRef.current?.disconnect(),

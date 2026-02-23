@@ -67,8 +67,16 @@ function normalizeTimerSpeed(speed: string) {
 const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
     const router = useRouter();
     const chatDiv = useRef<HTMLDivElement | null>(null);
-    const { lobbyState, socketState, gameExists, commands, socketRef, disconnect } =
-        useLobbySession(gameId);
+    const {
+        lobbyState,
+        socketState,
+        gameExists,
+        lobbyError,
+        disconnectedMessage,
+        commands,
+        socketRef,
+        disconnect,
+    } = useLobbySession(gameId);
 
     useEffect(() => {
         if (chatDiv.current) {
@@ -292,6 +300,11 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
         <>
             <Header />
             <div className="ui-page ui-fade-in !py-4">
+                {(lobbyError || disconnectedMessage) && (
+                    <div className="ui-panel ui-panel-pad mb-3 border-[rgba(226,84,84,0.6)] bg-[rgba(80,18,18,0.5)] text-[color:var(--ui-ivory)]">
+                        {lobbyError || disconnectedMessage}
+                    </div>
+                )}
                 <div className="ui-grid xl:grid-cols-[minmax(0,3fr),minmax(280px,1fr)] gap-4 lg:h-[calc(100vh-116px)]">
                 <div className="basis-full min-h-0">
                     <div className="ui-panel ui-panel-pad text-center flex flex-col lg:overflow-y-auto lg:h-full">

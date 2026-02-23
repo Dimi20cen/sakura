@@ -20,6 +20,8 @@ export type LobbyConnectionState = {
     socketState: SOCKET_STATE;
     gameExists: boolean | null;
     gameServer: string;
+    lastError?: string;
+    disconnectedMessage?: string;
 };
 
 export type LobbyStoreState = {

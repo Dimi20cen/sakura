@@ -4,6 +4,7 @@ import (
 	"imperials/entities"
 	"log"
 	"math/rand"
+	"strings"
 
 	"github.com/mitchellh/mapstructure"
 )
@@ -25,6 +26,7 @@ func (g *Game) startInitPhase() {
 
 	g.j.WSetInitPhase(g.InitPhase)
 	built := 0
+	lastInitSettlement := make(map[*entities.Player]*entities.Vertex)
 
 	initialAllowedVertices := make(map[*entities.Vertex]bool)
 	initialVertices := g.CurrentPlayer.GetBuildLocationsSettlement(g.Graph, true, false)
@@ -74,10 +76,11 @@ func (g *Game) startInitPhase() {
 		err = build(g, C)
 		if err != nil {
 			C = g.ai.ChooseBestVertexSettlement(p, AllowedVertices).C
-			build(g, C)
+			_ = build(g, C)
 		}
 		builtVertex, _ := g.Graph.GetVertex(C)
 		initialAllowedVertices[builtVertex] = false
+		lastInitSettlement[p] = builtVertex
 
 		if built >= len(g.Players) {
 			v, _ := g.Graph.GetVertex(C)
@@ -134,22 +137,10 @@ func (g *Game) startInitPhase() {
 	// Build at edge
 	initEdge := func(g *Game, p *entities.Player) {
 		g.resetTimeLeft()
-		edgeSet := make(map[*entities.Edge]bool)
-		AllowedEdges := make([]*entities.Edge, 0)
-		for _, e := range p.GetBuildLocationsRoad(g.Graph, true) {
-			edgeSet[e] = true
-			AllowedEdges = append(AllowedEdges, e)
-		}
-		if g.Mode == entities.Seafarers {
-			for _, e := range p.GetBuildLocationsShip(g.Graph) {
-				if !edgeSet[e] {
-					edgeSet[e] = true
-					AllowedEdges = append(AllowedEdges, e)
-				}
-			}
-		}
-		AllowedEdges = g.applyInitEdgeScenarioHooks(p, AllowedEdges)
-		if len(AllowedEdges) == 0 {
+		anchor := lastInitSettlement[p]
+		allowedEdges, roadAllowed, shipAllowed := g.getInitEdgeChoices(p, anchor)
+		allowedEdges = g.applyInitEdgeScenarioHooks(p, allowedEdges)
+		if len(allowedEdges) == 0 {
 			return
 		}
 
@@ -161,7 +152,7 @@ func (g *Game) startInitPhase() {
 			Type:    entities.PlayerActionTypeChooseEdge,
 			Message: msg,
 			Data: &entities.PlayerActionChooseEdge{
-				Allowed: AllowedEdges,
+				Allowed: allowedEdges,
 			},
 		})
 		if err != nil {
@@ -178,21 +169,59 @@ func (g *Game) startInitPhase() {
 		if edgeErr != nil {
 			edge = nil
 		}
-		if edge != nil && g.Mode == entities.Seafarers && edge.IsWaterEdge() {
-			err = g.BuildShip(p, C)
-		} else {
-			err = g.BuildRoad(p, C)
+		buildChosen := func(target *entities.Edge) error {
+			if target == nil {
+				return g.BuildRoad(p, C)
+			}
+
+			canRoad := roadAllowed[target]
+			canShip := shipAllowed[target]
+			if g.Mode != entities.Seafarers {
+				return g.BuildRoad(p, target.C)
+			}
+
+			if canRoad && canShip {
+				choice := "road"
+				if p.GetIsBot() {
+					choice = "ship"
+				} else {
+					resp, respErr := g.BlockForAction(p, g.TimerVals.RoadPlacement, &entities.PlayerAction{
+						Type:    entities.PlayerActionTypeChooseBuildable,
+						Message: "Choose what to build on this edge",
+						Data: entities.PlayerActionChooseBuildable{
+							AllowRoad: true,
+							AllowShip: true,
+						},
+					})
+					if respErr == nil {
+						var selected string
+						if mapstructure.Decode(resp, &selected) == nil {
+							selected = strings.ToLower(strings.TrimSpace(selected))
+							if selected == "ship" {
+								choice = "ship"
+							}
+						}
+					}
+				}
+
+				if choice == "ship" {
+					return g.BuildShip(p, target.C)
+				}
+				return g.BuildRoad(p, target.C)
+			}
+
+			if canShip {
+				return g.BuildShip(p, target.C)
+			}
+			return g.BuildRoad(p, target.C)
 		}
+
+		err = buildChosen(edge)
 		if err != nil {
 			if g.Mode == entities.Seafarers {
-				C = AllowedEdges[0].C
-				if AllowedEdges[0].IsWaterEdge() {
-					_ = g.BuildShip(p, C)
-				} else {
-					_ = g.BuildRoad(p, C)
-				}
+				_ = buildChosen(allowedEdges[0])
 			} else {
-				C = g.ai.ChooseBestEdgeRoad(p, AllowedEdges).C
+				C = g.ai.ChooseBestEdgeRoad(p, allowedEdges).C
 				_ = g.BuildRoad(p, C)
 			}
 		}
@@ -221,6 +250,51 @@ func (g *Game) startInitPhase() {
 	g.SendPlayerSecret(g.CurrentPlayer)
 	g.BroadcastState()
 	g.ai.Reset()
+}
+
+func (g *Game) getInitEdgeChoices(
+	p *entities.Player,
+	anchor *entities.Vertex,
+) ([]*entities.Edge, map[*entities.Edge]bool, map[*entities.Edge]bool) {
+	roadAllowed := make(map[*entities.Edge]bool)
+	for _, e := range p.GetBuildLocationsRoad(g.Graph, true) {
+		roadAllowed[e] = true
+	}
+
+	shipAllowed := make(map[*entities.Edge]bool)
+	if g.Mode == entities.Seafarers {
+		for _, e := range p.GetBuildLocationsShip(g.Graph) {
+			shipAllowed[e] = true
+		}
+	}
+
+	allowed := make([]*entities.Edge, 0)
+	if anchor == nil {
+		edgeSet := make(map[*entities.Edge]bool)
+		for e := range roadAllowed {
+			edgeSet[e] = true
+			allowed = append(allowed, e)
+		}
+		for e := range shipAllowed {
+			if !edgeSet[e] {
+				edgeSet[e] = true
+				allowed = append(allowed, e)
+			}
+		}
+		return allowed, roadAllowed, shipAllowed
+	}
+
+	edgeSet := make(map[*entities.Edge]bool)
+	for _, e := range g.Graph.GetAdjacentVertexEdges(anchor) {
+		if roadAllowed[e] || shipAllowed[e] {
+			if !edgeSet[e] {
+				edgeSet[e] = true
+				allowed = append(allowed, e)
+			}
+		}
+	}
+
+	return allowed, roadAllowed, shipAllowed
 }
 
 func (g *Game) simuateInit() {

@@ -225,16 +225,16 @@ func TestSeafarersSmokeBuildShipAndMoveShip(t *testing.T) {
 		t.Fatal("expected at least one movable ship with a valid destination")
 	}
 
-	// Cannot move before dice rolled.
-	g.DiceState = 0
+	// After dice: move is not allowed.
+	g.DiceState = 1
 	if err := g.MoveShip(p, from.C, to.C); err == nil {
-		t.Fatal("expected move ship before dice roll to fail")
+		t.Fatal("expected move ship after dice roll to fail")
 	}
 
-	// After dice: move succeeds.
-	g.DiceState = 1
+	// Before dice: move succeeds.
+	g.DiceState = 0
 	if err := g.MoveShip(p, from.C, to.C); err != nil {
-		t.Fatalf("move ship after dice failed: %v", err)
+		t.Fatalf("move ship before dice failed: %v", err)
 	}
 	if to.Placement == nil || to.Placement.GetType() != entities.BTShip {
 		t.Fatal("ship placement missing on destination edge")
@@ -452,6 +452,13 @@ func TestSeafarersCoastalRoadAllowed(t *testing.T) {
 	}
 	if coastalRoad == nil {
 		t.Fatal("no coastal road edge found")
+	}
+
+	for _, t := range coastalRoad.AdjacentTiles {
+		if t != nil && t.Type == entities.TileTypeSea && g.Pirate != nil {
+			g.Pirate.Move(t)
+			break
+		}
 	}
 	if err := g.BuildRoad(p, coastalRoad.C); err != nil {
 		t.Fatalf("expected road build on coastal edge to succeed: %v", err)

@@ -237,9 +237,6 @@ func (g *Game) BuildRoad(player *entities.Player, c entities.EdgeCoordinate) err
 	if !e.IsLandEdge() {
 		return errors.New("roads can only be built on land edges")
 	}
-	if g.IsSeaRobberBlockingEdge(e) {
-		return errors.New("pirate blocks this edge")
-	}
 
 	err = player.BuildAtEdge(e, entities.BTRoad)
 	if err != nil {
@@ -514,8 +511,8 @@ func (g *Game) MoveShip(player *entities.Player, fromC, toC entities.EdgeCoordin
 	if err := g.EnsureCurrentPlayer(player); err != nil {
 		return err
 	}
-	if g.DiceState == 0 {
-		return errors.New("ship movement is only allowed after rolling dice")
+	if g.DiceState != 0 {
+		return errors.New("ship movement is only allowed before rolling dice")
 	}
 	if player.ShipMoved {
 		return errors.New("already moved a ship this turn")
@@ -596,8 +593,8 @@ func (g *Game) MoveShipInteractive(player *entities.Player) error {
 	if err := g.EnsureCurrentPlayer(player); err != nil {
 		return err
 	}
-	if g.DiceState == 0 {
-		return errors.New("ship movement is only allowed after rolling dice")
+	if g.DiceState != 0 {
+		return errors.New("ship movement is only allowed before rolling dice")
 	}
 	if player.ShipMoved {
 		return errors.New("already moved a ship this turn")

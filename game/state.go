@@ -124,7 +124,7 @@ func (g *Game) GetPlayerSecretState(p *entities.Player) entities.PlayerSecretSta
 			len(p.GetBuildLocationsRoad(g.Graph, false)) > 0,
 		BuildShip: !busy && g.ensureCanBuild(p, entities.BTShip) == nil &&
 			len(p.GetBuildLocationsShip(g.Graph)) > 0,
-		MoveShip: !commonBusy && g.DiceState != 0 && g.Mode == entities.Seafarers &&
+		MoveShip: !commonBusy && !g.IsInitPhase() && g.DiceState == 0 && g.Mode == entities.Seafarers &&
 			!p.ShipMoved && len(g.GetMovableShips(p)) > 0,
 		BuyDevelopmentCard: !busy &&
 			(g.IsCreativeMode() || p.CanBuyDevelopmentCard()),

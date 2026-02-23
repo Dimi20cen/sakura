@@ -62,6 +62,9 @@ export function useLobbySession(gameId: string | undefined) {
                         if (event.payload.message.includes("E74")) {
                             router.replace("/lobby");
                         }
+                        if (event.payload.type === "error") {
+                            alert(event.payload.message);
+                        }
                         console.error(event.payload.message);
                         if (event.payload.type === "end") {
                             transport.disconnect(1000, "Client closed connection");

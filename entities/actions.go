@@ -7,6 +7,7 @@ const (
 	PlayerActionTypeChoosePlayer      = "cp"
 	PlayerActionTypeChooseVertex      = "cv"
 	PlayerActionTypeChooseEdge        = "ce"
+	PlayerActionTypeChooseBuildable   = "cb"
 	PlayerActionTypeChooseDice        = "cd"
 	PlayerActionTypeChooseImprovement = "ci"
 
@@ -67,4 +68,9 @@ type PlayerActionChooseVertex struct {
 
 type PlayerActionChooseEdge struct {
 	Allowed []*Edge `msgpack:"e"`
+}
+
+type PlayerActionChooseBuildable struct {
+	AllowRoad bool `msgpack:"r"`
+	AllowShip bool `msgpack:"s"`
 }

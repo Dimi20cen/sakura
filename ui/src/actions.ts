@@ -17,11 +17,13 @@ export enum PlayerActionType {
     ChoosePlayer = "cp",
     ChooseVertex = "cv",
     ChooseEdge = "ce",
+    ChooseBuildable = "cb",
     ChooseDice = "cd",
     ChooseImprovement = "ci",
 }
 
 let chooseDiceWindow: PIXI.Container | undefined;
+let chooseBuildableWindow: PIXI.Container | undefined;
 
 /**
  * Handle a player action
@@ -57,6 +59,10 @@ export function handle(action: tsg.PlayerAction) {
             chooseEdge(new tsg.PlayerActionChooseEdge(action.Data));
             break;
 
+        case PlayerActionType.ChooseBuildable:
+            chooseBuildable(action.Data || {});
+            break;
+
         case PlayerActionType.ChooseDice:
             chooseDice();
             break;
@@ -88,6 +94,7 @@ export function resetPendingAction() {
     board.resetEdgeHighlights();
     board.resetVertexHighlights();
     board.resetTileHighlights();
+    clearChooseBuildable();
     state.highlightPlayers();
     state.showPendingAction();
 }
@@ -254,6 +261,59 @@ export function clearChooseDice() {
         chooseDiceWindow.destroy();
     }
     canvas.app.markDirty();
+}
+
+function chooseBuildable(data: { r?: boolean; s?: boolean }) {
+    clearChooseBuildable();
+
+    const allowRoad = Boolean(data?.r);
+    const allowShip = Boolean(data?.s);
+
+    const WIDTH = 140;
+    const HEIGHT = 62;
+    const w = windows.getWindowSprite(WIDTH, HEIGHT);
+    chooseBuildableWindow = w;
+    w.zIndex = 1500;
+    w.x = 20;
+    w.y = canvas.getHeight() - 140 - HEIGHT;
+
+    const road = buttons.getButtonSprite(buttons.ButtonType.Road, 52);
+    road.x = 10;
+    road.y = 6;
+    road.setEnabled(allowRoad);
+    road.onClick(() => {
+        if (!allowRoad) return;
+        resetPendingAction();
+        ws.getCommandHub().sendGameMessage({
+            t: socketTypes.MSG_TYPE.ACTION_RESPONSE,
+            ar_data: "road",
+        });
+    });
+    w.addChild(road);
+
+    const ship = buttons.getButtonSprite(buttons.ButtonType.Ship, 52);
+    ship.x = 74;
+    ship.y = 6;
+    ship.setEnabled(allowShip);
+    ship.onClick(() => {
+        if (!allowShip) return;
+        resetPendingAction();
+        ws.getCommandHub().sendGameMessage({
+            t: socketTypes.MSG_TYPE.ACTION_RESPONSE,
+            ar_data: "ship",
+        });
+    });
+    w.addChild(ship);
+
+    canvas.app.stage.addChild(w);
+    canvas.app.markDirty();
+}
+
+function clearChooseBuildable() {
+    if (chooseBuildableWindow && !chooseBuildableWindow.destroyed) {
+        chooseBuildableWindow.destroy();
+    }
+    chooseBuildableWindow = undefined;
 }
 
 /**

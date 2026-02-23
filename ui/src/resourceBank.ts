@@ -161,7 +161,7 @@ export function setMode(mode: number) {
         [CardType.Ore]: 19,
     };
 
-    // Base has 25 development cards. C&K has 3 progress stacks (17/18/18).
+    // Base has 25 development cards. Cities and Knights has 3 progress stacks (17/18/18).
     devRemaining = mode === 2 ? 53 : 25;
     refreshText();
 }

@@ -26,10 +26,10 @@ This file guides agents when replacing or adding game assets.
 
 - Base mode runtime assets should be placed in `assets/base/...` unless they are truly cross-mode.
 - Seafarers-specific runtime assets should be placed in `assets/seafarers/...`.
-- Cities-and-Knights-specific runtime assets should be placed in `assets/cities-knights/...`.
+- Cities and Knights specific runtime assets should be placed in `assets/cities-knights/...`.
 - Cross-mode UI/audio/common assets should be placed in `assets/shared/...`.
 - Card deck convention:
-  - `assets/base/cards/decks/*` is currently a shared card atlas used by Base and Cities-and-Knights card IDs.
+  - `assets/base/cards/decks/*` is currently a shared card atlas used by Base and Cities and Knights card IDs.
   - Do not split this folder by mode unless code mapping is updated accordingly.
 
 ## Quality Targets (guidance)

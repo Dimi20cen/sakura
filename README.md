@@ -18,7 +18,7 @@ Open source game with mechanics similar to Catan.
 ## Game Modes
 
 - `Basic` (Mode `1`)
-- `Wonders & Warriors` (Mode `2`)
+- `Cities and Knights` (Mode `2`)
 - `Seafarers` (Mode `3`)
 
 ### Seafarers MVP

@@ -1085,7 +1085,7 @@ export function updateButtonsSecretState(state: PlayerSecretState) {
 
     trade.setTradeAllowed(Boolean(state.AllowedActions?.Trade));
 
-    // C&K
+    // Cities and Knights
     buttons.knightBox?.buildKnight.setEnabled(
         state.AllowedActions?.BuildKnight,
     );

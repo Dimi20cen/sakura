@@ -168,7 +168,7 @@ Timer phase bumps happen through helper methods in:
 
 - Supported game modes:
   - `1` = Base
-  - `2` = Cities and Knights (Wonders & Warriors)
+  - `2` = Cities and Knights
   - `3` = Seafarers
 - Built-in official maps are resolved in `maps/main.go`.
 - At runtime, map resolution order is:

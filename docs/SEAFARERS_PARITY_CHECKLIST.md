@@ -5,7 +5,7 @@ This document tracks parity between the implemented Seafarers mode and the offic
 ## Scope
 
 - In scope: Base game compatibility + Seafarers expansion parity.
-- Out of scope: Wonders & Warriors (tracked separately).
+- Out of scope: Cities and Knights (tracked separately).
 
 ## Current Coverage Snapshot
 

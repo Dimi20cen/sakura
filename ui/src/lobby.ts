@@ -10,7 +10,7 @@ export enum GAME_MODE {
 
 export const DISPLAY_GAME_MODE = {
     [GAME_MODE.Base]: "Basic",
-    [GAME_MODE.CitiesAndKnights]: "W&W",
+    [GAME_MODE.CitiesAndKnights]: "Cities and Knights",
     [GAME_MODE.Seafarers]: "Seafarers",
 };
 

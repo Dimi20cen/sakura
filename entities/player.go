@@ -49,6 +49,7 @@ type (
 	GameState struct {
 		CurrentPlayerOrder uint16         `msgpack:"c"`
 		NeedDice           bool           `msgpack:"d"`
+		StateSeq           uint64         `msgpack:"sq"`
 		TimerPhaseId       uint64         `msgpack:"tp"`
 		TimerEndsAtMs      int64          `msgpack:"te"`
 		ServerNowMs        int64          `msgpack:"ts"`

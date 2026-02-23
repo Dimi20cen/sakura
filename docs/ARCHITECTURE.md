@@ -119,6 +119,7 @@ The turn timer is now server-authoritative.
 
 `entities.GameState` includes:
 
+- `sq` (`StateSeq`): monotonically increasing game-state snapshot sequence id.
 - `tp` (`TimerPhaseId`): monotonically increasing phase/version id.
 - `te` (`TimerEndsAtMs`): server-calculated wall-clock end time in Unix milliseconds.
 - `ts` (`ServerNowMs`): server wall-clock snapshot in Unix milliseconds for skew correction.
@@ -137,8 +138,11 @@ and consumed in:
 
 - Whenever the active timer is reset (new turn/dice phase/special build/action timeout), the server increments `TimerPhaseId`.
 - The server continues sending per-player `TimeLeft` for compatibility, but HUD countdown is derived from `TimerEndsAtMs`.
+- Engine tick processing is serialized in the watcher loop (no per-tick goroutine fan-out), which prevents goroutine buildup during lock contention or slow actions.
+- Snapshot broadcasts are sequence-stamped; clients drop stale/out-of-order `gs` payloads using `StateSeq`.
 - When `TickerPause` is active and the current player has no pending timed action, the server sets `TimerEndsAtMs = 0` so the HUD freezes.
 - If `TickerPause` is active but the current player is in a pending timed action (for example robber placement), `TimerEndsAtMs` is still provided so the HUD countdown continues.
+- The game ticker now starts only after initialization succeeds (or after journal replay setup), so failed initialization does not leave background ticker goroutines running.
 
 Timer phase bumps happen through helper methods in:
 
@@ -154,6 +158,7 @@ Timer phase bumps happen through helper methods in:
 - `ui/src/buttons.ts` only renders the computed output (`displaySeconds`, mode).
 - If `TimerPhaseId` changes: client adopts the new `TimerEndsAtMs`.
 - If `TimerPhaseId` is unchanged: client only accepts a lower `TimerEndsAtMs` (tightening), which prevents visual timer restarts from stale/out-of-order snapshots.
+- If `StateSeq` is present: client ignores snapshots with `StateSeq <= lastAppliedStateSeq`.
 - Client estimates server time with `estimatedServerNow = clientNow + (ts - clientNowAtReceipt)`.
 - Display value is computed as `ceil((TimerEndsAtMs - estimatedServerNow) / 1000)` and clamped at `0`.
 - Server offset is only recalculated when `ServerNowMs` changes, preventing countdown freezes from repeated snapshots.

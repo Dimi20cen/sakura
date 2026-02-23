@@ -31,7 +31,6 @@ func (ws *WsClient) handleGame(msg map[string]interface{}) {
 				return
 			}
 
-			defer ws.Hub.Game.BroadcastState()
 			res, err := ws.Hub.Game.BlockForAction(ws.Player, 0, &entities.PlayerAction{
 				Type:      entities.PlayerActionTypeChooseVertex,
 				Message:   "Choose location for settlement",
@@ -63,7 +62,6 @@ func (ws *WsClient) handleGame(msg map[string]interface{}) {
 				return
 			}
 
-			defer ws.Hub.Game.BroadcastState()
 			res, err := ws.Hub.Game.BlockForAction(ws.Player, 0, &entities.PlayerAction{
 				Type:      entities.PlayerActionTypeChooseVertex,
 				Message:   "Choose location for city",
@@ -94,7 +92,6 @@ func (ws *WsClient) handleGame(msg map[string]interface{}) {
 				return
 			}
 
-			defer ws.Hub.Game.BroadcastState()
 			res, err := ws.Hub.Game.BlockForAction(ws.Player, 0, &entities.PlayerAction{
 				Type:      entities.PlayerActionTypeChooseEdge,
 				Message:   "Choose location for road",
@@ -146,7 +143,6 @@ func (ws *WsClient) handleGame(msg map[string]interface{}) {
 				return
 			}
 
-			defer ws.Hub.Game.BroadcastState()
 			res, err := ws.Hub.Game.BlockForAction(ws.Player, 0, &entities.PlayerAction{
 				Type:      entities.PlayerActionTypeChooseVertex,
 				Message:   "Choose location for warrior",
@@ -182,7 +178,6 @@ func (ws *WsClient) handleGame(msg map[string]interface{}) {
 				return
 			}
 
-			defer ws.Hub.Game.BroadcastState()
 			res, err := ws.Hub.Game.BlockForAction(ws.Player, 0, &entities.PlayerAction{
 				Type:      entities.PlayerActionTypeChooseVertex,
 				Message:   "Choose warrior to activate",
@@ -258,7 +253,6 @@ func (ws *WsClient) handleGame(msg map[string]interface{}) {
 				return
 			}
 
-			defer ws.Hub.Game.BroadcastState()
 			res, err := ws.Hub.Game.BlockForAction(ws.Player, 0, &entities.PlayerAction{
 				Type:      entities.PlayerActionTypeChooseVertex,
 				Message:   "Choose location for fence",
@@ -293,7 +287,6 @@ func (ws *WsClient) handleGame(msg map[string]interface{}) {
 				return
 			}
 
-			defer ws.Hub.Game.BroadcastState()
 			res, err := ws.Hub.Game.BlockForAction(ws.Player, 0, &entities.PlayerAction{
 				Type:      entities.PlayerActionTypeChooseEdge,
 				Message:   "Choose location for ship",

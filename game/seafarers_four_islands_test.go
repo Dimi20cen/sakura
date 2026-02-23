@@ -113,6 +113,9 @@ func TestSeafarersFogIslandsInitializeAndReveal(t *testing.T) {
 	g.InitPhase = false
 	g.DiceState = 1
 	p.CurrentHand.UpdateResources(10, 10, 10, 10, 10)
+	if g.IsSeaRobberBlockingEdge(targetEdge) && g.Pirate != nil {
+		g.Pirate.Tile = nil
+	}
 
 	if err := g.BuildShip(p, targetEdge.C); err != nil {
 		t.Fatalf("failed to build ship for fog reveal: %v", err)

@@ -22,6 +22,7 @@ import {
 import { MSG_RES_TYPE, WsResponse } from "../sock";
 
 let lastKnownMyDevCardsTotal = 0;
+let lastAppliedGameStateSeq = 0;
 
 export function isHandledByGameRuntime(msg: WsResponse): boolean {
     switch (msg.t) {
@@ -63,6 +64,7 @@ export function handleGameRuntimeMessage(msg: WsResponse) {
         case MSG_RES_TYPE.INIT_SETTINGS: {
             setGameWsReceiving(true);
             board.setInitComplete(false);
+            lastAppliedGameStateSeq = 0;
             const settings = new tsg.GameSettings(msg.data);
             state.setSettings(settings);
             initializeSettings(settings);
@@ -105,6 +107,13 @@ export function handleGameRuntimeMessage(msg: WsResponse) {
 
         case MSG_RES_TYPE.GAME_STATE: {
             const gs = new tsg.GameState(msg.data);
+            const stateSeq = Number(gs.StateSeq || 0);
+            if (stateSeq > 0) {
+                if (stateSeq <= lastAppliedGameStateSeq) {
+                    return;
+                }
+                lastAppliedGameStateSeq = stateSeq;
+            }
             dice.setFlashing(
                 gs.NeedDice && gs.CurrentPlayerOrder == getThisPlayerOrder(),
             );

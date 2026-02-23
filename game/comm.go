@@ -17,6 +17,7 @@ func (g *Game) BroadcastMessage(msg *entities.Message) {
 }
 
 func (g *Game) BroadcastState() {
+	g.StateSeq++
 	g.BroadcastMessage(&entities.Message{
 		Type: entities.MessageTypeGameState,
 		Data: g.GetGameState(),

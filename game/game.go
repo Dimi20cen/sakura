@@ -54,6 +54,7 @@ type (
 		Ticker       *time.Ticker
 		TickerPause  bool
 		TickerStop   chan bool
+		StateSeq     uint64
 		TimerVals    TimerValues
 		TimerPhaseId uint64
 
@@ -315,10 +316,6 @@ func (game *Game) Initialize(id string, numPlayers uint16) (*Game, error) {
 
 	rand.Seed(time.Now().UnixNano())
 
-	// Start game ticker
-	game.Ticker = time.NewTicker(1000 * time.Millisecond)
-	game.TickerStop = make(chan bool)
-	go game.TickWatcher()
 	game.TimerVals = timerValuesForSpeed(game.Settings.Speed)
 
 	// Dice init
@@ -341,6 +338,7 @@ func (game *Game) Initialize(id string, numPlayers uint16) (*Game, error) {
 		game.j.playing = false
 		game.InitGraph()
 		game.j.Play()
+		game.startTicker()
 		return game, nil
 	}
 
@@ -359,8 +357,19 @@ func (game *Game) Initialize(id string, numPlayers uint16) (*Game, error) {
 
 	game.Ports = make([]*entities.Port, 0)
 	game.generatePorts()
+	game.startTicker()
 
 	return game, nil
+}
+
+func (g *Game) startTicker() {
+	if g.Ticker != nil {
+		return
+	}
+
+	g.Ticker = time.NewTicker(1000 * time.Millisecond)
+	g.TickerStop = make(chan bool, 1)
+	go g.TickWatcher()
 }
 
 func (game *Game) InitWithGameMode() error {
@@ -440,7 +449,12 @@ func (g *Game) Terminate() {
 	}
 
 	g.Initialized = false
-	g.TickerStop <- true
+	if g.TickerStop != nil {
+		select {
+		case g.TickerStop <- true:
+		default:
+		}
+	}
 
 	for _, p := range g.Players {
 		p.Initialized = false
@@ -470,15 +484,19 @@ func (g *Game) TickWatcher() {
 	for {
 		select {
 		case <-g.Ticker.C:
-			go g.Tick()
+			g.Tick()
 
 			i++
 			if i > 5 {
-				go g.j.Flush()
+				g.j.Flush()
 				i = 0
 			}
 		case <-g.TickerStop:
-			g.Ticker.Stop()
+			if g.Ticker != nil {
+				g.Ticker.Stop()
+				g.Ticker = nil
+			}
+			g.TickerStop = nil
 			return
 		}
 	}
@@ -601,7 +619,7 @@ func (g *Game) SetUsername(p *entities.Player, username string) {
 	p.Color = entities.GetColorByUsernameOrOrder(username, p.Order)
 	g.j.WSetUsername(p, username)
 
-	if p.Username[len(p.Username)-1:] == "*" {
+	if len(p.Username) > 0 && p.Username[len(p.Username)-1:] == "*" {
 		p.SetIsBot(true)
 	}
 }

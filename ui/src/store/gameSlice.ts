@@ -4,6 +4,7 @@ import { MSG_RES_TYPE, SOCKET_STATE, WsResponse } from "../sock";
 export type GameRuntimeState = {
     socketState: SOCKET_STATE;
     receiving: boolean;
+    lastGameStateSeq: number;
     lastMessageType?: MSG_RES_TYPE;
     settings?: any;
     gameState?: any;
@@ -18,6 +19,7 @@ export type GameRuntimeState = {
 const initialState: GameRuntimeState = {
     socketState: SOCKET_STATE.INIT,
     receiving: false,
+    lastGameStateSeq: 0,
     spectators: [],
 };
 
@@ -42,6 +44,7 @@ const gameSlice = createSlice({
 
             if (msg.t === MSG_RES_TYPE.INIT_SETTINGS) {
                 state.receiving = true;
+                state.lastGameStateSeq = 0;
             } else if (!state.receiving) {
                 return;
             }
@@ -54,6 +57,13 @@ const gameSlice = createSlice({
                     return;
 
                 case MSG_RES_TYPE.GAME_STATE:
+                    const stateSeq = Number(msg.data?.sq || 0);
+                    if (stateSeq > 0 && stateSeq <= state.lastGameStateSeq) {
+                        return;
+                    }
+                    if (stateSeq > 0) {
+                        state.lastGameStateSeq = stateSeq;
+                    }
                     state.gameState = msg.data;
                     return;
 

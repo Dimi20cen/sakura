@@ -37,6 +37,7 @@ func (g *Game) GetGameState() *entities.GameState {
 	return &entities.GameState{
 		CurrentPlayerOrder: currentPlayerOrder,
 		NeedDice:           needDice,
+		StateSeq:           g.StateSeq,
 		TimerPhaseId:       g.TimerPhaseId,
 		TimerEndsAtMs:      timerEndsAtMs,
 		ServerNowMs:        serverNowMs,

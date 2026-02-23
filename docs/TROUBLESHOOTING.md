@@ -1,6 +1,6 @@
 # Troubleshooting
 
-Common issues when running Clash locally and how to resolve them.
+Common issues when running Imperials locally and how to resolve them.
 
 ## Backend fails to start with Mongo connection errors
 

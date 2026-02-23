@@ -1,6 +1,6 @@
 # Quick Start
 
-This is the shortest path to run Clash locally.
+This is the shortest path to run Imperials locally.
 
 ## Prerequisites
 
@@ -116,7 +116,7 @@ The UI will:
 
 ## Current local UI simplifications
 
-- Top navigation only shows: `Lobby`, `Map Editor`, `Profile`, `Sign In`
+- Top navigation only shows: `Lobby`, `Map Editor`, `Profile`
 - Lobby actions are intentionally simplified to:
   - `Join Game`
   - `Host Game`

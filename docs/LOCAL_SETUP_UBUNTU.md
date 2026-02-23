@@ -4,7 +4,7 @@ This guide walks through a clean local setup on Ubuntu 22.04/24.04.
 
 ## Overview
 
-Clash has:
+Imperials has:
 
 - A Go backend (`cmd/server/main.go`) running on `:8090`
 - A Next.js frontend (`ui`) running on `:3000`

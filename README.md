@@ -29,9 +29,14 @@ The current Seafarers rollout includes:
 - Ship movement once per turn, before rolling dice
 - Pirate behavior via robber-on-sea (blocks ship edge usage on adjacent edges)
 - Longest trade route logic (roads + ships with settlement/city transition rule)
-- One built-in official map: `Seafarers - Heading for New Shores`
+- Built-in official maps:
+  - `Seafarers - Heading for New Shores`
+  - `Seafarers - The Four Islands`
+  - `Seafarers - The Fog Islands`
+  - `Seafarers - Through the Desert`
 
 Automated smoke coverage is in `game/seafarers_smoke_test.go`.
+Detailed scope and parity tracking live in `docs/SEAFARERS_MVP.md` and `docs/SEAFARERS_PARITY_CHECKLIST.md`.
 
 ## License
 

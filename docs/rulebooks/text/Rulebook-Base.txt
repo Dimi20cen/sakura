@@ -1,0 +1,1728 @@
+K L A U S   T E U B E R
+
+
+
+
+   T HE G A ME
+                                            INTRODUCTION
+Welcome to the unexplored island of Catan!
+As you and your fellow explorers gaze across the uninhabited landscape of hexagonal tracts of
+terrain, you quickly realize that this unique land arrangement provides ample space for each of
+you to put down roots.
+You race off to establish your respective communities by gathering resources from nearby
+terrain, building your infrastructure, and nurturing trade relationships. Watch out for surprises—
+your rivals can block your path or send the robber to plunder your wealth!
+Good luck, explorers!
+
+
+
+
+OBJECTIVE
+The first player to reach 10 victory points (VPs) on their turn wins. Earn VPs by building. Collect and trade for the resources
+you need to build.
+                                                                               6
+
+
+
+
+                                                 4
+                                                     3:1
+
+
+
+
+                                                                                                                      LARGEST ARMY
+                                                                                                                                                    cards receives
+                                                                                                                  The first player to play 3 Knight
+                                                                                                                                                      more Knight
+                                                                                                                   this tile. If another player plays
+                                                                                                                                                        this tile.
+                                                                                                                     cards, they immediately receive
+                                                                                   2:1
+
+
+
+
+                                                                           4
+                                                                                                                                                                                                                               VICT
+                                                                                                              6
+
+
+
+
+                                                                                                                                                                                                                                       ORY
+                                                                                                                                                                                                                                               POIN
+                                                                                                                                                                                                                                                                T
+                                                                                3:1
+                                                           2:1
+
+
+
+
+                                                                                                                            LONGEST ROUTE
+                                                                                                                                                                    roads
+                                                                                                                           The first player to play 5 continuous LAR
+                                                                                                5                           receives this tile. If another player
+                                                                                                                                                                   plays        GEST ARM                                    Play
+                                                                                                                                                              The
+                                                                                                                                                                this tile.
+                                                                                                                            more, they immediately receive first player to play 3 Knight
+                                                                                                                                                                                                          Y              of Vic any numb
+                                                                                                                                                               this tile. If anothe
+                                                                                                                                                                                    r player plays
+                                                                                                                                                                                                   cards receives    (even on tory Point carer
+                                                                                                                                                                                                                      them) the turn you ds
+                                                           5
+
+
+
+
+                                                                                                                                                                cards, they immed                   more
+                                                                                                                                                                                       iately receive Knight                 to win
+                                                                                                                                                                                                     this tile.
+                                                                                                                                                                                                                                    the gamebuild
+                                                                 CN3081
+                                                                  CATAN
+                                                                                                                                                                                                                                              .
+                                                                                                                                                                                                                                                         GmbH
+
+
+
+
+                                                                  5 of 5
+                                                                               v6.250401
+                                                                                                                                                                                                                                                       CATAN
+                                                                                                                                                                                                                                                    © 2025
+
+
+
+
+                                1 VP                 2 VPs                                                                                         2 VPs                                                            1 VP
+                                                                                                    2:1
+
+
+
+
+                                each                 each                                                                                          each                                                             each
+                                                                           2:1
+
+
+
+
+                                                                                                          5
+                                                                 5
+
+
+
+
+                                                                                                                                                LONGES
+                                                                                                                                                      T ROUTE
+                                                                                                                                             The first player
+                                                                                                                                                              to
+                                                                                                                                             receives this tile. play 5 continuous roads
+    K L A U S   T E U B E R
+                                                                               CN3081
+                                                                               CATAN                                                         more, they immedIf another player plays
+                                                                                                                                                                 iately receive
+                                                                               5 of 5                                                                                           this tile.
+                                                                                        v6.250401
+
+
+
+
+     T HE G A ME
+
+
+
+
+2
+                                                                                                                                                                                                                                                                                                                                                                                                                     ly re m re
+                                                                                                                                                                                                                                                                                         2:1
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                              e th ni
+                                                                                                                                                                                                                                                                                                                                                                                                                                       le.
+                                                                                                                                                                                                                                                                                                                                                                                                                          ceiv ore K
+                                                                                                                                                                                                                                                                                                                                                                                                                 iate plays rds
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                  is ti
+                                                                                                                                                                                                                                                                                                                                                                                                                               AR
+                                                                                                                                                                                                                                                                                                                                                                                                              med layer ight ca
+                                                                                                                                                                                                                                                                                                                                                                                               card le. If a r to p ST
+                                                                                                                                                                                                                                                                                                                                                                                                        ey im er p 3 Kn
+                                                                                                                                                                                                                                                                                                                                                                                               this first pla GE
+                                                                                                                                                                                                                                                                                                                                                                                                   s, th noth lay
+                                                                                                                                                                                                                                                                                                                                                                                                               R
+                                                                                                                                                                                                                                                                                                                                                                                                             ye
+                                                                                                                                                                                                                                                                                                                                                                                        LA
+              2          3:1                                                                                                                                                                                    1
+                                                                     2:1
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                   ti
+                                                                                                                                                                                                                                                                                                                                                                                                The
+    6 sea frame pieces
+
+
+
+
+                                                                                                                                                                                        4o N
+                                                                                                                                                                                         CA 081
+                                                                                                                                                                                          CN
+                                                                                                                                                                                          f5
+                                                                                                                                                                                           TA
+                                                                                                                                                                                            3
+                                                                                                                                                                             v6.2
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                         6
+                                                                                                                                                             3                                                                                                                                                3:1                                                                                                                              3:1
+
+
+
+
+                                                                                                                                                                                 504
+                                                                                                                                                                    6
+
+                                                                                                                                                                                     0
+                                                                                 4
+
+
+
+
+                                                                                                                                                                            1
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       iate ther uous E
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ceiv r p ds
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            UT
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           ly re playe roa
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    e th lays
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             le.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        is ti
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         , th is tile play RO
+     2                              4                                                    1                                                                                                  3                                                                                                   6                                                                                                                   5
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   med ano ntin
+                                                                                          3:1
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             ey im . If 5 co
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     more ives th layer to ST
+                                                                                                                                                                                                                                                                                                                                                                  5o N
+                                                                                                                                                                                                                                                                                                                                                                   CA 081
+                                                                                                                                                                                                                                                                                                                                                                    CN
+                                                                                 2:1
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                    f5
+                                                                                                                                                                                                                                                                                                                                                                     TA
+                                                                                                                                                                                                                                                                                                                                                                      3
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          E
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   NG
+                                                                                                                                                                                                                                                                                                                                                      v6.2
+                                                                                                                                                                                                                 2:1                                                       LARGEST ARMY
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     LO
+                                                                                                                                                                                                                                                                                                                                                          504
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      rece first p
+                                                                                                             2:1                                                                                                                                                                                                                                                                                                                                    2:1
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                              0
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       The
+                                                                                                                                                                                                                                                                      The first player to play 3 Knight cards receives
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                      1
+                                                                                                                                                                                                                                                                                                                                                                                                                                               2
+                                                                                                                                                                                                                                                                       this tile. If another player plays more Knight
+                                                                                                         3
+                                                                                                                                                                                                                                                                         cards, they immediately receive this tile.
+    3:1                                  3:1                                                                                                                                                                                                                                               3:1
+
+
+
+
+                                                                                                                   1
+                                   3:1
+
+
+
+
+                                                                                                                     0
+                                                                                                                                                                                                                                                                                                                                                                                                                         2:1
+
+
+
+
+                                                                                                                 504
+6                              2                                         1                                                                                              3                                                                                              4                                                                                          5
+                                                                                             2:1
+
+
+
+
+                                                                                                             v6.2
+                                                                                                      CA 081
+                                                                                                     4o N
+                                                                                                         3
+                                                                                                        TA
+                                                                                                       f5
+                                                                                                       CN
+                                                       4o N
+                                                        CA 081
+                                                         CN
+                                                         f5
+                                                          TA
+                                                           3
+                                               v6.2
+                                                                                                                                                                                                                                  2:1
+                                                   504                               1                                                                       3:1                        3                                                                         3:1                     6                                                                3:1                                                2                                                              2:1                                                     5
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   3:1               4
+                                               1       0
+
+
+
+
+                  2                                        3
+
+
+
+
+                                                                                                                                                                                                                                                                                                     more ives th layer to ST
+                                                                                                                                                                                                                                                                                                      rece first p
+                                                                                                                                                                                                                                                                                                       The
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              1
+                                                   2:1                                                                                                                                                                                                                                                                                                                                                                                         2:1
+
+
+
+
+                                                                                                                                                                                                                                                                                                         ,
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 0
+                                                                                                          2:1
+
+
+
+
+                                                                                                                                                                                                                                                                                                           th
+                                                                                                                                                                    2:1
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                             LO
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             504
+                                                                                                                                                                                                                                                                                                             ey im tile. If lay 5 co OU
+                                                                                                                                                                                                                                                                                                                  is
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         v6.2
+                                                                                                                                                                                                                                                                                                                   NG
+                                                                                                                                                                                                                                                                                                                   med ano ntin
+                                                                           2:1
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                        N
+                                                                                                                                                                                                                                                                                                                       iate ther uous E
+    19 terrain hexes                                                                                                                                                                                                               2 bonus victory point (VP) tiles                                                                                                                                                                                                                                                                                        18 number discs
+
+
+
+
+                                                                                                                                                                                                                                                                             B
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                         P
+                                                                                                                                                                                                                                                                                                                                                                                                                     E
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           CA 081
+                                                                                                                                                                                                                                                                                                                       L
+                                                                                                                                                                                                                                                                                                                          E
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          5o N
+                                                                                                                                                                                                                                                                                                                           p
+                                                                                                                                                                                                                                                                                                                            ly re playe roa
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              3
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             TA
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            f5
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            CN
+                                                                                                                                                                                                                                                                                                                                 ceiv r p ds
+                                                                     1                                                                                                                                                                                            2                                                                                         4                                                                                                                           5
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                     R
+                                                                                                                                                                                                                                                                                                                                     e th lays
+                                                                                                                                                                    3                                                                                                                                                                                                                                                                                                                                                                                                                              6
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                         is ti
+                                                                                                                                                                                                                                                                                                                                              le.
+
+
+                                                                                                                                                                                                                                                                                                                                                  T
+              3:1                                              3:1
+
+
+
+
+                                                                                                                                                                             1  0
+                                                                                                                                                                            504
+          6                                3
+
+
+
+
+                                                                                                                                                                        v6.2
+
+
+
+
+                                                                                                                                                                                                                                                                             H
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                     C
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                         K
+                                                                                                                                                                                                                                                                                                                                                        F
+                                                                                                                                                                                                                                                                                                                       J
+                                                                                                                                                                  CA 081
+
+
+
+
+                                                                                                                                                                                                                                                                             6
+                                                                                                                                                                 4o N
+                                                                                                                                                                     3
+                                                                                                                                                                    TA
+                                                                                                                                                                   f5
+                                                                                                                                                                   CN
+                                                                                                   2:1                                                                                          4
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      1x                                      2x
+                                                                                       2:1
+                                                                                                                                                                                                3:1
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                    card le. If a r to p ST
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                    this first p
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                     The LAR
+                                                                                                               1                                                                                                 2
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                        s,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ti
+                                                                                                                                                                                                       3:1
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                           they nother lay 3 K AR
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 la
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  imm playe nigh
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ye
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       edia r pla t card Y
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         G
+                                                                                                                                                                                                                                                                                              PLAYER AID                                                                                                          PLAYER AID
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           tely ys
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            E
+                                                                                                                                                                                                                                                                           LONGEST
+                                                                                                                                                                                                                                                                                TURN ROUTE                                                                                                                   LARGEST     ARMY
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               rece more receiv
+                                                                                                                                                                                                                                                                                     OVERVIEW                                                                                                                 TURN OVERVIEW
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   ive
+                                                                                                                                                                                    5                                                                                  The first player to play
+                                                                                                                                                                                                                                                                              Production         Phase 5 continuous roads                                                                          The first player
+                                                                                                                                                                                                                                                                                                                                                                                                  Production        Phase to play 3 Knight cards receives
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       this Knight s
+                                                                      2:1
+                                                                                                                                                                                                                                                                        receives ••this
+                                                                                                                                                                                                                                                                                    Play a development card (optional)
+                                                                                                                                                                                                                                                                                         tile. If another player plays                                                                               • Play a development card (optional)
+                                                                                                                                                                                                                                                                                                                                                                                                    this
+                                                                                                                                                                                                                                                                                                                                                                                                     • Roll tile.
+                                                                                                                                                                                                                                                                                                                                                                                                            dice If another player plays more Knight
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           tile.
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            s
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             M
+                                                                                                                                                                                                                                                                                    Roll dice
+                                                                                                 5
+
+
+
+
+                                                                                                                                                                                                                                                                        more, they    immediately
+                                                                                                                                                                                                                                                                                  • Collect               receive
+                                                                                                                                                                                                                                                                                            resources or Resolve a 7 this tile.                                                                        cards,resources
+                                                                                                                                                                                                                                                                                                                                                                                                     • Collect    they orimmediately
+                                                                                                                                                                                                                                                                                                                                                                                                                          Resolve a 7     receive this tile.
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  e
+                                                                                                                                                                                                                                                                               Action Phase                                                                                                       Action Phase
+                                                                                                                                                                                                                                                                                  • In any order (optional):                                                                                         • In any order (optional):
+                                                                                                             CN3081                                                                                                                                                               • Trade                                                                                                            • Trade
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   2x                                     2x
+                                                                                                                                                                                                                                                                                  • Build roads, settlements, cities, and                                                                            • Build roads, settlements, cities, and
+                                                                                             1                                                                                                  4
+                                                                                                             CATAN                                                                                                                                                                  development cards                                                                                                  development cards
+                                                                                                              5 of 5                                                                                                                                                              • Play a development card (if you did not play one before                                                          • Play a development card (if you did not play one before
+                                                                                                                           v6.250401                                                                                                                                                the dice roll)                                                                                                     the dice roll)
+                                                                                                                                                                                                                                                                                   PLAY DEVELOPMENT CARDS                                                                                             PLAY DEVELOPMENT CARDS
+
+
+                      3x hills                   4x forests                              4x pastures
+                                                                                                                                                                                                                                                                                     • Not on the turn you bought it                                                                                    • Not on the turn you bought it
+                                                                                                                                                                                                                                                                                     • Only 1 development card per turn                                                                                 • Only 1 development card per turn
+                                                                                                                                                                                                                                                                                     • Before rolling dice or during the Action phase                                                                   • Before rolling dice or during the Action phase
+                                                                                                                                                                                                                                                                               VP card exception: You may play multiple VP cards (even on the                                                     VP card exception: You may play multiple VP cards (even on the
+
+
+
+                                                                                                                                                                                                                                                                                                                     4 player aids
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         v6.250401
+                                                                                                                                                                                                                                                                               turn you buy them) in order to win the game.                                                                       turn you buy them) in order to win the game.
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     2x                                  2x
+                                                                                                                                                                                                                                                                              2:1
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   CN3081
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   CATAN
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    3 of 5
+                                                                                                                                                                                                                                                                                    PLAYER
+                                                                                                                                                                                                                                                                                BUILDING   AID
+                                                                                                                                                                                                                                                                                         COSTS                                                                                                         PLAYER
+                                                                                                                                                                                                                                                                                                                                                                                                   BUILDING   AID
+                                                                                                                                                                                                                                                                                                                                                                                                            COSTS
+                                                                                                                                                                                                                                                                                     TURN OVERVIEW                                                                                                      TURN OVERVIEW
+                                                                                                                                                                                                                                                                            Road
+                                                                                                                                                                                                                                                                             Production Phase    0 VP                                                                                          Road
+                                                                                                                                                                                                                                                                                                                                                                                                Production Phase    0 VP
+                                                                                                                                                                                                                                                                                    • Play a development card (optional)       Longest Route                                                            • Play a development card (optional)    Longest Route
+                                                                                                                                                                                                                                                                                    • Roll dice                                = 2 VPs                                                                  • Roll dice                             = 2 VPs
+                                                                                                                                                                                                                                                                                    • Collect resources or Resolve a 7                                                                                  • Collect resources or Resolve a 7
+                                                                                                                                                                                                                                                                              Action Phase
+                                                                                                                                                                                                                                                                            Settlement                                                                                                           Action Phase
+                                                                                                                                                                                                                                                                                                                                                                                               Settlement
+                                                                                                                                                                                                                                                                                 • In any order (optional):                1 VP                                                                     • In any order (optional):                1 VP
+                                                                                                                                                                                                                                                                                 • Trade                                                                                                            • Trade
+                                                                                                                                                                                                                                                                                 • Build roads, settlements, cities, and                                                                            • Build roads, settlements, cities, and
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      2x                                                     2x
+                                                                                                                                                                                                                                                                                   development cards                                                                                                  development cards
+                                                                                                                                                                                                                                                                            City • Play a development card (if you did not 2
+                                                                                                                                                                                                                                                                                                                           play one before
+                                                                                                                                                                                                                                                                                                                               VPs                                                             City • Play a development card (if you did not play
+                                                                                                                                                                                                                                                                                                                                                                                                                                              2 VPs
+                                                                                                                                                                                                                                                                                                                                                                                                                                                   one before
+                                                                                                                                                                                                                                                                                   the dice roll)                                                                                                     the dice roll)
+                                                                                                                                                                                                              2:1
+
+
+
+
+                                                                                                                                                                                                                                                                                   PLAY DEVELOPMENT CARDS                                                                                             PLAY DEVELOPMENT CARDS
+                                                                                                                                                                                                                                                                                    • Not on the turn you bought it                                                                                     • Not on the turn you bought it
+                                                                                                                                                                                                                                                                                    • Only 1 development card per turn                                                                                  • Only 1 development card per turn
+                                                                                                                                                                                                                                                                            Development
+                                                                                                                                                                                                                                                                                • Before rolling diceCard                  ? VPs
+                                                                                                                                                                                                                                                                                                      or during the Action phase                                                               Development
+                                                                                                                                                                                                                                                                                                                                                                                                   • Before rolling diceCard                 ? VPs
+                                                                                                                                                                                                                                                                                                                                                                                                                        or during the Action phase
+                                                                                                                                                                                                                                                                               VP card exception: You may play multiple VP cards (even
+                                                                                                                                                                                                                                                                                                                            Largest    on the
+                                                                                                                                                                                                                                                                                                                                     Army                                                         VP card exception: You may play multiple VP cards (evenArmy
+                                                                                                                                                                                                                                                                                                                                                                                                                                               Largest     on the
+                                                                                                                                                                                                                                                                               turn you buy them) in order to win the game. = 2 VPs                                                               turn you buy them) in order to win the game. = 2 VPs
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                          LONGEST ROUTE
+                  4x fields                    3x mountains                                  1x desert
+                                                                                                                                                                                                                                                                                              front                                                                                                                      back
+                                                                                                                                                                                                                                                                                                     5                                                                                                  The first player to play 5 continuous roads
+                                                                                                                       CN3081
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     2x                                  1x
+                                                                                                                       CATAN
+                                                                                                                        3 of 5
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                         receives this tile. If another player plays
+                                                                                                                                                                                                            5
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                         more, they immediately receive this tile.
+                                                                                                                                                                                                                                                                                BUILDING COSTS                                                                                                     BUILDING COSTS
+                                                                                                                   v6.250401
+
+
+
+
+                                                                                                                                                                                                                         CN3081                                             Road                                                                                                               Road
+                                                                                                                                                                                                                                                                                                                               0 VP                                                                                                             0 VP
+                                                                                                                                                                                                                         CATAN
+
+
+    25 development cards
+                                                                                                                                                                                                                                                                                                                               Longest Route                                                                                                    Longest Route
+                                                                                                                                                                                                                          5 of 5
+                                                                                                                                                                                                                                                              v6.250401
+                                                                                                                                                                                                                                                                                                                               = 2 VPs                                                                                                          = 2 VPs
+
+
+
+                                                                                                                                                                                                                                                                            Settlement                                         1 VP                                                            Settlement                                       1 VP
+
+
+
+                                                                                                                                                                                                    ROAD BUILDING                                                           City                                               2INVENTION                                                      City                                                                 KNIGHT                                                                                                      VICTORY POINT
+                                                                                             MONOPOLY                                                                                                                                                                                                                            VPs                                                                                                            2 VPs
+
+
+                                                                                                                                                                                                                                                                            Development Card                                   ? VPs                                                           Development Card                                 ? VPs
+                                                                                                                                                                                                                                                                                                                               Largest Army                                                                                                     Largest Army
+                                                                                                                                                                                                                                                                                                                               = 2 VPs                                                                                                          = 2 VPs
+
+
+
+
+                                                                                            Announce one type of                                                                                                                                                                                                                                                                                                                                        Move the robber to a                                                                                                        Play any number
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  of Victory Point cards
+                                                                                         resource. Each player must                                                                                                                                                                                                      Take any 2 resource cards                                                                                                     new hex. Steal 1 random                                                                                                 (even on the turn you build
+                                                                                                                                                                                                      Build 2 roads at no cost.
+                                                                                          give you all their resource                                                                                                                                                                                                        from the supply.                                                                                                        resource card from a player                                                                                                 them) to win the game.
+                                                                                              cards of that type.                                                                                                                                                                                                                                                                                                                                    with a building on that hex.
+                                                                                                                                         © 2025 CATAN GmbH
+
+
+
+
+                                                                                                                                                                                                                                              © 2025 CATAN GmbH
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                           © 2025 CATAN GmbH
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 © 2025 CATAN GmbH
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           © 2025 CATAN GmbH
+                       card back                                                     2x Monopoly                                                                                        2x Road Building                                                                                                          2x Invention                                                                                                                       14x Knight                                                                                                    5x Victory Point
+    95 resource cards
+                                                                                                                           © 2025 CATAN GmbH
+
+
+
+
+                                                                                                                                                                                                                                   © 2025 CATAN GmbH
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                   © 2025 CATAN GmbH
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            © 2025 CATAN GmbH
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         © 2025 CATAN GmbH
+
+
+
+
+                       card back                                                          19x brick                                                                                                 19x wood                                                                                                                19x wool                                                                                                                  19x wheat                                                                                                                       19x ore
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      COMPONENTS
+
+     2 card trays                                                                                                                                                                                                       2 dice                                                                                                                                                                     20 settlements                                                                                                                                                      16 cities
+                                                                                                                                                                                                                                                                                                                                                                                                   (5x each color)                                                                                                                                                     (4x each color)
+
+
+
+
+                                                                                                                                                                                                                       1 robber
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  60 roads
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  (15x each color)
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  3
+                 If this is your first time playing CATAN®, we recommend using the
+                 setup shown here. For additional variety, check out the Variable Setup
+                 described on page 11.
+
+                  1       Assemble the Frame                                                                                           1
+                          Match the numbers at the puzzle piece ends of the
+                          sea frame pieces to assemble the coast of Catan.
+                                                                                                                                               2
+                  2 Place the Hexes and Number Discs
+                          Place the terrain hexes and number discs inside
+                          the frame as shown.
+
+                  3 Create the Supply                                                                                                      4
+                          Sort the resource cards by type and place
+                          them in five faceup stacks in the card
+                          trays. Shuffle the development cards
+                          and place them in a facedown stack
+                          in the remaining empty card tray
+                          slot. Place the Longest Route
+                          and Largest Army tiles near the
+                          game board.
+
+
+
+
+                          3
+                                      LARGEST ARMY
+                                 The first player to play 3 Knight cards receives
+                                  this tile. If another player plays more Knight
+                                    cards, they immediately receive this tile.
+1
+
+
+ FIXED3:1SETUP
+
+                          6
+
+
+
+
+                                    LONGEST ROUTE
+        5                         The first player to play 5 continuous roads
+                                   receives this tile. If another player plays
+                                   more, they immediately receive this tile.
+                                                                                         LARGEST ARMY
+                                                                                    The first player to play 3 Knight cards receives
+                                                                                     this tile. If another player plays more Knight
+                                                                                       cards, they immediately receive this tile.
+01
+
+
+
+
+                      4
+4 Place the Robber and Player Pieces
+    • Place the robber on the desert hex.
+      • Each player selects a color and takes the roads and buildings
+           (settlements and cities) in that color along with a player aid.
+             In a 3-player game, do not use the white pieces.
+            • Place 2 starting settlements and roads for each player
+                 as shown.
+
+             5 Collect Your Starting Resources
+                      Each player takes the resource cards from the supply that
+                        match the hexes adjacent to their second settlement,
+                         highlighted in black. Keep these cards hidden
+                           in your hand.
+
+                          6 Choose the First Player
+                                Each player rolls the dice. The player with the
+                                  highest roll is the first player.
+
+
+
+
+                                            5
+
+
+
+                                                                                                    GmbH
+                                                                                                       CATAN
+                                                                                                         © 2025
+
+
+
+
+                                                                                                                                                                          GmbH
+                                                                                                                                                                        CATAN
+                                                                                                                                                                     © 2025
+                                                                                                                                      © 2025 CATAN GmbH
+
+
+
+
+                                                                                                                                                                                 GmbH
+                                             GmbH
+
+
+
+
+                                                                                                                                                                                   CATAN
+                                               CATAN
+
+
+
+
+                                                                                                                                                                                     © 2025
+                                                 © 2025
+
+
+
+
+                                                                                                                                                                                                                       GmbH
+                                                                                   GmbH
+
+
+
+
+                                                                                                                                                                                                                     CATAN
+                                                                                 CATAN
+
+
+
+
+                                                                                                                                                                                                                  © 2025
+                                                                              © 2025
+
+
+
+
+                                                                                                                                                                                              © 2025 CATAN GmbH
+                                                          © 2025 CATAN GmbH
+
+
+
+
+                                                                                          GmbH
+                                                                                            CATAN
+                                                                                              © 2025
+
+
+
+
+                                                                                                                                                               GmbH
+                                                                                                                                                             CATAN
+                                                                                                                                                          © 2025
+
+
+
+
+                  6
+                                                                                                                  © 2025 CATAN GmbH
+
+
+
+
+                                                                                                                                                                                                                              5
+        TURN OVERVIEW
+        CATAN is played over a series of turns, starting with the first player, and moving clockwise around the table.
+        A turn consists of two phases, which occur in this order:
+               1. Production phase
+               2. Action phase
+        Once you have finished the Action phase, if you have not won, pass the dice to the player on your left.
+        They begin their turn with the Production phase.
+
+        PRODUCTION PHASE
+        PLAY A DEVELOPMENT CARD
+        If you have development cards, you may play one of them before rolling the dice. See “Development Cards” on page 9.
+                     ROLL DICE
+                     Roll both dice and add them together. This total determines which hexes produce resources this turn.
+
+        COLLECT RESOURCES
+        Hexes with a number disc matching the dice roll
+        produce this turn. Each player with a settlement on a
+
+
+
+
+                                                                                                             GmbH
+                                                                                                          © 2025 CATAN
+
+
+
+
+                                                                                                                                          GmbH
+                                                                                                                                        CATAN
+                                                                                                                                     © 2025
+        producing hex receives 1 resource card
+
+
+
+
+                                                                                                                                                                         GmbH
+                                                                                                                                                                       CATAN
+                                                                                                                                                                    © 2025
+        of the corresponding type from the supply.
+                                                                                                                                                   Hills produce brick
+        If a player has 2 or 3 settlements on that hex, they
+        receive 1 resource card for each settlement.
+
+
+
+
+                                                                                                                              GmbH
+                                                                                                                            CATAN
+                                                                                                                         © 2025
+        Similarly, a player receives 2 resource cards               Example: The White player rolls an 8.
+           for each of their cities on that hex.                    Blue has a settlement on the mountain
+
+
+
+
+                                                                                                                                                                         GmbH
+                                                                                                                                                                       CATAN
+                                                                                                                                                                    © 2025
+           If there are not enough resource cards in the            hex with the number 8 disc, so Blue
+                                                                                                                                                 Forests produce wood
+           supply to fulfill everyone’s production, then no         receives 1 ore resource card. Orange
+           one receives any of that resource. However, if only      receives 2 ore for their city on that hex.
+           one player is affected, give that player as many of
+           those resource cards as remain in the supply.
+
+
+
+
+                                                                                                                                                                         GmbH
+                                                                                                                                                                       CATAN
+                                                                                                                                                                    © 2025
+           RESOLVE A 7                                                                                                                           Pastures produce wool
+
+           When you roll a 7, hexes do not produce
+           any resources. Instead:                                  Example: White has 9 resource cards
+           1. DISCARD RESOURCES                                     in hand. When a 7 is rolled, they must
+                                                                                                                                                                         GmbH
+                                                                                                                                                                       CATAN
+
+
+
+
+                                                                    discard 4 cards.
+                                                                                                                                                                    © 2025
+
+
+
+
+           Each player who has more than 7 resource cards
+                                                                                                                                                 Fields produce wheat
+           must choose half (rounded down) of their resource
+           cards and return them to the supply.
+           2. ACTIVATE THE ROBBER
+                You must move the robber to a new hex.
+                                                                                                                                                                         GmbH
+                                                                                                                                                                       CATAN
+                                                                                                                                                                    © 2025
+
+
+
+
+                Steal 1 random resource card from a player
+                                                                                                                                                 Mountains produce ore
+                who has a building on that hex. If multiple
+                players have buildings on the new hex, you
+                choose one player to rob.                           Example: Orange rolls a 7. They move
+RULES
+
+
+
+
+                                                                    the robber to the pasture hex with a
+           Important: A hex with the robber does not
+                                                                    red settlement and a blue city. Orange
+           produce resources when its number is rolled.
+                                                                    chooses to steal a card from Blue and                                             The desert
+                                                                    takes a random card without looking.                                           produces nothing
+           6
+ACTION PHASE
+You may take actions in this phase as often as you like and in any order, as long as you have the resources to do so.
+
+TRADE
+You may trade freely with other players and the supply to get the resources you need to build. During your turn,
+other players may only trade with you, not with each other or with the supply.
+There are three types of trades you may perform:
+TRADE WITH OTHER PLAYERS
+To trade with other players, announce which resource(s) you want and which resource(s) you are willing
+to trade. Other players may accept your proposal, make counteroffers, or make their own proposals.
+Important: You may not give away cards in any way, which includes trading matching resource cards
+(for example, trying to trade 3 ore for 1 ore is not allowed).
+
+                     Example: It is Blue’s turn, and they want 1 wheat. Orange will trade
+                     1 wheat and wants 1 wool in return. Blue agrees and the players
+                     exchange cards. White also wants to trade for 1 wool, but Blue
+                     no longer has any. White may not trade with Orange because
+                     it is not Orange’s turn.
+
+GENERAL TRADE WITH THE SUPPLY (4:1)
+To trade with the supply, put 4 of the same resource cards into the supply
+and take 1 card of a different resource from the supply.
+                             © 2025 CATAN GmbH
+
+
+
+
+                                                 © 2025 CATAN GmbH
+
+
+
+
+                                                                     © 2025 CATAN GmbH
+
+
+
+
+                                                                                         © 2025 CATAN GmbH
+
+
+
+
+                                                                                                                    © 2025 CATAN GmbH
+
+
+
+
+       Example: It is Blue’s turn. They choose to trade 4 wood for 1 ore.
+
+
+PORT TRADE WITH THE SUPPLY
+(3:1 OR 2:1)
+If you have a building on a 3:1 port, you
+may put 3 of the same resource cards
+                                                                                                                                                                                © 2025 CATAN GmbH
+                                                                                                                                        © 2025 CATAN GmbH
+
+
+
+
+into the supply and take 1 card of a
+                                                                                                                                                                                                    © 2025 CATAN GmbH
+
+
+
+
+different resource from the supply.
+If you have a building on a 2:1 port, you                                                                    Example: White wants 1 ore. On their turn,
+may put 2 of the resource cards shown                                                                        they may not trade 2 wheat for 1 ore because
+on the port into the supply and take                                                                         they do not have a building on the 2:1 wheat
+1 card of a different resource from                                                                          port. However, they may trade 3 wood for 1 ore
+the supply.                                                                                                  because they have a settlement built on a 3:1 port.
+                                                                                                                                                                                                                                            © 2025 CATAN GmbH
+                                                                                                                                                            © 2025 CATAN GmbH
+
+
+
+
+                                                                                                                                                                                                                        © 2025 CATAN GmbH
+
+
+
+
+                                                                                                                                                                                                                                                                © 2025 CATAN GmbH
+
+
+
+
+                                                                                                                                                                                                                                                                                    7
+BUILD
+Roads, buildings (settlements and cities), and development cards each have different costs. During your turn, you may
+spend resources (aka “build”) to place roads and buildings on the board, as well as to take development cards from the
+supply. To do so, simply return the required resource cards from your hand to the supply.
+             ROADS
+              Roads are worth 0 VP.                                                                                                                           BUILDING COST:
+                     Roads are placed on empty hex edges. A new road must connect
+                      to one of your existing roads or buildings. You may not build a road
+                        starting on the other side of an opponent’s building.
+                                             6
+
+
+
+                 4
+                     3:1
+
+
+
+
+                                       Example: Blue may place a road on any of the
+                                                                    LARGEST ARMY
+
+                                         edges with a check mark. They may not place
+                                                               The first player to play 3 Knight cards receives
+                                                                this tile. If another player plays more Knight
+                                                                  cards, they immediately receive this tile.
+
+
+                                          a road on the edge with an “X” because they
+                                            may not build on the other side of
+                                              Orange’s settlement.
+                                             2:1
+
+
+
+
+                                                                                                                  Longest Route
+                                                                                                                  The first player to have 5 continuous roads in play receives this
+                       2:1
+
+
+
+
+                                                                  LONGEST ROUTE
+                                                                                                                  tile. If another player has more continuous roads in play, they
+                                                   5            The first player to play 5 continuous roads
+                                                                 receives this tile. If another player plays      immediately receive this tile. The Longest Route tile is worth
+                       5
+
+
+
+
+                                                                 more, they immediately receive this tile.
+
+                             CN3081
+                             CATAN
+                              5 of 5
+                                       v6.250401
+                                                                                                                  2 VPs.
+                                                                                                                  If, when a player’s route is broken (see example), they no
+                                                                                                                  longer meet the requirements for the Longest Route, the tile
+                                                                                                                  is returned to the supply. It remains in the supply until a single
+                                                                                                                  player has the longest continuous route of at least 5 roads.
+                                                                                                                  That player immediately receives the bonus tile and the 2 VPs.
+
+
+                                                                                    Example: Red has a continuous route of 7 roads and the Longest Route
+                                                                                  tile. White has a continuous route of 6 roads. On White’s turn, they
+                                                                                 build a settlement at the intersection shown, breaking Red’s route into a
+                                                                                 four-segment route and a three-segment route. Since White now has the
+                                                                                        longest route, they receive the tile and the 2 VPs.
+
+
+                                                        SETTLEMENTS                                                             The Distance Rule: When placing a
+                                                       Settlements are worth 1 VP.                                              settlement, stay at least two edges away
+                                     Settlements are placed on                                                                  from all other buildings!
+                                  empty intersections. A new
+                                settlement must follow the Distance
+                              Rule and must connect to at least one
+                           of your existing roads. You have
+                         5 settlement pieces. To continue building
+                       more settlements, you must first upgrade
+                      one to a city.
+
+                                                   BUILDING COST:
+                                                                                                                                Example: Orange may place a settlement
+                                                                                                                                on the intersections with a check mark.
+8
+CITIES
+Cities are worth 2 VPs.
+                                                                                                                                                                                                                   BUILDING COST:
+Cities always replace settlements. To build a city, remove one of your
+settlements from the board, return it to your player area, and place your city
+where the settlement was located. You have 4 cities and may not build more.
+DEVELOPMENT CARDS
+When you build a development card, draw the top card of the deck. Development cards stay
+                                                                                                                                                                                                                                                                               BUILDING COST:
+hidden until used. They do not count toward the number of cards in your hand when a 7 is
+rolled, and the robber may not steal them.
+You may play 1 development card during your turn by placing it face up in your player area.
+It may not be a card you built this turn. You may play a development card before rolling dice
+or at any time during the Action phase.
+Development cards never go back into the supply. If the supply runs out, you may not build any more cards.
+You may not trade or give away development cards.
+
+
+    INVENTION                                                  Invention                                                 MONOPOLY                                                                   Monopoly
+                                                               When you play this card, take any                                                                                                    When you play this card, announce one
+                                                               2 resource cards from the supply. Add                                                                                                type of resource. Each player must give
+                                                               them to your hand. They may be 2 of the                                                                                              you all their resource cards of that type.
+                                                                                                                       Announce one type of
+ Take any 2 resource cards                                                                                          resource. Each player must
+     from the supply.                                                                                                give you all their resource
+
+
+                                                               same resource or 2 different resources.                                                                                              You may only request one type of resource
+                                                                                                                         cards of that type.
+                                           © 2025 CATAN GmbH
+
+
+
+
+                                                                                                                                                            © 2025 CATAN GmbH
+
+
+
+
+                                                                                                                                                                                                    when you play this card, regardless of
+                                                                                                                                                                                                    how many cards you receive.
+
+
+
+
+                                                                                                                                                                                                                                       © 2025 CATAN GmbH
+                                                                                                                                                                                                                   © 2025 CATAN GmbH
+
+
+
+
+                                                                                                                                                                                                                                                           © 2025 CATAN GmbH
+                                                                                                                                                                                © 2025 CATAN GmbH
+
+
+
+
+                                                                                                                                                                                                                                       © 2025 CATAN GmbH
+
+
+
+
+ ROAD BUILDING                                                 Road Building                                         VICTORY POINT                                                                  Victory Point
+                                                               When you play this card, build 2 roads                                                                                               Reveal all your Victory Point cards,
+                                                               at no cost (i.e., without spending any                    Play any number
+                                                                                                                                                                                                    including any built this turn, if
+ Build 2 roads at no cost.                                     resource cards).                                        of Victory Point cards
+                                                                                                                    (even on the turn you build
+                                                                                                                      them) to win the game.
+                                                                                                                                                                                                    you can reach the number of VPs
+                                           © 2025 CATAN GmbH
+
+
+
+
+                                                                                                                                                            © 2025 CATAN GmbH
+
+
+
+
+                                                                                                                                                                                                    needed to win. Otherwise, you must
+                                                                                                                                                                                                    keep Victory Point cards hidden in
+                                                                                                                                                                                                    your player area.
+
+
+
+
+        KNIGHT                                                 Knight
+                                                               When you play a Knight card, you must                                                                                                Largest Army                                                                         KNIGHT                        KNIGHT                  KNIGHT
+
+
+
+
+                                                               “Activate the Robber” (see page 6).
+                                                                                                 6
+
+
+
+
+                                                                                                                                                                                                    The first player to have
+                                                                                     4
+
+    Move the robber to a
+   new hex. Steal 1 random
+                                                                                         3:1
+
+
+
+
+                                                                                                                                                                                                    3 Knight cards in play
+ resource card from a player                                                                                                                                                                                                                                                         Move the robber to a Move the robber to a Move the robber to a
+ with a building on that hex.
+                                © 2025 CATAN GmbH
+
+
+
+
+                                                                                                                                                                                                                                                                                    new hex. Steal 1 randomnew hex. Steal 1 random new hex. Steal 1 random
+                                                                                                                                                                                                                                                                                  resource card from a player
+                                                                                                                                                                                                                                                                                                         resource card from a player
+                                                                                                                                                                                                                                                                                                                                 resource card from a player
+                                                                                                              LARGEST ARMY                                                                                                                                                        with a building on thatwith
+                                                                                                                                                                                                                                                                                                          hex. a building on thatwith
+                                                                                                                                                                                                                                                                                                                                  hex. a building on that hex.
+                                                                                                                                                                                                                                                                                                                © 2025 CATAN GmbH
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                        © 2025 CATAN GmbH
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                 © 2025 CATAN GmbH
+
+
+
+
+                                                                                                                                                                                                    receives this tile.
+                                                                                                         The first player to play 3 Knight cards receives
+                                                                                                          this tile. If another player plays more Knight
+                                                                                                            cards, they immediately receive this tile.
+
+
+
+                                                                                                                                                                                                    If another player has more Knight cards in
+                                                                                                                                                                                                    play, they immediately receive this tile.
+                                                                                                                                                                                                    The Largest Army tile is worth 2 VPs.
+                                                                                                 2:1
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                     9
+                                                                                           2:1
+WINNING THE GAME
+If you have 10 or more VPs at any
+point during your turn, the game ends
+immediately and you are the winner!
+Turn over any number of Victory
+Point cards, including ones
+built this turn, to show that
+you have reached 10 VPs.
+Congratulations!
+
+
+
+
+Example: Blue ends the game
+on their turn with 10 VPs (2 cities,
+                                        6
+
+
+
+
+        4
+            3:1
+
+
+
+
+3 settlements, the Longest Route tile,
+                                                           LARGEST ARMY
+                                                      The first player to play 3 Knight cards receives
+                                                       this tile. If another player plays more Knight
+                                                         cards, they immediately receive this tile.
+
+
+
+
+and 1 Victory Point card). Victory!
+                                        2:1
+
+
+
+
+                                                                                                                                                6
+                  2:1
+
+
+
+
+                                                                                                                4
+                                                                                                                    3:1
+
+
+
+
+                                                         LONGEST ROUTE                                                                                         LARGEST ARMY
+                                              5        The first player to play 5 continuous roads                                                        The first player to play 3 Knight cards receives
+                                                        receives this tile. If another player plays                                                        this tile. If another player plays more Knight
+             5
+
+
+
+
+                                                        more, they immediately receive this tile.                                                            cards, they immediately receive this tile.
+
+                        CN3081
+                        CATAN
+                         5 of 5
+                                  v6.250401
+
+
+
+
+                                                                         Points                                                                                              Points                                                    Points                             Points
+                                            Built                                                                                                 Built                                                                    Built                              Built
+                                                                         Earned                                                                                              Earned                                                    Earned                             Earned
+                                                                                                                                                2:1
+
+
+
+
+                                              2                          4 VPs                                                                        1                      2 VPs                                           1         2 VPs                    2         4 VPs
+                                                                                                                          2:1
+
+
+
+
+                                              3                          3 VPs                                                                        4                      4 VPs                                           3         3 VPs                    4         4 VPs
+                                                                                                                                                             LONGEST ROUTE
+                                                                                                                                                      5    The first player to play 5 continuous roads
+                                                                                                                                                            receives this tile. If another player plays
+                                                                                                                     5
+
+
+
+
+                                                                                                                                                            more, they immediately receive this tile.
+
+                                                                                                                                CN3081
+                                                                                                                                CATAN
+                                                                                                                                 5 of 5
+                                                                                                                                          v6.250401
+
+
+
+
+                    14 continuous 2 VPs                                                                                         7 continuous                                 0 VPs                                      8 continuous   0 VPs               7 continuous   0 VPs
+ VP Cards                                         1                      1 VPs                           VP Cards                                     0                      0 VPs                           VP Cards        1         1 VPs    VP Cards        0         0 VPs
+ Knights                            3 played                             0 VPs                           Knights                          5 played                            2 VPs                          Knights      1 played     0 VPs    Knights     2 played      0 VPs
+
+ TOTAL                                                                   10 VPs                          TOTAL                                                               8 VPs                           TOTAL                     6 VPs    TOTAL                     8 VPs
+
+
+Red finished with 8 VPs. Orange also finished with 8 VPs. White finished with 6 VPs.
+
+
+
+10
+VARIABLE SETUP
+Level up your game! The variable setup provides the full CATAN experience.
+Here’s how:
+     1    Assemble the Frame
+    Shuffle and connect the puzzle piece ends
+    of the sea frame pieces to assemble the
+    coast of Catan.
+
+
+
+
+     2 Place the Hexes
+    Randomly place the hexes face up inside
+    the frame.
+
+
+
+
+     3 Place the Number Discs
+    Arrange the discs face down in A-B-C order. Starting in any corner of the board, place the number discs on the
+    hexes counterclockwise, skipping the desert. Then turn them over so the number side is faceup.
+
+
+
+
+                                                                                                                                                                                                                                               VARIABLE SETUP
+     4 Place the Robber                                         5 Create the Supply
+    Place the robber on the desert hex.                        Sort the resource cards by type and place them
+                                                               in five faceup stacks in the card trays. Shuffle the
+                                                                                                              6
+
+
+
+
+                                                                                  4
+                                                                                      3:1
+
+
+
+
+                                                               development cards and place them in a facedown                            LARGEST ARMY
+                                                                                                                                    The first player to play 3 Knight cards receives
+                                                                                                                                     this tile. If another player plays more Knight
+                                                                                                                                       cards, they immediately receive this tile.
+
+
+
+
+                                                               stack in the remaining empty card tray slot. Place the
+                                                               Longest Route and Largest Army tiles near
+                                                               the game board.
+                                                                                                              2:1
+                                                                                        2:1
+
+
+
+
+                                                                                                                              6
+
+
+
+
+                                                                                                             4
+
+
+                                                                                                                                       LONGEST ROUTE
+                                                                                                                    3:1
+
+
+
+
+                                                                                                                          5          The first player to play 5 continuous roads
+                                                                                                                                      receives this tile. If another player plays
+                                                                                       5
+
+
+
+
+                                                                                                                                      more, they immediately receive this tile.
+                                                                                                                                                                                            LARGEST ARMY
+                                                                                              CN3081                                                                                   The first player to play 3 Knight cards receives
+                                                                                              CATAN                                                                                     this tile. If another player plays more Knight
+                                                                                               5 of 5                                                                                     cards, they immediately receive this tile.
+                                                                                                        v6.250401
+
+
+
+
+                                                                                                                                                                                                                                          11
+                                                                                                                              2:1
+                                                                                                                      :1
+ 6 Choose the First Player
+Each player rolls the dice. The player with the highest roll is the first player.                                                                                                             1                      2                               3                                      4
+Then each player selects a color and takes the roads and buildings (settlements
+and cities) in that color along with a player aid.
+
+ 7      Place Your Starting Pieces
+ROUND 1                                                                                                                          ROUND 2
+The first player places 1 settlement on an                                               4                                       Starting with the last player and going in
+                                                                                  3
+empty intersection of their choice. Then they                              2                                                     reverse order, each player places
+place 1 road on an empty edge next to that                          1                           5                                1 settlement on an empty intersection of their
+settlement. The next player to the left does                                            6                                        choice and their second road on an empty
+                                                                                 7
+the same until all players have 1 settlement                              8                                                      adjacent edge.
+and 1 road on the board.                                                                                                         As before, when placing a settlement, stay
+Important: When placing a settlement, stay                                                                                       two edges away from all other settlements.
+two edges away from all other settlements.
+
+ 8 Collect Your Starting Resources
+Each player takes 1 matching resource card from the supply for each hex adjacent to their second settlement.
+Keep these resource cards hidden in your hand.
+
+                                                                                  Example: If the players’ 2nd settlements are the ones shown
+                                                                                  to the left, they would collect the resources shown below:
+
+
+
+
+                                                                                                                                                                                                        GmbH
+                                                                                                GmbH
+
+
+
+
+                                                                                                                                                                                                          CATAN
+                                                                                                  CATAN
+
+
+
+
+                                                                                                                                                                                                            © 2025
+                                                                                                    © 2025
+
+
+
+
+                                                                                                                                      GmbH
+                                                                                                                                    CATAN
+                                                                                                                                 © 2025
+
+
+
+
+                                                                                                                                                                                                                         © 2025 CATAN GmbH
+                                                                                                             © 2025 CATAN GmbH
+
+
+
+
+                                                                                                                                                                                                                                                           GmbH
+                                                                                                                                               GmbH
+
+
+
+
+                                                                                                                                                                                                                                                             CATAN
+                                                                                                                                                 CATAN
+
+
+
+
+                                                                                                                                                                                                                                                               © 2025
+                                                                                                                                                   © 2025
+
+
+
+
+                                                                                                                                                                                                                                                                                                 GmbH
+                                                                                                                                                                                       GmbH
+
+
+
+
+                                                                                                                                                                                                                                                                                               CATAN
+                                                                                                                                                                                     CATAN
+
+
+
+
+                                                                                                                                                                                                                                                                                            © 2025
+                                                                                                                                                                                  © 2025
+                                                                                                                                                              © 2025 CATAN GmbH
+
+
+
+
+                                                                                                                                                                                                                                                                        © 2025 CATAN GmbH
+
+
+
+
+CREDITS
+Designed by: Klaus Teuber (1952-2023)                    Editor of 1st Edition: Reiner Müller                                                                You have purchased a game of the highest
+                                                                                                                                                            quality. However, if you find any components
+Ongoing design: Benjamin Teuber                          Producer: Ron Magin
+                                                                                                                                                                  missing or damaged, please visit:
+Development team: Jasmin Balle, Arnd Beenen,             Special thanks: Brea Blankenfeld, Sebastian                                                                  catanstudio.com/support
+Morgan Dontanville, Arnd Fischer,                        Castro Casas, Nadine Fiedler, Caroline Fischer,                                                        For all other inquiries, contact us at:
+Bianca Freund, and Sonja Krützfeldt                      Kevin Hovdestad, Riley Jouppi, Aud Ketilsdatter                                                               info@catanstudio.com
+Art: Quentin Regnes (cover),                             (LSKC/345-2), Stephanie Newman, Donna Prior,
+Eric Hibbeler with assistance from Kin Wald (interior)   Sabrina Risch, Kelli Schmitz, and especially
+                                                         Guido Teuber
+Graphic design: Az Sperry (ENG),                                                                                                                                                                  catan.com
+                                                                                                                                                                                                                                             ®
+                                                                                                                                                                                                                                                  Studio                ™
+
+
+
+
+Michaela Kienle (GER)                                    Technical editing/proofreading support (ENG):                                                                                                                                           catanstudio.com
+                                                         Steven Kimball, Jason D. Kingsley
+3D Graphics: Alex Colón Hernández                                                                                                            Copyright © 2025 CATAN GmbH and CATAN Studio. CATAN, the
+                                                         Production team (US): Justin Anger,                                                 “CATAN Sun,” the CATAN Brand logo, and the CATAN Hex Icon
+Lead editor & rules redesign for 6th Edition             Emily Frenchik, Estelle Gavin, Chris Jensen, and                                    —and all other marks herein—are trademarks of CATAN
+(ENG): Anne Reynolds                                     Austin Litzler
+                                                                                                                                             GmbH (catan.com) in various territories of the world and are
+                                                                                                                                             used under license from CATAN GmbH. “Gamegenic” and the
+Lead editor & rules redesign for 6th Edition             Head of CATAN Studio: Pete Fenlon                                                   “Gamegenic logo” are TM & © Gamegenic GmbH, Germany. All
+(GER): Tina Landwehr-Rödde                                                                                                                   rights reserved. Published by CATAN Studio, 1995 W. County Rd.
+                                                                                                                                             B2, Roseville, MN 55113 USA. Phone +1.651.639.1905.
+12
+

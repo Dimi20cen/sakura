@@ -37,7 +37,7 @@ This document describes the currently implemented Seafarers scope.
 ### Ship Movement
 
 - Exactly one ship move per turn.
-- During action phase (after dice roll).
+- Before rolling dice.
 - A ship built this turn cannot be moved this turn.
 - Ship must be open-ended/movable.
 - Destination must be a valid ship build edge.

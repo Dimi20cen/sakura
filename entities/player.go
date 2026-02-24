@@ -162,9 +162,9 @@ func GetColorByUsernameOrOrder(username string, order uint16) string {
 	case "jethro7194":
 		return "#0000ff" // blue
 	case "kopstiklapsa":
-		return "#ffff00" // yellow
+		return "#ff7a00" // orange
 	case "staxtoputa":
-		return "#fc41ec" // plum
+		return "#ffffff" // white
 	case "giorgaros":
 		return "#ff0000" // red
 	default:

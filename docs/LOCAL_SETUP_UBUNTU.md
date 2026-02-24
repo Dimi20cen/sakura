@@ -149,8 +149,8 @@ Expected:
 On first local use, pick one profile from:
 
 - `Jethro7194` (blue)
-- `KopsTiKlapsa` (yellow)
-- `staxtoPUTA` (plum)
+- `KopsTiKlapsa` (orange)
+- `staxtoPUTA` (white)
 - `Giorgaros` (red)
 
 The selection is saved in browser local storage and can be changed later from `/choose-profile`.

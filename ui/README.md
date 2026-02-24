@@ -31,6 +31,7 @@ npm run dev
 - `http://localhost:3000`
 - `http://localhost:3000/lobby`
 - `http://localhost:3000/choose-profile`
+- `http://localhost:3000/design/swatches` (resource palette preview)
 
 ## API Routes in This App
 

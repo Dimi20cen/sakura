@@ -1,4 +1,5 @@
 import { FunctionComponent, MutableRefObject } from "react";
+import Image from "next/image";
 import { LobbyState } from "../src/store/types";
 import { hexToUrlString } from "../utils";
 import { classNames, playerColors } from "../utils/styles";
@@ -20,21 +21,17 @@ const playerRowClass = (self: boolean, ready: boolean) => {
     if (self) {
         base += " font-bold";
         if (ready) {
-            base +=
-                " bg-[rgba(54,101,66,0.62)] border-[rgba(183,148,90,0.45)]";
+            base += " ui-player-row-self-ready";
         } else {
-            base +=
-                " bg-[rgba(122,31,36,0.65)] border-[rgba(183,148,90,0.52)]";
+            base += " ui-player-row-self-waiting";
         }
         return base;
     }
 
     if (ready) {
-        base +=
-            " bg-[rgba(49,71,54,0.62)] border-[rgba(231,222,206,0.18)]";
+        base += " ui-player-row-ready";
     } else {
-        base +=
-            " bg-[rgba(54,35,36,0.72)] border-[rgba(231,222,206,0.18)]";
+        base += " ui-player-row-waiting";
     }
 
     return base;
@@ -71,12 +68,17 @@ const PlayerList: FunctionComponent<{
                 >
                     <div
                         className={classNames(
-                            "flex-shrink-0 rounded-full h-8 w-8 m-auto ring-1 ring-[rgba(231,222,206,0.4)]",
+                            "flex-shrink-0 rounded-full h-8 w-8 m-auto ui-player-chip-ring",
                             playerColors[hexToUrlString(player.Color)],
                         )}
                     >
                         {player.Username.endsWith("*") && (
-                            <img src={botImage.src} />
+                            <Image
+                                src={botImage.src}
+                                alt="Bot player"
+                                width={32}
+                                height={32}
+                            />
                         )}
                     </div>
                     <div className="flex-col pl-4 text-left items-center w-full">

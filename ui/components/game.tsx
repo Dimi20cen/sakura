@@ -27,11 +27,11 @@ const selectClasses =
 const labelClasses =
     "block text-[color:var(--ui-ivory-soft)] text-xs uppercase tracking-[0.08em] mb-2";
 const settingCardClasses =
-    "rounded-xl px-3 py-2.5 bg-[rgba(34,28,25,0.62)] border border-[rgba(231,222,206,0.14)]";
+    "ui-setting-card rounded-xl";
 const valueControlClasses =
-    "rounded-lg px-3 py-2.5 bg-[rgba(20,17,14,0.45)] border border-[rgba(231,222,206,0.18)] text-[color:var(--ui-ivory)]";
+    "ui-value-control rounded-lg";
 const stepperButtonClasses =
-    "p-1.5 rounded-md hover:bg-[rgba(183,148,90,0.2)] disabled:opacity-40 transition-colors";
+    "ui-stepper-btn p-1.5 rounded-md disabled:opacity-40 transition-colors";
 const rangeInputClasses =
     "w-full h-2 rounded-lg appearance-none cursor-pointer accent-[color:var(--ui-gold)] disabled:opacity-40";
 const turnTimerOptions = [
@@ -260,7 +260,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                     className={classNames(
                         `${settingCardClasses} px-4 pt-3 pb-2 transition-colors duration-200`,
                         lobbyState.advanced[setting]
-                            ? "bg-[rgba(122,31,36,0.62)] border-[rgba(183,148,90,0.55)]"
+                            ? "ui-card-active"
                             : "",
                     )}
                 >
@@ -268,7 +268,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                         <div className="w-full">
                             <input
                                 className={classNames(
-                                    "h-4 w-4 rounded-sm bg-[color:var(--ui-ivory)] checked:bg-[color:var(--ui-gold)] checked:border-[color:var(--ui-gold)]",
+                                    "ui-check-input h-4 w-4 rounded-sm checked:bg-[color:var(--ui-gold)] checked:border-[color:var(--ui-gold)]",
                                     "transition duration-200 align-top bg-no-repeat bg-center bg-contain float-left mt-1.5 mr-2",
                                     lobbyState.order === 0
                                         ? "cursor-pointer"
@@ -301,7 +301,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
             <Header />
             <div className="ui-page ui-fade-in !py-4">
                 {(lobbyError || disconnectedMessage) && (
-                    <div className="ui-panel ui-panel-pad mb-3 border-[rgba(226,84,84,0.6)] bg-[rgba(80,18,18,0.5)] text-[color:var(--ui-ivory)]">
+                    <div className="ui-panel ui-panel-pad ui-alert-error mb-3">
                         {lobbyError || disconnectedMessage}
                     </div>
                 )}
@@ -395,7 +395,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                                         .VictoryPoints
                                                 }
                                             />
-                                            <div className="flex justify-between text-xs text-[rgba(244,239,228,0.7)] mt-1.5">
+                                            <div className="flex justify-between text-xs text-[color:var(--ui-text-dim)] mt-1.5">
                                                 <span>{minVictoryPoints}</span>
                                                 <span>{maxVictoryPoints}</span>
                                             </div>
@@ -490,15 +490,15 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                                 className={classNames(
                                                     "inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm cursor-pointer transition-colors duration-200",
                                                     lobbyState.settings.Private
-                                                        ? "bg-[rgba(122,31,36,0.42)] border-[rgba(183,148,90,0.5)] text-[color:var(--ui-ivory)]"
-                                                        : "bg-[rgba(20,17,14,0.45)] border-[rgba(231,222,206,0.18)] text-[color:var(--ui-ivory-soft)]",
+                                                        ? "ui-toggle-chip-on"
+                                                        : "ui-toggle-chip-off",
                                                     lobbyState.order !== 0
                                                         ? "opacity-70 cursor-not-allowed"
                                                         : "",
                                                 )}
                                             >
                                                 <input
-                                                    className="h-3.5 w-3.5 rounded-sm border-[rgba(231,222,206,0.45)] bg-[color:var(--ui-ivory)] checked:bg-[color:var(--ui-gold)] checked:border-[color:var(--ui-gold)]"
+                                                    className="ui-check-input h-3.5 w-3.5 rounded-sm checked:bg-[color:var(--ui-gold)] checked:border-[color:var(--ui-gold)]"
                                                     type="checkbox"
                                                     id="Private"
                                                     aria-label="Private Game"
@@ -518,15 +518,15 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                                 className={classNames(
                                                     "inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm cursor-pointer transition-colors duration-200",
                                                     lobbyState.settings.CreativeMode
-                                                        ? "bg-[rgba(122,31,36,0.42)] border-[rgba(183,148,90,0.5)] text-[color:var(--ui-ivory)]"
-                                                        : "bg-[rgba(20,17,14,0.45)] border-[rgba(231,222,206,0.18)] text-[color:var(--ui-ivory-soft)]",
+                                                        ? "ui-toggle-chip-on"
+                                                        : "ui-toggle-chip-off",
                                                     lobbyState.order !== 0
                                                         ? "opacity-70 cursor-not-allowed"
                                                         : "",
                                                 )}
                                             >
                                                 <input
-                                                    className="h-3.5 w-3.5 rounded-sm border-[rgba(231,222,206,0.45)] bg-[color:var(--ui-ivory)] checked:bg-[color:var(--ui-gold)] checked:border-[color:var(--ui-gold)]"
+                                                    className="ui-check-input h-3.5 w-3.5 rounded-sm checked:bg-[color:var(--ui-gold)] checked:border-[color:var(--ui-gold)]"
                                                     type="checkbox"
                                                     id="CreativeMode"
                                                     aria-label="Creative Mode"
@@ -633,7 +633,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                                     disabled={lobbyState.order !== 0}
                                                     value={lobbyState.settings.DiscardLimit}
                                                 />
-                                                <div className="flex justify-between text-xs text-[rgba(244,239,228,0.7)] mt-1.5">
+                                                <div className="flex justify-between text-xs text-[color:var(--ui-text-dim)] mt-1.5">
                                                     <span>{minDiscardLimit}</span>
                                                     <span>{maxDiscardLimit}</span>
                                                 </div>
@@ -677,8 +677,8 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                     className={classNames(
                                         "w-full sm:w-3/4 xl:w-2/3 px-5 py-3 rounded-xl my-2 mx-auto border transition-colors duration-200",
                                         lobbyState.ready
-                                            ? "bg-[rgba(88,44,48,0.58)] border-[rgba(183,148,90,0.45)]"
-                                            : "bg-[rgba(61,42,35,0.62)] border-[rgba(231,222,206,0.18)]",
+                                            ? "ui-ready-on"
+                                            : "ui-ready-off",
                                     )}
                                 >
                                     <label
@@ -686,9 +686,9 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                         htmlFor="ready"
                                     >
                                         <input
-                                            className="h-5 w-5 rounded-sm border-[rgba(231,222,206,0.45)] bg-[color:var(--ui-ivory)]
+                                            className="ui-check-input h-5 w-5 rounded-sm
                                                    checked:bg-[color:var(--ui-gold)] checked:border-[color:var(--ui-gold)]
-                                                   focus:ring-2 focus:ring-[rgba(183,148,90,0.45)] focus:ring-offset-0"
+                                                   focus:ring-2 focus:ring-[color:var(--ui-focus-ring)] focus:ring-offset-0"
                                             type="checkbox"
                                             aria-label="Ready to play"
                                             checked={lobbyState.ready}
@@ -733,7 +733,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                         </div>
 
                         <div
-                            className="text-[color:var(--ui-ivory)] bg-[rgba(21,18,15,0.45)] border border-[rgba(231,222,206,0.14)] rounded-lg text-left p-3 overflow-y-auto overscroll-contain h-[220px] sm:h-[240px] lg:h-[280px]"
+                            className="ui-chat-box rounded-lg text-left p-3 overflow-y-auto overscroll-contain h-[220px] sm:h-[240px] lg:h-[280px]"
                             ref={chatDiv}
                         >
                             <div className="space-y-1.5">
@@ -741,7 +741,7 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
                                     lobbyState.chatMessages.map((m: { id: number; msg: string }) => (
                                         <p
                                             key={m.id}
-                                            className="text-sm leading-relaxed text-[color:var(--ui-ivory)] break-words border-b border-[rgba(231,222,206,0.08)] pb-1"
+                                            className="ui-chat-msg text-sm leading-relaxed text-[color:var(--ui-ivory)] break-words pb-1"
                                         >
                                             {m.msg}
                                         </p>

@@ -133,6 +133,10 @@ export function hexToUrlString(hex: string): string {
     switch (hex.toLocaleLowerCase()) {
         case "ff0000":
             return "red";
+        case "ff7a00":
+            return "orange";
+        case "ffffff":
+            return "white";
         case "00ff00":
             return "green";
         case "ffff00":

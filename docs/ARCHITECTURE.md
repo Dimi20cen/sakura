@@ -199,8 +199,8 @@ Created/used through `mango/creator.go`, `mango/registry.go`, and `ui/utils/mang
 - Default local profiles: `Jethro7194`, `KopsTiKlapsa`, `staxtoPUTA`, `Giorgaros`
 - Forced color mapping for those usernames:
   - `Jethro7194 -> blue`
-  - `KopsTiKlapsa -> yellow`
-  - `staxtoPUTA -> plum`
+  - `KopsTiKlapsa -> orange`
+  - `staxtoPUTA -> white`
   - `Giorgaros -> red`
 - Lobby UI is simplified to join/host flow (spectate removed from lobby controls)
 

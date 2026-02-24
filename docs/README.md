@@ -8,6 +8,7 @@ This folder contains the canonical docs for running and understanding SAKURA loc
 - [Ubuntu Setup](./LOCAL_SETUP_UBUNTU.md): detailed Ubuntu instructions.
 - [Environment Variables](./ENVIRONMENT.md): backend/frontend env reference with required values.
 - [Architecture](./ARCHITECTURE.md): how backend, frontend, MongoDB, and websockets fit together.
+- [Brand Guidelines](./BRAND_GUIDELINES.md): canonical visual direction, palette, and identity mapping.
 - [Game Rules Spec](./GAME_RULES_SPEC.md): canonical gameplay behavior by mode (Base, Cities and Knights, Seafarers).
 - [Rulebook Parity Log](./RULEBOOK_PARITY.md): alignment tracking versus official Base/Cities and Knights/Seafarers rulebooks.
 - [Rulebooks](./rulebooks/README.md): official PDFs, searchable text extracts, and chapter-structured summaries for parity work.
@@ -30,6 +31,7 @@ This folder contains the canonical docs for running and understanding SAKURA loc
 
 - Local run/setup behavior: `QUICK_START.md` and `LOCAL_SETUP_UBUNTU.md`
 - Runtime/backend/frontend architecture: `ARCHITECTURE.md`
+- Visual direction and identity system: `BRAND_GUIDELINES.md`
 - Gameplay behavior by mode: `GAME_RULES_SPEC.md`
 - Rulebook alignment/deviations: `RULEBOOK_PARITY.md`
 - Rulebook source files and extracts: `rulebooks/README.md`

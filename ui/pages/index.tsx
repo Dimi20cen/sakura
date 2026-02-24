@@ -21,6 +21,12 @@ const Index: NextPage = () => {
                         >
                             Multiplayer
                         </Link>
+                        <Link
+                            href="/design/swatches"
+                            className="ui-button ui-button-ghost"
+                        >
+                            Palette Swatches
+                        </Link>
                     </div>
                 </section>
             </div>

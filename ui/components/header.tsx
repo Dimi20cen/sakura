@@ -43,7 +43,7 @@ const Header: FunctionComponent<{
     }, []);
 
     return (
-        <Popover className="relative z-[1200] border-b border-[rgba(231,222,206,0.12)] bg-[rgba(20,16,14,0.66)] backdrop-blur">
+        <Popover className="relative z-[1200] ui-header-shell backdrop-blur">
             <div
                 className="absolute inset-0 z-30 pointer-events-none"
                 aria-hidden="true"
@@ -53,7 +53,7 @@ const Header: FunctionComponent<{
                     <div className="flex justify-between items-center py-3 md:py-4 md:justify-start md:space-x-10">
                     <div>
                         <span className="sr-only">SAKURA</span>
-                        <div className="h-auto w-auto rounded-tl-[38%] rounded-tr-[62%] rounded-br-[43%] rounded-bl-[57%] border border-[rgba(231,222,206,0.25)] shadow-[var(--ui-shadow-soft)] -rotate-3 p-2">
+                        <div className="h-auto w-auto rounded-tl-[38%] rounded-tr-[62%] rounded-br-[43%] rounded-bl-[57%] ui-header-logo-frame -rotate-3 p-2">
                             <Link href="/" passHref>
                                 <Image
                                     src="/icon.png"
@@ -84,7 +84,7 @@ const Header: FunctionComponent<{
                             <Link
                                 href="/choose-profile"
                                 aria-label="Choose profile"
-                                className="inline-flex items-center justify-center rounded-full p-1 border border-[rgba(231,222,206,0.2)] bg-[rgba(48,39,36,0.8)] hover:border-[rgba(183,148,90,0.6)] transition-colors duration-200"
+                                className="inline-flex items-center justify-center rounded-full p-1 ui-avatar-button transition-colors duration-200"
                             >
                                 <Image
                                     src={profileIcon}
@@ -114,10 +114,10 @@ const Header: FunctionComponent<{
                     className="fixed z-[1300] top-0 inset-x-0 p-2 transition transform origin-top-right md:hidden"
                 >
                     <div
-                        className="fixed inset-0 bg-[rgba(9,7,6,0.52)] backdrop-blur-[2px]"
+                        className="fixed inset-0 ui-menu-backdrop backdrop-blur-[2px]"
                         aria-hidden="true"
                     />
-                    <div className="relative rounded-2xl shadow-[var(--ui-shadow)] bg-[rgba(23,19,17,0.97)] border border-[rgba(231,222,206,0.14)] divide-y divide-[rgba(231,222,206,0.12)]">
+                    <div className="relative rounded-2xl shadow-[var(--ui-shadow)] ui-menu-panel divide-y divide-[color:var(--ui-border-faint)]">
                         <div className="pt-3 pb-3 px-5 sm:pb-3">
                             <div className="flex items-center justify-between">
                                 <div className="">

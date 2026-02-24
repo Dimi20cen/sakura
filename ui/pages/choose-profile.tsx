@@ -92,11 +92,11 @@ const ChooseProfile: NextPage = () => {
                             <button
                                 key={profile.username}
                                 disabled={busy}
-                                className="ui-panel rounded-xl border-[rgba(231,222,206,0.18)] p-4 hover:border-[rgba(183,148,90,0.55)] hover:bg-[rgba(58,45,40,0.9)] disabled:opacity-60 transition-colors duration-200"
+                                className="ui-panel ui-profile-card rounded-xl p-4 disabled:opacity-60 transition-colors duration-200"
                                 onClick={() => chooseProfile(profile.username)}
                             >
                                 <span className="flex items-center gap-3">
-                                    <span className="relative h-16 w-16 sm:h-20 sm:w-20 overflow-hidden rounded-full border border-[rgba(231,222,206,0.28)] ring-2 ring-[rgba(183,148,90,0.28)]">
+                                    <span className="relative h-16 w-16 sm:h-20 sm:w-20 overflow-hidden rounded-full border ui-profile-avatar-ring">
                                         <Image
                                             src={profile.icon}
                                             alt={profile.username}
@@ -113,7 +113,7 @@ const ChooseProfile: NextPage = () => {
                     </div>
 
                     {error ? (
-                        <div className="mt-4 rounded-md border border-[rgba(242,180,185,0.4)] bg-[rgba(122,31,36,0.4)] px-3 py-2 text-sm text-[#f2b4b9]">
+                        <div className="mt-4 rounded-md border ui-alert-error px-3 py-2 text-sm">
                             {error}
                         </div>
                     ) : null}

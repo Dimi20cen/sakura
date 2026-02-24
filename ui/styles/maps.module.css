@@ -43,7 +43,7 @@
     width: 12px;
     height: 12px;
     border-radius: 6px;
-    background-color: rgba(18, 14, 12, 0.95);
+    background-color: var(--ui-surface-panel-strong);
     cursor: pointer;
     opacity: 22%;
     border: 1px solid rgba(231, 222, 206, 0.2);
@@ -52,7 +52,7 @@
 
 .port:hover {
     opacity: 78%;
-    background-color: rgba(183, 148, 90, 0.95);
+    background-color: var(--ui-gold);
 }
 
 .port.l {
@@ -86,9 +86,9 @@
 }
 
 .hasport {
-    background-color: rgba(183, 148, 90, 0.95);
+    background-color: var(--ui-gold);
     opacity: 1;
-    border-color: rgba(231, 222, 206, 0.55);
+    border-color: var(--ui-ivory-soft);
 }
 
 .portdisabled {

@@ -894,7 +894,7 @@ const Index: NextPage = () => {
                                     </button>
                                 </div>
                                 {showEditorHelp && (
-                                    <div className="absolute left-0 top-11 z-20 w-[320px] rounded-lg border border-[rgba(231,222,206,0.2)] bg-[rgba(20,16,14,0.96)] px-3 py-2 text-sm text-[color:var(--ui-ivory-soft)] shadow-[var(--ui-shadow-soft)]">
+                                    <div className="ui-help-popover absolute left-0 top-11 z-20 w-[320px] rounded-lg px-3 py-2 text-sm">
                                         <div>Left click changes tile resource.</div>
                                         <div>Right click resets to Random or Fog.</div>
                                         <div>Left click edge dots assigns port locations.</div>
@@ -929,7 +929,7 @@ const Index: NextPage = () => {
                         </div>
                         <div
                             className={classNames(
-                                "relative flex-1 min-h-0 rounded-xl border border-[rgba(231,222,206,0.14)] bg-[rgba(16,12,10,0.45)] overflow-hidden",
+                                "relative flex-1 min-h-0 rounded-xl overflow-hidden ui-canvas-frame",
                                 isPanning ? "cursor-grabbing" : "cursor-grab",
                             )}
                             style={{ touchAction: "none" }}
@@ -1091,14 +1091,14 @@ const Index: NextPage = () => {
                                     className={classNames(
                                         "rounded-md border px-3 py-2 text-sm",
                                         statusMessage.tone === "ok"
-                                            ? "border-[rgba(183,221,184,0.4)] bg-[rgba(33,94,49,0.35)] text-[#b7ddb8]"
-                                            : "border-[rgba(242,180,185,0.4)] bg-[rgba(122,31,36,0.4)] text-[#f2b4b9]",
+                                            ? "ui-alert-ok"
+                                            : "ui-alert-error",
                                     )}
                                 >
                                     {statusMessage.text}
                                 </div>
                             ) : null}
-                            <div className="rounded-xl border border-[rgba(231,222,206,0.14)] bg-[rgba(24,20,18,0.52)] px-2.5 py-2.5">
+                            <div className="ui-side-surface rounded-xl px-2.5 py-2.5">
                                 <div>
                                     <div>
                                         <div className="flex items-center justify-between gap-2 mb-1.5">
@@ -1139,7 +1139,7 @@ const Index: NextPage = () => {
                                             }
                                         >
                                             <div className="relative mt-1">
-                                                <div className="relative w-full text-left rounded-md shadow-md cursor-default overflow-hidden border border-[rgba(231,222,206,0.2)] bg-[rgba(24,20,18,0.92)]">
+                                                <div className="ui-side-surface-strong relative w-full text-left rounded-md shadow-md cursor-default overflow-hidden">
                                                     <Combobox.Input
                                                         className="ui-input !rounded-none !border-none !bg-transparent !h-10 py-1.5 pl-3 pr-10 text-base leading-5 text-[color:var(--ui-ivory)]"
                                                         autoComplete="off"
@@ -1152,7 +1152,7 @@ const Index: NextPage = () => {
                                                     />
                                                     <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
                                                         <ChevronUpDownIcon
-                                                            className="w-5 h-5 text-[rgba(244,239,228,0.7)]"
+                                                            className="ui-icon-dim w-5 h-5"
                                                             aria-hidden="true"
                                                         />
                                                     </Combobox.Button>
@@ -1164,7 +1164,7 @@ const Index: NextPage = () => {
                                                     leaveTo="opacity-0"
                                                     afterLeave={() => setMapQuery("")}
                                                 >
-                                                    <Combobox.Options className="absolute z-10 w-full py-1 mt-1 overflow-auto text-base bg-[rgba(24,20,18,0.98)] rounded-md shadow-lg max-h-60 border border-[rgba(231,222,206,0.2)] focus:outline-none sm:text-sm">
+                                                    <Combobox.Options className="ui-side-surface-strong absolute z-10 w-full py-1 mt-1 overflow-auto text-base rounded-md shadow-lg max-h-60 focus:outline-none sm:text-sm">
                                                         {filteredMaps.length === 0 &&
                                                         mapQuery !== "" ? (
                                                             <div className="cursor-default select-none relative py-2 px-4 text-[color:var(--ui-ivory-soft)]">
@@ -1177,7 +1177,7 @@ const Index: NextPage = () => {
                                                                     className={(obj: any) =>
                                                                         `select-none relative py-1 pl-10 pr-4 cursor-pointer ${
                                                                             obj.active
-                                                                                ? "text-[color:var(--ui-ivory)] bg-[rgba(122,31,36,0.72)]"
+                                                                                ? "ui-map-select-active"
                                                                                 : "text-[color:var(--ui-ivory-soft)]"
                                                                         }`
                                                                     }
@@ -1224,7 +1224,7 @@ const Index: NextPage = () => {
                                 </div>
 
                                 <div className="grid gap-2.5 sm:grid-cols-2 mt-3">
-                                    <div className="rounded-lg border border-[rgba(231,222,206,0.16)] bg-[rgba(18,14,12,0.5)] px-2.5 py-2">
+                                    <div className="ui-list-item rounded-lg px-2.5 py-2">
                                         <div className="text-xs uppercase tracking-[0.06em] text-[color:var(--ui-ivory-soft)] mb-2">
                                             Rows
                                         </div>
@@ -1251,7 +1251,7 @@ const Index: NextPage = () => {
                                             </button>
                                         </div>
                                     </div>
-                                    <div className="rounded-lg border border-[rgba(231,222,206,0.16)] bg-[rgba(18,14,12,0.5)] px-2.5 py-2">
+                                    <div className="ui-list-item rounded-lg px-2.5 py-2">
                                         <div className="text-xs uppercase tracking-[0.06em] text-[color:var(--ui-ivory-soft)] mb-2">
                                             Columns
                                         </div>
@@ -1281,7 +1281,7 @@ const Index: NextPage = () => {
                                 </div>
                             </div>
 
-                            <div className="rounded-xl border border-[rgba(231,222,206,0.14)] bg-[rgba(24,20,18,0.52)] px-3 py-3">
+                            <div className="ui-side-surface rounded-xl px-3 py-3">
                                 <div className="flex items-center justify-between gap-2 mb-2">
                                     <h2 className="ui-title ui-title-md !mb-0">
                                         Distribution
@@ -1311,7 +1311,7 @@ const Index: NextPage = () => {
                                     </span>
                                 </div>
 
-                                <div className="rounded-xl border border-[rgba(231,222,206,0.16)] bg-[rgba(18,14,12,0.5)] p-1 grid grid-cols-3 gap-1 mb-3">
+                                <div className="ui-list-item rounded-xl p-1 grid grid-cols-3 gap-1 mb-3">
                                     <button
                                         className={classNames(
                                             "ui-button !h-8 !min-h-0 !text-sm",
@@ -1367,7 +1367,7 @@ const Index: NextPage = () => {
                                     {Object.keys(numbers).map((x) => (
                                         <li
                                             key={x}
-                                            className="rounded-lg border border-[rgba(231,222,206,0.14)] bg-[rgba(18,14,12,0.42)] px-2.5 py-2"
+                                            className="ui-list-item rounded-lg px-2.5 py-2"
                                         >
                                             <div className="flex items-center gap-2.5">
                                             <span className="inline-block w-[30px] text-right text-sm">
@@ -1412,7 +1412,7 @@ const Index: NextPage = () => {
                                         .map((x) => (
                                             <li
                                                 key={x}
-                                                className="rounded-lg border border-[rgba(231,222,206,0.14)] bg-[rgba(18,14,12,0.42)] px-2.5 py-2"
+                                                className="ui-list-item rounded-lg px-2.5 py-2"
                                             >
                                                 <div className="flex items-center gap-2.5">
                                                 <span className="inline-block w-[56px] text-right text-sm">
@@ -1454,7 +1454,7 @@ const Index: NextPage = () => {
                                     {Object.keys(ports).map((x) => (
                                         <li
                                             key={x}
-                                            className="rounded-lg border border-[rgba(231,222,206,0.14)] bg-[rgba(18,14,12,0.42)] px-2.5 py-2"
+                                            className="ui-list-item rounded-lg px-2.5 py-2"
                                         >
                                             <div className="flex items-center gap-2.5">
                                             <span className="inline-block w-[56px] text-right text-sm">

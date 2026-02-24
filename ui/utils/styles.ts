@@ -6,6 +6,8 @@ export function classNames(...classes: any[]) {
 
 export const playerColors: { [key: string]: string } = {
     red: "bg-red-200",
+    orange: "bg-orange-200",
+    white: "bg-neutral-100",
     green: "bg-green-200",
     yellow: "bg-yellow-200",
     blue: "bg-blue-200",

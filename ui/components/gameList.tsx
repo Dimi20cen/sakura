@@ -54,8 +54,8 @@ const renderGame = (
                 className={classNames(
                     "cursor-pointer ui-panel",
                     selectedGameId === id
-                        ? "bg-[rgba(122,31,36,0.62)] border-[rgba(183,148,90,0.55)] shadow-[0_8px_20px_rgba(122,31,36,0.35)]"
-                        : "bg-[rgba(38,31,28,0.78)] border-[rgba(231,222,206,0.12)]",
+                        ? "ui-card-active-strong"
+                        : "ui-card-idle",
                 )}
             >
                 <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-center text-sm sm:text-base text-[color:var(--ui-ivory)]">
@@ -71,7 +71,7 @@ const renderGame = (
                             className={classNames(
                                 game.active_players > i
                                     ? "text-[color:var(--ui-gold-soft)]"
-                                    : "text-[rgba(244,239,228,0.45)]",
+                                    : "ui-dot-inactive",
                                 "text-sm mr-1",
                             )}
                         >
@@ -101,8 +101,8 @@ const renderGameCards = (
                 className={classNames(
                     "ui-panel w-full rounded-xl border px-4 py-3 text-left transition-colors duration-200",
                     selectedGameId === id
-                        ? "bg-[rgba(122,31,36,0.62)] border-[rgba(183,148,90,0.55)]"
-                        : "bg-[rgba(38,31,28,0.78)] border-[rgba(231,222,206,0.12)]",
+                        ? "ui-card-active"
+                        : "ui-card-idle",
                 )}
             >
                 <div className="flex items-center justify-between text-sm">
@@ -124,7 +124,7 @@ const renderGameCards = (
                                 className={classNames(
                                     game.active_players > i
                                         ? "text-[color:var(--ui-gold-soft)]"
-                                        : "text-[rgba(244,239,228,0.45)]",
+                                        : "ui-dot-inactive",
                                     "text-sm mr-1",
                                 )}
                             >
@@ -281,7 +281,7 @@ const GameList: FunctionComponent = () => {
                                         handleRowClick,
                                     )
                                 ) : (
-                                    <div className="ui-panel rounded-xl border border-[rgba(231,222,206,0.12)] px-4 py-6 text-center text-[color:var(--ui-ivory-soft)] text-sm">
+                                    <div className="ui-panel ui-empty-state rounded-xl px-4 py-6 text-center text-sm">
                                         No active games found.
                                     </div>
                                 )}
@@ -371,7 +371,7 @@ const GameList: FunctionComponent = () => {
                         </button>
                     </div>
                     {actionError ? (
-                        <div className="w-full max-w-lg mx-auto rounded-md border border-[rgba(242,180,185,0.4)] bg-[rgba(122,31,36,0.4)] px-3 py-2 text-sm text-[#f2b4b9]">
+                        <div className="w-full max-w-lg mx-auto rounded-md border ui-alert-error px-3 py-2 text-sm">
                             {actionError}
                         </div>
                     ) : null}

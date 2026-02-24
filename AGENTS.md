@@ -14,6 +14,7 @@ This file defines how coding agents should operate in this repository.
 - Rulebook parity tracker: `docs/RULEBOOK_PARITY.md`
 - For work on game assets: `ui/ASSET_SPEC.md`
 - For frontend app setup/scripts: `ui/README.md`
+- Brand/font/color guide: `docs/BRAND_GUIDELINES.md`
 
 ## Documentation Maintenance (Required)
 

@@ -274,13 +274,18 @@ export async function renderTile(tile: UITile) {
     const SIDE_HALF = 300;
     const HEX_DIAG = 229;
     const texType = tile.Fog ? assets.TILE_TEX.FOG : tile.Type;
+    const isSeaTile = texType === assets.TILE_TEX.SEA;
 
-    const hex = new PIXI.Graphics()
-        .beginTextureFill({
+    const hex = new PIXI.Graphics();
+    if (isSeaTile) {
+        // Keep sea tiles transparent so the board background sea is visible.
+        hex.beginFill(0xffffff, 0);
+    } else {
+        hex.beginTextureFill({
             texture: PIXI.Assets.get(assets.tileTex[texType].src),
-        })
-        .drawPolygon(getHexPolygonPoints(SIDE_HALF, HEX_DIAG))
-        .endFill();
+        });
+    }
+    hex.drawPolygon(getHexPolygonPoints(SIDE_HALF, HEX_DIAG)).endFill();
 
     const tileSprite = new PIXI.Sprite();
     tileSprite.texture = canvas.app.generateRenderTexture(hex, {
@@ -298,9 +303,13 @@ export async function renderTile(tile: UITile) {
     tileSprite.y = fc.y;
 
     // Keep border in code so flat texture assets remain clean.
-    const tileBorder = new PIXI.Sprite(getHexBorderTexture(SIDE_HALF, HEX_DIAG));
-    tileBorder.anchor.set(0.5);
-    tileSprite.addChild(tileBorder);
+    if (!isSeaTile) {
+        const tileBorder = new PIXI.Sprite(
+            getHexBorderTexture(SIDE_HALF, HEX_DIAG),
+        );
+        tileBorder.anchor.set(0.5);
+        tileSprite.addChild(tileBorder);
+    }
 
     {
         // Number token

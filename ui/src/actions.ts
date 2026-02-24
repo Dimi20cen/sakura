@@ -25,6 +25,8 @@ export enum PlayerActionType {
 let chooseDiceWindow: PIXI.Container | undefined;
 let chooseBuildableWindow: PIXI.Container | undefined;
 let setupPlacementPreviewWindow: PIXI.Container | undefined;
+let setupPreferredBuildable: "road" | "ship" | undefined;
+let chooseBuildableAnchor: { x: number; y: number } | undefined;
 
 /**
  * Handle a player action
@@ -97,6 +99,7 @@ export function resetPendingAction() {
     board.resetTileHighlights();
     clearChooseBuildable();
     clearSetupPlacementPreview();
+    chooseBuildableAnchor = undefined;
     state.highlightPlayers();
     state.showPendingAction();
 }
@@ -119,8 +122,28 @@ function isSetupPlacementPreviewAction(action: tsg.PlayerAction) {
     );
 }
 
-function getSetupPreviewType(action: tsg.PlayerAction): buttons.ButtonType {
+type SetupPreviewType = buttons.ButtonType | "road_or_ship";
+
+function coordKey(c?: tsg.Coordinate) {
+    return `${c?.X ?? ""},${c?.Y ?? ""}`;
+}
+
+function edgeKey(edge?: tsg.Edge) {
+    const a = coordKey(edge?.C?.C1);
+    const b = coordKey(edge?.C?.C2);
+    return a <= b ? `${a}|${b}` : `${b}|${a}`;
+}
+
+function edgeKeySet(edges?: tsg.Edge[]) {
+    const out = new Set<string>();
+    if (!edges) return out;
+    edges.forEach((e) => out.add(edgeKey(e)));
+    return out;
+}
+
+function getSetupPreviewType(action: tsg.PlayerAction): SetupPreviewType {
     const message = String(action.Message || "").toLowerCase();
+    if (message.includes("road/ship")) return "road_or_ship";
     if (message.includes("settlement")) return buttons.ButtonType.Settlement;
     if (message.includes("city")) return buttons.ButtonType.City;
     if (message.includes("ship")) return buttons.ButtonType.Ship;
@@ -131,25 +154,50 @@ function showSetupPlacementPreview(
     action: tsg.PlayerAction,
     x: number,
     y: number,
-    onConfirm: () => void,
+    onConfirm: (preferred?: "road" | "ship") => void,
+    forcedType?: SetupPreviewType,
 ) {
     clearSetupPlacementPreview();
 
+    const previewType = forcedType || getSetupPreviewType(action);
     const w = new PIXI.Container();
-    const windowSprite = windows.getWindowSprite(62, 62);
+    const windowWidth = previewType === "road_or_ship" ? 118 : 62;
+    const windowSprite = windows.getWindowSprite(windowWidth, 62);
     w.addChild(windowSprite);
 
-    const preview = buttons.getButtonSprite(getSetupPreviewType(action), 52);
-    preview.x = 5;
-    preview.y = 5;
-    preview.setEnabled(true);
-    preview.onClick(() => {
-        clearSetupPlacementPreview();
-        onConfirm();
-    });
-    w.addChild(preview);
+    if (previewType === "road_or_ship") {
+        const roadPreview = buttons.getButtonSprite(buttons.ButtonType.Road, 52);
+        roadPreview.x = 5;
+        roadPreview.y = 5;
+        roadPreview.setEnabled(true);
+        roadPreview.onClick(() => {
+            clearSetupPlacementPreview();
+            onConfirm("road");
+        });
+        w.addChild(roadPreview);
 
-    w.x = x - 31;
+        const shipPreview = buttons.getButtonSprite(buttons.ButtonType.Ship, 52);
+        shipPreview.x = 61;
+        shipPreview.y = 5;
+        shipPreview.setEnabled(true);
+        shipPreview.onClick(() => {
+            clearSetupPlacementPreview();
+            onConfirm("ship");
+        });
+        w.addChild(shipPreview);
+    } else {
+        const preview = buttons.getButtonSprite(previewType, 52);
+        preview.x = 5;
+        preview.y = 5;
+        preview.setEnabled(true);
+        preview.onClick(() => {
+            clearSetupPlacementPreview();
+            onConfirm();
+        });
+        w.addChild(preview);
+    }
+
+    w.x = x - windowWidth / 2;
     w.y = y - 78;
     w.zIndex = 1200;
     setupPlacementPreviewWindow = w;
@@ -238,10 +286,28 @@ export function chooseVertex(a: tsg.PlayerActionChooseVertex, action: tsg.Player
  */
 export function chooseEdge(a: tsg.PlayerActionChooseEdge, action: tsg.PlayerAction) {
     board.highlightEdges(a.Allowed);
+    const roadOptions = edgeKeySet(a.AllowRoad);
+    const shipOptions = edgeKeySet(a.AllowShip);
+    const hasPerEdgeBuildableOptions =
+        Array.isArray(a.AllowRoad) || Array.isArray(a.AllowShip);
 
     board.setEdgeClickEvent((_, e) => {
-        const respond = () => {
-            resetPendingAction();
+        const c1 = board.getDispCoord(e.C.C1.X, e.C.C1.Y);
+        const c2 = board.getDispCoord(e.C.C2.X, e.C.C2.Y);
+        const fc = canvas.getScaled({
+            X: (c1.X + c2.X) / 2,
+            Y: (c1.Y + c2.Y) / 2,
+        });
+
+        const respond = (preferred?: "road" | "ship") => {
+            if (preferred) {
+                setupPreferredBuildable = preferred;
+            }
+            chooseBuildableAnchor = { x: fc.x, y: fc.y };
+            board.resetEdgeHighlights();
+            state.highlightPlayers();
+            state.showPendingAction();
+            clearSetupPlacementPreview();
             ws.getCommandHub().sendGameMessage({
                 t: socketTypes.MSG_TYPE.ACTION_RESPONSE,
                 ar_data: e.C.encode(),
@@ -251,13 +317,26 @@ export function chooseEdge(a: tsg.PlayerActionChooseEdge, action: tsg.PlayerActi
             respond();
             return;
         }
-        const c1 = board.getDispCoord(e.C.C1.X, e.C.C1.Y);
-        const c2 = board.getDispCoord(e.C.C2.X, e.C.C2.Y);
-        const fc = canvas.getScaled({
-            X: (c1.X + c2.X) / 2,
-            Y: (c1.Y + c2.Y) / 2,
-        });
-        showSetupPlacementPreview(action, fc.x, fc.y, respond);
+        let setupTypeByEdge: SetupPreviewType | undefined = undefined;
+        if (getSetupPreviewType(action) === "road_or_ship") {
+            if (hasPerEdgeBuildableOptions) {
+                const key = edgeKey(e);
+                const canRoad = roadOptions.has(key);
+                const canShip = shipOptions.has(key);
+                if (canRoad && canShip) {
+                    setupTypeByEdge = "road_or_ship";
+                } else if (canShip) {
+                    setupTypeByEdge = buttons.ButtonType.Ship;
+                } else {
+                    setupTypeByEdge = buttons.ButtonType.Road;
+                }
+            } else {
+                setupTypeByEdge = e.IsBeach
+                    ? "road_or_ship"
+                    : buttons.ButtonType.Road;
+            }
+        }
+        showSetupPlacementPreview(action, fc.x, fc.y, respond, setupTypeByEdge);
     });
 }
 
@@ -353,41 +432,78 @@ function chooseBuildable(data: { r?: boolean; s?: boolean }) {
     const allowRoad = Boolean(data?.r);
     const allowShip = Boolean(data?.s);
 
-    const WIDTH = 140;
+    if (setupPreferredBuildable) {
+        const preferred = setupPreferredBuildable;
+        setupPreferredBuildable = undefined;
+        if (
+            (preferred === "road" && allowRoad) ||
+            (preferred === "ship" && allowShip)
+        ) {
+            resetPendingAction();
+            ws.getCommandHub().sendGameMessage({
+                t: socketTypes.MSG_TYPE.ACTION_RESPONSE,
+                ar_data: preferred,
+            });
+            return;
+        }
+    }
+
+    const showBoth = allowRoad && allowShip;
+    const WIDTH = showBoth ? 140 : 76;
     const HEIGHT = 62;
     const w = windows.getWindowSprite(WIDTH, HEIGHT);
     chooseBuildableWindow = w;
     w.zIndex = 1500;
-    w.x = 20;
-    w.y = canvas.getHeight() - 140 - HEIGHT;
+    if (chooseBuildableAnchor) {
+        const margin = 10;
+        const topY = chooseBuildableAnchor.y - HEIGHT - 16;
+        const bottomY = chooseBuildableAnchor.y + 16;
+        w.x = Math.max(
+            margin,
+            Math.min(
+                chooseBuildableAnchor.x - WIDTH / 2,
+                canvas.getWidth() - WIDTH - margin,
+            ),
+        );
+        w.y =
+            topY >= margin
+                ? topY
+                : Math.min(bottomY, canvas.getHeight() - HEIGHT - margin);
+    } else {
+        w.x = 20;
+        w.y = canvas.getHeight() - 140 - HEIGHT;
+    }
+    chooseBuildableAnchor = undefined;
 
-    const road = buttons.getButtonSprite(buttons.ButtonType.Road, 52);
-    road.x = 10;
-    road.y = 6;
-    road.setEnabled(allowRoad);
-    road.onClick(() => {
-        if (!allowRoad) return;
-        resetPendingAction();
-        ws.getCommandHub().sendGameMessage({
-            t: socketTypes.MSG_TYPE.ACTION_RESPONSE,
-            ar_data: "road",
+    if (allowRoad) {
+        const road = buttons.getButtonSprite(buttons.ButtonType.Road, 52);
+        road.x = showBoth ? 10 : 12;
+        road.y = 6;
+        road.setEnabled(true);
+        road.onClick(() => {
+            resetPendingAction();
+            ws.getCommandHub().sendGameMessage({
+                t: socketTypes.MSG_TYPE.ACTION_RESPONSE,
+                ar_data: "road",
+            });
         });
-    });
-    w.addChild(road);
+        w.addChild(road);
+    }
 
-    const ship = buttons.getButtonSprite(buttons.ButtonType.Ship, 52);
-    ship.x = 74;
-    ship.y = 6;
-    ship.setEnabled(allowShip);
-    ship.onClick(() => {
-        if (!allowShip) return;
-        resetPendingAction();
-        ws.getCommandHub().sendGameMessage({
-            t: socketTypes.MSG_TYPE.ACTION_RESPONSE,
-            ar_data: "ship",
+    if (allowShip) {
+        const ship = buttons.getButtonSprite(buttons.ButtonType.Ship, 52);
+        ship.x = showBoth ? 74 : 12;
+        ship.y = 6;
+        ship.setEnabled(true);
+        ship.onClick(() => {
+            resetPendingAction();
+            ws.getCommandHub().sendGameMessage({
+                t: socketTypes.MSG_TYPE.ACTION_RESPONSE,
+                ar_data: "ship",
+            });
         });
-    });
-    w.addChild(ship);
+        w.addChild(ship);
+    }
 
     canvas.app.stage.addChild(w);
     canvas.app.markDirty();

@@ -923,18 +923,26 @@ return out; }
 
 export type IPlayerActionChooseEdge = {
 Allowed: Edge /* []*entities.Edge */[];
+AllowRoad: Edge /* []*entities.Edge */[];
+AllowShip: Edge /* []*entities.Edge */[];
 }
 
 export class PlayerActionChooseEdge implements IPlayerActionChooseEdge { 
 public Allowed: Edge /* []*entities.Edge */[];
+public AllowRoad: Edge /* []*entities.Edge */[];
+public AllowShip: Edge /* []*entities.Edge */[];
 
 constructor(input: any) {
 this.Allowed = input.e?.map((v: any) => v ? new Edge(v) : undefined);
+this.AllowRoad = input.r?.map((v: any) => v ? new Edge(v) : undefined);
+this.AllowShip = input.s?.map((v: any) => v ? new Edge(v) : undefined);
 }
 
 public encode() {
 const out: any = {};
 out.e = this.Allowed?.map((v: any) => v?.encode?.());
+out.r = this.AllowRoad?.map((v: any) => v?.encode?.());
+out.s = this.AllowShip?.map((v: any) => v?.encode?.());
 return out; }
 }
 

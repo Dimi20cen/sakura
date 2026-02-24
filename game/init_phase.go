@@ -1,9 +1,9 @@
 package game
 
 import (
-	"sakura/entities"
 	"log"
 	"math/rand"
+	"sakura/entities"
 	"strings"
 
 	"github.com/mitchellh/mapstructure"
@@ -148,11 +148,23 @@ func (g *Game) startInitPhase() {
 		if g.Mode == entities.Seafarers {
 			msg = "Choose location for road/ship"
 		}
+		allowRoadEdges := make([]*entities.Edge, 0, len(allowedEdges))
+		allowShipEdges := make([]*entities.Edge, 0, len(allowedEdges))
+		for _, edge := range allowedEdges {
+			if roadAllowed[edge] {
+				allowRoadEdges = append(allowRoadEdges, edge)
+			}
+			if shipAllowed[edge] {
+				allowShipEdges = append(allowShipEdges, edge)
+			}
+		}
 		exp, err := g.BlockForAction(p, g.TimerVals.RoadPlacement, &entities.PlayerAction{
 			Type:    entities.PlayerActionTypeChooseEdge,
 			Message: msg,
 			Data: &entities.PlayerActionChooseEdge{
-				Allowed: allowedEdges,
+				Allowed:   allowedEdges,
+				AllowRoad: allowRoadEdges,
+				AllowShip: allowShipEdges,
 			},
 		})
 		if err != nil {

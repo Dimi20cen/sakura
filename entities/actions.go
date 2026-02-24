@@ -67,7 +67,9 @@ type PlayerActionChooseVertex struct {
 }
 
 type PlayerActionChooseEdge struct {
-	Allowed []*Edge `msgpack:"e"`
+	Allowed   []*Edge `msgpack:"e"`
+	AllowRoad []*Edge `msgpack:"r,omitempty"`
+	AllowShip []*Edge `msgpack:"s,omitempty"`
 }
 
 type PlayerActionChooseBuildable struct {

@@ -95,6 +95,7 @@ Socket URL format:
 Backend `JWTMiddleware` supports reading token from query when upgrading websocket.
 
 Messages are msgpack-encoded and parsed by `ui/src/sock.ts` types + adapter layer.
+Game command `pg` toggles manual pause/resume (server-authoritative).
 
 Inbound game messages are handled by `ui/src/store/gameRuntime.ts` (with Pixi rendering side-effects). `ui/src/ws.ts` is now a compatibility module for command hub/player context ownership.
 
@@ -142,6 +143,7 @@ and consumed in:
 - Snapshot broadcasts are sequence-stamped; clients drop stale/out-of-order `gs` payloads using `StateSeq`.
 - When `TickerPause` is active and the current player has no pending timed action, the server sets `TimerEndsAtMs = 0` so the HUD freezes.
 - If `TickerPause` is active but the current player is in a pending timed action (for example robber placement), `TimerEndsAtMs` is still provided so the HUD countdown continues.
+- When manual game pause is active (`GameState.Paused = true`), `TimerEndsAtMs` is always `0` until resumed.
 - The game ticker now starts only after initialization succeeds (or after journal replay setup), so failed initialization does not leave background ticker goroutines running.
 
 Timer phase bumps happen through helper methods in:

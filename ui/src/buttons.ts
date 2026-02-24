@@ -28,6 +28,8 @@ let seafarersShipContainer: PIXI.Container | null = null;
 let turnTimerContainer: PIXI.Container | null = null;
 let turnTimerText: PIXI.Text | null = null;
 let turnTimerDebugText: PIXI.Text | null = null;
+let pauseToggleContainer: PIXI.Container | null = null;
+let pauseToggleIcon: PIXI.Graphics | null = null;
 let timerTickerStarted = false;
 
 /** Static button sprites */
@@ -135,6 +137,63 @@ function updateTurnTimerWidget() {
     canvas.app.markDirty();
 }
 
+function ensurePauseToggleWidget(commandHub: CommandHub) {
+    if (pauseToggleContainer && !pauseToggleContainer.destroyed) {
+        return;
+    }
+
+    pauseToggleContainer = new PIXI.Container();
+    pauseToggleContainer.zIndex = 1300;
+    pauseToggleContainer.interactive = true;
+    pauseToggleContainer.cursor = "pointer";
+    pauseToggleContainer.hitArea = new PIXI.Rectangle(0, 0, 36, 36);
+
+    pauseToggleIcon = new PIXI.Graphics();
+    pauseToggleContainer.addChild(pauseToggleIcon);
+    redrawPauseToggleIcon(false);
+    new windows.TooltipHandler(
+        pauseToggleContainer,
+        "Pause or resume the game",
+    );
+
+    pauseToggleContainer.on("pointerdown", (event) => {
+        event.stopPropagation();
+        if (pauseToggleContainer?.cursor !== "pointer") {
+            return;
+        }
+        commandHub.togglePause();
+    });
+    pauseToggleContainer.visible = !ws.isSpectator();
+    canvas.app.stage.addChild(pauseToggleContainer);
+}
+
+function redrawPauseToggleIcon(paused: boolean) {
+    if (!pauseToggleIcon || pauseToggleIcon.destroyed) {
+        return;
+    }
+
+    pauseToggleIcon.clear();
+    pauseToggleIcon.beginFill(0xffffff);
+    if (paused) {
+        // Show "play" when paused so users can resume.
+        pauseToggleIcon.drawPolygon([12, 8, 12, 28, 27, 18]);
+    } else {
+        // Show "pause" when game is running.
+        pauseToggleIcon.drawRoundedRect(9, 8, 6, 20, 2);
+        pauseToggleIcon.drawRoundedRect(21, 8, 6, 20, 2);
+    }
+    pauseToggleIcon.endFill();
+}
+
+export function updatePauseToggle(paused: boolean) {
+    if (!pauseToggleContainer || pauseToggleContainer.destroyed) {
+        return;
+    }
+    redrawPauseToggleIcon(paused);
+    pauseToggleContainer.visible = !ws.isSpectator();
+    canvas.app.markDirty();
+}
+
 export function relayout() {
     if (!container || container.destroyed) {
         return;
@@ -195,6 +254,11 @@ export function relayout() {
     if (turnTimerContainer && !turnTimerContainer.destroyed) {
         turnTimerContainer.x = container.x + actionBarWidth() - 70;
         turnTimerContainer.y = container.y + (C_HEIGHT - 36) / 2;
+    }
+    if (pauseToggleContainer && !pauseToggleContainer.destroyed) {
+        // Keep pause near the top-left controls, directly under fullscreen.
+        pauseToggleContainer.x = 20;
+        pauseToggleContainer.y = 108;
     }
     updateTurnTimerWidget();
 
@@ -444,6 +508,7 @@ export function render(commandHub: CommandHub) {
     container.x = actionBarPos.x;
     container.y = actionBarPos.y;
     ensureTurnTimerWidget();
+    ensurePauseToggleWidget(commandHub);
     if (!timerTickerStarted) {
         timerTickerStarted = true;
         window.setInterval(updateTurnTimerWidget, 1000);

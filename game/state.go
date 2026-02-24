@@ -1,8 +1,8 @@
 package game
 
 import (
-	"sakura/entities"
 	"log"
+	"sakura/entities"
 	"sort"
 	"time"
 
@@ -24,8 +24,9 @@ func (g *Game) GetGameState() *entities.GameState {
 		currentTimeLeft = 0
 	}
 	timerEndsAtMs := int64(0)
-	shouldAdvanceTimer := !g.TickerPause ||
-		(g.CurrentPlayer != nil && g.CurrentPlayer.PendingAction != nil)
+	shouldAdvanceTimer := !g.Paused &&
+		(!g.TickerPause ||
+			(g.CurrentPlayer != nil && g.CurrentPlayer.PendingAction != nil))
 	if shouldAdvanceTimer {
 		timerEndsAtMs = serverNowMs + int64(currentTimeLeft)*1000
 	}
@@ -37,6 +38,7 @@ func (g *Game) GetGameState() *entities.GameState {
 	return &entities.GameState{
 		CurrentPlayerOrder: currentPlayerOrder,
 		NeedDice:           needDice,
+		Paused:             g.Paused,
 		StateSeq:           g.StateSeq,
 		TimerPhaseId:       g.TimerPhaseId,
 		TimerEndsAtMs:      timerEndsAtMs,

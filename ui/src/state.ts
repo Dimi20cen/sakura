@@ -64,6 +64,7 @@ let pendingActionContainer: PIXI.Container;
 let pendingActionText: PIXI.Text;
 let pendingActionCancel: buttons.ButtonSprite;
 let currentPendingAction: Partial<PlayerAction> | undefined;
+let pauseOverlay: PIXI.Graphics | null = null;
 
 // Persistent state
 export let lastKnownStates: PlayerState[] | null = null;
@@ -117,8 +118,23 @@ export function relayout() {
         bankContainer.x = bankPos.x;
         bankContainer.y = bankPos.y;
     }
+    updatePauseOverlay(Boolean(lastKnownGameState?.Paused));
 
     canvas.app.markDirty();
+}
+
+function updatePauseOverlay(paused: boolean) {
+    if (!pauseOverlay || pauseOverlay.destroyed) {
+        return;
+    }
+    pauseOverlay.clear();
+    pauseOverlay.visible = paused;
+    if (!paused) {
+        return;
+    }
+    pauseOverlay.beginFill(0x000000, 0.35);
+    pauseOverlay.drawRect(0, 0, canvas.getWidth(), canvas.getHeight());
+    pauseOverlay.endFill();
 }
 
 const profileAvatarByUsername: Record<string, string> = {
@@ -188,6 +204,12 @@ function intialize(commandHub: CommandHub) {
     pendingActionCancel.setEnabled(true);
     pendingActionCancel.on("pointerdown", cancelPendingAction);
     pendingActionContainer.addChild(pendingActionCancel);
+
+    pauseOverlay = new PIXI.Graphics();
+    pauseOverlay.zIndex = 1250;
+    pauseOverlay.visible = false;
+    pauseOverlay.interactive = false;
+    canvas.app.stage.addChild(pauseOverlay);
 
     // Render buttons here so we know the player's color
     buttons.render(commandHub);
@@ -280,6 +302,8 @@ export function renderGameState(gs: GameState, commandHub: CommandHub) {
         intialize(commandHub);
     }
     syncTurnTimerSnapshot(gs, states);
+    buttons.updatePauseToggle(Boolean(gs.Paused));
+    updatePauseOverlay(Boolean(gs.Paused));
 
     states.forEach((state) => {
         // Clear pending action if not found

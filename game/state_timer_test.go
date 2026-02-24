@@ -100,3 +100,17 @@ func TestGetGameStateTimerEndsAtMsRunning(t *testing.T) {
 		)
 	}
 }
+
+func TestGetGameStateTimerEndsAtMsManualPauseAlwaysZero(t *testing.T) {
+	g := buildGameForTimerStateTest(t)
+	g.Paused = true
+	g.CurrentPlayer.PendingAction = &entities.PlayerAction{Type: entities.PlayerActionTypeChooseTile}
+
+	gs := g.GetGameState()
+	if !gs.Paused {
+		t.Fatal("expected paused flag in game state")
+	}
+	if gs.TimerEndsAtMs != 0 {
+		t.Fatalf("expected TimerEndsAtMs=0 during manual pause, got %d", gs.TimerEndsAtMs)
+	}
+}

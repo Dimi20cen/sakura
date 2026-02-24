@@ -43,6 +43,7 @@ Source: `entities/game_mode.go`, `ui/src/lobby.ts`.
   - `Longest Road`: +2 VP (roads; Seafarers extends to roads+ships as trade route behavior)
   - `Largest Army`: +2 VP (tracked in Base via played knights)
 - Timer is server-authoritative and snapshot-based (`StateSeq`, `TimerPhaseId`, `TimerEndsAtMs`, `ServerNowMs`).
+- Active (non-spectator) players can toggle a manual pause/resume state; while paused, turn timer progression is frozen.
 
 Primary references: `game/state.go`, `maps/main.go`, `docs/ARCHITECTURE.md`.
 

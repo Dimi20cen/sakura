@@ -23,6 +23,7 @@ export enum MSG_TYPE {
     TRADE = "tr",
     ACTION_RESPONSE = "ar",
     SPECIAL_BUILD = "sb",
+    TOGGLE_PAUSE = "pg",
 
     // Lobby messages
     UPDATE_USERNAME = "uu",

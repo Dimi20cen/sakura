@@ -17,6 +17,15 @@ func (ws *WsClient) handleGame(msg map[string]interface{}) {
 }
 
 func (ws *WsClient) dispatchGameCommand(msg map[string]interface{}) {
+	if ws.Hub.Game.Paused {
+		switch msg["t"] {
+		case "i", "r", "pg":
+		default:
+			ws.Hub.Game.SendError(errors.New("game is paused"), ws.Player)
+			return
+		}
+	}
+
 	switch msg["t"] {
 	case "i": // Init
 		ws.sendInitMessage()
@@ -52,6 +61,9 @@ func (ws *WsClient) dispatchGameCommand(msg map[string]interface{}) {
 
 	case "r": // Informational Request
 		ws.handleInfoRequestCommand(msg)
+
+	case "pg": // Pause/Resume
+		ws.Hub.Game.SendError(ws.Hub.Game.TogglePause(ws.Player), ws.Player)
 	}
 }
 

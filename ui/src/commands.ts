@@ -160,6 +160,12 @@ export default class CommandHub {
         });
     };
 
+    public togglePause = () => {
+        this.sendGameMessage({
+            t: socketTypes.MSG_TYPE.TOGGLE_PAUSE,
+        });
+    };
+
     public createTradeOffer(offer: number[], ask: number[]) {
         this.sendGameMessage({
             t: socketTypes.MSG_TYPE.TRADE,

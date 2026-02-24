@@ -79,6 +79,7 @@ return out; }
 export type IGameState = {
 CurrentPlayerOrder: number;
 NeedDice: boolean;
+Paused: boolean;
 StateSeq: number;
 TimerPhaseId: number;
 TimerEndsAtMs: number;
@@ -101,6 +102,7 @@ Merchant: Merchant /* entities.Merchant */;
 export class GameState implements IGameState { 
 public CurrentPlayerOrder: number;
 public NeedDice: boolean;
+public Paused: boolean;
 public StateSeq: number;
 public TimerPhaseId: number;
 public TimerEndsAtMs: number;
@@ -122,6 +124,7 @@ public Merchant: Merchant /* entities.Merchant */;
 constructor(input: any) {
 this.CurrentPlayerOrder = input.c;
 this.NeedDice = input.d;
+this.Paused = input.gp;
 this.StateSeq = input.sq;
 this.TimerPhaseId = input.tp;
 this.TimerEndsAtMs = input.te;
@@ -145,6 +148,7 @@ public encode() {
 const out: any = {};
 out.c = this.CurrentPlayerOrder;
 out.d = this.NeedDice;
+out.gp = this.Paused;
 out.sq = this.StateSeq;
 out.tp = this.TimerPhaseId;
 out.te = this.TimerEndsAtMs;

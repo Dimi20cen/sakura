@@ -2,10 +2,10 @@ package game
 
 import (
 	"errors"
-	"sakura/entities"
-	"sakura/maps"
 	"log"
 	"math/rand"
+	"sakura/entities"
+	"sakura/maps"
 	"strings"
 	"sync"
 	"time"
@@ -53,6 +53,7 @@ type (
 
 		Ticker       *time.Ticker
 		TickerPause  bool
+		Paused       bool
 		TickerStop   chan bool
 		StateSeq     uint64
 		TimerVals    TimerValues
@@ -509,7 +510,7 @@ func (g *Game) Tick() {
 	}
 
 	// Is the ticker running
-	if g.TickerPause {
+	if g.TickerPause || g.Paused {
 		return
 	}
 

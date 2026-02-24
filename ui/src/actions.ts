@@ -25,6 +25,7 @@ export enum PlayerActionType {
 let chooseDiceWindow: PIXI.Container | undefined;
 let chooseBuildableWindow: PIXI.Container | undefined;
 let setupPlacementPreviewWindow: PIXI.Container | undefined;
+let setupPlacementSelectionKey: string | undefined;
 let setupPreferredBuildable: "road" | "ship" | undefined;
 let chooseBuildableAnchor: { x: number; y: number } | undefined;
 
@@ -109,6 +110,7 @@ function clearSetupPlacementPreview() {
         setupPlacementPreviewWindow.destroy({ children: true });
     }
     setupPlacementPreviewWindow = undefined;
+    setupPlacementSelectionKey = undefined;
     canvas.app.markDirty();
 }
 
@@ -132,6 +134,18 @@ function edgeKey(edge?: tsg.Edge) {
     const a = coordKey(edge?.C?.C1);
     const b = coordKey(edge?.C?.C2);
     return a <= b ? `${a}|${b}` : `${b}|${a}`;
+}
+
+function vertexSelectionKey(v: tsg.Vertex) {
+    return `v:${coordKey(v.C)}`;
+}
+
+function tileSelectionKey(t: tsg.Tile) {
+    return `t:${coordKey(t.Center)}`;
+}
+
+function edgeSelectionKey(e: tsg.Edge) {
+    return `e:${edgeKey(e)}`;
 }
 
 function edgeKeySet(edges?: tsg.Edge[]) {
@@ -234,9 +248,15 @@ export function chooseTile(a: tsg.PlayerActionChooseTile, action: tsg.PlayerActi
             respond();
             return;
         }
+        const selectedKey = tileSelectionKey(tile);
+        if (setupPlacementSelectionKey === selectedKey) {
+            clearSetupPlacementPreview();
+            return;
+        }
         const c = board.getDispCoord(tile.Center.X, tile.Center.Y);
         const fc = canvas.getScaled(c);
         showSetupPlacementPreview(action, fc.x, fc.y, respond);
+        setupPlacementSelectionKey = selectedKey;
     });
 }
 
@@ -274,9 +294,15 @@ export function chooseVertex(a: tsg.PlayerActionChooseVertex, action: tsg.Player
             respond();
             return;
         }
+        const selectedKey = vertexSelectionKey(v);
+        if (setupPlacementSelectionKey === selectedKey) {
+            clearSetupPlacementPreview();
+            return;
+        }
         const c = board.getDispCoord(v.C.X, v.C.Y);
         const fc = canvas.getScaled(c);
         showSetupPlacementPreview(action, fc.x, fc.y, respond);
+        setupPlacementSelectionKey = selectedKey;
     });
 }
 
@@ -317,6 +343,11 @@ export function chooseEdge(a: tsg.PlayerActionChooseEdge, action: tsg.PlayerActi
             respond();
             return;
         }
+        const selectedKey = edgeSelectionKey(e);
+        if (setupPlacementSelectionKey === selectedKey) {
+            clearSetupPlacementPreview();
+            return;
+        }
         let setupTypeByEdge: SetupPreviewType | undefined = undefined;
         if (getSetupPreviewType(action) === "road_or_ship") {
             if (hasPerEdgeBuildableOptions) {
@@ -337,6 +368,7 @@ export function chooseEdge(a: tsg.PlayerActionChooseEdge, action: tsg.PlayerActi
             }
         }
         showSetupPlacementPreview(action, fc.x, fc.y, respond, setupTypeByEdge);
+        setupPlacementSelectionKey = selectedKey;
     });
 }
 

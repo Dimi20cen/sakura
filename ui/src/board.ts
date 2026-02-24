@@ -702,36 +702,7 @@ function renderEdgeHighlightSprite(edge: UIEdge) {
     container.addChild(highlightSprite);
     edge.highlightSprite = highlightSprite;
 
-    let texType, beachzIndex;
-    if (edge.IsBeach) {
-        if (edge.Orientation == 2) {
-            texType = assets.ROAD.ISLAND_R;
-            beachzIndex = 85;
-        } else if (edge.Orientation == 3) {
-            texType = assets.ROAD.ISLAND_L;
-            beachzIndex = 86;
-        }
-    }
-
-    if (texType && beachzIndex) {
-        // Create border
-        const b = new PIXI.Sprite();
-        b.zIndex = beachzIndex;
-        assets.assignTexture(b, assets.road[texType]);
-
-        const fc = canvas.getScaled({
-            X: (fc1.X + fc2.X) / 2,
-            Y: (fc1.Y + fc2.Y) / 2,
-        });
-        b.x = fc.x;
-        b.y = fc.y;
-        b.anchor.x = 0.5;
-        b.anchor.y = 0.5;
-        b.rotation = (((-60 * (1 - edge.Orientation)) % 360) * Math.PI) / 180.0;
-        b.scale.set(110 / b.height);
-        boardContainer.addChild(b);
-        destroyBeforeReinit.push(b);
-    }
+    // Intentionally skip beach/island edge overlays to keep the board visually flat.
 }
 
 /**

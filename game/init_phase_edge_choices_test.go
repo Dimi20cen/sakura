@@ -34,6 +34,9 @@ func buildInitSeafarersGame(t *testing.T) *Game {
 func TestInitEdgeChoicesIncludeRoadAndShipOnCoastalAnchor(t *testing.T) {
 	g := buildInitSeafarersGame(t)
 	p := g.CurrentPlayer
+	if g.Pirate != nil {
+		g.Pirate.Tile = nil
+	}
 
 	var coastal *entities.Vertex
 	for _, v := range p.GetBuildLocationsSettlement(g.Graph, true, false) {
@@ -117,5 +120,57 @@ func TestSecondInitEdgeChoicesAreAnchoredToSecondSettlement(t *testing.T) {
 		if e == firstEdge {
 			t.Fatal("second settlement choices must not include first settlement edge")
 		}
+	}
+}
+
+func TestInitEdgeChoicesExcludeShipOnPirateBlockedEdge(t *testing.T) {
+	g := buildInitSeafarersGame(t)
+	p := g.CurrentPlayer
+
+	var coastal *entities.Vertex
+	for _, v := range p.GetBuildLocationsSettlement(g.Graph, true, false) {
+		if v.HasAdjacentSea() {
+			coastal = v
+			break
+		}
+	}
+	if coastal == nil {
+		t.Fatal("no coastal settlement location found")
+	}
+	if err := g.BuildSettlement(p, coastal.C); err != nil {
+		t.Fatalf("failed to build coastal settlement: %v", err)
+	}
+
+	allowed, _, shipAllowed := g.getInitEdgeChoices(p, coastal)
+	if len(allowed) == 0 {
+		t.Fatal("expected init edge choices from coastal settlement")
+	}
+
+	var blockedEdge *entities.Edge
+	var seaTile *entities.Tile
+	for _, e := range allowed {
+		if !shipAllowed[e] {
+			continue
+		}
+		for _, t := range e.AdjacentTiles {
+			if t != nil && t.Type == entities.TileTypeSea {
+				blockedEdge = e
+				seaTile = t
+				break
+			}
+		}
+		if blockedEdge != nil {
+			break
+		}
+	}
+	if blockedEdge == nil || seaTile == nil {
+		t.Fatal("expected at least one ship-allowed edge adjacent to sea")
+	}
+
+	g.Pirate.Move(seaTile)
+
+	_, _, shipAllowedAfter := g.getInitEdgeChoices(p, coastal)
+	if shipAllowedAfter[blockedEdge] {
+		t.Fatal("expected pirate-blocked edge to be excluded from setup ship choices")
 	}
 }

@@ -98,6 +98,7 @@ Status: Core mechanics implemented; scenario parity is mixed (see below).
   - pirate applies on sea
   - on `7`/Knight, player chooses valid land/sea target
   - pirate blocks adjacent ship edge usage and can steal from ship-adjacent players
+  - during setup edge placement, pirate-blocked edges are not offered as ship options
 - Longest trade route behavior:
   - computed across roads + ships
   - road/ship transition requires own settlement/city at transition vertex

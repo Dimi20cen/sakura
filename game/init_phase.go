@@ -264,6 +264,9 @@ func (g *Game) getInitEdgeChoices(
 	shipAllowed := make(map[*entities.Edge]bool)
 	if g.Mode == entities.Seafarers {
 		for _, e := range p.GetBuildLocationsShip(g.Graph) {
+			if g.IsSeaRobberBlockingEdge(e) {
+				continue
+			}
 			shipAllowed[e] = true
 		}
 	}

@@ -44,6 +44,14 @@ Entry format:
 - Evidence: `maps/main.go`, `maps/seafarers_scenarios.go`, `docs/SEAFARERS_PARITY_CHECKLIST.md`
 - Next action: continue parity delivery for missing scenarios.
 
+- Area: Pirate blocking for setup ship placement
+- Mode: Seafarers
+- Rulebook: Seafarers pirate blocking on sea routes
+- Repo status: aligned
+- Notes: During initial road/ship placement, edges adjacent to the pirate are excluded from ship-eligible setup choices.
+- Evidence: `game/init_phase.go` (`getInitEdgeChoices`), `game/init_phase_edge_choices_test.go` (`TestInitEdgeChoicesExcludeShipOnPirateBlockedEdge`)
+- Next action: none
+
 ### Base
 
 - Area: Full parity audit coverage

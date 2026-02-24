@@ -3,6 +3,7 @@ import * as canvas from "./canvas";
 import * as trade from "./trade";
 import * as ws from "./ws";
 import * as state from "./state";
+import * as actions from "./actions";
 import * as assets from "./assets";
 import * as windows from "./windows";
 import {
@@ -494,6 +495,21 @@ export function render(commandHub: CommandHub) {
         rerender();
         callback();
     };
+    const rerenderBuildToggleAnd =
+        (target: Parameters<typeof state.togglePendingBuildPlacement>[0], callback: () => void) =>
+        () => {
+            rerender();
+            if (state.togglePendingBuildPlacement(target)) {
+                return;
+            }
+            if (state.hasPendingBuildPlacement()) {
+                // Switch selection: cancel current placement, then request new build.
+                actions.cancelPendingAction();
+                window.setTimeout(callback, 0);
+                return;
+            }
+            callback();
+        };
 
     container.addChild(
         windows.getWindowSprite(
@@ -525,12 +541,12 @@ export function render(commandHub: CommandHub) {
         );
         buttons.buildSettlement.interactive = true;
         buttons.buildSettlement.cursor = "pointer";
-        buttons.buildSettlement.reactDisable = true;
+        buttons.buildSettlement.reactDisable = false;
         buttons.buildSettlement.x = BUTTON_Y;
         buttons.buildSettlement.y = BUTTON_Y;
         buttons.buildSettlement.zIndex = 10;
         buttons.buildSettlement.onClick(
-            rerenderAnd(commandHub.buildSettlement),
+            rerenderBuildToggleAnd("s", commandHub.buildSettlement),
         );
         container.addChild(buttons.buildSettlement);
         const cs = getCountSprite(COUNT_WIDTH, COUNT_HEIGHT, COUNT_FONTSIZE);
@@ -557,11 +573,13 @@ export function render(commandHub: CommandHub) {
         );
         buttons.buildCity.interactive = true;
         buttons.buildCity.cursor = "pointer";
-        buttons.buildCity.reactDisable = true;
+        buttons.buildCity.reactDisable = false;
         buttons.buildCity.x = BUTTON_Y + BUTTON_X_DELTA * 1;
         buttons.buildCity.y = BUTTON_Y;
         buttons.buildCity.zIndex = 10;
-        buttons.buildCity.onClick(rerenderAnd(commandHub.buildCity));
+        buttons.buildCity.onClick(
+            rerenderBuildToggleAnd("c", commandHub.buildCity),
+        );
         container.addChild(buttons.buildCity);
         const cs = getCountSprite(COUNT_WIDTH, COUNT_HEIGHT, COUNT_FONTSIZE);
         buttonCounts[ButtonType.City] = cs;
@@ -587,11 +605,13 @@ export function render(commandHub: CommandHub) {
         );
         buttons.buildRoad.interactive = true;
         buttons.buildRoad.cursor = "pointer";
-        buttons.buildRoad.reactDisable = true;
+        buttons.buildRoad.reactDisable = false;
         buttons.buildRoad.x = BUTTON_Y + BUTTON_X_DELTA * 2;
         buttons.buildRoad.y = BUTTON_Y;
         buttons.buildRoad.zIndex = 10;
-        buttons.buildRoad.onClick(rerenderAnd(commandHub.buildRoad));
+        buttons.buildRoad.onClick(
+            rerenderBuildToggleAnd("r", commandHub.buildRoad),
+        );
         container.addChild(buttons.buildRoad);
         const cs = getCountSprite(COUNT_WIDTH, COUNT_HEIGHT, COUNT_FONTSIZE);
         buttonCounts[ButtonType.Road] = cs;
@@ -688,11 +708,13 @@ export function render(commandHub: CommandHub) {
         );
         buttons.buildShip.interactive = true;
         buttons.buildShip.cursor = "pointer";
-        buttons.buildShip.reactDisable = true;
+        buttons.buildShip.reactDisable = false;
         buttons.buildShip.x = BUTTON_Y + BUTTON_X_DELTA * 0;
         buttons.buildShip.y = BUTTON_Y;
         buttons.buildShip.zIndex = 10;
-        buttons.buildShip.onClick(rerenderAnd(commandHub.buildShip));
+        buttons.buildShip.onClick(
+            rerenderBuildToggleAnd("sh", commandHub.buildShip),
+        );
         seafarersShipContainer.addChild(buttons.buildShip);
         const cs = getCountSprite(COUNT_WIDTH, COUNT_HEIGHT, COUNT_FONTSIZE);
         buttonCounts[ButtonType.Ship] = cs;
@@ -715,11 +737,13 @@ export function render(commandHub: CommandHub) {
         );
         buttons.moveShip.interactive = true;
         buttons.moveShip.cursor = "pointer";
-        buttons.moveShip.reactDisable = true;
+        buttons.moveShip.reactDisable = false;
         buttons.moveShip.x = BUTTON_Y + BUTTON_X_DELTA * 1;
         buttons.moveShip.y = BUTTON_Y;
         buttons.moveShip.zIndex = 10;
-        buttons.moveShip.onClick(rerenderAnd(commandHub.moveShip));
+        buttons.moveShip.onClick(
+            rerenderBuildToggleAnd("ms", commandHub.moveShip),
+        );
         seafarersShipContainer.addChild(buttons.moveShip);
         buttons.moveShip.tooltip = new windows.TooltipHandler(
             buttons.moveShip,
@@ -738,11 +762,13 @@ export function render(commandHub: CommandHub) {
         );
         buttons.buildWall.interactive = true;
         buttons.buildWall.cursor = "pointer";
-        buttons.buildWall.reactDisable = true;
+        buttons.buildWall.reactDisable = false;
         buttons.buildWall.x = BUTTON_Y + BUTTON_X_DELTA * 3;
         buttons.buildWall.y = BUTTON_Y;
         buttons.buildWall.zIndex = 10;
-        buttons.buildWall.onClick(rerenderAnd(commandHub.buildWall));
+        buttons.buildWall.onClick(
+            rerenderBuildToggleAnd("w", commandHub.buildWall),
+        );
         container.addChild(buttons.buildWall);
         const cs = getCountSprite(COUNT_WIDTH, COUNT_HEIGHT, COUNT_FONTSIZE);
         buttonCounts[ButtonType.Wall] = cs;
@@ -835,7 +861,7 @@ export function render(commandHub: CommandHub) {
             b.x = BUTTON_Y;
             b.y = BUTTON_Y;
             b.zIndex = 10;
-            b.onClick(rerenderAnd(commandHub.buildKnight));
+            b.onClick(rerenderBuildToggleAnd("k", commandHub.buildKnight));
             kbc.addChild(b);
             b.tooltip = new windows.TooltipHandler(
                 b,
@@ -855,11 +881,13 @@ export function render(commandHub: CommandHub) {
             buttons.knightBox!.activateKnight = b;
             b.interactive = true;
             b.cursor = "pointer";
-            b.reactDisable = true;
+            b.reactDisable = false;
             b.x = BUTTON_Y + BUTTON_X_DELTA * 1;
             b.y = BUTTON_Y;
             b.zIndex = 10;
-            b.onClick(rerenderAnd(commandHub.activateKnight));
+            b.onClick(
+                rerenderBuildToggleAnd("ka", commandHub.activateKnight),
+            );
             kbc.addChild(b);
             b.tooltip = new windows.TooltipHandler(
                 b,
@@ -879,11 +907,13 @@ export function render(commandHub: CommandHub) {
             buttons.knightBox!.robberKnight = b;
             b.interactive = true;
             b.cursor = "pointer";
-            b.reactDisable = true;
+            b.reactDisable = false;
             b.x = BUTTON_Y + BUTTON_X_DELTA * 2;
             b.y = BUTTON_Y;
             b.zIndex = 10;
-            b.onClick(rerenderAnd(commandHub.robberKnight));
+            b.onClick(
+                rerenderBuildToggleAnd("kr", commandHub.robberKnight),
+            );
             kbc.addChild(b);
             b.tooltip = new windows.TooltipHandler(
                 b,
@@ -903,11 +933,11 @@ export function render(commandHub: CommandHub) {
             buttons.knightBox!.moveKnight = b;
             b.interactive = true;
             b.cursor = "pointer";
-            b.reactDisable = true;
+            b.reactDisable = false;
             b.x = BUTTON_Y + BUTTON_X_DELTA * 3;
             b.y = BUTTON_Y;
             b.zIndex = 10;
-            b.onClick(rerenderAnd(commandHub.moveKnight));
+            b.onClick(rerenderBuildToggleAnd("km", commandHub.moveKnight));
             kbc.addChild(b);
             b.tooltip = new windows.TooltipHandler(
                 b,
@@ -982,7 +1012,7 @@ export function render(commandHub: CommandHub) {
             buttons.improveBox!.paper = b;
             b.interactive = true;
             b.cursor = "pointer";
-            b.reactDisable = true;
+            b.reactDisable = false;
             b.x = BUTTON_Y;
             b.y = BUTTON_Y;
             b.zIndex = 10;
@@ -1126,62 +1156,79 @@ function setButtonEnabled(
 
 /**
  * Update the enabled state of the buttons from player secret.
- * @param state Player state
+ * @param secret Player state
  */
-export function updateButtonsSecretState(state: PlayerSecretState) {
-    for (const i in state.BuildablesLeft) {
+export function updateButtonsSecretState(secret: PlayerSecretState) {
+    for (const i in secret.BuildablesLeft) {
         const t = Number(i) as BuildableType;
         const bt = (ButtonType as any)[BuildableType[t]] as ButtonType;
 
         if (buttonCounts[bt]) {
-            buttonCounts[bt]!.text.text = `${state.BuildablesLeft[t]}`;
+            buttonCounts[bt]!.text.text = `${secret.BuildablesLeft[t]}`;
         }
     }
 
-    buttons.buildSettlement.setEnabled(state.AllowedActions?.BuildSettlement);
-    buttons.buildCity.setEnabled(state.AllowedActions?.BuildCity);
-    buttons.buildRoad.setEnabled(state.AllowedActions?.BuildRoad);
-    buttons.buildShip?.setEnabled(state.AllowedActions?.BuildShip);
-    buttons.moveShip?.setEnabled(state.AllowedActions?.MoveShip);
-    buttons.buyDevelopmentCard?.setEnabled(
-        state.AllowedActions?.BuyDevelopmentCard,
+    buttons.buildSettlement.setEnabled(
+        secret.AllowedActions?.BuildSettlement ||
+            state.isPendingBuildPlacement("s"),
     );
-    buttons.endTurn.setEnabled(state.AllowedActions?.EndTurn);
+    buttons.buildCity.setEnabled(
+        secret.AllowedActions?.BuildCity || state.isPendingBuildPlacement("c"),
+    );
+    buttons.buildRoad.setEnabled(
+        secret.AllowedActions?.BuildRoad || state.isPendingBuildPlacement("r"),
+    );
+    buttons.buildShip?.setEnabled(
+        secret.AllowedActions?.BuildShip || state.isPendingBuildPlacement("sh"),
+    );
+    buttons.moveShip?.setEnabled(
+        secret.AllowedActions?.MoveShip || state.isPendingBuildPlacement("ms"),
+    );
+    buttons.buyDevelopmentCard?.setEnabled(
+        secret.AllowedActions?.BuyDevelopmentCard,
+    );
+    buttons.endTurn.setEnabled(secret.AllowedActions?.EndTurn);
 
-    trade.setTradeAllowed(Boolean(state.AllowedActions?.Trade));
+    trade.setTradeAllowed(Boolean(secret.AllowedActions?.Trade));
 
     // Cities and Knights
     buttons.knightBox?.buildKnight.setEnabled(
-        state.AllowedActions?.BuildKnight,
+        secret.AllowedActions?.BuildKnight || state.isPendingBuildPlacement("k"),
     );
     buttons.knightBox?.activateKnight.setEnabled(
-        state.AllowedActions?.ActivateKnight,
+        secret.AllowedActions?.ActivateKnight ||
+            state.isPendingBuildPlacement("ka"),
     );
     buttons.knightBox?.robberKnight.setEnabled(
-        state.AllowedActions?.RobberKnight,
+        secret.AllowedActions?.RobberKnight ||
+            state.isPendingBuildPlacement("kr"),
     );
-    buttons.knightBox?.moveKnight.setEnabled(state.AllowedActions?.MoveKnight);
+    buttons.knightBox?.moveKnight.setEnabled(
+        secret.AllowedActions?.MoveKnight || state.isPendingBuildPlacement("km"),
+    );
 
     const anyKnight =
-        state.AllowedActions?.ActivateKnight ||
-        state.AllowedActions?.RobberKnight ||
-        state.AllowedActions?.MoveKnight ||
-        state.AllowedActions?.BuildKnight;
+        secret.AllowedActions?.ActivateKnight ||
+        secret.AllowedActions?.RobberKnight ||
+        secret.AllowedActions?.MoveKnight ||
+        secret.AllowedActions?.BuildKnight;
     buttons.openKnightBox?.setEnabled(anyKnight, true);
 
-    buttons.improveBox?.paper.setEnabled(state.AllowedActions?.ImprovePaper);
-    buttons.improveBox?.cloth.setEnabled(state.AllowedActions?.ImproveCloth);
-    buttons.improveBox?.coin.setEnabled(state.AllowedActions?.ImproveCoin);
+    buttons.improveBox?.paper.setEnabled(secret.AllowedActions?.ImprovePaper);
+    buttons.improveBox?.cloth.setEnabled(secret.AllowedActions?.ImproveCloth);
+    buttons.improveBox?.coin.setEnabled(secret.AllowedActions?.ImproveCoin);
 
     const anyImprove =
-        state.AllowedActions?.ImprovePaper ||
-        state.AllowedActions?.ImproveCloth ||
-        state.AllowedActions?.ImproveCoin;
+        secret.AllowedActions?.ImprovePaper ||
+        secret.AllowedActions?.ImproveCloth ||
+        secret.AllowedActions?.ImproveCoin;
     buttons.openImproveBox?.setEnabled(anyImprove, true);
 
-    buttons.buildWall?.setEnabled(state.AllowedActions?.BuildWall);
+    buttons.buildWall?.setEnabled(
+        secret.AllowedActions?.BuildWall || state.isPendingBuildPlacement("w"),
+    );
     buttons.specialBuild?.setEnabled(
-        Boolean(state.AllowedActions?.SpecialBuild),
+        Boolean(secret.AllowedActions?.SpecialBuild),
     );
 
     updateTurnTimerWidget();

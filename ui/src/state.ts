@@ -579,6 +579,86 @@ export function showPendingAction(action?: Partial<PlayerAction>) {
     currentPendingAction = action;
 }
 
+type BuildToggleTarget =
+    | "s"
+    | "c"
+    | "r"
+    | "sh"
+    | "ms"
+    | "w"
+    | "k"
+    | "ka"
+    | "kr"
+    | "km";
+
+/**
+ * Cancel current pending map-placement action if it matches the same build intent.
+ * @returns true when a cancel was sent.
+ */
+export function togglePendingBuildPlacement(target: BuildToggleTarget): boolean {
+    const matches = isPendingBuildPlacement(target);
+
+    if (!matches) {
+        return false;
+    }
+
+    cancelPendingAction();
+    return true;
+}
+
+/**
+ * Returns true when this build target currently has a pending cancelable placement action.
+ */
+export function isPendingBuildPlacement(target: BuildToggleTarget): boolean {
+    const actionType = String(currentPendingAction?.Type || "");
+    const message = String(currentPendingAction?.Message || "").toLowerCase();
+    const canCancel = Boolean(currentPendingAction?.CanCancel);
+    if (!canCancel) {
+        return false;
+    }
+
+    switch (target) {
+        case "r":
+            return actionType === "ce" && message.includes("road");
+        case "sh":
+            return actionType === "ce" && message.includes("location for ship");
+        case "ms":
+            return (
+                actionType === "ce" &&
+                (message.includes("ship to move") ||
+                    message.includes("destination for ship"))
+            );
+        case "s":
+            return actionType === "cv" && message.includes("settlement");
+        case "c":
+            return actionType === "cv" && message.includes("city");
+        case "w":
+            return actionType === "cv" && message.includes("fence");
+        case "k":
+            return actionType === "cv" && message.includes("location for warrior");
+        case "ka":
+            return actionType === "cv" && message.includes("warrior to activate");
+        case "kr":
+            return (
+                actionType === "cv" &&
+                message.includes("warrior to chase away the robber")
+            );
+        case "km":
+            return actionType === "cv" && message.includes("warrior to move");
+        default:
+            return false;
+    }
+}
+
+/**
+ * Returns true when there is any cancelable build placement action active.
+ */
+export function hasPendingBuildPlacement(): boolean {
+    const actionType = String(currentPendingAction?.Type || "");
+    const canCancel = Boolean(currentPendingAction?.CanCancel);
+    return canCancel && (actionType === "ce" || actionType === "cv");
+}
+
 type PlayerClickEvent = (event: any, order: number) => void;
 let playerClickEvent: PlayerClickEvent | null = null;
 

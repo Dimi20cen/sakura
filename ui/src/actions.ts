@@ -182,9 +182,6 @@ export function chooseDice() {
     const WIDTH = 20 + (DICE_WIDTH + 5) * 6;
     const HEIGHT = 2 * DICE_WIDTH + 25;
     const w = windows.getWindowSprite(WIDTH, HEIGHT);
-    const respond = new windows.YesNoWindow(WIDTH + 10, 12.5);
-    respond.render();
-    w.addChild(respond.container);
     chooseDiceWindow = w;
 
     let whiteSel = 0;
@@ -192,14 +189,12 @@ export function chooseDice() {
 
     const check = () => {
         if (whiteSel && redSel) {
-            respond.onYes(() => {
-                ws.getCommandHub().sendGameMessage({
-                    t: socketTypes.MSG_TYPE.ACTION_RESPONSE,
-                    ar_data: [redSel, whiteSel],
-                });
-                resetPendingAction();
-                clearChooseDice();
+            ws.getCommandHub().sendGameMessage({
+                t: socketTypes.MSG_TYPE.ACTION_RESPONSE,
+                ar_data: [redSel, whiteSel],
             });
+            resetPendingAction();
+            clearChooseDice();
             canvas.app.markDirty();
         }
     };

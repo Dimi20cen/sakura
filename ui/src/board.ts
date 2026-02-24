@@ -2,7 +2,6 @@ import * as PIXI from "pixi.js";
 import * as dice from "./dice";
 import * as canvas from "./canvas";
 import * as anim from "./animation";
-import * as windows from "./windows";
 import * as assets from "./assets";
 import {
     CoordStr,
@@ -37,9 +36,6 @@ let vertexPlacements: { [key: CoordStr]: IVertexPlacement };
 
 /** Map from EdgeCoordinate to edge placement */
 let edgePlacements: { [key: CoordStr]: IEdgePlacement };
-
-/** Window to confirm placement of anything */
-let placementConfirmationWindow: windows.YesNoWindow | undefined;
 
 /** Map from coordinates to display coordinates */
 let DispCoordMap: { [key: CoordStr]: ICoordinate };
@@ -683,9 +679,7 @@ function renderVertexHighlightSprite(vertex: UIVertex) {
     );
     highlightSprite.on("pointerdown", (event) => {
         event.stopPropagation();
-        confirmPlacement(highlightSprite, () =>
-            vertexClickEvent?.(event, vertex),
-        );
+        vertexClickEvent?.(event, vertex);
     });
     container.addChild(highlightSprite);
     vertex.highlightSprite = highlightSprite;
@@ -706,7 +700,7 @@ function renderEdgeHighlightSprite(edge: UIEdge) {
 
     highlightSprite.on("pointerdown", (event) => {
         event.stopPropagation();
-        confirmPlacement(highlightSprite, () => edgeClickEvent?.(event, edge));
+        edgeClickEvent?.(event, edge);
     });
     container.addChild(highlightSprite);
     edge.highlightSprite = highlightSprite;
@@ -725,7 +719,7 @@ function renderTileHighlightSprite(tile: UITile) {
     highlightSprite.scale.set(0.4);
     highlightSprite.on("pointerdown", (event) => {
         event.stopPropagation();
-        confirmPlacement(highlightSprite, () => tileClickEvent?.(event, tile));
+        tileClickEvent?.(event, tile);
     });
     container.addChild(highlightSprite);
     tile.highlightSprite = highlightSprite;
@@ -798,7 +792,6 @@ export function resetVertexHighlights() {
         vertex.highlightSprite.visible = false;
     }
 
-    clearPlacementConfirmation();
     canvas.app.markDirty();
 }
 
@@ -831,7 +824,6 @@ export function resetEdgeHighlights() {
         edge.highlightSprite.visible = false;
     }
 
-    clearPlacementConfirmation();
     canvas.app.markDirty();
 }
 
@@ -865,7 +857,6 @@ export function resetTileHighlights() {
         tile.highlightSprite.visible = false;
     }
 
-    clearPlacementConfirmation();
     canvas.app.markDirty();
 }
 
@@ -976,38 +967,6 @@ export async function setMerchantTile(m: Merchant) {
     getTex();
     anim.requestTranslationAnimation([board.merchant], 8);
 
-    canvas.app.markDirty();
-}
-
-/**
- * Ask the player to confirm a placement at a location
- * @param target location of confirmation
- * @param callback Callback to call when confirmation is confirmed
- */
-function confirmPlacement(target: PIXI.Container, callback: () => void) {
-    clearPlacementConfirmation();
-
-    placementConfirmationWindow = new windows.YesNoWindow(
-        target.x + 30,
-        target.y - 40,
-    );
-    placementConfirmationWindow.onNo(clearPlacementConfirmation);
-    placementConfirmationWindow.onYes(() => {
-        clearPlacementConfirmation();
-        callback();
-    });
-    placementConfirmationWindow.render();
-    placementConfirmationWindow.container.zIndex = 1200;
-    container.addChild(placementConfirmationWindow.container);
-    canvas.app.markDirty();
-}
-
-/**
- * Remove the confirmation window
- */
-function clearPlacementConfirmation() {
-    placementConfirmationWindow?.destroy();
-    placementConfirmationWindow = undefined;
     canvas.app.markDirty();
 }
 

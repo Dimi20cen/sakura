@@ -25,12 +25,21 @@ This file guides agents when replacing or adding game assets.
 ## Mode Notes
 
 - Base mode runtime assets should be placed in `assets/base/...` unless they are truly cross-mode.
+- Base piece naming convention:
+  - settlements: `assets/base/pieces/settlement/settlement-<color>.png`
+  - cities: `assets/base/pieces/city/city-<color>.png`
 - Seafarers-specific runtime assets should be placed in `assets/seafarers/...`.
 - Cities and Knights specific runtime assets should be placed in `assets/cities-knights/...`.
 - Cross-mode UI/audio/common assets should be placed in `assets/shared/...`.
+- Cities and Knights UI controls/icons/event die faces should live under:
+  - `assets/cities-knights/buttons/...`
+  - `assets/cities-knights/icons/...`
+  - `assets/cities-knights/dice/...`
 - Card deck convention:
-  - `assets/base/cards/decks/*` is currently a shared card atlas used by Base and Cities and Knights card IDs.
-  - Do not split this folder by mode unless code mapping is updated accordingly.
+  - Base/shared deck IDs remain in `assets/base/cards/decks/*`.
+  - Cities and Knights-only deck IDs must live in `assets/cities-knights/cards/decks/*`.
+  - Use descriptive filenames aligned to rulebook terms (for example `progress-politics-bishop.jpg`, not numeric IDs).
+  - If moving IDs between these folders, update `ui/src/assets.ts` imports and `ui/assets/mappings.json` aliases in the same change.
 
 ## Quality Targets (guidance)
 

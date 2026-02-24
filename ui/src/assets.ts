@@ -146,12 +146,12 @@ export const shipToken = shipTokenS;
 
 /******************** House *******************************************/
 
-import houseRed from "../public/assets/base/pieces/city/city-red.png";
-import houseBlue from "../public/assets/base/pieces/city/city-blue.png";
-import houseGreen from "../public/assets/base/pieces/city/city-green.png";
-import houseYellow from "../public/assets/base/pieces/city/city-yellow.png";
-import housePlum from "../public/assets/base/pieces/city/city-plum.png";
-import houseCyan from "../public/assets/base/pieces/city/city-cyan.png";
+import houseRed from "../public/assets/base/pieces/settlement/settlement-red.png";
+import houseBlue from "../public/assets/base/pieces/settlement/settlement-blue.png";
+import houseGreen from "../public/assets/base/pieces/settlement/settlement-green.png";
+import houseYellow from "../public/assets/base/pieces/settlement/settlement-yellow.png";
+import housePlum from "../public/assets/base/pieces/settlement/settlement-plum.png";
+import houseCyan from "../public/assets/base/pieces/settlement/settlement-cyan.png";
 
 export const house: { [key: string]: StaticImageData } = {
     red: houseRed,
@@ -166,12 +166,12 @@ export const house: { [key: string]: StaticImageData } = {
 
 /******************** City *******************************************/
 
-import cityRed from "../public/assets/base/pieces/house/house-red.png";
-import cityBlue from "../public/assets/base/pieces/house/house-blue.png";
-import cityGreen from "../public/assets/base/pieces/house/house-green.png";
-import cityYellow from "../public/assets/base/pieces/house/house-yellow.png";
-import cityPlum from "../public/assets/base/pieces/house/house-plum.png";
-import cityCyan from "../public/assets/base/pieces/house/house-cyan.png";
+import cityRed from "../public/assets/base/pieces/city/city-red.png";
+import cityBlue from "../public/assets/base/pieces/city/city-blue.png";
+import cityGreen from "../public/assets/base/pieces/city/city-green.png";
+import cityYellow from "../public/assets/base/pieces/city/city-yellow.png";
+import cityPlum from "../public/assets/base/pieces/city/city-plum.png";
+import cityCyan from "../public/assets/base/pieces/city/city-cyan.png";
 
 export const city: { [key: string]: StaticImageData } = {
     red: cityRed,
@@ -338,7 +338,7 @@ export const numberTokens: { [key: number]: StaticImageData } = {
 
 import iconCards from "../public/assets/shared/icons/cards.png";
 import iconDcard from "../public/assets/shared/icons/dcard.png";
-import iconKnight from "../public/assets/shared/icons/knight.png";
+import iconKnight from "../public/assets/cities-knights/icons/knight.png";
 import iconRoad from "../public/assets/shared/icons/road.png";
 import iconVp from "../public/assets/shared/icons/vp.png";
 
@@ -385,17 +385,17 @@ import btnCity from "../public/assets/shared/buttons/city.png";
 import btnRoad from "../public/assets/shared/buttons/road.png";
 import btnShip from "../public/assets/shared/buttons/ship.png";
 import btnDevelopmentCard from "../public/assets/shared/buttons/dcard.png";
-import btnKnightBox from "../public/assets/shared/buttons/knight.png";
-import btnKnightBuild from "../public/assets/shared/buttons/knight_build.png";
-import btnKnightActivate from "../public/assets/shared/buttons/knight_activate.png";
-import btnKnightRobber from "../public/assets/shared/buttons/knight_robber.png";
-import btnKnightMove from "../public/assets/shared/buttons/knight_move.png";
+import btnKnightBox from "../public/assets/cities-knights/buttons/knight.png";
+import btnKnightBuild from "../public/assets/cities-knights/buttons/knight_build.png";
+import btnKnightActivate from "../public/assets/cities-knights/buttons/knight_activate.png";
+import btnKnightRobber from "../public/assets/cities-knights/buttons/knight_robber.png";
+import btnKnightMove from "../public/assets/cities-knights/buttons/knight_move.png";
 import btnMoveShip from "../public/assets/shared/buttons/move_ship.png";
-import btnCityImprove from "../public/assets/shared/buttons/improve.png";
-import btnCityImprovePaper from "../public/assets/shared/buttons/improve_paper.jpg";
-import btnCityImproveCloth from "../public/assets/shared/buttons/improve_cloth.jpg";
-import btnCityImproveCoin from "../public/assets/shared/buttons/improve_coin.jpg";
-import btnWall from "../public/assets/shared/buttons/w.png";
+import btnCityImprove from "../public/assets/cities-knights/buttons/improve.png";
+import btnCityImprovePaper from "../public/assets/cities-knights/buttons/improve_paper.jpg";
+import btnCityImproveCloth from "../public/assets/cities-knights/buttons/improve_cloth.jpg";
+import btnCityImproveCoin from "../public/assets/cities-knights/buttons/improve_coin.jpg";
+import btnWall from "../public/assets/cities-knights/buttons/w.png";
 import btnEndTurn from "../public/assets/shared/buttons/endturn.png";
 import btnSpecialBuild from "../public/assets/shared/buttons/specialbuild.png";
 import btnEdit from "../public/assets/shared/buttons/edit.png";
@@ -460,10 +460,10 @@ import diceR3 from "../public/assets/shared/dice/dice-3-r.png";
 import diceR4 from "../public/assets/shared/dice/dice-4-r.png";
 import diceR5 from "../public/assets/shared/dice/dice-5-r.png";
 import diceR6 from "../public/assets/shared/dice/dice-6-r.png";
-import diceE1 from "../public/assets/shared/dice/event-1.png";
-import diceE2 from "../public/assets/shared/dice/event-2.png";
-import diceE3 from "../public/assets/shared/dice/event-3.png";
-import diceE4 from "../public/assets/shared/dice/event-4.png";
+import diceE1 from "../public/assets/cities-knights/dice/event-1.png";
+import diceE2 from "../public/assets/cities-knights/dice/event-2.png";
+import diceE3 from "../public/assets/cities-knights/dice/event-3.png";
+import diceE4 from "../public/assets/cities-knights/dice/event-4.png";
 
 export const diceWhite: { [key: number]: StaticImageData } = {
     1: diceW1,
@@ -492,61 +492,61 @@ export const diceEvent: { [key: number]: StaticImageData } = {
 
 /****************** Cards *********************************************/
 
-import cards0 from "../public/assets/base/cards/decks/0.jpg";
+import cards0 from "../public/assets/base/cards/decks/unknown-card-back.jpg";
 import cards1 from "../public/assets/base/cards/decks/wood.webp";
 import cards2 from "../public/assets/base/cards/decks/brick.webp";
 import cards3 from "../public/assets/base/cards/decks/wool.webp";
 import cards4 from "../public/assets/base/cards/decks/wheat.webp";
 import cards5 from "../public/assets/base/cards/decks/ore.webp";
-import cards6 from "../public/assets/base/cards/decks/6.jpg";
-import cards7 from "../public/assets/base/cards/decks/7.jpg";
-import cards8 from "../public/assets/base/cards/decks/8.jpg";
-import cards101 from "../public/assets/base/cards/decks/101.jpg";
-import cards102 from "../public/assets/base/cards/decks/102.jpg";
-import cards103 from "../public/assets/base/cards/decks/103.jpg";
-import cards104 from "../public/assets/base/cards/decks/104.jpg";
-import cards105 from "../public/assets/base/cards/decks/105.jpg";
-import cards106 from "../public/assets/base/cards/decks/106.jpg";
-import cards107 from "../public/assets/base/cards/decks/107.jpg";
-import cards108 from "../public/assets/base/cards/decks/108.jpg";
-import cards109 from "../public/assets/base/cards/decks/109.jpg";
-import cards110 from "../public/assets/base/cards/decks/110.jpg";
-import cards111 from "../public/assets/base/cards/decks/111.jpg";
-import cards112 from "../public/assets/base/cards/decks/112.jpg";
-import cards113 from "../public/assets/base/cards/decks/113.jpg";
-import cards114 from "../public/assets/base/cards/decks/114.jpg";
-import cards115 from "../public/assets/base/cards/decks/115.jpg";
-import cards116 from "../public/assets/base/cards/decks/116.jpg";
-import cards117 from "../public/assets/base/cards/decks/117.jpg";
-import cards118 from "../public/assets/base/cards/decks/118.jpg";
-import cards119 from "../public/assets/base/cards/decks/119.jpg";
-import cards120 from "../public/assets/base/cards/decks/120.jpg";
-import cards121 from "../public/assets/base/cards/decks/121.jpg";
-import cards122 from "../public/assets/base/cards/decks/122.jpg";
-import cards123 from "../public/assets/base/cards/decks/123.jpg";
-import cards124 from "../public/assets/base/cards/decks/124.jpg";
-import cards125 from "../public/assets/base/cards/decks/125.jpg";
-import cards126 from "../public/assets/base/cards/decks/126.jpg";
-import cards127 from "../public/assets/base/cards/decks/127.jpg";
-import cards128 from "../public/assets/base/cards/decks/128.jpg";
-import cards129 from "../public/assets/base/cards/decks/129.jpg";
-import cards130 from "../public/assets/base/cards/decks/130.jpg";
-import cards200 from "../public/assets/base/cards/decks/200.jpg";
-import cards201 from "../public/assets/base/cards/decks/201.jpg";
-import cards202 from "../public/assets/base/cards/decks/202.jpg";
-import cards203 from "../public/assets/base/cards/decks/203.jpg";
-import cards204 from "../public/assets/base/cards/decks/204.jpg";
-import cards205 from "../public/assets/base/cards/decks/205.jpg";
-import cards206 from "../public/assets/base/cards/decks/206.jpg";
-import cards207 from "../public/assets/base/cards/decks/207.jpg";
-import cards208 from "../public/assets/base/cards/decks/208.jpg";
-import cards209 from "../public/assets/base/cards/decks/209.jpg";
-import cards210 from "../public/assets/base/cards/decks/210.jpg";
-import cards211 from "../public/assets/base/cards/decks/211.jpg";
-import cards212 from "../public/assets/base/cards/decks/212.jpg";
-import cards213 from "../public/assets/base/cards/decks/213.jpg";
-import cards214 from "../public/assets/base/cards/decks/214.jpg";
-import cards215 from "../public/assets/base/cards/decks/215.jpg";
+import cards6 from "../public/assets/cities-knights/cards/decks/commodity-paper.jpg";
+import cards7 from "../public/assets/cities-knights/cards/decks/commodity-cloth.jpg";
+import cards8 from "../public/assets/cities-knights/cards/decks/commodity-coin.jpg";
+import cards101 from "../public/assets/base/cards/decks/knight.jpg";
+import cards102 from "../public/assets/base/cards/decks/victory-point-card.jpg";
+import cards103 from "../public/assets/base/cards/decks/road-building.jpg";
+import cards104 from "../public/assets/base/cards/decks/year-of-plenty.jpg";
+import cards105 from "../public/assets/base/cards/decks/monopoly.jpg";
+import cards106 from "../public/assets/cities-knights/cards/decks/progress-science-alchemist.jpg";
+import cards107 from "../public/assets/cities-knights/cards/decks/progress-science-crane.jpg";
+import cards108 from "../public/assets/cities-knights/cards/decks/progress-science-engineer.jpg";
+import cards109 from "../public/assets/cities-knights/cards/decks/progress-science-inventor.jpg";
+import cards110 from "../public/assets/cities-knights/cards/decks/progress-science-irrigation.jpg";
+import cards111 from "../public/assets/cities-knights/cards/decks/progress-science-medicine.jpg";
+import cards112 from "../public/assets/cities-knights/cards/decks/progress-science-mining.jpg";
+import cards113 from "../public/assets/cities-knights/cards/decks/progress-science-printer.jpg";
+import cards114 from "../public/assets/cities-knights/cards/decks/progress-science-road-building.jpg";
+import cards115 from "../public/assets/cities-knights/cards/decks/progress-science-smith.jpg";
+import cards116 from "../public/assets/cities-knights/cards/decks/progress-trade-commercial-harbor.jpg";
+import cards117 from "../public/assets/cities-knights/cards/decks/progress-trade-master-merchant.jpg";
+import cards118 from "../public/assets/cities-knights/cards/decks/progress-trade-merchant.jpg";
+import cards119 from "../public/assets/cities-knights/cards/decks/progress-trade-merchant-fleet.jpg";
+import cards120 from "../public/assets/cities-knights/cards/decks/progress-trade-resource-monopoly.jpg";
+import cards121 from "../public/assets/cities-knights/cards/decks/progress-trade-trade-monopoly.jpg";
+import cards122 from "../public/assets/cities-knights/cards/decks/progress-politics-bishop.jpg";
+import cards123 from "../public/assets/cities-knights/cards/decks/progress-politics-constitution.jpg";
+import cards124 from "../public/assets/cities-knights/cards/decks/progress-politics-deserter.jpg";
+import cards125 from "../public/assets/cities-knights/cards/decks/progress-politics-diplomat.jpg";
+import cards126 from "../public/assets/cities-knights/cards/decks/progress-politics-intrigue.jpg";
+import cards127 from "../public/assets/cities-knights/cards/decks/progress-politics-saboteur.jpg";
+import cards128 from "../public/assets/cities-knights/cards/decks/progress-politics-spy.jpg";
+import cards129 from "../public/assets/cities-knights/cards/decks/progress-politics-warlord.jpg";
+import cards130 from "../public/assets/cities-knights/cards/decks/progress-politics-wedding.jpg";
+import cards200 from "../public/assets/base/cards/decks/development-card-back.jpg";
+import cards201 from "../public/assets/cities-knights/cards/decks/progress-science-back-hidden.jpg";
+import cards202 from "../public/assets/cities-knights/cards/decks/progress-trade-back-hidden.jpg";
+import cards203 from "../public/assets/cities-knights/cards/decks/progress-politics-back-hidden.jpg";
+import cards204 from "../public/assets/cities-knights/cards/decks/defender-of-catan-hidden.jpg";
+import cards205 from "../public/assets/base/cards/decks/longest-road-hidden.jpg";
+import cards206 from "../public/assets/base/cards/decks/largest-army-hidden.jpg";
+import cards207 from "../public/assets/cities-knights/cards/decks/science-improvement-level-3-hidden.jpg";
+import cards208 from "../public/assets/cities-knights/cards/decks/science-improvement-level-4-hidden.jpg";
+import cards209 from "../public/assets/cities-knights/cards/decks/science-improvement-level-5-hidden.jpg";
+import cards210 from "../public/assets/cities-knights/cards/decks/trade-improvement-level-3-hidden.jpg";
+import cards211 from "../public/assets/cities-knights/cards/decks/trade-improvement-level-4-hidden.jpg";
+import cards212 from "../public/assets/cities-knights/cards/decks/trade-improvement-level-5-hidden.jpg";
+import cards213 from "../public/assets/cities-knights/cards/decks/politics-improvement-level-3-hidden.jpg";
+import cards214 from "../public/assets/cities-knights/cards/decks/politics-improvement-level-4-hidden.jpg";
+import cards215 from "../public/assets/cities-knights/cards/decks/politics-improvement-level-5-hidden.jpg";
 
 export const cards: { [key: number]: StaticImageData } = {
     0: cards0,

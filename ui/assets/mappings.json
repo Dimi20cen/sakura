@@ -114,6 +114,13 @@
     "ui/public/assets/base/pieces/city/city-plum.png": "ui/public/assets/base/pieces/settlement/settlement-plum.png",
     "ui/public/assets/base/pieces/house/house-plum.png": "ui/public/assets/base/pieces/city/city-plum.png",
     "ui/public/assets/base/pieces/city/city-cyan.png": "ui/public/assets/base/pieces/settlement/settlement-cyan.png",
-    "ui/public/assets/base/pieces/house/house-cyan.png": "ui/public/assets/base/pieces/city/city-cyan.png"
+    "ui/public/assets/base/pieces/house/house-cyan.png": "ui/public/assets/base/pieces/city/city-cyan.png",
+    "ui/public/assets/base/board/textures/road.png": "ui/public/assets/base/pieces/road/road.png",
+    "ui/public/assets/base/board/textures/road-red.png": "ui/public/assets/base/pieces/road/road-red.png",
+    "ui/public/assets/base/board/textures/road-blue.png": "ui/public/assets/base/pieces/road/road-blue.png",
+    "ui/public/assets/base/board/textures/road-green.png": "ui/public/assets/base/pieces/road/road-green.png",
+    "ui/public/assets/base/board/textures/road-yellow.png": "ui/public/assets/base/pieces/road/road-yellow.png",
+    "ui/public/assets/base/board/textures/road-plum.png": "ui/public/assets/base/pieces/road/road-plum.png",
+    "ui/public/assets/base/board/textures/road-cyan.png": "ui/public/assets/base/pieces/road/road-cyan.png"
   }
 }

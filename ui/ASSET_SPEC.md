@@ -26,6 +26,7 @@ This file guides agents when replacing or adding game assets.
 
 - Base mode runtime assets should be placed in `assets/base/...` unless they are truly cross-mode.
 - Base piece naming convention:
+  - roads: `assets/base/pieces/road/road-<color>.png` and `assets/base/pieces/road/road.png`
   - settlements: `assets/base/pieces/settlement/settlement-<color>.png`
   - cities: `assets/base/pieces/city/city-<color>.png`
 - Seafarers-specific runtime assets should be placed in `assets/seafarers/...`.

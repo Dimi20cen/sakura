@@ -111,15 +111,15 @@ tileTex[TILE_TEX.FOG] = tileTexFog;
 
 /************************* Roads *******************************/
 import roadBeach from "../public/assets/seafarers/textures/beach.png";
-import roadRoad from "../public/assets/base/board/textures/road.png";
+import roadRoad from "../public/assets/base/pieces/road/road.png";
 import roadIslandR from "../public/assets/seafarers/textures/island-r.png";
 import roadIslandL from "../public/assets/seafarers/textures/island-l.png";
-import roadRed from "../public/assets/base/board/textures/road-red.png";
-import roadBlue from "../public/assets/base/board/textures/road-blue.png";
-import roadGreen from "../public/assets/base/board/textures/road-green.png";
-import roadYellow from "../public/assets/base/board/textures/road-yellow.png";
-import roadPlum from "../public/assets/base/board/textures/road-plum.png";
-import roadCyan from "../public/assets/base/board/textures/road-cyan.png";
+import roadRed from "../public/assets/base/pieces/road/road-red.png";
+import roadBlue from "../public/assets/base/pieces/road/road-blue.png";
+import roadGreen from "../public/assets/base/pieces/road/road-green.png";
+import roadYellow from "../public/assets/base/pieces/road/road-yellow.png";
+import roadPlum from "../public/assets/base/pieces/road/road-plum.png";
+import roadCyan from "../public/assets/base/pieces/road/road-cyan.png";
 import shipTokenS from "../public/assets/seafarers/pieces/ships/ship-token.png";
 
 export enum ROAD {

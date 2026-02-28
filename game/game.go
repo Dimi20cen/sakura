@@ -334,6 +334,10 @@ func (game *Game) Initialize(id string, numPlayers uint16) (*Game, error) {
 	}
 	game.NumPlayers = numPlayers
 
+	if game.Settings.MapDefn != nil {
+		game.NormalizeScenarioSettings()
+	}
+
 	// Graph objects
 	game.InitGraph()
 	game.InitWithGameMode()
@@ -353,6 +357,7 @@ func (game *Game) Initialize(id string, numPlayers uint16) (*Game, error) {
 	if game.Settings.MapDefn == nil {
 		game.Settings.MapDefn = maps.GetBaseMap()
 	}
+	game.NormalizeScenarioSettings()
 	game.configureScenarioHooks()
 
 	// Initialize graph

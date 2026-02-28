@@ -56,7 +56,7 @@ Entry format:
 - Mode: Seafarers
 - Rulebook: Seafarers scenario 1 (`Heading for New Shores`)
 - Repo status: aligned
-- Notes: Scenario uses a 14-VP target, restricts initial settlement + road/ship placement to the main island, and awards +2 VP per player for the first settlement on each small island.
+- Notes: Scenario uses a 14-VP target, restricts initial settlement + road/ship placement to the main island, awards +2 VP per player for the first settlement on each small island, and normalizes the displayed/settings victory target to the same 14-VP rule.
 - Evidence: `maps/main.go`, `game/scenario_heading_for_new_shores.go`, `game/seafarers_heading_for_new_shores_test.go`, `docs/rulebooks/text/Rulebook-Seafarers.txt`
 - Next action: verify full official map/layout parity.
 
@@ -64,7 +64,7 @@ Entry format:
 - Mode: Seafarers
 - Rulebook: Seafarers scenario 2 (`The Four Islands`)
 - Repo status: aligned
-- Notes: Scenario uses a 13-VP target and tracks each player's home islands from their initial settlements so only unexplored-island settlements award +2 VP.
+- Notes: Scenario uses a 13-VP target, tracks each player's home islands from their initial settlements so only unexplored-island settlements award +2 VP, and normalizes the displayed/settings victory target to 13 VP.
 - Evidence: `maps/seafarers_scenarios.go`, `game/scenario_four_islands.go`, `game/seafarers_four_islands_test.go`, `docs/rulebooks/text/Rulebook-Seafarers.txt`
 - Next action: verify full official map/layout parity.
 
@@ -75,6 +75,14 @@ Entry format:
 - Notes: Discovery now uses runtime tile and number stacks so land discoveries gain a number disc plus reward, while sea discoveries gain neither. Map/layout parity remains first-pass.
 - Evidence: `maps/seafarers_scenarios.go`, `game/scenario_fog_islands.go`, `game/actions.go` (`RevealFogAdjacentToEdge`), `game/seafarers_fog_islands_test.go`, `game/seafarers_smoke_test.go`, `docs/rulebooks/text/Rulebook-Seafarers.txt`
 - Next action: verify official map/layout parity and expand scenario acceptance coverage.
+
+- Area: Through the Desert scenario parity
+- Mode: Seafarers
+- Rulebook: Seafarers scenario 4 (`Through the Desert`)
+- Repo status: aligned
+- Notes: Scenario uses a 14-VP target, restricts initial settlement + road/ship placement to the main island, awards +2 VP once per player per unexplored land region, and normalizes the displayed/settings victory target to 14 VP.
+- Evidence: `maps/seafarers_scenarios.go`, `game/scenario_through_desert.go`, `game/seafarers_four_islands_test.go`, `game/scenario_through_desert_test.go`, `docs/rulebooks/text/Rulebook-Seafarers.txt`
+- Next action: verify full official map/layout parity.
 
 ### Base
 

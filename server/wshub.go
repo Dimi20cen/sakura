@@ -1,11 +1,11 @@
 package server
 
 import (
+	"log"
 	"sakura/entities"
 	"sakura/game"
 	"sakura/mango"
 	"sakura/maps"
-	"log"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -42,6 +42,22 @@ type WsHub struct {
 
 	// List of banned users
 	BannedUsers sync.Map
+}
+
+func (h *WsHub) syncSettingsMapDefinition() {
+	if h.Game.Settings.MapDefn == nil || h.Game.Settings.MapDefn.Name != h.Game.Settings.MapName {
+		defn := h.Game.Store.GetMap(h.Game.Settings.MapName)
+		if defn == nil {
+			defn = maps.GetMapByName(h.Game.Settings.MapName)
+		}
+
+		if defn == nil {
+			h.Game.Settings.MapName = maps.BaseMapName
+			defn = maps.GetBaseMap()
+		}
+		h.Game.Settings.MapDefn = defn
+	}
+	h.Game.NormalizeScenarioSettings()
 }
 
 func (s *Server) NewWsHub(id string) *WsHub {
@@ -296,20 +312,7 @@ func (h *WsHub) StoreSettings() {
 	h.Mutex.Lock()
 	defer h.Mutex.Unlock()
 
-	if h.Game.Settings.MapDefn == nil || h.Game.Settings.MapDefn.Name != h.Game.Settings.MapName {
-		defn := h.Game.Store.GetMap(h.Game.Settings.MapName)
-		if defn == nil {
-			defn = maps.GetMapByName(h.Game.Settings.MapName)
-		}
-
-		// Get base map as default
-		if defn == nil {
-			h.Game.Settings.MapName = maps.BaseMapName
-			defn = maps.GetBaseMap()
-			h.BroadcastLobbyMessage(h.GetLobbySettingsMessage())
-		}
-		h.Game.Settings.MapDefn = defn
-	}
+	h.syncSettingsMapDefinition()
 
 	h.Game.Store.WriteGamePrivacy(h.Game.ID, h.Game.Settings.Private)
 

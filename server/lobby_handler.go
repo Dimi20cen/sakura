@@ -1,10 +1,10 @@
 package server
 
 import (
-	"sakura/entities"
-	"sakura/maps"
 	"log"
 	"math/rand"
+	"sakura/entities"
+	"sakura/maps"
 	"sort"
 	"sync/atomic"
 	"time"
@@ -58,6 +58,7 @@ func (ws *WsClient) handleLobby(msg map[string]interface{}) {
 		ws.Hub.Game.Settings.Private = false
 		ws.Hub.Game.Settings.EnableKarma = false
 		ws.Hub.Game.Settings.Speed = entities.Speed60s
+		ws.Hub.syncSettingsMapDefinition()
 		ws.Ready = true
 		go ws.Hub.StoreSettings()
 		ws.Hub.BroadcastLobbyMessage(ws.Hub.GetLobbySettingsMessage())
@@ -85,6 +86,7 @@ func (ws *WsClient) handleLobby(msg map[string]interface{}) {
 			return
 		}
 		mapstructure.Decode(msg["settings"], &ws.Hub.Game.Settings)
+		ws.Hub.syncSettingsMapDefinition()
 		go ws.Hub.StoreSettings()
 		ws.Hub.BroadcastLobbyMessage(ws.Hub.GetLobbySettingsMessage())
 

@@ -11,7 +11,9 @@ import (
 	"github.com/vmihailenco/msgpack/v5"
 )
 
-type testGameStore struct{}
+type testGameStore struct {
+	lastSettings []byte
+}
 
 func (s *testGameStore) Init(id string) error { return nil }
 func (s *testGameStore) CreateGameIfNotExists(id string) error {
@@ -53,6 +55,7 @@ func (s *testGameStore) WriteGamePrivacy(id string, private bool) error {
 	return nil
 }
 func (s *testGameStore) WriteGameSettings(id string, settings []byte) error {
+	s.lastSettings = append([]byte(nil), settings...)
 	return nil
 }
 func (s *testGameStore) WriteJournalEntries(id string, entries [][]byte) error {
@@ -218,6 +221,90 @@ func TestHandleGameActionResponseForwardsExpect(t *testing.T) {
 		}
 	case <-time.After(250 * time.Millisecond):
 		t.Fatal("expected action response to be forwarded")
+	}
+}
+
+func TestStoreSettingsNormalizesScenarioVictoryPoints(t *testing.T) {
+	store := &testGameStore{}
+	hub := &WsHub{
+		Game: game.Game{
+			ID:    "scenario-settings",
+			Store: store,
+			Settings: entities.GameSettings{
+				Mode:          entities.Seafarers,
+				MapName:       maps.SeafarersHeadingForNewShores,
+				DiscardLimit:  7,
+				VictoryPoints: 12,
+				MaxPlayers:    4,
+				Speed:         entities.Speed60s,
+			},
+		},
+	}
+
+	hub.StoreSettings()
+
+	if got := hub.Game.Settings.VictoryPoints; got != 14 {
+		t.Fatalf("expected hub settings victory points to normalize to 14, got %d", got)
+	}
+	if len(store.lastSettings) == 0 {
+		t.Fatal("expected settings to be persisted")
+	}
+
+	var persisted entities.GameSettings
+	if err := msgpack.Unmarshal(store.lastSettings, &persisted); err != nil {
+		t.Fatalf("failed to decode persisted settings: %v", err)
+	}
+	if got := persisted.VictoryPoints; got != 14 {
+		t.Fatalf("expected persisted settings victory points to be 14, got %d", got)
+	}
+}
+
+func TestHandleLobbySetSettingsBroadcastsNormalizedScenarioVictoryPoints(t *testing.T) {
+	store := &testGameStore{}
+	player, _ := entities.NewPlayer(entities.Seafarers, "host", "host", 0)
+	ws := &WsClient{
+		Hub: &WsHub{
+			Game: game.Game{
+				ID:    "scenario-broadcast",
+				Store: store,
+				Settings: entities.GameSettings{
+					Mode:          entities.Seafarers,
+					MapName:       maps.BaseMapName,
+					MapDefn:       maps.GetBaseMap(),
+					DiscardLimit:  7,
+					VictoryPoints: 12,
+					MaxPlayers:    4,
+					Speed:         entities.Speed60s,
+				},
+			},
+		},
+		Player:         player,
+		MessageChannel: make(chan []byte, 4),
+	}
+	ws.Hub.Register(ws)
+
+	ws.handleLobby(map[string]interface{}{
+		"t": WsLobbyRequestTypeSetSettings,
+		"settings": map[string]interface{}{
+			"Mode":          int(entities.Seafarers),
+			"MapName":       maps.SeafarersHeadingForNewShores,
+			"DiscardLimit":  7,
+			"VictoryPoints": 12,
+			"MaxPlayers":    4,
+			"EnableKarma":   true,
+			"CreativeMode":  false,
+			"Speed":         entities.Speed60s,
+			"Advanced":      false,
+		},
+	})
+
+	if got := ws.Hub.Game.Settings.VictoryPoints; got != 14 {
+		t.Fatalf("expected hub settings victory points to normalize to 14, got %d", got)
+	}
+
+	msg := readMessage(t, ws.MessageChannel)
+	if msg.Type != WsLobbyResponseTypeSettings {
+		t.Fatalf("expected lobby settings broadcast, got %q", msg.Type)
 	}
 }
 

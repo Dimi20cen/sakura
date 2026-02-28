@@ -30,6 +30,9 @@ func TestSeafarersFourIslandsInitialize(t *testing.T) {
 	if g.Settings.MapDefn.Scenario == nil {
 		t.Fatal("scenario metadata missing on four islands map")
 	}
+	if got := g.Settings.VictoryPoints; got != 13 {
+		t.Fatalf("expected settings victory points to normalize to 13, got %d", got)
+	}
 	if target := g.getScenarioVictoryTarget(); target != 13 {
 		t.Fatalf("expected scenario victory target 13, got %d", target)
 	}
@@ -106,7 +109,7 @@ func TestFourIslandsUnexploredIslandBonusIsPerPlayer(t *testing.T) {
 func TestFourIslandsInitSettlementsDefineHomeIslands(t *testing.T) {
 	p, _ := entities.NewPlayer(entities.Seafarers, "p", "p", 0)
 	g := &Game{
-		InitPhase: true,
+		InitPhase:        true,
 		ScenarioLandHome: make(map[*entities.Player]map[int]bool),
 		ScenarioLandRegionByTile: map[entities.Coordinate]int{
 			{X: 1, Y: 1}: 1,
@@ -161,6 +164,9 @@ func TestSeafarersThroughDesertInitialize(t *testing.T) {
 
 	if g.Settings.MapDefn.Scenario == nil {
 		t.Fatal("scenario metadata missing on through the desert map")
+	}
+	if got := g.Settings.VictoryPoints; got != 14 {
+		t.Fatalf("expected settings victory points to normalize to 14, got %d", got)
 	}
 	if target := g.getScenarioVictoryTarget(); target != 14 {
 		t.Fatalf("expected scenario victory target 14, got %d", target)
@@ -355,13 +361,13 @@ func TestSeafarersThroughDesertFourteenVPWinsOnCurrentPlayersTurn(t *testing.T) 
 	p0, _ := entities.NewPlayer(entities.Seafarers, "p0", "p0", 0)
 	p1, _ := entities.NewPlayer(entities.Seafarers, "p1", "p1", 1)
 	g := &Game{
-		Store:            &noopStore{},
-		Bank:             bank,
-		Settings:         entities.GameSettings{Mode: entities.Seafarers, MapDefn: defn, VictoryPoints: 10},
-		Players:          []*entities.Player{p0, p1},
-		CurrentPlayer:    p0,
+		Store:              &noopStore{},
+		Bank:               bank,
+		Settings:           entities.GameSettings{Mode: entities.Seafarers, MapDefn: defn, VictoryPoints: 10},
+		Players:            []*entities.Player{p0, p1},
+		CurrentPlayer:      p0,
 		ExtraVictoryPoints: &entities.ExtraVictoryPoints{},
-		ScenarioBonusVP:  map[*entities.Player]int{
+		ScenarioBonusVP: map[*entities.Player]int{
 			p0: 14,
 			p1: 13,
 		},

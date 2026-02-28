@@ -297,13 +297,16 @@ export async function renderTile(tile: UITile) {
         assets.tileRenderMode[texType] ?? assets.TILE_RENDER_MODE.TEXTURE_FILL;
     const isSeaTile = renderMode === assets.TILE_RENDER_MODE.TRANSPARENT;
     let tileSprite: PIXI.Container;
+    const tileAsset = assets.tileTex[texType];
 
     if (renderMode === assets.TILE_RENDER_MODE.ILLUSTRATED_HEX) {
-        const tileAsset = assets.tileTex[texType];
         const tileTexture = await assets.getTexture(tileAsset);
         const normalizedScale =
-            ILLUSTRATED_HEX_SCALE *
-            assets.getIllustratedTileNormalization(tileAsset);
+            texType === assets.TILE_TEX.SEA
+                ? ILLUSTRATED_HEX_SCALE *
+                  assets.getIllustratedTileNormalization(tileAsset)
+                : ILLUSTRATED_HEX_SCALE *
+                  assets.getIllustratedTileNormalization(tileAsset);
         const tileArt = new PIXI.Sprite(tileTexture);
         tileArt.anchor.set(0.5);
         tileArt.width = HEX_WIDTH * normalizedScale;
@@ -311,13 +314,17 @@ export async function renderTile(tile: UITile) {
         tile.artSprite = tileArt;
         tileSprite = tileArt;
     } else {
+        const tileTexture = await assets.getTexture(tileAsset);
         const hex = new PIXI.Graphics();
         if (isSeaTile) {
-            // Keep sea tiles transparent so the board background sea is visible.
-            hex.beginFill(0xffffff, 0);
+            // Render actual sea hexes as distinct tiles so they don't blend
+            // into the global board background ocean.
+            hex.beginTextureFill({
+                texture: tileTexture,
+            });
         } else {
             hex.beginTextureFill({
-                texture: PIXI.Assets.get(assets.tileTex[texType].src),
+                texture: tileTexture,
             });
         }
         hex.drawPolygon(getHexPolygonPoints(SIDE_HALF, HEX_DIAG)).endFill();

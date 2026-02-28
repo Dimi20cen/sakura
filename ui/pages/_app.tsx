@@ -80,14 +80,14 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
 
                 <meta
                     name="viewport"
-                    content="initial-scale=1.0, user-scalable=no, width=device-width"
+                    content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"
                 />
 
                 <link rel="icon" href="/favicon.ico" sizes="any" />
                 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
                 <link rel="icon" type="image/png" sizes="512x512" href="/icon.png" />
                 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-                <link rel="manifest" href="manifest.json" />
+                <link rel="manifest" href="/manifest.json" />
                 <meta name="mobile-web-app-capable" content="yes" />
                 <meta name="apple-mobile-web-app-capable" content="yes" />
                 <meta name="application-name" content="SAKURA" />

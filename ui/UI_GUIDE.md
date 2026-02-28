@@ -34,6 +34,13 @@ npm run dev
 - `http://localhost:3000/choose-profile`
 - `http://localhost:3000/design/swatches` (resource palette preview)
 
+## PWA / iPhone Install
+
+- The frontend ships a web app manifest at `ui/public/manifest.json` plus Apple mobile web app metadata in `ui/pages/_app.tsx`.
+- For LAN testing on iPhone, run the Next dev server with `npm run dev -- -H 0.0.0.0 -p 3000`, then open `http://<YOUR_LAN_IP>:3000` in Safari.
+- To launch without Safari chrome, use Safari's `Share -> Add to Home Screen`, then start SAKURA from the Home Screen.
+- `viewport-fit=cover` and safe-area padding are enabled globally in `ui/styles/globals.css` so installed sessions can use the full screen without clipping behind the notch or home indicator.
+
 ## Asset Notes
 
 - Canonical runtime assets live under `ui/assets/runtime`.

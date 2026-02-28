@@ -148,6 +148,13 @@ FRONTEND_URL=http://<YOUR_LAN_IP>:3000
 
 - `http://<YOUR_LAN_IP>:3000`
 
+4. For the iPhone fullscreen-like install flow, open that URL in Safari and choose `Share -> Add to Home Screen`.
+
+Notes:
+
+- SAKURA includes a web app manifest and Apple standalone app metadata, so launching from the Home Screen removes normal Safari browser chrome.
+- Safe-area insets are handled in the frontend so installed sessions respect the notch and home indicator.
+
 Optional backend watcher:
 
 ```bash

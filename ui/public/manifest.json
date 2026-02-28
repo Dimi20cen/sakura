@@ -2,14 +2,17 @@
     "id": "/",
     "name": "SAKURA",
     "short_name": "SAKURA",
+    "description": "Strategize to conquer in a browser-first multiplayer board game.",
     "lang": "en-US",
+    "scope": "/",
     "start_url": "/",
-    "display": "fullscreen",
+    "display": "standalone",
     "orientation": "landscape",
+    "background_color": "#140f0d",
     "theme_color": "#3A62BE",
     "icons": [
         {
-            "src": "icon.png",
+            "src": "/icon.png",
             "sizes": "512x512",
             "type": "image/png"
         }

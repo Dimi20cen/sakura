@@ -106,6 +106,12 @@ a {
 .ui-shell {
     position: relative;
     min-height: 100vh;
+    min-height: 100dvh;
+    padding:
+        env(safe-area-inset-top)
+        env(safe-area-inset-right)
+        env(safe-area-inset-bottom)
+        env(safe-area-inset-left);
     isolation: isolate;
     background:
         radial-gradient(circle at 12% 15%, rgba(183, 148, 90, 0.12), transparent 45%),
@@ -131,7 +137,8 @@ a {
 
 .ui-content {
     position: relative;
-    min-height: 100vh;
+    min-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    min-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
     width: 100%;
 }
 

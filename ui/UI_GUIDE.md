@@ -48,6 +48,7 @@ npm run dev
 - Base number tokens live only under `ui/assets/runtime/base/tokens/number-tokens`.
 - Active base resource and development deck art now lives under `ui/assets/runtime/base/cards/decks` as SVG files for `wood`, `brick`, `wool`, `wheat`, `ore`, `knight`, `victory-point-card`, `road-building`, `year-of-plenty`, `monopoly`, and `development-card-back`.
 - Active Cities and Knights commodity deck art now lives under `ui/assets/runtime/cities-knights/cards/decks` as SVG files for `commodity-paper`, `commodity-cloth`, and `commodity-coin`.
+- Shared HUD icons live under `ui/assets/runtime/shared/icons`; `road.svg` and `knight.svg` are the normal longest-road and largest-army icons, while `road-highlight.svg` and `knight-highlight.svg` are their highlighted variants used by the player panel.
 - Ports live under `ui/assets/source/base/ports` and `ui/assets/runtime/base/ports`; the active base port art now uses SVG sign files mapped by `ui/src/assets.ts` as `1=wood`, `2=brick`, `3=wool`, `4=wheat`, `5=ore`, and `6=any`, plus `pier.svg` as the dock connector rendered behind each sign.
 - Seafarers runtime textures are currently limited to the files still referenced by the app, such as `beach.png`, `island-l.png`, and `island-r.png`, while the sea board image now lives under `ui/assets/runtime/base/board/sea.jpg`.
 - `ui/src/assets.ts` declares tile render modes and a reference illustrated tile size so imported tile art can be normalized by asset dimensions, while `ui/src/board.ts` applies the final snug spacing and scale adjustments.

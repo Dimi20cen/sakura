@@ -375,8 +375,10 @@ export const numberTokens: { [key: number]: AssetImage } = {
 
 import iconCards from "../assets/runtime/shared/icons/cards.png";
 import iconDcard from "../assets/runtime/shared/icons/dcard.png";
-import iconKnight from "../assets/runtime/cities-knights/icons/knight.png";
-import iconRoad from "../assets/runtime/shared/icons/road.png";
+import iconKnight from "../assets/runtime/shared/icons/knight.svg";
+import iconKnightHighlight from "../assets/runtime/shared/icons/knight-highlight.svg";
+import iconRoad from "../assets/runtime/shared/icons/road.svg";
+import iconRoadHighlight from "../assets/runtime/shared/icons/road-highlight.svg";
 import iconVp from "../assets/runtime/shared/icons/vp.png";
 
 export enum ICON {
@@ -393,6 +395,11 @@ export const icons: { [key in ICON]: AssetImage } = {
     knight: iconKnight,
     road: iconRoad,
     vp: iconVp,
+};
+
+export const highlightedIcons: Partial<Record<ICON, AssetImage>> = {
+    knight: iconKnightHighlight,
+    road: iconRoadHighlight,
 };
 
 /************************* Icons **************************************/

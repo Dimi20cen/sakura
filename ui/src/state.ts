@@ -35,7 +35,11 @@ type InitializableSprite = PIXI.Sprite & { initialized?: boolean };
 
 // Players
 let container: PIXI.Container;
-type IconText = { img: PIXI.Sprite; text: PIXI.Text };
+type IconText = {
+    img: PIXI.Sprite;
+    text: PIXI.Text;
+    icon: assets.ICON;
+};
 export let players: {
     bg: PIXI.Graphics;
 
@@ -368,7 +372,7 @@ export function renderGameState(gs: GameState, commandHub: CommandHub) {
                 text.anchor.y = 0.5;
                 text.y = 1;
                 imgc.addChild(text);
-                return { img, text };
+                return { img, text, icon };
             };
 
             // User name
@@ -496,19 +500,30 @@ export function renderGameState(gs: GameState, commandHub: CommandHub) {
 
         // Highlight extra points
         if (state.HasLongestRoad) {
-            p.road.img.tint = 0xc99200;
+            assets.assignTexture(
+                p.road.img,
+                assets.highlightedIcons[p.road.icon] ?? assets.icons[p.road.icon],
+            );
+            p.road.img.tint = 0xffffff;
             p.road.text.style.fill = 0xc99200;
         } else {
-            p.road.img.tint = 0x000000;
+            assets.assignTexture(p.road.img, assets.icons[p.road.icon]);
+            p.road.img.tint = 0xffffff;
             p.road.text.style.fill = 0x000000;
         }
 
         // Highlight extra points / most active knights
         if (state.HasLargestArmy) {
-            p.knights.img.tint = 0xc99200;
+            assets.assignTexture(
+                p.knights.img,
+                assets.highlightedIcons[p.knights.icon] ??
+                    assets.icons[p.knights.icon],
+            );
+            p.knights.img.tint = 0xffffff;
             p.knights.text.style.fill = 0xc99200;
         } else {
-            p.knights.img.tint = 0x000000;
+            assets.assignTexture(p.knights.img, assets.icons[p.knights.icon]);
+            p.knights.img.tint = 0xffffff;
             p.knights.text.style.fill = 0x000000;
         }
 

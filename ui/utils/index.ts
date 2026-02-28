@@ -140,7 +140,7 @@ export function hexToUrlString(hex: string): string {
         case "00ff00":
             return "green";
         case "ffff00":
-            return "yellow";
+            return "orange";
         case "0000ff":
             return "blue";
         case "fc41ec":

@@ -4,11 +4,11 @@ Read `~/Projects/meta/agent-scripts/AGENTS.md` first.
 
 ## DOCs
 
-- Canonical docs index: `docs/README.md`
+- Canonical docs index: `docs/DOCS_INDEX.md`
 - Canonical gameplay behavior spec: `docs/GAME_RULES_SPEC.md`
 - Rulebook parity tracker: `docs/RULEBOOK_PARITY.md`
-- For work on game assets: `ui/ASSET_SPEC.md`
-- For frontend app setup/scripts: `ui/README.md`
+- For work on game assets: `ui/UI_GUIDE.md` and `ui/src/assets.ts`
+- For frontend app setup/scripts: `ui/UI_GUIDE.md`
 - Brand/font/color guide: `docs/BRAND_GUIDELINES.md`
 
 ## Documentation Maintenance (Required)
@@ -33,7 +33,7 @@ Read `~/Projects/meta/agent-scripts/AGENTS.md` first.
 - Gameplay rules and mode behavior: `docs/GAME_RULES_SPEC.md`
 - Rulebook parity and deviations: `docs/RULEBOOK_PARITY.md`
 - Expansion rules/status: `docs/SEAFARERS_MVP.md`, `docs/SEAFARERS_PARITY_CHECKLIST.md`
-- UI/asset structure and checks: `ui/ASSET_SPEC.md`, `ui/ASSET_MIGRATION_CHECKLIST.md`, `ui/ASSET_SMOKE_CHECKLIST.md`, `ui/README.md`
+- UI/asset structure and checks: `ui/UI_GUIDE.md`, `ui/assets/source`, `ui/assets/runtime`, `ui/public/assets`, `ui/src/assets.ts`
 - Root project summary: `README.md`
 
 ### Required end-of-task checks

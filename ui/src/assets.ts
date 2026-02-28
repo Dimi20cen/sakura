@@ -88,15 +88,15 @@ export function assignTexture(
 }
 
 /************************* Tile Textures *******************************/
-import tileTexDesert from "../assets/source/base/board/textures/tile-desert-colonist.svg";
-import tileTexWood from "../assets/source/base/board/textures/tile-lumber-colonist.svg";
-import tileTexBrick from "../assets/source/base/board/textures/tile-brick-colonist.svg";
-import tileTexWool from "../assets/source/base/board/textures/tile-wool-colonist.svg";
-import tileTexWheat from "../assets/source/base/board/textures/tile-grain-colonist.svg";
-import tileTexOre from "../assets/source/base/board/textures/tile-ore-colonist.svg";
-import tileTexGold from "../assets/source/base/board/textures/tile-gold-colonist.svg";
-import tileTexSea from "../assets/source/base/board/textures/tile-sea-colonist.svg";
-import tileTexFog from "../assets/source/base/board/textures/tile-fog-colonist.svg";
+import tileTexDesert from "../assets/runtime/base/board/textures/tile-desert.svg";
+import tileTexWood from "../assets/runtime/base/board/textures/tile-wood.svg";
+import tileTexBrick from "../assets/runtime/base/board/textures/tile-brick.svg";
+import tileTexWool from "../assets/runtime/base/board/textures/tile-wool.svg";
+import tileTexWheat from "../assets/runtime/base/board/textures/tile-wheat.svg";
+import tileTexOre from "../assets/runtime/base/board/textures/tile-ore.svg";
+import tileTexGold from "../assets/runtime/base/board/textures/tile-gold.svg";
+import tileTexSea from "../assets/runtime/base/board/textures/tile-sea.svg";
+import tileTexFog from "../assets/runtime/base/board/textures/tile-fog.svg";
 
 export enum TILE_TEX {
     SEA = 7,
@@ -144,26 +144,24 @@ export function getIllustratedTileNormalization(tile: AssetImage) {
 }
 
 /************************* Roads *******************************/
-import roadBeach from "../public/assets/seafarers/textures/beach.png";
-import roadRoad from "../public/assets/base/pieces/road/road.png";
-import roadIslandR from "../public/assets/seafarers/textures/island-r.png";
-import roadIslandL from "../public/assets/seafarers/textures/island-l.png";
+import roadBeach from "../assets/runtime/seafarers/textures/beach.png";
+import roadIslandR from "../assets/runtime/seafarers/textures/island-r.png";
+import roadIslandL from "../assets/runtime/seafarers/textures/island-l.png";
 import roadRed from "../assets/source/base/pieces/road/road-red.svg";
 import roadBlue from "../assets/source/base/pieces/road/road-blue.svg";
 import roadGreen from "../assets/source/base/pieces/road/road-green.svg";
 import roadOrange from "../assets/source/base/pieces/road/road-orange.svg";
 import roadPlum from "../assets/source/base/pieces/road/road-plum.svg";
 import roadCyan from "../assets/source/base/pieces/road/road-cyan.svg";
-import shipBlack from "../assets/source/base/pieces/ship/ship-black.svg";
-import shipRed from "../assets/source/base/pieces/ship/ship-red.svg";
-import shipBlue from "../assets/source/base/pieces/ship/ship-blue.svg";
-import shipGreen from "../assets/source/base/pieces/ship/ship-green.svg";
-import shipOrange from "../assets/source/base/pieces/ship/ship-orange.svg";
-import shipPlum from "../assets/source/base/pieces/ship/ship-plum.svg";
-import shipCyan from "../assets/source/base/pieces/ship/ship-cyan.svg";
+import shipBlack from "../assets/runtime/seafarers/pieces/ship/ship-black.svg";
+import shipRed from "../assets/runtime/seafarers/pieces/ship/ship-red.svg";
+import shipBlue from "../assets/runtime/seafarers/pieces/ship/ship-blue.svg";
+import shipGreen from "../assets/runtime/seafarers/pieces/ship/ship-green.svg";
+import shipOrange from "../assets/runtime/seafarers/pieces/ship/ship-orange.svg";
+import shipPlum from "../assets/runtime/seafarers/pieces/ship/ship-plum.svg";
+import shipCyan from "../assets/runtime/seafarers/pieces/ship/ship-cyan.svg";
 
 export enum ROAD {
-    ROAD = "road",
     ISLAND_R = "island_r",
     ISLAND_L = "island_l",
     BEACH = "beach",
@@ -172,14 +170,12 @@ export const road: { [key: string | ROAD]: AssetImage } = {
     red: roadRed,
     blue: roadBlue,
     green: roadGreen,
-    yellow: roadOrange,
     orange: roadOrange,
     white: roadCyan,
     plum: roadPlum,
     cyan: roadCyan,
 };
 road[ROAD.BEACH] = roadBeach;
-road[ROAD.ROAD] = roadRoad;
 road[ROAD.ISLAND_R] = roadIslandR;
 road[ROAD.ISLAND_L] = roadIslandL;
 export const ship: { [key: string]: AssetImage } = {
@@ -187,7 +183,6 @@ export const ship: { [key: string]: AssetImage } = {
     red: shipRed,
     blue: shipBlue,
     green: shipGreen,
-    yellow: shipOrange,
     orange: shipOrange,
     white: shipCyan,
     plum: shipPlum,
@@ -206,7 +201,6 @@ export const house: { [key: string]: AssetImage } = {
     red: houseRed,
     blue: houseBlue,
     green: houseGreen,
-    yellow: houseOrange,
     orange: houseOrange,
     white: houseCyan,
     plum: housePlum,
@@ -225,7 +219,6 @@ export const city: { [key: string]: AssetImage } = {
     red: cityRed,
     blue: cityBlue,
     green: cityGreen,
-    yellow: cityOrange,
     orange: cityOrange,
     white: cityCyan,
     plum: cityPlum,
@@ -234,26 +227,26 @@ export const city: { [key: string]: AssetImage } = {
 
 /******************** Knight *******************************************/
 
-import knight1Red from "../public/assets/cities-knights/pieces/knight/1-red.png";
-import knight1Blue from "../public/assets/cities-knights/pieces/knight/1-blue.png";
-import knight1Green from "../public/assets/cities-knights/pieces/knight/1-green.png";
-import knight1Yellow from "../public/assets/cities-knights/pieces/knight/1-yellow.png";
-import knight1Plum from "../public/assets/cities-knights/pieces/knight/1-plum.png";
-import knight1Cyan from "../public/assets/cities-knights/pieces/knight/1-cyan.png";
-import knight2Red from "../public/assets/cities-knights/pieces/knight/2-red.png";
-import knight2Blue from "../public/assets/cities-knights/pieces/knight/2-blue.png";
-import knight2Green from "../public/assets/cities-knights/pieces/knight/2-green.png";
-import knight2Yellow from "../public/assets/cities-knights/pieces/knight/2-yellow.png";
-import knight2Plum from "../public/assets/cities-knights/pieces/knight/2-plum.png";
-import knight2Cyan from "../public/assets/cities-knights/pieces/knight/2-cyan.png";
-import knight3Red from "../public/assets/cities-knights/pieces/knight/3-red.png";
-import knight3Blue from "../public/assets/cities-knights/pieces/knight/3-blue.png";
-import knight3Green from "../public/assets/cities-knights/pieces/knight/3-green.png";
-import knight3Yellow from "../public/assets/cities-knights/pieces/knight/3-yellow.png";
-import knight3Plum from "../public/assets/cities-knights/pieces/knight/3-plum.png";
-import knight3Cyan from "../public/assets/cities-knights/pieces/knight/3-cyan.png";
+import knight1Red from "../assets/runtime/cities-knights/pieces/knight/1-red.png";
+import knight1Blue from "../assets/runtime/cities-knights/pieces/knight/1-blue.png";
+import knight1Green from "../assets/runtime/cities-knights/pieces/knight/1-green.png";
+import knight1Orange from "../assets/runtime/cities-knights/pieces/knight/1-orange.png";
+import knight1Plum from "../assets/runtime/cities-knights/pieces/knight/1-plum.png";
+import knight1Cyan from "../assets/runtime/cities-knights/pieces/knight/1-cyan.png";
+import knight2Red from "../assets/runtime/cities-knights/pieces/knight/2-red.png";
+import knight2Blue from "../assets/runtime/cities-knights/pieces/knight/2-blue.png";
+import knight2Green from "../assets/runtime/cities-knights/pieces/knight/2-green.png";
+import knight2Orange from "../assets/runtime/cities-knights/pieces/knight/2-orange.png";
+import knight2Plum from "../assets/runtime/cities-knights/pieces/knight/2-plum.png";
+import knight2Cyan from "../assets/runtime/cities-knights/pieces/knight/2-cyan.png";
+import knight3Red from "../assets/runtime/cities-knights/pieces/knight/3-red.png";
+import knight3Blue from "../assets/runtime/cities-knights/pieces/knight/3-blue.png";
+import knight3Green from "../assets/runtime/cities-knights/pieces/knight/3-green.png";
+import knight3Orange from "../assets/runtime/cities-knights/pieces/knight/3-orange.png";
+import knight3Plum from "../assets/runtime/cities-knights/pieces/knight/3-plum.png";
+import knight3Cyan from "../assets/runtime/cities-knights/pieces/knight/3-cyan.png";
 
-import knightDisabledS from "../public/assets/cities-knights/pieces/knight/disabled.png";
+import knightDisabledS from "../assets/runtime/cities-knights/pieces/knight/disabled.png";
 export const knightDisabled = knightDisabledS;
 
 export const knight: { [level: number]: { [color: string]: AssetImage } } =
@@ -262,8 +255,7 @@ export const knight: { [level: number]: { [color: string]: AssetImage } } =
             red: knight1Red,
             blue: knight1Blue,
             green: knight1Green,
-            yellow: knight1Yellow,
-            orange: knight1Yellow,
+            orange: knight1Orange,
             white: knight1Cyan,
             plum: knight1Plum,
             cyan: knight1Cyan,
@@ -272,8 +264,7 @@ export const knight: { [level: number]: { [color: string]: AssetImage } } =
             red: knight2Red,
             blue: knight2Blue,
             green: knight2Green,
-            yellow: knight2Yellow,
-            orange: knight2Yellow,
+            orange: knight2Orange,
             white: knight2Cyan,
             plum: knight2Plum,
             cyan: knight2Cyan,
@@ -282,8 +273,7 @@ export const knight: { [level: number]: { [color: string]: AssetImage } } =
             red: knight3Red,
             blue: knight3Blue,
             green: knight3Green,
-            yellow: knight3Yellow,
-            orange: knight3Yellow,
+            orange: knight3Orange,
             white: knight3Cyan,
             plum: knight3Plum,
             cyan: knight3Cyan,
@@ -292,19 +282,18 @@ export const knight: { [level: number]: { [color: string]: AssetImage } } =
 
 /******************************* Merchant *****************************/
 
-import merchantRed from "../public/assets/cities-knights/pieces/merchant/red.png";
-import merchantBlue from "../public/assets/cities-knights/pieces/merchant/blue.png";
-import merchantGreen from "../public/assets/cities-knights/pieces/merchant/green.png";
-import merchantYellow from "../public/assets/cities-knights/pieces/merchant/yellow.png";
-import merchantPlum from "../public/assets/cities-knights/pieces/merchant/plum.png";
-import merchantCyan from "../public/assets/cities-knights/pieces/merchant/cyan.png";
+import merchantRed from "../assets/runtime/cities-knights/pieces/merchant/red.png";
+import merchantBlue from "../assets/runtime/cities-knights/pieces/merchant/blue.png";
+import merchantGreen from "../assets/runtime/cities-knights/pieces/merchant/green.png";
+import merchantOrange from "../assets/runtime/cities-knights/pieces/merchant/orange.png";
+import merchantPlum from "../assets/runtime/cities-knights/pieces/merchant/plum.png";
+import merchantCyan from "../assets/runtime/cities-knights/pieces/merchant/cyan.png";
 
 export const merchant: { [key: string]: AssetImage } = {
     red: merchantRed,
     blue: merchantBlue,
     green: merchantGreen,
-    yellow: merchantYellow,
-    orange: merchantYellow,
+    orange: merchantOrange,
     white: merchantCyan,
     plum: merchantPlum,
     cyan: merchantCyan,
@@ -312,9 +301,9 @@ export const merchant: { [key: string]: AssetImage } = {
 
 /******************************* Metropolis ***************************/
 
-import metro6 from "../public/assets/cities-knights/city-improvements/m-6.png";
-import metro7 from "../public/assets/cities-knights/city-improvements/m-7.png";
-import metro8 from "../public/assets/cities-knights/city-improvements/m-8.png";
+import metro6 from "../assets/runtime/cities-knights/city-improvements/m-6.png";
+import metro7 from "../assets/runtime/cities-knights/city-improvements/m-7.png";
+import metro8 from "../assets/runtime/cities-knights/city-improvements/m-8.png";
 
 export const metropolis: { [key: number]: AssetImage } = {
     6: metro6,
@@ -324,48 +313,48 @@ export const metropolis: { [key: number]: AssetImage } = {
 
 /******************************* Other ********************************/
 
-import wallS from "../public/assets/cities-knights/city-improvements/w.png";
+import wallS from "../assets/runtime/cities-knights/city-improvements/w.png";
 export const wall = wallS;
 
-import robberS from "../public/assets/shared/ui/robber.png";
+import robberS from "../assets/runtime/shared/ui/robber.png";
 export const robber = robberS;
-import pirateS from "../public/assets/seafarers/pieces/pirate.png";
+import pirateS from "../assets/runtime/seafarers/pieces/pirate.png";
 export const pirate = pirateS;
 
-import bankS from "../public/assets/shared/ui/bank.png";
+import bankS from "../assets/runtime/shared/ui/bank.png";
 export const bank = bankS;
 
-import settingsS from "../public/assets/shared/ui/settings.png";
+import settingsS from "../assets/runtime/shared/ui/settings.png";
 export const settings = settingsS;
 
-import botS from "../public/assets/shared/ui/bot.png";
+import botS from "../assets/runtime/shared/ui/bot.png";
 export const bot = botS;
 
-import spectateS from "../public/assets/shared/ui/spectate.png";
+import spectateS from "../assets/runtime/shared/ui/spectate.png";
 export const spectate = spectateS;
 
-import seaS from "../public/assets/seafarers/board/sea.jpg";
+import seaS from "../assets/runtime/base/board/sea.jpg";
 export const sea = seaS;
 
-import barbarianTrackS from "../public/assets/cities-knights/board/barbarian/track.png";
+import barbarianTrackS from "../assets/runtime/cities-knights/board/barbarian/track.png";
 export const barbarianTrack = barbarianTrackS;
-import barbarianShipS from "../public/assets/cities-knights/board/barbarian/ship.png";
+import barbarianShipS from "../assets/runtime/cities-knights/board/barbarian/ship.png";
 export const barbarianShip = barbarianShipS;
 
 /*************************** Number Tokens ****************************/
 
-import num0 from "../public/assets/base/tokens/number-tokens/0.png";
-import num1 from "../public/assets/base/tokens/number-tokens/1.png";
-import num2 from "../public/assets/base/tokens/number-tokens/2.png";
-import num3 from "../public/assets/base/tokens/number-tokens/3.png";
-import num4 from "../public/assets/base/tokens/number-tokens/4.png";
-import num5 from "../public/assets/base/tokens/number-tokens/5.png";
-import num6 from "../public/assets/base/tokens/number-tokens/6.png";
-import num8 from "../public/assets/base/tokens/number-tokens/8.png";
-import num9 from "../public/assets/base/tokens/number-tokens/9.png";
-import num10 from "../public/assets/base/tokens/number-tokens/10.png";
-import num11 from "../public/assets/base/tokens/number-tokens/11.png";
-import num12 from "../public/assets/base/tokens/number-tokens/12.png";
+import num0 from "../assets/runtime/base/tokens/number-tokens/0.png";
+import num1 from "../assets/runtime/base/tokens/number-tokens/1.png";
+import num2 from "../assets/runtime/base/tokens/number-tokens/2.png";
+import num3 from "../assets/runtime/base/tokens/number-tokens/3.png";
+import num4 from "../assets/runtime/base/tokens/number-tokens/4.png";
+import num5 from "../assets/runtime/base/tokens/number-tokens/5.png";
+import num6 from "../assets/runtime/base/tokens/number-tokens/6.png";
+import num8 from "../assets/runtime/base/tokens/number-tokens/8.png";
+import num9 from "../assets/runtime/base/tokens/number-tokens/9.png";
+import num10 from "../assets/runtime/base/tokens/number-tokens/10.png";
+import num11 from "../assets/runtime/base/tokens/number-tokens/11.png";
+import num12 from "../assets/runtime/base/tokens/number-tokens/12.png";
 
 export const numberTokens: { [key: number]: AssetImage } = {
     0: num0,
@@ -384,11 +373,11 @@ export const numberTokens: { [key: number]: AssetImage } = {
 
 /************************* Icons **************************************/
 
-import iconCards from "../public/assets/shared/icons/cards.png";
-import iconDcard from "../public/assets/shared/icons/dcard.png";
-import iconKnight from "../public/assets/cities-knights/icons/knight.png";
-import iconRoad from "../public/assets/shared/icons/road.png";
-import iconVp from "../public/assets/shared/icons/vp.png";
+import iconCards from "../assets/runtime/shared/icons/cards.png";
+import iconDcard from "../assets/runtime/shared/icons/dcard.png";
+import iconKnight from "../assets/runtime/cities-knights/icons/knight.png";
+import iconRoad from "../assets/runtime/shared/icons/road.png";
+import iconVp from "../assets/runtime/shared/icons/vp.png";
 
 export enum ICON {
     CARDS = "cards",
@@ -408,12 +397,12 @@ export const icons: { [key in ICON]: AssetImage } = {
 
 /************************* Icons **************************************/
 
-import port1 from "../public/assets/base/tokens/ports/1.png";
-import port2 from "../public/assets/base/tokens/ports/2.png";
-import port3 from "../public/assets/base/tokens/ports/3.png";
-import port4 from "../public/assets/base/tokens/ports/4.png";
-import port5 from "../public/assets/base/tokens/ports/5.png";
-import port6 from "../public/assets/base/tokens/ports/6.png";
+import port1 from "../assets/runtime/base/ports/1.png";
+import port2 from "../assets/runtime/base/ports/2.png";
+import port3 from "../assets/runtime/base/ports/3.png";
+import port4 from "../assets/runtime/base/ports/4.png";
+import port5 from "../assets/runtime/base/ports/5.png";
+import port6 from "../assets/runtime/base/ports/6.png";
 
 export const ports: { [key: number]: AssetImage } = {
     1: port1,
@@ -426,29 +415,29 @@ export const ports: { [key: number]: AssetImage } = {
 
 /************************* Buttons ************************************/
 
-import btnYes from "../public/assets/shared/buttons/yes.png";
-import btnNo from "../public/assets/shared/buttons/no.png";
+import btnYes from "../assets/runtime/shared/buttons/yes.png";
+import btnNo from "../assets/runtime/shared/buttons/no.png";
 import btnSettlement from "../assets/source/base/pieces/settlement/settlement-black.svg";
 import btnCity from "../assets/source/base/pieces/city/city-black.svg";
 import btnRoad from "../assets/source/base/pieces/road/road-black.svg";
-import btnShip from "../assets/source/base/pieces/ship/ship-black.svg";
-import btnDevelopmentCard from "../public/assets/shared/buttons/dcard.png";
-import btnKnightBox from "../public/assets/cities-knights/buttons/knight.png";
-import btnKnightBuild from "../public/assets/cities-knights/buttons/knight_build.png";
-import btnKnightActivate from "../public/assets/cities-knights/buttons/knight_activate.png";
-import btnKnightRobber from "../public/assets/cities-knights/buttons/knight_robber.png";
-import btnKnightMove from "../public/assets/cities-knights/buttons/knight_move.png";
-import btnMoveShip from "../public/assets/shared/buttons/move_ship.png";
-import btnCityImprove from "../public/assets/cities-knights/buttons/improve.png";
-import btnCityImprovePaper from "../public/assets/cities-knights/buttons/improve_paper.jpg";
-import btnCityImproveCloth from "../public/assets/cities-knights/buttons/improve_cloth.jpg";
-import btnCityImproveCoin from "../public/assets/cities-knights/buttons/improve_coin.jpg";
-import btnWall from "../public/assets/cities-knights/buttons/w.png";
-import btnEndTurn from "../public/assets/shared/buttons/endturn.png";
-import btnSpecialBuild from "../public/assets/shared/buttons/specialbuild.png";
-import btnEdit from "../public/assets/shared/buttons/edit.png";
-import btnFullscreen from "../public/assets/shared/buttons/fullscreen.png";
-import btnChat from "../public/assets/shared/buttons/chat.png";
+import btnShip from "../assets/runtime/seafarers/pieces/ship/ship-black.svg";
+import btnDevelopmentCard from "../assets/runtime/shared/buttons/dcard.png";
+import btnKnightBox from "../assets/runtime/cities-knights/buttons/knight.png";
+import btnKnightBuild from "../assets/runtime/cities-knights/buttons/knight_build.png";
+import btnKnightActivate from "../assets/runtime/cities-knights/buttons/knight_activate.png";
+import btnKnightRobber from "../assets/runtime/cities-knights/buttons/knight_robber.png";
+import btnKnightMove from "../assets/runtime/cities-knights/buttons/knight_move.png";
+import btnMoveShip from "../assets/runtime/shared/buttons/move_ship.png";
+import btnCityImprove from "../assets/runtime/cities-knights/buttons/improve.png";
+import btnCityImprovePaper from "../assets/runtime/cities-knights/buttons/improve_paper.jpg";
+import btnCityImproveCloth from "../assets/runtime/cities-knights/buttons/improve_cloth.jpg";
+import btnCityImproveCoin from "../assets/runtime/cities-knights/buttons/improve_coin.jpg";
+import btnWall from "../assets/runtime/cities-knights/buttons/w.png";
+import btnEndTurn from "../assets/runtime/shared/buttons/endturn.png";
+import btnSpecialBuild from "../assets/runtime/shared/buttons/specialbuild.png";
+import btnEdit from "../assets/runtime/shared/buttons/edit.png";
+import btnFullscreen from "../assets/runtime/shared/buttons/fullscreen.png";
+import btnChat from "../assets/runtime/shared/buttons/chat.png";
 
 export const buttons: { [key in ButtonType]: AssetImage } = {
     yes: btnYes,
@@ -477,41 +466,40 @@ export const buttons: { [key in ButtonType]: AssetImage } = {
 };
 
 // Button backgrounds
-import buttonsBgRed from "../public/assets/shared/buttons/bg/red.jpg";
-import buttonsBgBlue from "../public/assets/shared/buttons/bg/blue.jpg";
-import buttonsBgGreen from "../public/assets/shared/buttons/bg/green.jpg";
-import buttonsBgYellow from "../public/assets/shared/buttons/bg/yellow.jpg";
-import buttonsBgPlum from "../public/assets/shared/buttons/bg/plum.jpg";
-import buttonsBgCyan from "../public/assets/shared/buttons/bg/cyan.jpg";
+import buttonsBgRed from "../assets/runtime/shared/buttons/bg/red.jpg";
+import buttonsBgBlue from "../assets/runtime/shared/buttons/bg/blue.jpg";
+import buttonsBgGreen from "../assets/runtime/shared/buttons/bg/green.jpg";
+import buttonsBgOrange from "../assets/runtime/shared/buttons/bg/orange.jpg";
+import buttonsBgPlum from "../assets/runtime/shared/buttons/bg/plum.jpg";
+import buttonsBgCyan from "../assets/runtime/shared/buttons/bg/cyan.jpg";
 
 export const buttonsBg: { [key: string]: AssetImage } = {
     red: buttonsBgRed,
     blue: buttonsBgBlue,
     green: buttonsBgGreen,
-    yellow: buttonsBgYellow,
-    orange: buttonsBgYellow,
+    orange: buttonsBgOrange,
     white: buttonsBgCyan,
     plum: buttonsBgPlum,
     cyan: buttonsBgCyan,
 };
 
 /************************* Dice ************************************/
-import diceW1 from "../public/assets/shared/dice/dice-1.png";
-import diceW2 from "../public/assets/shared/dice/dice-2.png";
-import diceW3 from "../public/assets/shared/dice/dice-3.png";
-import diceW4 from "../public/assets/shared/dice/dice-4.png";
-import diceW5 from "../public/assets/shared/dice/dice-5.png";
-import diceW6 from "../public/assets/shared/dice/dice-6.png";
-import diceR1 from "../public/assets/shared/dice/dice-1-r.png";
-import diceR2 from "../public/assets/shared/dice/dice-2-r.png";
-import diceR3 from "../public/assets/shared/dice/dice-3-r.png";
-import diceR4 from "../public/assets/shared/dice/dice-4-r.png";
-import diceR5 from "../public/assets/shared/dice/dice-5-r.png";
-import diceR6 from "../public/assets/shared/dice/dice-6-r.png";
-import diceE1 from "../public/assets/cities-knights/dice/event-1.png";
-import diceE2 from "../public/assets/cities-knights/dice/event-2.png";
-import diceE3 from "../public/assets/cities-knights/dice/event-3.png";
-import diceE4 from "../public/assets/cities-knights/dice/event-4.png";
+import diceW1 from "../assets/runtime/shared/dice/dice-1.png";
+import diceW2 from "../assets/runtime/shared/dice/dice-2.png";
+import diceW3 from "../assets/runtime/shared/dice/dice-3.png";
+import diceW4 from "../assets/runtime/shared/dice/dice-4.png";
+import diceW5 from "../assets/runtime/shared/dice/dice-5.png";
+import diceW6 from "../assets/runtime/shared/dice/dice-6.png";
+import diceR1 from "../assets/runtime/shared/dice/dice-1-r.png";
+import diceR2 from "../assets/runtime/shared/dice/dice-2-r.png";
+import diceR3 from "../assets/runtime/shared/dice/dice-3-r.png";
+import diceR4 from "../assets/runtime/shared/dice/dice-4-r.png";
+import diceR5 from "../assets/runtime/shared/dice/dice-5-r.png";
+import diceR6 from "../assets/runtime/shared/dice/dice-6-r.png";
+import diceE1 from "../assets/runtime/cities-knights/dice/event-1.png";
+import diceE2 from "../assets/runtime/cities-knights/dice/event-2.png";
+import diceE3 from "../assets/runtime/cities-knights/dice/event-3.png";
+import diceE4 from "../assets/runtime/cities-knights/dice/event-4.png";
 
 export const diceWhite: { [key: number]: AssetImage } = {
     1: diceW1,
@@ -540,61 +528,61 @@ export const diceEvent: { [key: number]: AssetImage } = {
 
 /****************** Cards *********************************************/
 
-import cards0 from "../public/assets/base/cards/decks/unknown-card-back.jpg";
-import cards1 from "../public/assets/base/cards/decks/wood.webp";
-import cards2 from "../public/assets/base/cards/decks/brick.webp";
-import cards3 from "../public/assets/base/cards/decks/wool.webp";
-import cards4 from "../public/assets/base/cards/decks/wheat.webp";
-import cards5 from "../public/assets/base/cards/decks/ore.webp";
-import cards6 from "../public/assets/cities-knights/cards/decks/commodity-paper.jpg";
-import cards7 from "../public/assets/cities-knights/cards/decks/commodity-cloth.jpg";
-import cards8 from "../public/assets/cities-knights/cards/decks/commodity-coin.jpg";
-import cards101 from "../public/assets/base/cards/decks/knight.jpg";
-import cards102 from "../public/assets/base/cards/decks/victory-point-card.jpg";
-import cards103 from "../public/assets/base/cards/decks/road-building.jpg";
-import cards104 from "../public/assets/base/cards/decks/year-of-plenty.jpg";
-import cards105 from "../public/assets/base/cards/decks/monopoly.jpg";
-import cards106 from "../public/assets/cities-knights/cards/decks/progress-science-alchemist.jpg";
-import cards107 from "../public/assets/cities-knights/cards/decks/progress-science-crane.jpg";
-import cards108 from "../public/assets/cities-knights/cards/decks/progress-science-engineer.jpg";
-import cards109 from "../public/assets/cities-knights/cards/decks/progress-science-inventor.jpg";
-import cards110 from "../public/assets/cities-knights/cards/decks/progress-science-irrigation.jpg";
-import cards111 from "../public/assets/cities-knights/cards/decks/progress-science-medicine.jpg";
-import cards112 from "../public/assets/cities-knights/cards/decks/progress-science-mining.jpg";
-import cards113 from "../public/assets/cities-knights/cards/decks/progress-science-printer.jpg";
-import cards114 from "../public/assets/cities-knights/cards/decks/progress-science-road-building.jpg";
-import cards115 from "../public/assets/cities-knights/cards/decks/progress-science-smith.jpg";
-import cards116 from "../public/assets/cities-knights/cards/decks/progress-trade-commercial-harbor.jpg";
-import cards117 from "../public/assets/cities-knights/cards/decks/progress-trade-master-merchant.jpg";
-import cards118 from "../public/assets/cities-knights/cards/decks/progress-trade-merchant.jpg";
-import cards119 from "../public/assets/cities-knights/cards/decks/progress-trade-merchant-fleet.jpg";
-import cards120 from "../public/assets/cities-knights/cards/decks/progress-trade-resource-monopoly.jpg";
-import cards121 from "../public/assets/cities-knights/cards/decks/progress-trade-trade-monopoly.jpg";
-import cards122 from "../public/assets/cities-knights/cards/decks/progress-politics-bishop.jpg";
-import cards123 from "../public/assets/cities-knights/cards/decks/progress-politics-constitution.jpg";
-import cards124 from "../public/assets/cities-knights/cards/decks/progress-politics-deserter.jpg";
-import cards125 from "../public/assets/cities-knights/cards/decks/progress-politics-diplomat.jpg";
-import cards126 from "../public/assets/cities-knights/cards/decks/progress-politics-intrigue.jpg";
-import cards127 from "../public/assets/cities-knights/cards/decks/progress-politics-saboteur.jpg";
-import cards128 from "../public/assets/cities-knights/cards/decks/progress-politics-spy.jpg";
-import cards129 from "../public/assets/cities-knights/cards/decks/progress-politics-warlord.jpg";
-import cards130 from "../public/assets/cities-knights/cards/decks/progress-politics-wedding.jpg";
-import cards200 from "../public/assets/base/cards/decks/development-card-back.jpg";
-import cards201 from "../public/assets/cities-knights/cards/decks/progress-science-back-hidden.jpg";
-import cards202 from "../public/assets/cities-knights/cards/decks/progress-trade-back-hidden.jpg";
-import cards203 from "../public/assets/cities-knights/cards/decks/progress-politics-back-hidden.jpg";
-import cards204 from "../public/assets/cities-knights/cards/decks/defender-of-catan-hidden.jpg";
-import cards205 from "../public/assets/base/cards/decks/longest-road-hidden.jpg";
-import cards206 from "../public/assets/base/cards/decks/largest-army-hidden.jpg";
-import cards207 from "../public/assets/cities-knights/cards/decks/science-improvement-level-3-hidden.jpg";
-import cards208 from "../public/assets/cities-knights/cards/decks/science-improvement-level-4-hidden.jpg";
-import cards209 from "../public/assets/cities-knights/cards/decks/science-improvement-level-5-hidden.jpg";
-import cards210 from "../public/assets/cities-knights/cards/decks/trade-improvement-level-3-hidden.jpg";
-import cards211 from "../public/assets/cities-knights/cards/decks/trade-improvement-level-4-hidden.jpg";
-import cards212 from "../public/assets/cities-knights/cards/decks/trade-improvement-level-5-hidden.jpg";
-import cards213 from "../public/assets/cities-knights/cards/decks/politics-improvement-level-3-hidden.jpg";
-import cards214 from "../public/assets/cities-knights/cards/decks/politics-improvement-level-4-hidden.jpg";
-import cards215 from "../public/assets/cities-knights/cards/decks/politics-improvement-level-5-hidden.jpg";
+import cards0 from "../assets/runtime/base/cards/decks/unknown-card-back.jpg";
+import cards1 from "../assets/runtime/base/cards/decks/wood.webp";
+import cards2 from "../assets/runtime/base/cards/decks/brick.webp";
+import cards3 from "../assets/runtime/base/cards/decks/wool.webp";
+import cards4 from "../assets/runtime/base/cards/decks/wheat.webp";
+import cards5 from "../assets/runtime/base/cards/decks/ore.webp";
+import cards6 from "../assets/runtime/cities-knights/cards/decks/commodity-paper.jpg";
+import cards7 from "../assets/runtime/cities-knights/cards/decks/commodity-cloth.jpg";
+import cards8 from "../assets/runtime/cities-knights/cards/decks/commodity-coin.jpg";
+import cards101 from "../assets/runtime/base/cards/decks/knight.jpg";
+import cards102 from "../assets/runtime/base/cards/decks/victory-point-card.jpg";
+import cards103 from "../assets/runtime/base/cards/decks/road-building.jpg";
+import cards104 from "../assets/runtime/base/cards/decks/year-of-plenty.jpg";
+import cards105 from "../assets/runtime/base/cards/decks/monopoly.jpg";
+import cards106 from "../assets/runtime/cities-knights/cards/decks/progress-science-alchemist.jpg";
+import cards107 from "../assets/runtime/cities-knights/cards/decks/progress-science-crane.jpg";
+import cards108 from "../assets/runtime/cities-knights/cards/decks/progress-science-engineer.jpg";
+import cards109 from "../assets/runtime/cities-knights/cards/decks/progress-science-inventor.jpg";
+import cards110 from "../assets/runtime/cities-knights/cards/decks/progress-science-irrigation.jpg";
+import cards111 from "../assets/runtime/cities-knights/cards/decks/progress-science-medicine.jpg";
+import cards112 from "../assets/runtime/cities-knights/cards/decks/progress-science-mining.jpg";
+import cards113 from "../assets/runtime/cities-knights/cards/decks/progress-science-printer.jpg";
+import cards114 from "../assets/runtime/cities-knights/cards/decks/progress-science-road-building.jpg";
+import cards115 from "../assets/runtime/cities-knights/cards/decks/progress-science-smith.jpg";
+import cards116 from "../assets/runtime/cities-knights/cards/decks/progress-trade-commercial-harbor.jpg";
+import cards117 from "../assets/runtime/cities-knights/cards/decks/progress-trade-master-merchant.jpg";
+import cards118 from "../assets/runtime/cities-knights/cards/decks/progress-trade-merchant.jpg";
+import cards119 from "../assets/runtime/cities-knights/cards/decks/progress-trade-merchant-fleet.jpg";
+import cards120 from "../assets/runtime/cities-knights/cards/decks/progress-trade-resource-monopoly.jpg";
+import cards121 from "../assets/runtime/cities-knights/cards/decks/progress-trade-trade-monopoly.jpg";
+import cards122 from "../assets/runtime/cities-knights/cards/decks/progress-politics-bishop.jpg";
+import cards123 from "../assets/runtime/cities-knights/cards/decks/progress-politics-constitution.jpg";
+import cards124 from "../assets/runtime/cities-knights/cards/decks/progress-politics-deserter.jpg";
+import cards125 from "../assets/runtime/cities-knights/cards/decks/progress-politics-diplomat.jpg";
+import cards126 from "../assets/runtime/cities-knights/cards/decks/progress-politics-intrigue.jpg";
+import cards127 from "../assets/runtime/cities-knights/cards/decks/progress-politics-saboteur.jpg";
+import cards128 from "../assets/runtime/cities-knights/cards/decks/progress-politics-spy.jpg";
+import cards129 from "../assets/runtime/cities-knights/cards/decks/progress-politics-warlord.jpg";
+import cards130 from "../assets/runtime/cities-knights/cards/decks/progress-politics-wedding.jpg";
+import cards200 from "../assets/runtime/base/cards/decks/development-card-back.jpg";
+import cards201 from "../assets/runtime/cities-knights/cards/decks/progress-science-back-hidden.jpg";
+import cards202 from "../assets/runtime/cities-knights/cards/decks/progress-trade-back-hidden.jpg";
+import cards203 from "../assets/runtime/cities-knights/cards/decks/progress-politics-back-hidden.jpg";
+import cards204 from "../assets/runtime/cities-knights/cards/decks/defender-of-catan-hidden.jpg";
+import cards205 from "../assets/runtime/base/cards/decks/longest-road-hidden.jpg";
+import cards206 from "../assets/runtime/base/cards/decks/largest-army-hidden.jpg";
+import cards207 from "../assets/runtime/cities-knights/cards/decks/science-improvement-level-3-hidden.jpg";
+import cards208 from "../assets/runtime/cities-knights/cards/decks/science-improvement-level-4-hidden.jpg";
+import cards209 from "../assets/runtime/cities-knights/cards/decks/science-improvement-level-5-hidden.jpg";
+import cards210 from "../assets/runtime/cities-knights/cards/decks/trade-improvement-level-3-hidden.jpg";
+import cards211 from "../assets/runtime/cities-knights/cards/decks/trade-improvement-level-4-hidden.jpg";
+import cards212 from "../assets/runtime/cities-knights/cards/decks/trade-improvement-level-5-hidden.jpg";
+import cards213 from "../assets/runtime/cities-knights/cards/decks/politics-improvement-level-3-hidden.jpg";
+import cards214 from "../assets/runtime/cities-knights/cards/decks/politics-improvement-level-4-hidden.jpg";
+import cards215 from "../assets/runtime/cities-knights/cards/decks/politics-improvement-level-5-hidden.jpg";
 
 export const cards: { [key: number]: AssetImage } = {
     0: cards0,

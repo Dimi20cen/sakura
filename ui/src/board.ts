@@ -32,6 +32,7 @@ const SHIP_DISPLAY_WIDTH = 32;
 const ROAD_THICKNESS_SCALE = 1;
 const BOARD_SPACING_SCALE = 0.87;
 const ILLUSTRATED_HEX_SCALE = 1.37;
+const TILE_NUMBER_Y_OFFSET = 18;
 
 /** Current playing board */
 let board: IBoard;
@@ -359,7 +360,7 @@ export async function renderTile(tile: UITile) {
 
         // Number on token
         numSprite.x = fc.x;
-        numSprite.y = fc.y;
+        numSprite.y = fc.y + TILE_NUMBER_Y_OFFSET;
         numSprite.anchor.x = 0.5;
         numSprite.anchor.y = 0.5;
         tile.numberSprite = numSprite;

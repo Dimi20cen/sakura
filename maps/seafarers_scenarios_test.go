@@ -31,10 +31,10 @@ func TestGetSeafarersScenarioCatalog(t *testing.T) {
 		t.Fatalf("expected 9 seafarers catalog entries, got %d", len(catalog))
 	}
 
-	if catalog[0].Title != SeafarersHeadingForNewShores || catalog[0].Placeholder || catalog[0].VictoryPoints != 12 {
+	if catalog[0].Title != SeafarersHeadingForNewShores || catalog[0].Placeholder || catalog[0].VictoryPoints != 14 {
 		t.Fatalf("expected first catalog entry to be non-placeholder heading for new shores")
 	}
-	if catalog[1].Title != SeafarersFourIslands || catalog[1].Placeholder || catalog[1].VictoryPoints != 12 {
+	if catalog[1].Title != SeafarersFourIslands || catalog[1].Placeholder || catalog[1].VictoryPoints != 13 {
 		t.Fatalf("expected second catalog entry to be non-placeholder four islands")
 	}
 	if catalog[2].Title != SeafarersFogIslands || catalog[2].Placeholder || catalog[2].VictoryPoints != 12 {
@@ -53,8 +53,8 @@ func TestGetMapByNameSeafarersFourIslandsIsPlayable(t *testing.T) {
 	if defn.Scenario == nil || defn.Scenario.Placeholder {
 		t.Fatal("expected four islands map to be non-placeholder with scenario metadata")
 	}
-	if defn.Scenario.VictoryPoints != 12 {
-		t.Fatalf("expected four islands victory points override 12, got %d", defn.Scenario.VictoryPoints)
+	if defn.Scenario.VictoryPoints != 13 {
+		t.Fatalf("expected four islands victory points override 13, got %d", defn.Scenario.VictoryPoints)
 	}
 }
 

@@ -511,17 +511,78 @@ func TestRevealFogAdjacentToEdgeAwardsResource(t *testing.T) {
 	}
 }
 
+func TestRevealFogAdjacentToEdgeSeaDiscoveryGivesNoReward(t *testing.T) {
+	bank, err := entities.GetNewBank(entities.Seafarers)
+	if err != nil {
+		t.Fatalf("failed to create bank: %v", err)
+	}
+	player, err := entities.NewPlayer(entities.Seafarers, "p0", "p0", 0)
+	if err != nil {
+		t.Fatalf("failed to create player: %v", err)
+	}
+
+	fogTile := &entities.Tile{Center: entities.Coordinate{X: 0, Y: 0}, Type: entities.TileTypeFog, Fog: true}
+	c1 := entities.Coordinate{X: 0, Y: 0}
+	c2 := entities.Coordinate{X: 2, Y: 0}
+	v1 := &entities.Vertex{C: c1, AdjacentTiles: []*entities.Tile{fogTile}}
+	v2 := &entities.Vertex{C: c2, AdjacentTiles: []*entities.Tile{fogTile}}
+	edge := &entities.Edge{C: entities.EdgeCoordinate{C1: c1, C2: c2}}
+
+	g := &Game{
+		Initialized:          true,
+		Mode:                 entities.Seafarers,
+		Bank:                 bank,
+		Players:              []*entities.Player{player},
+		CurrentPlayer:        player,
+		ScenarioFogTileStack: []entities.TileType{entities.TileTypeSea},
+		Settings: entities.GameSettings{
+			MapDefn: &entities.MapDefinition{
+				Scenario: &entities.ScenarioMetadata{Key: "seafarers_fog_islands"},
+			},
+		},
+		Graph: &entities.Graph{
+			Vertices: map[entities.Coordinate]*entities.Vertex{
+				c1: v1,
+				c2: v2,
+			},
+			Edges: map[entities.EdgeCoordinate]*entities.Edge{
+				edge.C: edge,
+			},
+			Tiles: map[entities.Coordinate]*entities.Tile{
+				fogTile.Center: fogTile,
+			},
+		},
+	}
+
+	g.RevealFogAdjacentToEdge(player, edge)
+	if fogTile.Fog {
+		t.Fatal("expected fog tile to be revealed")
+	}
+	if fogTile.Type != entities.TileTypeSea {
+		t.Fatalf("expected sea discovery, got %d", fogTile.Type)
+	}
+	if fogTile.Number != 0 {
+		t.Fatalf("expected sea discovery to have no number disc, got %d", fogTile.Number)
+	}
+	if got := player.CurrentHand.GetCardCount(); got != 0 {
+		t.Fatalf("expected no discovery reward for sea tile, got %d cards", got)
+	}
+}
+
 func TestSeafarersFogIslandsStyleDiscoveryByShip(t *testing.T) {
 	defn := &entities.MapDefinition{
 		Name:        "Seafarers - Fog Islands (Test)",
 		Order:       []bool{false, false, false},
 		Ports:       []entities.PortType{},
 		Numbers:     []uint16{5},
-		RandomTiles: []entities.TileType{entities.TileTypeWood},
+		RandomTiles: []entities.TileType{entities.TileTypeSea},
 		Map: [][]int{
 			{int(entities.TileTypeNone), int(entities.TileTypeSea), int(entities.TileTypeNone)},
 			{int(entities.TileTypeSea), int(entities.TileTypeFog), int(entities.TileTypeSea)},
 			{int(entities.TileTypeNone), int(entities.TileTypeSea), int(entities.TileTypeNone)},
+		},
+		Scenario: &entities.ScenarioMetadata{
+			Key: "seafarers_fog_islands",
 		},
 	}
 
@@ -583,6 +644,7 @@ func TestSeafarersFogIslandsStyleDiscoveryByShip(t *testing.T) {
 	g.InitPhase = false
 	g.DiceState = 1
 	p.CurrentHand.UpdateResources(10, 10, 10, 10, 10)
+	beforeCards := p.CurrentHand.GetCardCount()
 	if g.Pirate != nil {
 		g.Pirate.Tile = nil
 	}
@@ -593,8 +655,14 @@ func TestSeafarersFogIslandsStyleDiscoveryByShip(t *testing.T) {
 	if fogTile.Fog {
 		t.Fatal("expected fog tile to be revealed after building adjacent ship")
 	}
-	if p.CurrentHand.GetCardDeck(entities.CardTypeWood).Quantity == 0 {
-		t.Fatal("expected discovery reward when revealing fog land tile")
+	if fogTile.Type != entities.TileTypeSea {
+		t.Fatal("expected test discovery tile to reveal as sea")
+	}
+	if fogTile.Number != 0 {
+		t.Fatal("expected sea discovery to have no number disc")
+	}
+	if p.CurrentHand.GetCardCount() != beforeCards-2 {
+		t.Fatal("expected no discovery reward when revealing fog sea tile")
 	}
 }
 

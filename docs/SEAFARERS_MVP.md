@@ -18,6 +18,26 @@ This document describes the currently implemented Seafarers scope.
 
 ## Rules Implemented
 
+### Scenario rules
+
+- `Heading for New Shores`
+  - Victory target: `14` VP
+  - Initial settlements with paired road/ship placement are restricted to the main island
+  - Each player earns `+2 VP` for their first settlement on each small island
+- `The Four Islands`
+  - Victory target: `13` VP
+  - Each player's initial settlement island(s) define that player's home islands
+  - Each player earns `+2 VP` for their first settlement on each unexplored island
+- `The Fog Islands`
+  - Victory target: `12` VP
+  - Fog discoveries resolve from tile and number stacks at reveal time
+  - Land discoveries receive a number disc and one immediate reward resource
+  - Sea discoveries receive no number disc and no immediate reward
+- `Through the Desert`
+  - Victory target: `14` VP
+  - Initial settlements with paired road/ship placement are restricted to the main island
+  - Each player earns `+2 VP` for their first settlement in each unexplored region
+
 ### Ships
 
 - Buildable type: `BTShip`
@@ -76,14 +96,22 @@ This document describes the currently implemented Seafarers scope.
 
 ### Automated smoke test
 
-- File: `game/seafarers_smoke_test.go`
 - Key scenario tests:
+  - `TestSeafarersHeadingForNewShoresInitialize`
+  - `TestHeadingForNewShoresBonusIsPerIslandPerPlayer`
+  - `TestHeadingForNewShoresInitPlacementRestrictedToMainIsland`
+  - `TestSeafarersFourIslandsInitialize`
+  - `TestFourIslandsHomeIslandsDoNotGrantBonus`
+  - `TestFourIslandsUnexploredIslandBonusIsPerPlayer`
+  - `TestFourIslandsInitSettlementsDefineHomeIslands`
+  - `TestSeafarersFogIslandsInitializeAndReveal`
   - `TestSeafarersSmokeBuildShipAndMoveShip`
   - `TestSeafarersPirateStealsFromShip`
   - `TestSeafarersHasSeparateRobberAndPirateTokens`
   - `TestSeafarersScriptedMultiplayerSmoke`
-  - `TestSeafarersFogIslandsInitializeAndReveal`
   - `TestSeafarersThroughDesertSettlementRegionBonus`
+  - `TestSeafarersThroughDesertDesertAdjacentStripCountsAsUnexploredRegion`
+  - `TestSeafarersThroughDesertFourteenVPWinsOnCurrentPlayersTurn`
 
 ### Full test run
 

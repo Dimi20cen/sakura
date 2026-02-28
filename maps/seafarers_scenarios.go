@@ -106,8 +106,8 @@ func getSeafarersFourIslandsMap() *entities.MapDefinition {
 			Key:             "seafarers_four_islands",
 			Title:           SeafarersFourIslands,
 			Placeholder:     false,
-			VictoryPoints:   12,
-			VictoryRuleText: "If you have 12 or more VPs at any point during your turn, you win.",
+			VictoryPoints:   13,
+			VictoryRuleText: "If you have 13 or more VPs at any point during your turn, you win.",
 		},
 	}
 }
@@ -226,8 +226,8 @@ func GetSeafarersScenarioCatalog() []*entities.ScenarioMetadata {
 	}
 
 	return []*entities.ScenarioMetadata{
-		makeMeta("seafarers_heading_for_new_shores", SeafarersHeadingForNewShores, false, 12, "If you have 12 or more VPs at any point during your turn, you win."),
-		makeMeta("seafarers_four_islands", SeafarersFourIslands, false, 12, "If you have 12 or more VPs at any point during your turn, you win."),
+		makeMeta("seafarers_heading_for_new_shores", SeafarersHeadingForNewShores, false, 14, "If you have 14 or more VPs at any point during your turn, you win."),
+		makeMeta("seafarers_four_islands", SeafarersFourIslands, false, 13, "If you have 13 or more VPs at any point during your turn, you win."),
 		makeMeta("seafarers_fog_islands", SeafarersFogIslands, false, 12, "If you have 12 or more VPs at any point during your turn, you win."),
 		makeMeta("seafarers_through_the_desert", SeafarersThroughDesert, false, 14, "If you have 14 or more VPs at any point during your turn, you win."),
 		makeMeta("seafarers_forgotten_tribe", SeafarersForgottenTribe, true, 0, ""),

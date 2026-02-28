@@ -356,8 +356,24 @@ func (g *Game) RevealFogAdjacentToEdge(player *entities.Player, edge *entities.E
 			continue
 		}
 
+		if g.Settings.MapDefn != nil &&
+			g.Settings.MapDefn.Scenario != nil &&
+			g.Settings.MapDefn.Scenario.Key == "seafarers_fog_islands" {
+			discoveredType, ok := g.drawFogDiscoveryTile()
+			if ok {
+				t.Type = discoveredType
+				if discoveredType != entities.TileTypeSea {
+					t.Number = g.drawFogDiscoveryNumber()
+				} else {
+					t.Number = 0
+				}
+			}
+		}
 		t.Fog = false
 		g.giveDiscoveryRewardForTile(player, t)
+		if g.j.g != nil {
+			g.j.WSetTileType(t)
+		}
 		g.BroadcastMessage(&entities.Message{
 			Type: entities.MessageTypeTileFog,
 			Data: t,

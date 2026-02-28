@@ -18,6 +18,12 @@ func (g *Game) configureScenarioHooks() {
 	}
 
 	switch g.Settings.MapDefn.Scenario.Key {
+	case "seafarers_heading_for_new_shores":
+		g.configureHeadingForNewShoresHooks()
+	case "seafarers_four_islands":
+		g.configureFourIslandsHooks()
+	case "seafarers_fog_islands":
+		g.configureFogIslandsHooks()
 	case "seafarers_through_the_desert":
 		g.configureThroughDesertHooks()
 	}

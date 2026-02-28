@@ -52,6 +52,30 @@ Entry format:
 - Evidence: `game/init_phase.go` (`getInitEdgeChoices`), `game/init_phase_edge_choices_test.go` (`TestInitEdgeChoicesExcludeShipOnPirateBlockedEdge`)
 - Next action: none
 
+- Area: Heading for New Shores scenario parity
+- Mode: Seafarers
+- Rulebook: Seafarers scenario 1 (`Heading for New Shores`)
+- Repo status: aligned
+- Notes: Scenario uses a 14-VP target, restricts initial settlement + road/ship placement to the main island, and awards +2 VP per player for the first settlement on each small island.
+- Evidence: `maps/main.go`, `game/scenario_heading_for_new_shores.go`, `game/seafarers_heading_for_new_shores_test.go`, `docs/rulebooks/text/Rulebook-Seafarers.txt`
+- Next action: verify full official map/layout parity.
+
+- Area: Four Islands scenario parity
+- Mode: Seafarers
+- Rulebook: Seafarers scenario 2 (`The Four Islands`)
+- Repo status: aligned
+- Notes: Scenario uses a 13-VP target and tracks each player's home islands from their initial settlements so only unexplored-island settlements award +2 VP.
+- Evidence: `maps/seafarers_scenarios.go`, `game/scenario_four_islands.go`, `game/seafarers_four_islands_test.go`, `docs/rulebooks/text/Rulebook-Seafarers.txt`
+- Next action: verify full official map/layout parity.
+
+- Area: Fog Islands scenario parity
+- Mode: Seafarers
+- Rulebook: Seafarers scenario 3 (`The Fog Islands`)
+- Repo status: partial
+- Notes: Discovery now uses runtime tile and number stacks so land discoveries gain a number disc plus reward, while sea discoveries gain neither. Map/layout parity remains first-pass.
+- Evidence: `maps/seafarers_scenarios.go`, `game/scenario_fog_islands.go`, `game/actions.go` (`RevealFogAdjacentToEdge`), `game/seafarers_fog_islands_test.go`, `game/seafarers_smoke_test.go`, `docs/rulebooks/text/Rulebook-Seafarers.txt`
+- Next action: verify official map/layout parity and expand scenario acceptance coverage.
+
 ### Base
 
 - Area: Full parity audit coverage

@@ -91,3 +91,30 @@ func TestThroughDesertBonusIsPerPlayer(t *testing.T) {
 		t.Fatalf("expected p1 +2 bonus independently, got %d", got)
 	}
 }
+
+func TestThroughDesertSameRegionAwardsOnlyOncePerPlayer(t *testing.T) {
+	p, _ := entities.NewPlayer(entities.Seafarers, "p", "p", 0)
+	g := &Game{
+		ScenarioBonusVP: make(map[*entities.Player]int),
+		ScenarioDesertAwarded: map[*entities.Player]map[int]bool{
+			p: {},
+		},
+		ScenarioDesertRegionByTile: map[entities.Coordinate]int{
+			{X: 9, Y: 9}: 2,
+		},
+		ScenarioDesertMainRegion: 1,
+	}
+
+	v := &entities.Vertex{
+		AdjacentTiles: []*entities.Tile{
+			{Center: entities.Coordinate{X: 9, Y: 9}},
+		},
+	}
+
+	g.applyThroughDesertSettlementBonus(p, v)
+	g.applyThroughDesertSettlementBonus(p, v)
+
+	if got := g.ScenarioBonusVP[p]; got != 2 {
+		t.Fatalf("expected same region to award only once, got %d", got)
+	}
+}

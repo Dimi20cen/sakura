@@ -116,10 +116,26 @@ Primary references:
 
 Currently playable built-in scenarios:
 
-- `Seafarers - Heading for New Shores` (12 VP target)
-- `Seafarers - The Four Islands` (12 VP target, first-pass)
-- `Seafarers - The Fog Islands` (12 VP target, first-pass)
+- `Seafarers - Heading for New Shores` (14 VP target, first-pass)
+- `Seafarers - The Four Islands` (13 VP target, first-pass)
+- `Seafarers - The Fog Islands` (12 VP target, first-pass map; stack-based discovery implemented)
 - `Seafarers - Through the Desert` (14 VP target, first-pass)
+
+Implemented scenario-specific rules:
+
+- `Heading for New Shores`
+  - initial settlements with paired road/ship placement are restricted to the main island
+  - each player gains `+2 VP` for their first settlement on each small island
+- `The Four Islands`
+  - each player's initial settlement island(s) define that player's home islands
+  - each player gains `+2 VP` for their first settlement on each unexplored island
+- `The Fog Islands`
+  - fog discoveries are resolved from runtime tile and number stacks
+  - land discoveries receive a number disc and one immediate resource of the discovered hex type
+  - sea discoveries receive no number disc and no immediate resource
+- `Through the Desert`
+  - initial settlements with paired road/ship placement are restricted to the main island
+  - each player gains `+2 VP` for their first settlement in each unexplored region
 
 Catalog-only placeholder scenarios (metadata wired; full rules not implemented):
 

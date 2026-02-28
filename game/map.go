@@ -53,7 +53,7 @@ func generateMapInner(g *Game, defn *entities.MapDefinition) error {
 	// Check validity of random tiles
 	for _, tile := range defn.RandomTiles {
 		tileType := entities.TileType(tile)
-		if tileType < entities.TileTypeDesert || (tileType > entities.TileTypeOre && tileType != entities.TileTypeGold) {
+		if tileType < entities.TileTypeDesert || (tileType > entities.TileTypeSea && tileType != entities.TileTypeGold) {
 			return errors.New("invalid tile type")
 		}
 	}

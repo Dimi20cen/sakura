@@ -30,104 +30,111 @@ func TestSeafarersFourIslandsInitialize(t *testing.T) {
 	if g.Settings.MapDefn.Scenario == nil {
 		t.Fatal("scenario metadata missing on four islands map")
 	}
-	if target := g.getScenarioVictoryTarget(); target != 12 {
-		t.Fatalf("expected scenario victory target 12, got %d", target)
+	if target := g.getScenarioVictoryTarget(); target != 13 {
+		t.Fatalf("expected scenario victory target 13, got %d", target)
 	}
 }
 
-func TestSeafarersFogIslandsInitializeAndReveal(t *testing.T) {
-	defn := maps.GetMapByName(maps.SeafarersFogIslands)
-	if defn == nil {
-		t.Fatal("fog islands map definition missing")
-	}
-
+func TestFourIslandsHomeIslandsDoNotGrantBonus(t *testing.T) {
+	p, _ := entities.NewPlayer(entities.Seafarers, "p", "p", 0)
 	g := &Game{
-		Store: &noopStore{},
-		Settings: entities.GameSettings{
-			Mode:          entities.Seafarers,
-			MapName:       maps.SeafarersFogIslands,
-			MapDefn:       defn,
-			VictoryPoints: 10,
-			Speed:         entities.NormalSpeed,
+		ScenarioBonusVP: make(map[*entities.Player]int),
+		ScenarioLandHome: map[*entities.Player]map[int]bool{
+			p: {1: true, 2: true},
+		},
+		ScenarioLandAwarded: map[*entities.Player]map[int]bool{
+			p: {},
+		},
+		ScenarioLandRegionByTile: map[entities.Coordinate]int{
+			{X: 1, Y: 1}: 1,
+			{X: 2, Y: 2}: 2,
+			{X: 3, Y: 3}: 3,
 		},
 	}
-	if _, err := g.Initialize("seafarers-fog-islands-init", 2); err != nil {
-		t.Fatalf("initialize failed: %v", err)
-	}
-	stopTickerForTest(g)
 
-	if g.Settings.MapDefn.Scenario == nil {
-		t.Fatal("scenario metadata missing on fog islands map")
-	}
-	if target := g.getScenarioVictoryTarget(); target != 12 {
-		t.Fatalf("expected scenario victory target 12, got %d", target)
+	homeVertex := &entities.Vertex{
+		AdjacentTiles: []*entities.Tile{
+			{Center: entities.Coordinate{X: 1, Y: 1}},
+		},
 	}
 
-	fogBefore := 0
-	var fogTile *entities.Tile
-	for _, t := range g.Tiles {
-		if t.Fog {
-			fogBefore++
-			fogTile = t
-		}
+	g.applyFourIslandsSettlementBonus(p, homeVertex)
+	if got := g.ScenarioBonusVP[p]; got != 0 {
+		t.Fatalf("expected no bonus on home island settlement, got %d", got)
 	}
-	if fogTile == nil || fogBefore == 0 {
-		t.Fatal("expected at least one fog tile on fog islands map")
+}
+
+func TestFourIslandsUnexploredIslandBonusIsPerPlayer(t *testing.T) {
+	p0, _ := entities.NewPlayer(entities.Seafarers, "p0", "p0", 0)
+	p1, _ := entities.NewPlayer(entities.Seafarers, "p1", "p1", 1)
+	g := &Game{
+		ScenarioBonusVP: make(map[*entities.Player]int),
+		ScenarioLandHome: map[*entities.Player]map[int]bool{
+			p0: {1: true},
+			p1: {2: true},
+		},
+		ScenarioLandAwarded: map[*entities.Player]map[int]bool{
+			p0: {},
+			p1: {},
+		},
+		ScenarioLandRegionByTile: map[entities.Coordinate]int{
+			{X: 1, Y: 1}: 1,
+			{X: 2, Y: 2}: 2,
+			{X: 3, Y: 3}: 3,
+		},
+		InitPhase: false,
 	}
 
-	p := g.CurrentPlayer
-	var anchor *entities.Vertex
-	var targetEdge *entities.Edge
-	for _, v := range g.Vertices {
-		if !v.HasAdjacentSea() {
-			continue
-		}
-		hasFog := false
-		for _, t := range v.AdjacentTiles {
-			if t.Fog {
-				hasFog = true
-				break
-			}
-		}
-		if !hasFog {
-			continue
-		}
-		for _, e := range g.Graph.GetAdjacentVertexEdges(v) {
-			if e.IsWaterEdge() && e.Placement == nil {
-				anchor = v
-				targetEdge = e
-				break
-			}
-		}
-		if anchor != nil {
-			break
-		}
-	}
-	if anchor == nil || targetEdge == nil {
-		t.Fatal("could not find anchor/edge for fog reveal")
+	unexploredForBoth := &entities.Vertex{
+		AdjacentTiles: []*entities.Tile{
+			{Center: entities.Coordinate{X: 3, Y: 3}},
+		},
 	}
 
-	if err := p.BuildAtVertex(anchor, entities.BTSettlement); err != nil {
-		t.Fatalf("failed to place anchor settlement: %v", err)
+	g.applyFourIslandsSettlementBonus(p0, unexploredForBoth)
+	g.applyFourIslandsSettlementBonus(p0, unexploredForBoth)
+	g.applyFourIslandsSettlementBonus(p1, unexploredForBoth)
+
+	if got := g.ScenarioBonusVP[p0]; got != 2 {
+		t.Fatalf("expected p0 +2 bonus on unexplored island, got %d", got)
 	}
-	g.InitPhase = false
-	g.DiceState = 1
-	p.CurrentHand.UpdateResources(10, 10, 10, 10, 10)
-	if g.IsSeaRobberBlockingEdge(targetEdge) && g.Pirate != nil {
-		g.Pirate.Tile = nil
+	if got := g.ScenarioBonusVP[p1]; got != 2 {
+		t.Fatalf("expected p1 +2 bonus independently on same island, got %d", got)
+	}
+}
+
+func TestFourIslandsInitSettlementsDefineHomeIslands(t *testing.T) {
+	p, _ := entities.NewPlayer(entities.Seafarers, "p", "p", 0)
+	g := &Game{
+		InitPhase: true,
+		ScenarioLandHome: make(map[*entities.Player]map[int]bool),
+		ScenarioLandRegionByTile: map[entities.Coordinate]int{
+			{X: 1, Y: 1}: 1,
+			{X: 2, Y: 2}: 2,
+		},
 	}
 
-	if err := g.BuildShip(p, targetEdge.C); err != nil {
-		t.Fatalf("failed to build ship for fog reveal: %v", err)
+	first := &entities.Vertex{
+		AdjacentTiles: []*entities.Tile{
+			{Center: entities.Coordinate{X: 1, Y: 1}},
+		},
 	}
-	fogAfter := 0
-	for _, t := range g.Tiles {
-		if t.Fog {
-			fogAfter++
-		}
+	second := &entities.Vertex{
+		AdjacentTiles: []*entities.Tile{
+			{Center: entities.Coordinate{X: 2, Y: 2}},
+		},
 	}
-	if fogAfter >= fogBefore {
-		t.Fatalf("expected fog count to decrease after adjacent ship build (before=%d after=%d)", fogBefore, fogAfter)
+
+	p.VertexPlacements = []entities.VertexBuildable{&entities.Settlement{Owner: p, Location: first}}
+	g.trackFourIslandsHomeIsland(p, first)
+	p.VertexPlacements = []entities.VertexBuildable{
+		&entities.Settlement{Owner: p, Location: first},
+		&entities.Settlement{Owner: p, Location: second},
+	}
+	g.trackFourIslandsHomeIsland(p, second)
+
+	if !g.ScenarioLandHome[p][1] || !g.ScenarioLandHome[p][2] {
+		t.Fatal("expected both init-settlement islands to be tracked as home islands")
 	}
 }
 
@@ -270,5 +277,101 @@ func TestSeafarersThroughDesertInitPlacementRestrictedToMainIsland(t *testing.T)
 		if !g.throughDesertVertexTouchesRegion(v, g.ScenarioDesertMainRegion) {
 			t.Fatal("found filtered init vertex outside main island")
 		}
+	}
+}
+
+func TestSeafarersThroughDesertDesertAdjacentStripCountsAsUnexploredRegion(t *testing.T) {
+	defn := maps.GetMapByName(maps.SeafarersThroughDesert)
+	if defn == nil {
+		t.Fatal("through the desert map definition missing")
+	}
+
+	g := &Game{
+		Store: &noopStore{},
+		Settings: entities.GameSettings{
+			Mode:          entities.Seafarers,
+			MapName:       maps.SeafarersThroughDesert,
+			MapDefn:       defn,
+			VictoryPoints: 10,
+			Speed:         entities.NormalSpeed,
+		},
+	}
+	if _, err := g.Initialize("seafarers-through-desert-strip-region", 2); err != nil {
+		t.Fatalf("initialize failed: %v", err)
+	}
+	stopTickerForTest(g)
+	g.ensureThroughDesertRegions()
+
+	p := g.CurrentPlayer
+	var stripVertex *entities.Vertex
+	var stripRegion int
+	for _, v := range g.Vertices {
+		adjacentDesert := false
+		candidateRegion := 0
+		for _, tile := range v.AdjacentTiles {
+			if tile == nil {
+				continue
+			}
+			if tile.Type == entities.TileTypeDesert {
+				adjacentDesert = true
+				continue
+			}
+			if rid, ok := g.ScenarioDesertRegionByTile[tile.Center]; ok && rid != g.ScenarioDesertMainRegion {
+				candidateRegion = rid
+			}
+		}
+		if adjacentDesert && candidateRegion != 0 {
+			stripVertex = v
+			stripRegion = candidateRegion
+			break
+		}
+	}
+	if stripVertex == nil {
+		t.Fatal("expected to find a desert-adjacent unexplored-region vertex for the land strip")
+	}
+	if stripRegion == g.ScenarioDesertMainRegion {
+		t.Fatal("expected desert-adjacent land strip to be outside the main island region")
+	}
+
+	if err := p.BuildAtVertex(stripVertex, entities.BTSettlement); err != nil {
+		t.Fatalf("failed to place settlement on desert-adjacent strip: %v", err)
+	}
+	g.onScenarioSettlementBuilt(p, stripVertex)
+	if got := g.ScenarioBonusVP[p]; got != 2 {
+		t.Fatalf("expected desert-adjacent strip settlement to award +2 VP, got %d", got)
+	}
+}
+
+func TestSeafarersThroughDesertFourteenVPWinsOnCurrentPlayersTurn(t *testing.T) {
+	defn := maps.GetMapByName(maps.SeafarersThroughDesert)
+	if defn == nil {
+		t.Fatal("through the desert map definition missing")
+	}
+	bank, err := entities.GetNewBank(entities.Seafarers)
+	if err != nil {
+		t.Fatalf("failed to create bank: %v", err)
+	}
+
+	p0, _ := entities.NewPlayer(entities.Seafarers, "p0", "p0", 0)
+	p1, _ := entities.NewPlayer(entities.Seafarers, "p1", "p1", 1)
+	g := &Game{
+		Store:            &noopStore{},
+		Bank:             bank,
+		Settings:         entities.GameSettings{Mode: entities.Seafarers, MapDefn: defn, VictoryPoints: 10},
+		Players:          []*entities.Player{p0, p1},
+		CurrentPlayer:    p0,
+		ExtraVictoryPoints: &entities.ExtraVictoryPoints{},
+		ScenarioBonusVP:  map[*entities.Player]int{
+			p0: 14,
+			p1: 13,
+		},
+	}
+
+	g.CheckForVictory()
+	if !g.GameOver {
+		t.Fatal("expected game over when current player reaches the 14 VP scenario target")
+	}
+	if winner := g.getScenarioVictoryWinner(); winner != p0 {
+		t.Fatal("expected current player to satisfy the scenario victory condition")
 	}
 }

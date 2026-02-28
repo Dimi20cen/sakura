@@ -70,6 +70,12 @@ type (
 		DiceStats                  *entities.DiceStats
 		ScenarioHooks              ScenarioHookSet
 		ScenarioBonusVP            map[*entities.Player]int
+		ScenarioLandRegionByTile   map[entities.Coordinate]int
+		ScenarioLandMainRegion     int
+		ScenarioLandAwarded        map[*entities.Player]map[int]bool
+		ScenarioLandHome           map[*entities.Player]map[int]bool
+		ScenarioFogTileStack       []entities.TileType
+		ScenarioFogNumberStack     []uint16
 		ScenarioDesertRegionByTile map[entities.Coordinate]int
 		ScenarioDesertMainRegion   int
 		ScenarioDesertAwarded      map[*entities.Player]map[int]bool
@@ -355,6 +361,7 @@ func (game *Game) Initialize(id string, numPlayers uint16) (*Game, error) {
 		game.Initialized = false
 		return nil, err
 	}
+	game.finalizeScenarioSetup()
 
 	game.Ports = make([]*entities.Port, 0)
 	game.generatePorts()
@@ -393,6 +400,9 @@ func (game *Game) InitWithGameMode() error {
 	game.ExtraVictoryPoints = &entities.ExtraVictoryPoints{}
 	game.SetExtraVictoryPoints()
 	game.ScenarioBonusVP = make(map[*entities.Player]int)
+	game.ScenarioLandRegionByTile = make(map[entities.Coordinate]int)
+	game.ScenarioLandAwarded = make(map[*entities.Player]map[int]bool)
+	game.ScenarioLandHome = make(map[*entities.Player]map[int]bool)
 	game.ScenarioDesertRegionByTile = make(map[entities.Coordinate]int)
 	game.ScenarioDesertAwarded = make(map[*entities.Player]map[int]bool)
 

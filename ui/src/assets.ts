@@ -692,8 +692,13 @@ export async function loadAssets() {
     await Promise.all(
         Object.values(tileTex).map((s) =>
             (async () => {
-                await PIXI.Assets.load(s.src);
-                progress();
+                try {
+                    await getTexture(s);
+                } catch (err) {
+                    console.error("Failed to preload tile texture", s.src, err);
+                } finally {
+                    progress();
+                }
             })(),
         ),
     );

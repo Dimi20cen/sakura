@@ -24,6 +24,13 @@ import {
 } from "../tsg";
 import { hexToUrlString } from "../utils";
 
+const KNIGHT_DISPLAY_WIDTH = 37;
+const SETTLEMENT_DISPLAY_WIDTH = 40;
+const CITY_DISPLAY_WIDTH = 53;
+const ROAD_DISPLAY_WIDTH = 15;
+const SHIP_DISPLAY_WIDTH = 18;
+const ROAD_THICKNESS_SCALE = 1;
+
 /** Current playing board */
 let board: IBoard;
 
@@ -392,8 +399,9 @@ export function renderVertexPlacement(vp: IVertexPlacement, removed = false) {
 
     // Draw knight and disabled overlay
     const drawKnight = (level: number) => {
-        assets.assignTexture(sprite, assets.knight[level][urlColor]);
-        sprite.scale.set(37 / sprite.width);
+        assets.assignTexture(sprite, assets.knight[level][urlColor], () => {
+            sprite.scale.set(KNIGHT_DISPLAY_WIDTH / sprite.width);
+        });
 
         if (!vp.Activated) {
             const overlay = new PIXI.Sprite();
@@ -406,13 +414,15 @@ export function renderVertexPlacement(vp: IVertexPlacement, removed = false) {
     // Generate sprite with correct color
     switch (vp.Type) {
         case VertexPlacementType.Settlement:
-            assets.assignTexture(sprite, assets.house[urlColor]);
-            sprite.scale.set(45 / sprite.width);
+            assets.assignTexture(sprite, assets.house[urlColor], () => {
+                sprite.scale.set(SETTLEMENT_DISPLAY_WIDTH / sprite.width);
+            });
             break;
 
         case VertexPlacementType.City:
-            assets.assignTexture(sprite, assets.city[urlColor]);
-            sprite.scale.set(60 / sprite.width);
+            assets.assignTexture(sprite, assets.city[urlColor], () => {
+                sprite.scale.set(CITY_DISPLAY_WIDTH / sprite.width);
+            });
 
             if (vp.Wall) {
                 const wallSprite = new PIXI.Sprite();
@@ -483,9 +493,16 @@ export function renderEdgePlacement(ep: IEdgePlacement, removed = false) {
     // Generate sprite with correct color
     const roadSprite = new PIXI.Sprite();
     const color = hexToUrlString(ep.Owner.Color);
+    const applyRoadScale = () => {
+        roadContainer.scale.set(
+            (isShip ? SHIP_DISPLAY_WIDTH : ROAD_DISPLAY_WIDTH) /
+                roadSprite.texture.width,
+        );
+    };
     assets.assignTexture(
         roadSprite,
         isShip ? assets.shipToken : assets.road[color],
+        applyRoadScale,
     );
     roadSprite.anchor.x = 0.5;
     roadSprite.anchor.y = 0.5;
@@ -505,23 +522,23 @@ export function renderEdgePlacement(ep: IEdgePlacement, removed = false) {
     roadSprite.rotation =
         (((-60 * (1 - ep.Location.Orientation)) % 360) * Math.PI) / 180.0;
     // Make road pieces thicker without changing their length.
-    roadSprite.scale.x = 1.25;
+    roadSprite.scale.x = ROAD_THICKNESS_SCALE;
 
     const shadow = new PIXI.Sprite();
     assets.assignTexture(shadow, isShip ? assets.shipToken : assets.road[color]);
     shadow.anchor.x = roadSprite.anchor.x;
     shadow.anchor.y = roadSprite.anchor.y;
-    shadow.x = 6;
-    shadow.y = 8;
+    shadow.x = 4;
+    shadow.y = 5;
     shadow.tint = isShip ? 0x4b5563 : 0x666666;
     shadow.rotation = roadSprite.rotation;
-    shadow.scale.x = 1.25;
+    shadow.scale.x = ROAD_THICKNESS_SCALE;
 
     roadContainer.addChild(shadow);
     roadContainer.addChild(roadSprite);
 
     container.addChild(roadContainer);
-    roadContainer.scale.set((isShip ? 26 : 25) / roadSprite.texture.width);
+    applyRoadScale();
 
     if (isInitComplete) {
         anim.requestTranslationAnimation([roadContainer], 4);

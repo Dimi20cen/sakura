@@ -33,6 +33,11 @@ npm run dev
 - `http://localhost:3000/choose-profile`
 - `http://localhost:3000/design/swatches` (resource palette preview)
 
+## Asset Notes
+
+- Base structure pieces (roads, settlements, cities) are sourced from SVG files under `ui/assets/source/base/pieces/*`.
+- The runtime resolves those SVGs via URL-backed asset descriptors in `ui/src/assets.ts`, so structure art can stay vector without maintaining rasterized PNG copies.
+
 ## API Routes in This App
 
 API routes live under `ui/pages/api/*` and include:

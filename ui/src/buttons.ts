@@ -311,6 +311,66 @@ function rerender() {
     // Originally: invalidate bitmap cache
 }
 
+function isStructureButton(type: ButtonType) {
+    return (
+        type === ButtonType.Settlement ||
+        type === ButtonType.City ||
+        type === ButtonType.Road
+    );
+}
+
+function getStructureButtonAsset(type: ButtonType, bgColor?: string) {
+    if (!bgColor || !isStructureButton(type)) {
+        return undefined;
+    }
+
+    const cText = hexToUrlString(bgColor);
+    switch (type) {
+        case ButtonType.Settlement:
+            return assets.house[cText];
+        case ButtonType.City:
+            return assets.city[cText];
+        case ButtonType.Road:
+            return assets.road[cText];
+        default:
+            return undefined;
+    }
+}
+
+function getStructureButtonScale(
+    type: ButtonType,
+    simg: assets.AssetImage,
+    width: number,
+    height: number,
+    iconScaleMultiplier = 1,
+) {
+    switch (type) {
+        case ButtonType.Settlement:
+            return (
+                Math.min(
+                    (width * 0.62) / simg.width,
+                    (height * 0.62) / simg.height,
+                ) * iconScaleMultiplier
+            );
+        case ButtonType.City:
+            return (
+                Math.min(
+                    (width * 0.72) / simg.width,
+                    (height * 0.72) / simg.height,
+                ) * iconScaleMultiplier
+            );
+        case ButtonType.Road:
+            return (
+                Math.min(
+                    (width * 0.14) / simg.width,
+                    (height * 0.72) / simg.height,
+                ) * iconScaleMultiplier
+            );
+        default:
+            return iconScaleMultiplier;
+    }
+}
+
 /**
  * Create a new button sprite
  * @param type button type
@@ -328,6 +388,7 @@ export function getButtonSprite(
     bgColor?: string,
     done?: () => void,
     mask: "circle" | "rounded-rect" = "rounded-rect",
+    iconScaleMultiplier = 1,
 ): ButtonSprite {
     const s = new PIXI.Sprite();
     const outer = <ButtonSprite>s;
@@ -366,8 +427,10 @@ export function getButtonSprite(
         });
     };
 
-    const simg = assets.buttons[type];
-    const h = height || (width / simg.width) * simg.height;
+    const structureButtonAsset = getStructureButtonAsset(type, bgColor);
+    const structureButton = Boolean(structureButtonAsset);
+    const simg = structureButtonAsset || assets.buttons[type];
+    const h = height || (structureButton ? width : (width / simg.width) * simg.height);
 
     const drawShape = (g: PIXI.Graphics) => {
         switch (mask) {
@@ -414,13 +477,29 @@ export function getButtonSprite(
     const image = new PIXI.Sprite();
     outer.addChild(image);
     assets.assignTexture(image, simg, () => {
-        const g = new PIXI.Graphics();
-        g.beginTextureFill({ texture: image.texture });
-        drawShape(g);
-        g.endFill();
-        image.texture = canvas.app.generateRenderTexture(g);
+        if (!structureButton) {
+            const g = new PIXI.Graphics();
+            g.beginTextureFill({ texture: image.texture });
+            drawShape(g);
+            g.endFill();
+            image.texture = canvas.app.generateRenderTexture(g);
+            return;
+        }
+
+        const scale = getStructureButtonScale(
+            type,
+            simg,
+            width,
+            h,
+            iconScaleMultiplier,
+        );
+        image.scale.set(scale);
+        image.x = (width - simg.width * scale) / 2;
+        image.y = (h - simg.height * scale) / 2;
     });
-    image.scale.set(width / simg.width, h / simg.height);
+    if (!structureButton) {
+        image.scale.set(width / simg.width, h / simg.height);
+    }
     image.zIndex = 1;
 
     outer.setEnabled(outer.cursor === "pointer");

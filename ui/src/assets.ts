@@ -5,7 +5,12 @@ import { ButtonType } from "./buttons";
 import { sound } from "@pixi/sound";
 import type { StaticImageData } from "next/image";
 
-export function getCachedTexture(s: StaticImageData) {
+export type AssetImage = Pick<
+    StaticImageData,
+    "src" | "width" | "height" | "blurDataURL"
+>;
+
+export function getCachedTexture(s: AssetImage) {
     const cached = PIXI.utils.TextureCache[s.src];
     if (cached?.valid) {
         return cached;
@@ -13,7 +18,7 @@ export function getCachedTexture(s: StaticImageData) {
     return undefined;
 }
 
-export async function getTexture(s: StaticImageData) {
+export async function getTexture(s: AssetImage) {
     const cached = getCachedTexture(s);
     if (cached) {
         return cached;
@@ -24,7 +29,7 @@ export async function getTexture(s: StaticImageData) {
 
 export function assignTexture(
     sprite: PIXI.Sprite,
-    s: StaticImageData,
+    s: AssetImage,
     done?: () => void,
 ) {
     const spriteAlive = () => !sprite.destroyed;
@@ -97,7 +102,7 @@ export enum TILE_TEX {
     SEA = 7,
     FOG = 114,
 }
-export const tileTex: { [key: number]: StaticImageData } = {
+export const tileTex: { [key: number]: AssetImage } = {
     0: tileTexDesert,
     1: tileTexWood,
     2: tileTexBrick,
@@ -114,12 +119,12 @@ import roadBeach from "../public/assets/seafarers/textures/beach.png";
 import roadRoad from "../public/assets/base/pieces/road/road.png";
 import roadIslandR from "../public/assets/seafarers/textures/island-r.png";
 import roadIslandL from "../public/assets/seafarers/textures/island-l.png";
-import roadRed from "../public/assets/base/pieces/road/road-red.png";
-import roadBlue from "../public/assets/base/pieces/road/road-blue.png";
-import roadGreen from "../public/assets/base/pieces/road/road-green.png";
-import roadYellow from "../public/assets/base/pieces/road/road-yellow.png";
-import roadPlum from "../public/assets/base/pieces/road/road-plum.png";
-import roadCyan from "../public/assets/base/pieces/road/road-cyan.png";
+import roadRed from "../assets/source/base/pieces/road/road-red.svg";
+import roadBlue from "../assets/source/base/pieces/road/road-blue.svg";
+import roadGreen from "../assets/source/base/pieces/road/road-green.svg";
+import roadYellow from "../assets/source/base/pieces/road/road-yellow.svg";
+import roadPlum from "../assets/source/base/pieces/road/road-plum.svg";
+import roadCyan from "../assets/source/base/pieces/road/road-cyan.svg";
 import shipTokenS from "../public/assets/seafarers/pieces/ships/ship-token.png";
 
 export enum ROAD {
@@ -128,7 +133,7 @@ export enum ROAD {
     ISLAND_L = "island_l",
     BEACH = "beach",
 }
-export const road: { [key: string | ROAD]: StaticImageData } = {
+export const road: { [key: string | ROAD]: AssetImage } = {
     red: roadRed,
     blue: roadBlue,
     green: roadGreen,
@@ -145,15 +150,14 @@ road[ROAD.ISLAND_L] = roadIslandL;
 export const shipToken = shipTokenS;
 
 /******************** House *******************************************/
+import houseRed from "../assets/source/base/pieces/settlement/settlement-red.svg";
+import houseBlue from "../assets/source/base/pieces/settlement/settlement-blue.svg";
+import houseGreen from "../assets/source/base/pieces/settlement/settlement-green.svg";
+import houseYellow from "../assets/source/base/pieces/settlement/settlement-yellow.svg";
+import housePlum from "../assets/source/base/pieces/settlement/settlement-plum.svg";
+import houseCyan from "../assets/source/base/pieces/settlement/settlement-cyan.svg";
 
-import houseRed from "../public/assets/base/pieces/settlement/settlement-red.png";
-import houseBlue from "../public/assets/base/pieces/settlement/settlement-blue.png";
-import houseGreen from "../public/assets/base/pieces/settlement/settlement-green.png";
-import houseYellow from "../public/assets/base/pieces/settlement/settlement-yellow.png";
-import housePlum from "../public/assets/base/pieces/settlement/settlement-plum.png";
-import houseCyan from "../public/assets/base/pieces/settlement/settlement-cyan.png";
-
-export const house: { [key: string]: StaticImageData } = {
+export const house: { [key: string]: AssetImage } = {
     red: houseRed,
     blue: houseBlue,
     green: houseGreen,
@@ -165,15 +169,14 @@ export const house: { [key: string]: StaticImageData } = {
 };
 
 /******************** City *******************************************/
+import cityRed from "../assets/source/base/pieces/city/city-red.svg";
+import cityBlue from "../assets/source/base/pieces/city/city-blue.svg";
+import cityGreen from "../assets/source/base/pieces/city/city-green.svg";
+import cityYellow from "../assets/source/base/pieces/city/city-yellow.svg";
+import cityPlum from "../assets/source/base/pieces/city/city-plum.svg";
+import cityCyan from "../assets/source/base/pieces/city/city-cyan.svg";
 
-import cityRed from "../public/assets/base/pieces/city/city-red.png";
-import cityBlue from "../public/assets/base/pieces/city/city-blue.png";
-import cityGreen from "../public/assets/base/pieces/city/city-green.png";
-import cityYellow from "../public/assets/base/pieces/city/city-yellow.png";
-import cityPlum from "../public/assets/base/pieces/city/city-plum.png";
-import cityCyan from "../public/assets/base/pieces/city/city-cyan.png";
-
-export const city: { [key: string]: StaticImageData } = {
+export const city: { [key: string]: AssetImage } = {
     red: cityRed,
     blue: cityBlue,
     green: cityGreen,
@@ -208,7 +211,7 @@ import knight3Cyan from "../public/assets/cities-knights/pieces/knight/3-cyan.pn
 import knightDisabledS from "../public/assets/cities-knights/pieces/knight/disabled.png";
 export const knightDisabled = knightDisabledS;
 
-export const knight: { [level: number]: { [color: string]: StaticImageData } } =
+export const knight: { [level: number]: { [color: string]: AssetImage } } =
     {
         1: {
             red: knight1Red,
@@ -251,7 +254,7 @@ import merchantYellow from "../public/assets/cities-knights/pieces/merchant/yell
 import merchantPlum from "../public/assets/cities-knights/pieces/merchant/plum.png";
 import merchantCyan from "../public/assets/cities-knights/pieces/merchant/cyan.png";
 
-export const merchant: { [key: string]: StaticImageData } = {
+export const merchant: { [key: string]: AssetImage } = {
     red: merchantRed,
     blue: merchantBlue,
     green: merchantGreen,
@@ -268,7 +271,7 @@ import metro6 from "../public/assets/cities-knights/city-improvements/m-6.png";
 import metro7 from "../public/assets/cities-knights/city-improvements/m-7.png";
 import metro8 from "../public/assets/cities-knights/city-improvements/m-8.png";
 
-export const metropolis: { [key: number]: StaticImageData } = {
+export const metropolis: { [key: number]: AssetImage } = {
     6: metro6,
     7: metro7,
     8: metro8,
@@ -319,7 +322,7 @@ import num10 from "../public/assets/base/tokens/number-tokens/10.png";
 import num11 from "../public/assets/base/tokens/number-tokens/11.png";
 import num12 from "../public/assets/base/tokens/number-tokens/12.png";
 
-export const numberTokens: { [key: number]: StaticImageData } = {
+export const numberTokens: { [key: number]: AssetImage } = {
     0: num0,
     1: num1,
     2: num2,
@@ -350,7 +353,7 @@ export enum ICON {
     VP = "vp",
 }
 
-export const icons: { [key in ICON]: StaticImageData } = {
+export const icons: { [key in ICON]: AssetImage } = {
     cards: iconCards,
     dcard: iconDcard,
     knight: iconKnight,
@@ -367,7 +370,7 @@ import port4 from "../public/assets/base/tokens/ports/4.png";
 import port5 from "../public/assets/base/tokens/ports/5.png";
 import port6 from "../public/assets/base/tokens/ports/6.png";
 
-export const ports: { [key: number]: StaticImageData } = {
+export const ports: { [key: number]: AssetImage } = {
     1: port1,
     2: port2,
     3: port3,
@@ -380,9 +383,9 @@ export const ports: { [key: number]: StaticImageData } = {
 
 import btnYes from "../public/assets/shared/buttons/yes.png";
 import btnNo from "../public/assets/shared/buttons/no.png";
-import btnSettlement from "../public/assets/shared/buttons/settlement.png";
-import btnCity from "../public/assets/shared/buttons/city.png";
-import btnRoad from "../public/assets/shared/buttons/road.png";
+import btnSettlement from "../assets/source/base/pieces/settlement/settlement-black.svg";
+import btnCity from "../assets/source/base/pieces/city/city-black.svg";
+import btnRoad from "../assets/source/base/pieces/road/road-black.svg";
 import btnShip from "../public/assets/shared/buttons/ship.png";
 import btnDevelopmentCard from "../public/assets/shared/buttons/dcard.png";
 import btnKnightBox from "../public/assets/cities-knights/buttons/knight.png";
@@ -402,7 +405,7 @@ import btnEdit from "../public/assets/shared/buttons/edit.png";
 import btnFullscreen from "../public/assets/shared/buttons/fullscreen.png";
 import btnChat from "../public/assets/shared/buttons/chat.png";
 
-export const buttons: { [key in ButtonType]: StaticImageData } = {
+export const buttons: { [key in ButtonType]: AssetImage } = {
     yes: btnYes,
     no: btnNo,
     settlement: btnSettlement,
@@ -436,7 +439,7 @@ import buttonsBgYellow from "../public/assets/shared/buttons/bg/yellow.jpg";
 import buttonsBgPlum from "../public/assets/shared/buttons/bg/plum.jpg";
 import buttonsBgCyan from "../public/assets/shared/buttons/bg/cyan.jpg";
 
-export const buttonsBg: { [key: string]: StaticImageData } = {
+export const buttonsBg: { [key: string]: AssetImage } = {
     red: buttonsBgRed,
     blue: buttonsBgBlue,
     green: buttonsBgGreen,
@@ -465,7 +468,7 @@ import diceE2 from "../public/assets/cities-knights/dice/event-2.png";
 import diceE3 from "../public/assets/cities-knights/dice/event-3.png";
 import diceE4 from "../public/assets/cities-knights/dice/event-4.png";
 
-export const diceWhite: { [key: number]: StaticImageData } = {
+export const diceWhite: { [key: number]: AssetImage } = {
     1: diceW1,
     2: diceW2,
     3: diceW3,
@@ -474,7 +477,7 @@ export const diceWhite: { [key: number]: StaticImageData } = {
     6: diceW6,
 };
 
-export const diceRed: { [key: number]: StaticImageData } = {
+export const diceRed: { [key: number]: AssetImage } = {
     1: diceR1,
     2: diceR2,
     3: diceR3,
@@ -483,7 +486,7 @@ export const diceRed: { [key: number]: StaticImageData } = {
     6: diceR6,
 };
 
-export const diceEvent: { [key: number]: StaticImageData } = {
+export const diceEvent: { [key: number]: AssetImage } = {
     1: diceE1,
     2: diceE2,
     3: diceE3,
@@ -548,7 +551,7 @@ import cards213 from "../public/assets/cities-knights/cards/decks/politics-impro
 import cards214 from "../public/assets/cities-knights/cards/decks/politics-improvement-level-4-hidden.jpg";
 import cards215 from "../public/assets/cities-knights/cards/decks/politics-improvement-level-5-hidden.jpg";
 
-export const cards: { [key: number]: StaticImageData } = {
+export const cards: { [key: number]: AssetImage } = {
     0: cards0,
     1: cards1,
     2: cards2,

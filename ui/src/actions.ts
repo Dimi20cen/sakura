@@ -29,6 +29,12 @@ let setupPlacementSelectionKey: string | undefined;
 let setupPreferredBuildable: "road" | "ship" | undefined;
 let chooseBuildableAnchor: { x: number; y: number } | undefined;
 
+function getCurrentPlayerColor() {
+    return (
+        state.lastKnownStates?.[ws.getThisPlayerOrder()]?.Color || "#ff0000"
+    );
+}
+
 /**
  * Handle a player action
  * @param action Action to perform
@@ -174,13 +180,22 @@ function showSetupPlacementPreview(
     clearSetupPlacementPreview();
 
     const previewType = forcedType || getSetupPreviewType(action);
+    const playerColor = getCurrentPlayerColor();
     const w = new PIXI.Container();
     const windowWidth = previewType === "road_or_ship" ? 118 : 62;
     const windowSprite = windows.getWindowSprite(windowWidth, 62);
     w.addChild(windowSprite);
 
     if (previewType === "road_or_ship") {
-        const roadPreview = buttons.getButtonSprite(buttons.ButtonType.Road, 52);
+        const roadPreview = buttons.getButtonSprite(
+            buttons.ButtonType.Road,
+            52,
+            undefined,
+            playerColor,
+            undefined,
+            "rounded-rect",
+            0.75,
+        );
         roadPreview.x = 5;
         roadPreview.y = 5;
         roadPreview.setEnabled(true);
@@ -200,7 +215,19 @@ function showSetupPlacementPreview(
         });
         w.addChild(shipPreview);
     } else {
-        const preview = buttons.getButtonSprite(previewType, 52);
+        const preview = buttons.getButtonSprite(
+            previewType,
+            52,
+            undefined,
+            previewType === buttons.ButtonType.Settlement ||
+                previewType === buttons.ButtonType.City ||
+                previewType === buttons.ButtonType.Road
+                ? playerColor
+                : undefined,
+            undefined,
+            "rounded-rect",
+            previewType === buttons.ButtonType.Road ? 0.75 : 1,
+        );
         preview.x = 5;
         preview.y = 5;
         preview.setEnabled(true);

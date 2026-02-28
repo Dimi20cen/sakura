@@ -333,6 +333,20 @@ export const bot = botS;
 import spectateS from "../assets/runtime/shared/ui/spectate.png";
 export const spectate = spectateS;
 
+import uiKitBank from "../assets/runtime/shared/ui-kit/bank.svg";
+import uiKitPlayers from "../assets/runtime/shared/ui-kit/icon-players.svg";
+import uiKitTradeArrowGreen from "../assets/runtime/shared/ui-kit/icon-trade-arrow-green.svg";
+import uiKitTradeArrowRed from "../assets/runtime/shared/ui-kit/icon-trade-arrow-red.svg";
+import uiKitX from "../assets/runtime/shared/ui-kit/icon-x.svg";
+
+export const uiKit = {
+    bank: uiKitBank,
+    players: uiKitPlayers,
+    tradeArrowGreen: uiKitTradeArrowGreen,
+    tradeArrowRed: uiKitTradeArrowRed,
+    x: uiKitX,
+} as const;
+
 import seaS from "../assets/runtime/base/board/sea.jpg";
 export const sea = seaS;
 

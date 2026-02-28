@@ -6,6 +6,7 @@ import * as gameLog from "./gameLog";
 import * as hand from "./hand";
 import * as resourceBank from "./resourceBank";
 import * as state from "./state";
+import * as trade from "./trade";
 
 let installed = false;
 
@@ -17,6 +18,7 @@ export function relayoutHUD() {
     buttons.relayout();
     hand.relayout();
     resourceBank.relayout();
+    trade.relayout();
     chat.relayout();
     gameLog.relayout();
     dice.relayout();

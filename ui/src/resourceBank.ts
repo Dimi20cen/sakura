@@ -5,10 +5,14 @@ import * as canvas from "./canvas";
 import * as windows from "./windows";
 import * as tsg from "../tsg";
 import { CardType } from "./entities";
-import { computeResourceBankPosition, RIGHT_STACK_PANEL_WIDTH } from "./hudLayout";
+import {
+    computeEvenlySpacedRowXPositions,
+    computeResourceBankPosition,
+} from "./hudLayout";
+import { getUIConfig } from "./uiConfig";
 
-const WIDTH = RIGHT_STACK_PANEL_WIDTH;
-const HEIGHT = 66;
+const WIDTH = () => getUIConfig().hud.resourceBank.width;
+const HEIGHT = () => getUIConfig().hud.resourceBank.height;
 const CARD_WIDTH = 34;
 const CARD_HEIGHT = 48;
 const COUNT_WIDTH = 20;
@@ -26,6 +30,9 @@ const RESOURCE_ORDER = [
 type CardCountMap = Record<number, number>;
 
 let container: PIXI.Container | null = null;
+let panelWidth = 0;
+let panelHeight = 0;
+let bankChips: PIXI.Container[] = [];
 let chipText: Record<number, PIXI.Text> = {};
 let devText: PIXI.Text | null = null;
 
@@ -55,6 +62,21 @@ function refreshText() {
     canvas.app?.markDirty();
 }
 
+function layoutChipPositions() {
+    const chipXPositions = computeEvenlySpacedRowXPositions({
+        containerWidth: WIDTH(),
+        itemWidth: CARD_WIDTH,
+        itemCount: RESOURCE_ORDER.length + 1,
+        preferredGap: 6,
+        minInset: 4,
+    });
+
+    bankChips.forEach((chip, index) => {
+        chip.x = chipXPositions[index] ?? 0;
+        chip.y = 8;
+    });
+}
+
 function ensureUI() {
     if (!canvas.app) {
         return;
@@ -66,13 +88,15 @@ function ensureUI() {
 
     chipText = {};
     devText = null;
+    bankChips = [];
 
     container = new PIXI.Container();
     container.zIndex = 1400;
+    panelWidth = WIDTH();
+    panelHeight = HEIGHT();
 
-    container.addChild(windows.getWindowSprite(WIDTH, HEIGHT));
+    container.addChild(windows.getWindowSprite(WIDTH(), HEIGHT()));
 
-    let x = 26;
     for (const ct of RESOURCE_ORDER) {
         const chip = new PIXI.Container();
 
@@ -95,12 +119,8 @@ function ensureUI() {
         chip.sortableChildren = true;
         chip.addChild(count.sprite);
         chipText[ct] = count.text;
-
-        chip.x = x;
-        chip.y = 8;
         container.addChild(chip);
-
-        x += 40;
+        bankChips.push(chip);
     }
 
     const devChip = new PIXI.Container();
@@ -123,11 +143,10 @@ function ensureUI() {
     devChip.sortableChildren = true;
     devChip.addChild(devCount.sprite);
     devText = devCount.text;
-
-    devChip.x = x;
-    devChip.y = 8;
     container.addChild(devChip);
+    bankChips.push(devChip);
 
+    layoutChipPositions();
     canvas.app.stage.addChild(container);
     relayout();
     refreshText();
@@ -138,9 +157,22 @@ export function initialize() {
 }
 
 export function relayout() {
+    if (
+        container &&
+        !container.destroyed &&
+        (panelWidth !== WIDTH() || panelHeight !== HEIGHT())
+    ) {
+        container.destroy({ children: true });
+        container = null;
+        ensureUI();
+        return;
+    }
+
     if (!container || container.destroyed) {
         return;
     }
+
+    layoutChipPositions();
 
     const pos = computeResourceBankPosition({
         canvasWidth: canvas.getWidth(),

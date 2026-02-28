@@ -7,16 +7,187 @@ import * as anim from "./animation";
 import * as buttons from "./buttons";
 import * as tsg from "../tsg";
 import { sound } from "@pixi/sound";
+import * as assets from "./assets";
 import { getWindowSprite, YesNoWindow } from "./windows";
 import { CardType } from "./entities";
 import { getThisPlayerOrder, getCommandHub, isSpectator } from "./ws";
-
-const WINDOW_WIDTH = 380;
-const WINDOW_HEIGHT = 90;
+import { getUIConfig } from "./uiConfig";
+import {
+    addIconSprite,
+    createDockRail,
+    createDockSideRail,
+} from "./uiDock";
+import {
+    clampSpanWithinBounds,
+    computeActionBarPosition,
+    computeHandPosition,
+    computeHandWidth,
+} from "./hudLayout";
 
 type OfferObject = tsg.TradeOffer & {
     container: PIXI.Container & anim.Translatable;
 };
+
+function getTradeConfig() {
+    return getUIConfig().trade;
+}
+
+function relayoutEditorWindows() {
+    if (
+        !offerWindow?.container ||
+        !askWindow?.container ||
+        !possibleAskWindow?.container ||
+        !offerYesNoWindow?.container
+    ) {
+        return;
+    }
+
+    const tradeEditor = getTradeConfig().editor;
+    const handHeight = getUIConfig().hud.bottomRail.handHeight;
+    const handPos = computeHandPosition({
+        canvasHeight: canvas.getHeight(),
+        handHeight,
+    });
+    const handWidth = computeHandWidth(canvas.getWidth());
+    const actionBarPos = computeActionBarPosition({
+        canvasWidth: canvas.getWidth(),
+        canvasHeight: canvas.getHeight(),
+    });
+    const editorX = handPos.x;
+    const actionRailWidth = offerYesNoWindow.container.width || 48;
+    const resolvedX = clampSpanWithinBounds({
+        preferredX: editorX,
+        minX: handPos.x,
+        maxX: actionBarPos.x,
+        spanWidth:
+            tradeEditor.offerWidth +
+            tradeEditor.actionRailGap +
+            actionRailWidth,
+    });
+    const offerY =
+        handPos.y -
+        tradeEditor.windowHeight -
+        tradeEditor.rowGap;
+
+    offerWindow.container.x = resolvedX;
+    offerWindow.container.y = offerY;
+
+    askWindow.container.x = resolvedX;
+    askWindow.container.y =
+        offerY - tradeEditor.windowHeight - tradeEditor.rowGap;
+
+    possibleAskWindow.container.x = resolvedX;
+    possibleAskWindow.container.y =
+        askWindow.container.y - tradeEditor.windowHeight - tradeEditor.rowGap;
+
+    offerYesNoWindow.container.x =
+        resolvedX + tradeEditor.offerWidth + tradeEditor.actionRailGap;
+    offerYesNoWindow.container.y = askWindow.container.y;
+}
+
+function decorateTradeEditorWindow(
+    tradeWindow: hand.HandWindow,
+    icon: assets.AssetImage,
+    secondaryIcon?: assets.AssetImage,
+) {
+    const editor = getTradeConfig().editor;
+    tradeWindow.contentInsetLeft = editor.contentInsetLeft;
+
+    const defaultBg = tradeWindow.container.children[0];
+    if (defaultBg) {
+        defaultBg.visible = false;
+    }
+
+    tradeWindow.container.children
+        .filter((child) => child.name === "trade-editor-chrome")
+        .forEach((child) => tradeWindow.container.removeChild(child));
+
+    const chrome = new PIXI.Container();
+    chrome.name = "trade-editor-chrome";
+    chrome.addChild(
+        createDockRail({
+            width: tradeWindow.container.width,
+            height: editor.windowHeight,
+        }),
+    );
+    chrome.addChild(
+        createDockSideRail({
+            width: editor.railWidth,
+            height: editor.windowHeight,
+        }),
+    );
+
+    const addIcon = (asset: assets.AssetImage, centerY: number) => {
+        addIconSprite(chrome, {
+            asset,
+            width: editor.iconSize,
+            height: editor.iconSize,
+            x: (editor.railWidth - editor.iconSize) / 2,
+            y: centerY - editor.iconSize / 2,
+        });
+    };
+
+    if (secondaryIcon) {
+        addIcon(icon, editor.windowHeight / 2 - editor.iconSize * 0.45);
+        addIcon(
+            secondaryIcon,
+            editor.windowHeight / 2 + editor.iconSize * 0.55,
+        );
+    } else {
+        addIcon(icon, editor.windowHeight / 2);
+    }
+
+    tradeWindow.container.addChildAt(chrome, 0);
+}
+
+function decorateTradeActionRail(window: YesNoWindow) {
+    const editor = getTradeConfig().editor;
+    const defaultBg = window.container.children[0];
+    if (defaultBg) {
+        defaultBg.visible = false;
+    }
+
+    window.container.children
+        .filter((child) => child.name === "trade-editor-action-rail")
+        .forEach((child) => window.container.removeChild(child));
+
+    window._yesButton!.alpha = 0.001;
+    window._noButton!.alpha = 0.001;
+
+    const chrome = new PIXI.Container();
+    chrome.name = "trade-editor-action-rail";
+    chrome.addChild(
+        createDockRail({
+            width: 48,
+            height: editor.windowHeight,
+        }),
+    );
+
+    const makeActionChip = (
+        asset: assets.AssetImage,
+        centerY: number,
+        fill: number,
+    ) => {
+        const chip = new PIXI.Graphics();
+        chip.beginFill(fill);
+        chip.drawRoundedRect(6, centerY - 19, 36, 36, 12);
+        chip.endFill();
+        chrome.addChild(chip);
+
+        addIconSprite(chrome, {
+            asset,
+            width: 22,
+            height: 22,
+            x: 13,
+            y: centerY - 11,
+        });
+    };
+
+    makeActionChip(assets.uiKit.tradeArrowGreen, 24, 0x5ad469);
+    makeActionChip(assets.uiKit.x, 66, 0x17b6cf);
+
+    window.container.addChildAt(chrome, 0);
+}
 
 /** Currently available trade offers */
 let currentOffers: OfferObject[] = [];
@@ -70,43 +241,51 @@ export function clearOfferEditor() {
 export function initialize() {
     const isCK = state.settings.Mode == state.GameMode.CitiesAndKnights;
     const isCK_1 = isCK ? 1 : 0;
-    const cardWidth = 52;
+    const tradeEditor = getTradeConfig().editor;
+    const cardWidth = tradeEditor.cardWidth;
 
     offerWindow = new hand.HandWindow(
         canvas.app.stage,
-        WINDOW_WIDTH,
-        WINDOW_HEIGHT,
+        tradeEditor.offerWidth,
+        tradeEditor.windowHeight,
     );
     askWindow = new hand.HandWindow(
         canvas.app.stage,
-        isCK ? 16 + cardWidth * 6 + 30 : 16 + cardWidth * 5,
-        WINDOW_HEIGHT,
+        isCK ? tradeEditor.ckAskBaseWidth : tradeEditor.compactAskBaseWidth,
+        tradeEditor.windowHeight,
     );
     possibleAskWindow = new hand.HandWindow(
         canvas.app.stage,
-        isCK ? 16 + cardWidth * 8 : 16 + cardWidth * 5,
-        WINDOW_HEIGHT,
+        isCK
+            ? tradeEditor.ckPossibleAskWidth
+            : tradeEditor.basePossibleAskWidth,
+        tradeEditor.windowHeight,
         false,
         false,
     );
 
-    offerWindow.container.x = 20;
-    offerWindow.container.y = canvas.getHeight() - 110 - WINDOW_HEIGHT - 20;
+    decorateTradeEditorWindow(
+        possibleAskWindow,
+        assets.uiKit.players,
+        assets.uiKit.tradeArrowGreen,
+    );
+    decorateTradeEditorWindow(
+        askWindow,
+        assets.uiKit.bank,
+        assets.uiKit.tradeArrowRed,
+    );
+    decorateTradeEditorWindow(offerWindow, assets.uiKit.bank);
+
     offerWindow.container.visible = false;
     offerWindow.clickCallback = removeFromCurrentOffer;
     offerWindow.interactive = true;
     offerWindow.showRatios();
 
-    askWindow.container.x = 20 + WINDOW_WIDTH + 20;
-    askWindow.container.y = canvas.getHeight() - 110 - WINDOW_HEIGHT - 20;
     askWindow.container.visible = false;
     askWindow.container.zIndex = 1400;
     askWindow.clickCallback = removeFromCurrentAsk;
     askWindow.interactive = true;
 
-    possibleAskWindow.container.x = 20 + WINDOW_WIDTH + 20;
-    possibleAskWindow.container.y =
-        canvas.getHeight() - 20 - WINDOW_HEIGHT - 10;
     possibleAskWindow.container.zIndex = 100;
     possibleAskWindow.container.visible = false;
     possibleAskWindow.clickCallback = addToCurrentAsk;
@@ -116,16 +295,23 @@ export function initialize() {
     possibleAskWindow.interactive = true;
 
     offerYesNoWindow = new YesNoWindow(
-        askWindow.container.x + askWindow.container.width + 5,
-        askWindow.container.y,
+        0,
+        0,
     )
         .onYes(makeOffer)
         .onNo(clearOfferEditor)
         .render();
+    decorateTradeActionRail(offerYesNoWindow);
     offerYesNoWindow.container.visible = false;
     offerYesNoWindow.container.zIndex = 1400;
     offerYesNoWindow._yesButton!.reactDisable = true;
     canvas.app.stage.addChild(offerYesNoWindow.container);
+    relayoutEditorWindows();
+}
+
+export function relayout() {
+    relayoutEditorWindows();
+    canvas.app.markDirty();
 }
 
 /**
@@ -251,6 +437,15 @@ export function hasOffer() {
 function render() {
     canvas.app.markDirty();
 
+    if (
+        !offerWindow?.container ||
+        !askWindow?.container ||
+        !possibleAskWindow?.container ||
+        !offerYesNoWindow?.container
+    ) {
+        return;
+    }
+
     if (hand.handWindow) {
         hand.handWindow.interactive = canAddToCurrentOffer();
     }
@@ -319,8 +514,10 @@ export function showTradeOffer(offer: tsg.TradeOffer) {
     }
 
     const index = currentOffers.indexOf(offerObject);
+    const tradeOffers = getTradeConfig().offers;
 
-    const getY = (i: number) => 20 + i * 70;
+    const getY = (i: number) =>
+        tradeOffers.laneTop + i * tradeOffers.laneGap;
 
     // Refresh container
     offerContainer.destroy({ children: true });
@@ -341,25 +538,29 @@ export function showTradeOffer(offer: tsg.TradeOffer) {
 
     const tradeOfferWindow = new hand.HandWindow(
         offerContainer,
-        250,
-        80,
+        tradeOffers.cardWindowWidth,
+        tradeOffers.cardWindowHeight,
         true,
         false,
     );
     const tradeAskWindow = new hand.HandWindow(
         offerContainer,
-        250,
-        80,
+        tradeOffers.cardWindowWidth,
+        tradeOffers.cardWindowHeight,
         true,
         false,
     );
-    tradeOfferWindow.cardWidth = 40;
-    tradeAskWindow.cardWidth = 40;
+    tradeOfferWindow.cardWidth = tradeOffers.cardWidth;
+    tradeAskWindow.cardWidth = tradeOffers.cardWidth;
 
     const isCurrent = offer.CurrentPlayer == getThisPlayerOrder();
-    tradeOfferWindow.container.x = isCurrent ? 0 : 280;
+    tradeOfferWindow.container.x = isCurrent
+        ? 0
+        : tradeOffers.cardWindowWidth + tradeOffers.panelGap;
     tradeOfferWindow.container.y = 0;
-    tradeAskWindow.container.x = isCurrent ? 280 : 0;
+    tradeAskWindow.container.x = isCurrent
+        ? tradeOffers.cardWindowWidth + tradeOffers.panelGap
+        : 0;
     tradeAskWindow.container.y = 0;
 
     {
@@ -368,8 +569,8 @@ export function showTradeOffer(offer: tsg.TradeOffer) {
             fontWeight: "bold",
             fill: 0x00aa00,
         });
-        plus.x = 263;
-        plus.y = -8;
+        plus.x = tradeOffers.markerPlusX;
+        plus.y = tradeOffers.markerPlusY;
         plus.pivot.x = 40;
 
         const minus = new PIXI.Text("-", {
@@ -377,8 +578,8 @@ export function showTradeOffer(offer: tsg.TradeOffer) {
             fontWeight: "bold",
             fill: 0xaa0000,
         });
-        minus.x = 260;
-        minus.y = -20;
+        minus.x = tradeOffers.markerMinusX;
+        minus.y = tradeOffers.markerMinusY;
         minus.pivot.x = 40;
 
         tradeOfferWindow.container.addChild(isCurrent ? minus : plus);
@@ -396,7 +597,8 @@ export function showTradeOffer(offer: tsg.TradeOffer) {
             i: number,
         ): PIXI.Sprite => {
             const button = state.getPlayerAvatarSprite(playerOrder);
-            button.x = 10 + i * 50;
+            button.x =
+                tradeOffers.acceptPanelPadding + i * tradeOffers.acceptAvatarStep;
             button.y = 10;
             button.tint = 0x666666;
             const status = offer.Acceptances[playerOrder];
@@ -422,7 +624,12 @@ export function showTradeOffer(offer: tsg.TradeOffer) {
             lastWindow.container.x + lastWindow.container.width + 10;
         closeOfferContainer.y = tradeAskWindow.container.y;
         closeOfferContainer.addChild(
-            getWindowSprite((offer.Acceptances.length - 1) * 50 + 10, 80),
+            getWindowSprite(
+                (offer.Acceptances.length - 1) *
+                    tradeOffers.acceptAvatarStep +
+                    tradeOffers.acceptPanelPadding,
+                tradeOffers.acceptPanelHeight,
+            ),
         );
         offerContainer.addChild(closeOfferContainer);
 
@@ -439,10 +646,10 @@ export function showTradeOffer(offer: tsg.TradeOffer) {
 
     // Get position of container before putting in respond window
     // This ensures that the offers are lined up
-    offerContainer.x = canvas.getWidth() - 430;
+    offerContainer.x = canvas.getWidth() - tradeOffers.laneRightOffset;
     offerContainer.y = getY(index);
     offerContainer.zIndex = 1500;
-    offerContainer.scale.set(0.8);
+    offerContainer.scale.set(tradeOffers.scale);
     offerContainer.pivot.x = offerContainer.width + 100;
 
     // Respond window
@@ -473,7 +680,10 @@ export function showTradeOffer(offer: tsg.TradeOffer) {
 
     // Counter offer button
     if (offer.CreatedBy != getThisPlayerOrder() && !isSpectator()) {
-        const counterWindow = getWindowSprite(42, 42);
+        const counterWindow = getWindowSprite(
+            tradeOffers.counterButtonWindowSize,
+            tradeOffers.counterButtonWindowSize,
+        );
         counterWindow.x =
             respondWindow.container.x + respondWindow.container.width + 5;
         counterWindow.y = 20;
@@ -514,8 +724,11 @@ export function showTradeOffer(offer: tsg.TradeOffer) {
 
     {
         // Offerer window
-        const offererWindow = getWindowSprite(50 + 10, 80);
-        offererWindow.x = -70;
+        const offererWindow = getWindowSprite(
+            tradeOffers.offererPanelWidth,
+            tradeOffers.offererPanelHeight,
+        );
+        offererWindow.x = tradeOffers.offererOffsetX;
         const offererAvatar = state.getPlayerAvatarSprite(offer.CurrentPlayer);
         offererAvatar.x = 10;
         offererAvatar.y = 10;
@@ -528,7 +741,7 @@ export function showTradeOffer(offer: tsg.TradeOffer) {
     // Request animation
     if (isNewOffer) {
         offerObject.container.targetX = offerContainer.x;
-        offerContainer.x += 40;
+        offerContainer.x += tradeOffers.enterAnimationOffsetX;
         anim.requestTranslationAnimation(currentOffers.map((c) => c.container));
         sound.play("soundTrade");
     }

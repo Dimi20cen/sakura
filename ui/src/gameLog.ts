@@ -5,7 +5,8 @@ import * as state from "./state";
 import * as windows from "./windows";
 import * as tsg from "../tsg";
 import { CardType } from "./entities";
-import { computeGameLogPosition, RIGHT_STACK_PANEL_WIDTH } from "./hudLayout";
+import { computeGameLogPosition, getRightStackPanelWidth } from "./hudLayout";
+import { getUIConfig } from "./uiConfig";
 
 type LogEntry = {
     id: number;
@@ -13,10 +14,10 @@ type LogEntry = {
     icons?: number[];
 };
 
-const WIDTH = RIGHT_STACK_PANEL_WIDTH;
-const HEIGHT = 300;
+const WIDTH = () => getRightStackPanelWidth();
+const HEIGHT = () => getUIConfig().hud.gameLog.height;
 const MAX_ENTRIES = 80;
-const VISIBLE_ROWS = 13;
+const VISIBLE_ROWS = () => getUIConfig().hud.gameLog.visibleRows;
 
 let container: PIXI.Container | null = null;
 let content: PIXI.Container | null = null;
@@ -43,7 +44,7 @@ function ensureUI() {
     container = new PIXI.Container();
     container.zIndex = 1600;
 
-    const bg = windows.getWindowSprite(WIDTH, HEIGHT);
+    const bg = windows.getWindowSprite(WIDTH(), HEIGHT());
     container.addChild(bg);
 
     const title = new PIXI.Text("Game Log", {
@@ -61,7 +62,7 @@ function ensureUI() {
 
     const mask = new PIXI.Graphics();
     mask.beginFill(0xffffff);
-    mask.drawRect(8, 34, WIDTH - 16, HEIGHT - 42);
+    mask.drawRect(8, 34, WIDTH() - 16, HEIGHT() - 42);
     mask.endFill();
     container.addChild(mask);
 
@@ -79,7 +80,7 @@ function rerender() {
 
     feed.removeChildren();
 
-    const start = Math.max(0, entries.length - VISIBLE_ROWS);
+    const start = Math.max(0, entries.length - VISIBLE_ROWS());
     const visible = entries.slice(start);
 
     visible.forEach((entry, idx) => {
@@ -95,7 +96,7 @@ function rerender() {
         row.addChild(text);
 
         if (entry.icons?.length) {
-            let iconX = WIDTH - 16 - Math.min(entry.icons.length, 6) * 16;
+            let iconX = WIDTH() - 16 - Math.min(entry.icons.length, 6) * 16;
             entry.icons.slice(0, 6).forEach((ct) => {
                 const icon = new PIXI.Sprite();
                 icon.x = iconX;

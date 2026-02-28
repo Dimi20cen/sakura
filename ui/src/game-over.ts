@@ -5,6 +5,7 @@ import * as canvas from "./canvas";
 import * as state from "./state";
 import { getThisPlayerOrder } from "./ws";
 import { PlayerState } from "../tsg";
+import { getUIConfig } from "./uiConfig";
 
 let gameOverWindow: PIXI.Sprite;
 
@@ -41,19 +42,20 @@ function positionToMessage(pos: number) {
  * @param msg Game over message
  */
 export function handleGameOver(msg: GameOverMessage) {
+    const gameOver = getUIConfig().overlays.gameOver;
     if (gameOverWindow && !gameOverWindow.destroyed) {
         gameOverWindow?.destroy({ children: true });
     }
 
-    const PLAYER_HEIGHT = 95;
-    const EXTRA_HEIGHT = 80;
-    const width = 450;
+    const PLAYER_HEIGHT = gameOver.playerRowHeight;
+    const EXTRA_HEIGHT = gameOver.extraHeight;
+    const width = gameOver.width;
     const height =
         EXTRA_HEIGHT + msg.Players.length * PLAYER_HEIGHT + PLAYER_HEIGHT - 15;
 
     gameOverWindow = windows.getWindowSprite(width, height);
     gameOverWindow.pivot.x = width / 2;
-    gameOverWindow.pivot.y = height / 4;
+    gameOverWindow.pivot.y = height / gameOver.pivotYDivisor;
     gameOverWindow.x = canvas.getWidth() / 2;
     gameOverWindow.y = canvas.getHeight() / 4;
     gameOverWindow.zIndex = 2500;
@@ -64,14 +66,14 @@ export function handleGameOver(msg: GameOverMessage) {
         msg.Players.findIndex((p) => p.Order === getThisPlayerOrder()) + 1;
     const title = new PIXI.Text(positionToMessage(rank), {
         fontFamily: "sans-serif",
-        fontSize: 32,
+        fontSize: gameOver.titleFontSize,
         fill: 0x000000,
         align: "center",
     });
     title.style.fontWeight = "bold";
     title.anchor.x = 0.5;
     title.x = width / 2;
-    title.y = 30;
+    title.y = gameOver.titleY;
     gameOverWindow.addChild(title);
 
     const getPlayer = (p: PlayerState | undefined) => {

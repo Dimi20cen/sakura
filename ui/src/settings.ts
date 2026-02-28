@@ -5,6 +5,7 @@ import * as windows from "./windows";
 import { GameSettings } from "../tsg";
 import { DISPLAY_GAME_MODE, GAME_MODE } from "./lobby";
 import { capitalizeFirstLetter } from "../utils";
+import { getUIConfig } from "./uiConfig";
 
 export let settingsContainer: PIXI.Container;
 export let settingDetailsContainer: PIXI.Container;
@@ -12,39 +13,49 @@ let settings: GameSettings;
 
 export function initialize(s: GameSettings) {
     settings = s;
+    const { settingsButton } = getUIConfig().controls;
+    const settingsPanel = getUIConfig().settingsPanel;
 
     settingsContainer = new PIXI.Container();
     const settingsSprite = new PIXI.Sprite();
     assets.assignTexture(settingsSprite, assets.settings);
-    settingsSprite.scale.set(0.3);
+    settingsSprite.scale.set(settingsButton.iconScale);
     settingsSprite.anchor.x = 0.5;
     settingsSprite.anchor.y = 0.5;
-    settingsSprite.x = 25;
-    settingsSprite.y = 25;
-    settingsContainer.x = 10;
-    settingsContainer.y = 10;
+    settingsSprite.x = settingsButton.iconX;
+    settingsSprite.y = settingsButton.iconY;
+    settingsContainer.x = settingsButton.x;
+    settingsContainer.y = settingsButton.y;
     settingsContainer.zIndex = 900;
     settingsContainer.addChild(settingsSprite);
     settingsContainer.interactive = true;
     settingsContainer.cursor = "pointer";
 
     settingDetailsContainer = new PIXI.Container();
-    settingDetailsContainer.addChild(windows.getWindowSprite(170, 240));
-    settingDetailsContainer.x = 15;
-    settingDetailsContainer.y = 65;
+    settingDetailsContainer.addChild(
+        windows.getWindowSprite(
+            settingsPanel.detailsWidth,
+            settingsPanel.detailsHeight,
+        ),
+    );
+    settingDetailsContainer.x = settingsPanel.detailsX;
+    settingDetailsContainer.y = settingsPanel.detailsY;
     settingDetailsContainer.zIndex = 20000;
     settingDetailsContainer.visible = false;
 
     const addSettingsText = (text: string, idx: number) => {
         const t = new PIXI.Text(text, {
             fontFamily: "sans-serif",
-            fontSize: 13,
+            fontSize: settingsPanel.fontSize,
             fill: 0x000000,
             align: "left",
             fontWeight: "bold",
         });
-        t.x = 10;
-        t.y = idx === 0 ? 10 : 10 + 20 * idx;
+        t.x = settingsPanel.titleX;
+        t.y =
+            idx === 0
+                ? settingsPanel.rowStartY
+                : settingsPanel.rowStartY + settingsPanel.rowStep * idx;
         settingDetailsContainer.addChild(t);
     };
     addSettingsText("Settings", 0);

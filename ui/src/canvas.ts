@@ -4,6 +4,7 @@ import * as buttons from "./buttons";
 import { loadAssets } from "./assets";
 import { ICoordinate } from "../tsg";
 import { toggleFullscreen } from "../utils";
+import { getUIConfig } from "./uiConfig";
 
 type AppType = PIXI.Application & {
     /** Needs re-render */
@@ -43,13 +44,14 @@ export { app };
  * @param done Callback when done
  */
 export async function initialize(div: HTMLDivElement, done?: () => void) {
+    const { canvas: canvasConfig } = getUIConfig();
     const newApp = new PIXI.Application({
         backgroundColor: 0x0077be,
-        width: 1200,
-        height: 800,
+        width: canvasConfig.width,
+        height: canvasConfig.height,
         antialias: true,
         autoDensity: true,
-        resolution: 1.25,
+        resolution: canvasConfig.resolution,
         sharedTicker: false,
         autoStart: false,
         clearBeforeRender: false,
@@ -220,16 +222,17 @@ async function startup(done?: () => void) {
  * Initialize the fullscreen button
  */
 function addFullscreenButton() {
+    const { fullscreenButton } = getUIConfig().controls;
     const fsbtn = buttons.getButtonSprite(
         buttons.ButtonType.Fullscreen,
-        30,
-        30,
+        fullscreenButton.size,
+        fullscreenButton.size,
     );
     fsbtn.setEnabled(true);
     fsbtn.onClick(toggleFullscreen);
     // Align fullscreen with the settings icon centerline and place it below.
-    fsbtn.x = 20;
-    fsbtn.y = 64;
+    fsbtn.x = fullscreenButton.x;
+    fsbtn.y = fullscreenButton.y;
     app.stage.addChild(fsbtn);
 }
 
@@ -237,6 +240,7 @@ function addFullscreenButton() {
  * Get scaling ratio for display coordinates
  */
 export function getScaleRatio() {
+    const { canvas: canvasConfig } = getUIConfig();
     return Math.min(
         window.innerWidth / getWidth(),
         window.innerHeight / getHeight(),
@@ -250,9 +254,10 @@ const resize = () => {
     if (!app?.view) return;
 
     const ratio = getScaleRatio();
+    const { canvas: canvasConfig } = getUIConfig();
     const canvas = app.view as HTMLCanvasElement;
-    canvas.style!.height = `${800 * ratio}px`;
-    canvas.style!.width = `${1200 * ratio}px`;
+    canvas.style!.height = `${canvasConfig.height * ratio}px`;
+    canvas.style!.width = `${canvasConfig.width * ratio}px`;
     canvas.parentElement!.style.height = canvas.style.height;
     canvas.parentElement!.style.width = canvas.style.width;
     app.markDirty();
@@ -263,7 +268,7 @@ const resize = () => {
  */
 export function getHeight() {
     if (!app?.view || !app?.renderer) {
-        return 800;
+        return getUIConfig().canvas.height;
     }
     return app.view.height / app.renderer.resolution;
 }
@@ -273,7 +278,7 @@ export function getHeight() {
  */
 export function getWidth() {
     if (!app?.view || !app?.renderer) {
-        return 1200;
+        return getUIConfig().canvas.width;
     }
     return app.view.width / app.renderer.resolution;
 }

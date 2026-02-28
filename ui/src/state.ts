@@ -30,6 +30,7 @@ import { CardType } from "./entities";
 import CommandHub from "./commands";
 import { hexToUrlString } from "../utils";
 import { syncTurnTimerSnapshot } from "./store/turnTimerRuntime";
+import { getUIConfig } from "./uiConfig";
 
 type InitializableSprite = PIXI.Sprite & { initialized?: boolean };
 
@@ -75,8 +76,33 @@ export let lastKnownStates: PlayerState[] | null = null;
 export let lastKnownGameState: GameState | null = null;
 let lastKnownSecretVictoryPoints: number = 0;
 
-const WINDOW_WIDTH = 250;
-let WINDOW_SCALE = 1.08;
+function getPlayerPanelConfig() {
+    return getUIConfig().hud.playerPanel;
+}
+
+function getPlayerPanelWidth() {
+    return getPlayerPanelConfig().width;
+}
+
+function getPlayerPanelScale(playerCount: number) {
+    const config = getPlayerPanelConfig();
+    return playerCount > config.crowdedThreshold
+        ? config.scaleCrowded
+        : config.scaleDefault;
+}
+
+function getPlayerPanelHeight(playerCount: number) {
+    const config = getPlayerPanelConfig();
+    return playerCount * config.rowHeight + config.headerOffset;
+}
+
+function getPlayerRowOffset(order: number) {
+    return order * getPlayerPanelConfig().rowHeight;
+}
+
+function getPendingActionConfig() {
+    return getUIConfig().overlays.pendingAction;
+}
 
 export enum GameMode {
     Base = 1,
@@ -103,13 +129,14 @@ export function relayout() {
         return;
     }
 
-    const windowHeight = lastKnownStates.length * 80 + 15;
+    const windowHeight = getPlayerPanelHeight(lastKnownStates.length);
+    const windowScale = getPlayerPanelScale(lastKnownStates.length);
     const playerPanelPos = computePlayerPanelPosition({
         canvasWidth: canvas.getWidth(),
         canvasHeight: canvas.getHeight(),
-        panelWidth: WINDOW_WIDTH,
+        panelWidth: getPlayerPanelWidth(),
         panelHeight: windowHeight,
-        panelScale: WINDOW_SCALE,
+        panelScale: windowScale,
     });
     container.x = playerPanelPos.x;
     container.y = playerPanelPos.y;
@@ -154,53 +181,64 @@ const profileAvatarByUsername: Record<string, string> = {
  */
 function intialize(commandHub: CommandHub) {
     // State window
-    const WINDOW_HEIGHT = lastKnownStates!.length * 80 + 15;
+    const playerCount = lastKnownStates!.length;
+    const windowHeight = getPlayerPanelHeight(playerCount);
+    const windowScale = getPlayerPanelScale(playerCount);
 
     players = new Array(6);
-    if ((lastKnownStates?.length || 4) > 4) {
-        WINDOW_SCALE = 1;
-    }
 
     container = new PIXI.Container();
     const playerPanelPos = computePlayerPanelPosition({
         canvasWidth: canvas.getWidth(),
         canvasHeight: canvas.getHeight(),
-        panelWidth: WINDOW_WIDTH,
-        panelHeight: WINDOW_HEIGHT,
-        panelScale: WINDOW_SCALE,
+        panelWidth: getPlayerPanelWidth(),
+        panelHeight: windowHeight,
+        panelScale: windowScale,
     });
     container.x = playerPanelPos.x;
     container.y = playerPanelPos.y;
     container.cacheAsBitmapResolution = 2;
     container.cacheAsBitmapMultisample = PIXI.MSAA_QUALITY.HIGH;
     canvas.app.stage.addChild(container);
-    container.scale.set(WINDOW_SCALE);
+    container.scale.set(windowScale);
 
     // Window
-    container.addChild(windows.getWindowSprite(WINDOW_WIDTH, WINDOW_HEIGHT));
+    container.addChild(
+        windows.getWindowSprite(getPlayerPanelWidth(), windowHeight),
+    );
 
     // Pending action window
+    const pendingActionConfig = getPendingActionConfig();
     pendingActionContainer = new PIXI.Container();
-    pendingActionContainer.x = 20;
-    pendingActionContainer.y = 20;
+    pendingActionContainer.x = pendingActionConfig.x;
+    pendingActionContainer.y = pendingActionConfig.y;
     pendingActionContainer.zIndex = 1300;
     pendingActionContainer.visible = false;
 
     pendingActionText = new PIXI.Text("", {
         fontFamily: "sans-serif",
-        fontSize: 20,
+        fontSize: pendingActionConfig.fontSize,
         fill: 0x000000,
         align: "left",
     });
-    pendingActionText.x = 10;
-    pendingActionText.y = 20;
+    pendingActionText.x = pendingActionConfig.textX;
+    pendingActionText.y = pendingActionConfig.textY;
     pendingActionText.anchor.y = 0.5;
 
-    pendingActionContainer.addChild(windows.getWindowSprite(450, 40));
+    pendingActionContainer.addChild(
+        windows.getWindowSprite(
+            pendingActionConfig.width,
+            pendingActionConfig.height,
+        ),
+    );
     pendingActionContainer.addChild(pendingActionText);
 
-    pendingActionCancel = buttons.getButtonSprite(buttons.ButtonType.No, 38);
-    pendingActionCancel.x = pendingActionContainer.width - 40;
+    pendingActionCancel = buttons.getButtonSprite(
+        buttons.ButtonType.No,
+        pendingActionConfig.closeButtonSize,
+    );
+    pendingActionCancel.x =
+        pendingActionContainer.width - pendingActionConfig.closeButtonSize - 2;
     pendingActionCancel.y = 1;
     pendingActionCancel.anchor.x = 0;
     pendingActionCancel.interactive = true;
@@ -322,13 +360,18 @@ export function renderGameState(gs: GameState, commandHub: CommandHub) {
             players[state.Order] = {} as any;
             const spriteset = players[state.Order];
 
-            const offset = state.Order * 80;
+            const offset = getPlayerRowOffset(state.Order);
 
             {
                 const g = new PIXI.Graphics();
                 g.beginFill(0xaaaaaa);
                 g.alpha = 0.5;
-                g.drawRect(0, 8 + offset, WINDOW_WIDTH - 2, 79);
+                g.drawRect(
+                    0,
+                    8 + offset,
+                    getPlayerPanelWidth() - 2,
+                    getPlayerPanelConfig().highlightRowHeight,
+                );
                 g.endFill();
                 container.addChild(g);
                 spriteset.bg = g;

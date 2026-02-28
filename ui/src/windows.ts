@@ -2,6 +2,7 @@ import * as PIXI from "pixi.js";
 import * as canvas from "./canvas";
 import * as buttons from "./buttons";
 import { getCardTexture } from "./hand";
+import { getUIConfig } from "./uiConfig";
 
 let currentErrorWindow: PIXI.Container | undefined;
 
@@ -11,15 +12,15 @@ let currentErrorWindow: PIXI.Container | undefined;
  * @param height Height of the window
  */
 export function getWindowSprite(width: number, height: number) {
+    const { windows } = getUIConfig();
     const s = new PIXI.Sprite();
     const g = new PIXI.Graphics();
     g.lineStyle({
-        color: 0,
-        width: 2,
+        color: windows.borderColor,
+        width: windows.borderWidth,
     });
-    g.beginFill(0xffffff);
-    g.alpha = 0.9;
-    g.drawRoundedRect(0, 0, width, height, 4);
+    g.beginFill(windows.fillColor, windows.fillAlpha);
+    g.drawRoundedRect(0, 0, width, height, windows.cornerRadius);
     g.endFill();
     s.addChild(g);
     return s;
@@ -69,29 +70,34 @@ export class YesNoWindow {
             return this;
         }
 
-        this.container.addChild(getWindowSprite(42, 80));
+        const yesNo = getUIConfig().windows.yesNo;
+        this.container.addChild(getWindowSprite(yesNo.width, yesNo.height));
         this.container.x = this.x;
         this.container.y = this.y;
 
         this._yesButton = buttons.getButtonSprite(
             buttons.ButtonType.Yes,
-            32,
-            32,
+            yesNo.buttonSize,
+            yesNo.buttonSize,
         );
-        this._noButton = buttons.getButtonSprite(buttons.ButtonType.No, 32, 32);
+        this._noButton = buttons.getButtonSprite(
+            buttons.ButtonType.No,
+            yesNo.buttonSize,
+            yesNo.buttonSize,
+        );
         this._yesButton.setEnabled(this._yesEnabled);
         this._noButton.setEnabled(this._noEnabled);
         this.container.addChild(this._yesButton);
         this.container.addChild(this._noButton);
 
         // Yes
-        this._yesButton.x = 5;
-        this._yesButton.y = 5;
+        this._yesButton.x = yesNo.inset;
+        this._yesButton.y = yesNo.inset;
         this._yesButton.onClick(() => this.yesFun?.());
 
         // No
-        this._noButton.x = 5;
-        this._noButton.y = 2 * 4 + 35;
+        this._noButton.x = yesNo.inset;
+        this._noButton.y = yesNo.inset + yesNo.buttonSize + yesNo.gap;
         this._noButton.onClick(() => this.noFun?.());
 
         return this;
@@ -141,15 +147,16 @@ export class YesNoWindow {
  */
 export function showErrorWindow(titleMessage: string, message: string) {
     console.error(titleMessage, message);
+    const modal = getUIConfig().windows.errorModal;
 
     if (currentErrorWindow && !currentErrorWindow.destroyed) {
         currentErrorWindow.destroy({ children: true });
     }
 
-    const errorWindow = getWindowSprite(300, 300);
-    errorWindow.pivot.x = 300 / 2;
-    errorWindow.pivot.y = 300 / 2;
-    errorWindow.x = 1200 / 2;
+    const errorWindow = getWindowSprite(modal.width, modal.height);
+    errorWindow.pivot.x = modal.width / 2;
+    errorWindow.pivot.y = modal.height / 2;
+    errorWindow.x = canvas.getWidth() / 2;
     errorWindow.y = window.innerHeight / 2 - 20;
     canvas.app.stage.addChild(errorWindow);
     canvas.app.markDirty();
@@ -157,31 +164,35 @@ export function showErrorWindow(titleMessage: string, message: string) {
 
     const title = new PIXI.Text(titleMessage, {
         fontFamily: "sans-serif",
-        fontSize: 28,
+        fontSize: modal.titleFontSize,
         fill: 0x000000,
         align: "center",
     });
     title.style.fontWeight = "bold";
     title.anchor.x = 0.5;
-    title.x = 300 / 2;
+    title.x = modal.width / 2;
     title.y = 30;
     errorWindow.addChild(title);
 
     const description = new PIXI.Text(message, {
         fontFamily: "sans-serif",
-        fontSize: 16,
+        fontSize: modal.bodyFontSize,
         fill: 0x000000,
         align: "left",
         wordWrap: true,
-        wordWrapWidth: 260,
+        wordWrapWidth: modal.bodyWidth,
     });
     description.x = 20;
     description.y = 80;
     errorWindow.addChild(description);
 
-    const cross = buttons.getButtonSprite(buttons.ButtonType.No, 40, 40);
-    cross.pivot.x = 40;
-    cross.x = 300;
+    const cross = buttons.getButtonSprite(
+        buttons.ButtonType.No,
+        modal.closeButtonSize,
+        modal.closeButtonSize,
+    );
+    cross.pivot.x = modal.closeButtonSize;
+    cross.x = modal.width;
     cross.y = 0;
     cross.onClick(() => {
         errorWindow.destroy({ children: true });
@@ -251,51 +262,59 @@ export class TooltipHandler {
      * Create the tooltip window
      */
     private makeWindow() {
+        const tooltip = getUIConfig().windows.tooltip;
         const style = new PIXI.TextStyle({
-            fontSize: 14,
+            fontSize: tooltip.fontSize,
             align: "left",
             fontFamily: "sans-serif",
             wordWrap: true,
-            wordWrapWidth: 200,
+            wordWrapWidth: tooltip.wordWrapWidth,
         });
         const m = PIXI.TextMetrics.measureText(this.message, style);
 
-        const cardWidth = 32;
+        const cardWidth = tooltip.cardWidth;
         const cardHeight = (cardWidth * 3) / 2;
-        const totalCardWidth = this.cards.length * (cardWidth + 5) + 5;
-        const totalCardHeight = this.cards.length > 0 ? cardHeight + 10 : 0;
+        const totalCardWidth =
+            this.cards.length * (cardWidth + tooltip.cardGap) + tooltip.cardGap;
+        const totalCardHeight =
+            this.cards.length > 0 ? cardHeight + tooltip.padding * 2 : 0;
 
         const windowWidth = Math.max(
-            Math.min(210, m.width + 10),
+            Math.min(tooltip.maxWidth, m.width + tooltip.padding * 2),
             totalCardWidth,
         );
-        const windowHeight = m.height + totalCardHeight + 10;
+        const windowHeight = m.height + totalCardHeight + tooltip.padding * 2;
         this.window = getWindowSprite(windowWidth, windowHeight);
         this.window.pivot.y = windowHeight;
         const pos = this.target.getGlobalPosition();
-        this.window.x = pos.x - 10;
-        this.window.y = pos.y - 5;
+        this.window.x = pos.x - tooltip.offsetX;
+        this.window.y = pos.y - tooltip.offsetY;
         this.window.zIndex = 10000;
 
         // Prevent going out of window
         this.window.x -= Math.max(
             0,
-            this.window.x + windowWidth - canvas.getWidth() + 5,
+            this.window.x + windowWidth - canvas.getWidth() + tooltip.viewportInset,
         );
-        this.window.x = Math.max(5, this.window.x);
-        this.window.y = Math.max(this.window.pivot.y + 5, this.window.y);
+        this.window.x = Math.max(tooltip.viewportInset, this.window.x);
+        this.window.y = Math.max(
+            this.window.pivot.y + tooltip.viewportInset,
+            this.window.y,
+        );
 
         const text = new PIXI.Text(this.message, style);
-        text.x = 5;
-        text.y = 5;
+        text.x = tooltip.padding;
+        text.y = tooltip.padding;
         this.window.addChild(text);
 
         this.cards.forEach((card, i) => {
             const cardSprite = new PIXI.Sprite();
             getCardTexture(card, cardSprite, cardWidth);
             cardSprite.x =
-                5 + (5 + cardWidth) * i + (windowWidth - totalCardWidth) / 2;
-            cardSprite.y = m.height + 10;
+                tooltip.padding +
+                (tooltip.cardGap + cardWidth) * i +
+                (windowWidth - totalCardWidth) / 2;
+            cardSprite.y = m.height + tooltip.padding * 2;
             this.window!.addChild(cardSprite);
         });
 

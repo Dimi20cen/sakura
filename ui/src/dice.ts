@@ -9,6 +9,7 @@ import { computeDicePosition } from "./hudLayout";
 import { sound } from "@pixi/sound";
 import { DieRollState } from "../tsg";
 import { getCommandHub } from "./ws";
+import { createDockRail, createDockSlot } from "./uiDock";
 
 let redDiceSprite: PIXI.Sprite;
 let redDiceInner: PIXI.Sprite;
@@ -60,7 +61,7 @@ export function relayout() {
  */
 function getBorder(s: number) {
     const border = new PIXI.Graphics();
-    border.lineStyle({ color: 0, width: 2 });
+    border.lineStyle({ color: 0x5a341a, width: 2 });
     border.beginFill(0, 0);
     border.drawRoundedRect(0, 0, s, s, 10 * (s / 64));
     border.endFill();
@@ -89,11 +90,35 @@ export async function render(
     const SIZE = 64;
 
     if (!diceContainer || diceContainer.destroyed) {
+        const SIZE = 64;
         diceContainer = new PIXI.Container();
         diceContainer.x = canvas.getWidth() - 230;
         diceContainer.y = canvas.getHeight() - 180;
         diceContainer.zIndex = 1100;
         canvas.app.stage.addChild(diceContainer);
+
+        diceContainer.addChild(
+            createDockRail({
+                width: 152,
+                height: 76,
+            }),
+        );
+        diceContainer.addChild(
+            createDockSlot({
+                x: 8,
+                y: 6,
+                width: SIZE + 4,
+                height: SIZE + 4,
+            }),
+        );
+        diceContainer.addChild(
+            createDockSlot({
+                x: 78,
+                y: 6,
+                width: SIZE + 4,
+                height: SIZE + 4,
+            }),
+        );
 
         redDiceSprite = new PIXI.Sprite();
         redDiceInner = new PIXI.Sprite();
@@ -110,7 +135,7 @@ export async function render(
         whiteDiceInner = new PIXI.Sprite();
         whiteDiceInner.width = SIZE;
         whiteDiceInner.height = SIZE;
-        whiteDiceSprite.x = SIZE + 10;
+        whiteDiceSprite.x = SIZE + 14;
         whiteDiceInner.interactive = true;
         whiteDiceInner.cursor = "pointer";
         whiteDiceInner.on("pointerdown", rollDice);
@@ -118,8 +143,8 @@ export async function render(
         whiteDiceSprite.addChild(whiteDiceInner);
         whiteDiceSprite.addChild(getBorder(SIZE));
 
-        diceContainer.pivot.x = (whiteDiceInner.width + whiteDiceSprite.x) / 2;
-        diceContainer.pivot.y = whiteDiceInner.height / 2;
+        diceContainer.pivot.x = 76;
+        diceContainer.pivot.y = 38;
     }
 
     if (eventRoll && (!eventDiceInner || eventDiceInner.destroyed)) {
@@ -127,8 +152,8 @@ export async function render(
         eventDiceInner = new PIXI.Sprite();
         eventDiceInner.width = (SIZE * 2) / 3;
         eventDiceInner.height = (SIZE * 2) / 3;
-        eventDiceSprite.x = 90;
-        eventDiceSprite.y = -SIZE + 10;
+        eventDiceSprite.x = 108;
+        eventDiceSprite.y = -40;
         diceContainer.addChild(eventDiceSprite);
         eventDiceSprite.addChild(eventDiceInner);
         eventDiceSprite.addChild(getBorder((SIZE * 2) / 3));

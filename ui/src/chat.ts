@@ -7,9 +7,9 @@ import {
     computeChatLanePosition,
     computeChatPopupPosition,
     computeChatWindowPosition,
-    RIGHT_STACK_PANEL_WIDTH,
 } from "./hudLayout";
 import { sound } from "@pixi/sound";
+import { getUIConfig } from "./uiConfig";
 
 type Message = { text: string; color: string };
 
@@ -18,11 +18,8 @@ let inputBox: HTMLInputElement;
 let scrollOffset = 0;
 let chatLane: PIXI.Container;
 let unreadDot: PIXI.Graphics;
-const CHAT_WIDTH = 250;
-const CHAT_HEIGHT = 160;
-const CHAT_LANE_WIDTH = RIGHT_STACK_PANEL_WIDTH;
-const CHAT_LANE_HEIGHT = 34;
 const messages: Message[] = [];
+let syncInputLayout: (() => void) | null = null;
 // [
 //     {
 //         text: "meew: Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
@@ -39,7 +36,9 @@ const messages: Message[] = [];
 //     { text: "rajuRastogi: orange will not win now", color: "red" },
 // ];
 
-const G_X = 250;
+function getChatConfig() {
+    return getUIConfig().hud.chat;
+}
 
 /**
  * Creates a new chat window.
@@ -49,9 +48,14 @@ export function initialize() {
         windowSprite.destroy();
     }
 
-    windowSprite = windows.getWindowSprite(CHAT_WIDTH, CHAT_HEIGHT);
-    windowSprite.pivot.x = CHAT_WIDTH;
-    windowSprite.pivot.y = CHAT_HEIGHT;
+    const chatConfig = getChatConfig();
+
+    windowSprite = windows.getWindowSprite(
+        chatConfig.windowWidth,
+        chatConfig.windowHeight,
+    );
+    windowSprite.pivot.x = chatConfig.windowWidth;
+    windowSprite.pivot.y = chatConfig.windowHeight;
     const chatWindowPos = computeChatWindowPosition({
         canvasWidth: canvas.getWidth(),
         canvasHeight: canvas.getHeight(),
@@ -74,15 +78,17 @@ export function initialize() {
 
     const resize = () => {
         const ratio = canvas.getScaleRatio();
-        inputBox.style.height = `${25 * ratio}px`;
-        inputBox.style.width = `${(CHAT_WIDTH - 10) * ratio}px`;
-        inputBox.style.bottom = `${(G_X + 6) * ratio}px`;
-        inputBox.style.right = `${25 * ratio}px`;
+        const nextChatConfig = getChatConfig();
+        inputBox.style.height = `${nextChatConfig.inputHeight * ratio}px`;
+        inputBox.style.width = `${(nextChatConfig.windowWidth - 10) * ratio}px`;
+        inputBox.style.bottom = `${nextChatConfig.inputInsetBottom * ratio}px`;
+        inputBox.style.right = `${nextChatConfig.inputInsetRight * ratio}px`;
         inputBox.style.fontSize = `${0.9 * ratio}em`;
-        inputBox.style.padding = `0 ${4 * ratio}px`;
+        inputBox.style.padding = `0 ${nextChatConfig.inputHorizontalPadding * ratio}px`;
         inputBox.style.borderRadius = `${4 * ratio}px`;
-        inputBox.style.border = `${2 * ratio}px solid grey`;
+        inputBox.style.border = `${nextChatConfig.inputBorderWidth * ratio}px solid grey`;
     };
+    syncInputLayout = resize;
     resize();
     window.addEventListener("resize", resize);
 
@@ -99,6 +105,7 @@ export function initialize() {
     });
 
     windowSprite.on("removed", () => {
+        syncInputLayout = null;
         inputBox.remove();
         window.removeEventListener("resize", resize);
     });
@@ -132,7 +139,7 @@ export function initialize() {
         btn.setEnabled(true);
         btn.pivot.x = 25;
         btn.zIndex = 30;
-        btn.x = CHAT_WIDTH - 3;
+        btn.x = chatConfig.windowWidth - 3;
         btn.y = 3;
         windowSprite.addChild(btn);
         btn.on("pointerdown", () => setVisible(false));
@@ -144,9 +151,17 @@ export function initialize() {
         chatLane.interactive = true;
         chatLane.cursor = "pointer";
         chatLane.zIndex = 1000;
-        chatLane.hitArea = new PIXI.Rectangle(0, 0, CHAT_LANE_WIDTH, CHAT_LANE_HEIGHT);
+        chatLane.hitArea = new PIXI.Rectangle(
+            0,
+            0,
+            chatConfig.laneWidth,
+            chatConfig.laneHeight,
+        );
 
-        const bg = windows.getWindowSprite(CHAT_LANE_WIDTH, CHAT_LANE_HEIGHT);
+        const bg = windows.getWindowSprite(
+            chatConfig.laneWidth,
+            chatConfig.laneHeight,
+        );
         chatLane.addChild(bg);
 
         const label = new PIXI.Text("Chat", {
@@ -157,16 +172,16 @@ export function initialize() {
         });
         label.anchor.set(0.5);
         label.scale.set(0.5);
-        label.x = CHAT_LANE_WIDTH / 2;
-        label.y = CHAT_LANE_HEIGHT / 2;
+        label.x = chatConfig.laneWidth / 2;
+        label.y = chatConfig.laneHeight / 2;
         chatLane.addChild(label);
 
         unreadDot = new PIXI.Graphics();
         unreadDot.beginFill(0xdc2626);
         unreadDot.drawCircle(0, 0, 5);
         unreadDot.endFill();
-        unreadDot.x = CHAT_LANE_WIDTH - 14;
-        unreadDot.y = CHAT_LANE_HEIGHT / 2;
+        unreadDot.x = chatConfig.laneWidth - 14;
+        unreadDot.y = chatConfig.laneHeight / 2;
         unreadDot.visible = false;
         chatLane.addChild(unreadDot);
 
@@ -197,6 +212,7 @@ export function relayout() {
         chatLane.x = lanePos.x;
         chatLane.y = lanePos.y;
     }
+    syncInputLayout?.();
     canvas.app.markDirty();
 }
 
@@ -211,7 +227,7 @@ function renderMessages() {
     const style = new PIXI.TextStyle({
         fontSize: 14,
         wordWrap: true,
-        wordWrapWidth: 230,
+        wordWrapWidth: getChatConfig().windowWidth - 20,
         fontFamily: "'Dekko', monospace",
     });
 
@@ -327,7 +343,7 @@ export function chatMessage(msg: Message) {
         const laneY = chatLane?.y || 0;
         const popupPos = computeChatPopupPosition({
             canvasWidth: canvas.getWidth(),
-            chatButtonY: laneY + CHAT_LANE_HEIGHT / 2,
+            chatButtonY: laneY + getChatConfig().laneHeight / 2,
         });
         popup.x = popupPos.x;
         popup.y = popupPos.y;

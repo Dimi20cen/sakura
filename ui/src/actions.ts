@@ -9,6 +9,7 @@ import * as canvas from "./canvas";
 import * as windows from "./windows";
 import * as PIXI from "pixi.js";
 import * as buttons from "./buttons";
+import { getUIConfig } from "./uiConfig";
 
 export enum PlayerActionType {
     SelectCards = "sc",
@@ -33,6 +34,10 @@ function getCurrentPlayerColor() {
     return (
         state.lastKnownStates?.[ws.getThisPlayerOrder()]?.Color || "#ff0000"
     );
+}
+
+function getOverlayConfig() {
+    return getUIConfig().overlays;
 }
 
 /**
@@ -181,23 +186,27 @@ function showSetupPlacementPreview(
 
     const previewType = forcedType || getSetupPreviewType(action);
     const playerColor = getCurrentPlayerColor();
+    const setupPreview = getOverlayConfig().setupPreview;
     const w = new PIXI.Container();
-    const windowWidth = previewType === "road_or_ship" ? 118 : 62;
-    const windowSprite = windows.getWindowSprite(windowWidth, 62);
+    const windowWidth =
+        previewType === "road_or_ship"
+            ? setupPreview.dualWidth
+            : setupPreview.singleWidth;
+    const windowSprite = windows.getWindowSprite(windowWidth, setupPreview.height);
     w.addChild(windowSprite);
 
     if (previewType === "road_or_ship") {
         const roadPreview = buttons.getButtonSprite(
             buttons.ButtonType.Road,
-            52,
+            setupPreview.buttonSize,
             undefined,
             playerColor,
             undefined,
             "rounded-rect",
             0.75,
         );
-        roadPreview.x = 5;
-        roadPreview.y = 5;
+        roadPreview.x = setupPreview.padding;
+        roadPreview.y = setupPreview.padding;
         roadPreview.setEnabled(true);
         roadPreview.onClick(() => {
             clearSetupPlacementPreview();
@@ -207,12 +216,12 @@ function showSetupPlacementPreview(
 
         const shipPreview = buttons.getButtonSprite(
             buttons.ButtonType.Ship,
-            52,
+            setupPreview.buttonSize,
             undefined,
             playerColor,
         );
-        shipPreview.x = 61;
-        shipPreview.y = 5;
+        shipPreview.x = setupPreview.secondaryButtonX;
+        shipPreview.y = setupPreview.padding;
         shipPreview.setEnabled(true);
         shipPreview.onClick(() => {
             clearSetupPlacementPreview();
@@ -222,7 +231,7 @@ function showSetupPlacementPreview(
     } else {
         const preview = buttons.getButtonSprite(
             previewType,
-            52,
+            setupPreview.buttonSize,
             undefined,
             previewType === buttons.ButtonType.Settlement ||
                 previewType === buttons.ButtonType.City ||
@@ -234,8 +243,8 @@ function showSetupPlacementPreview(
             "rounded-rect",
             previewType === buttons.ButtonType.Road ? 0.75 : 1,
         );
-        preview.x = 5;
-        preview.y = 5;
+        preview.x = setupPreview.padding;
+        preview.y = setupPreview.padding;
         preview.setEnabled(true);
         preview.onClick(() => {
             clearSetupPlacementPreview();
@@ -245,7 +254,7 @@ function showSetupPlacementPreview(
     }
 
     w.x = x - windowWidth / 2;
-    w.y = y - 78;
+    w.y = y - setupPreview.offsetY;
     w.zIndex = 1200;
     setupPlacementPreviewWindow = w;
     board.container.addChild(w);
@@ -411,9 +420,16 @@ export function chooseEdge(a: tsg.PlayerActionChooseEdge, action: tsg.PlayerActi
 export function chooseDice() {
     clearChooseDice();
 
-    const DICE_WIDTH = 40;
-    const WIDTH = 20 + (DICE_WIDTH + 5) * 6;
-    const HEIGHT = 2 * DICE_WIDTH + 25;
+    const chooseDiceConfig = getOverlayConfig().chooseDice;
+    const DICE_WIDTH = chooseDiceConfig.dieWidth;
+    const WIDTH =
+        chooseDiceConfig.padding * 2 +
+        (DICE_WIDTH + chooseDiceConfig.gap) * 6 -
+        chooseDiceConfig.gap;
+    const HEIGHT =
+        chooseDiceConfig.padding * 2 +
+        2 * DICE_WIDTH +
+        chooseDiceConfig.rowGap;
     const w = windows.getWindowSprite(WIDTH, HEIGHT);
     chooseDiceWindow = w;
 
@@ -439,8 +455,10 @@ export function chooseDice() {
         const white = new PIXI.Sprite();
         assets.assignTexture(white, assets.diceWhite[i]);
         white.scale.set(DICE_WIDTH / white.width);
-        white.x = 10 + (DICE_WIDTH + 5) * (i - 1);
-        white.y = 10;
+        white.x =
+            chooseDiceConfig.padding +
+            (DICE_WIDTH + chooseDiceConfig.gap) * (i - 1);
+        white.y = chooseDiceConfig.padding;
         white.interactive = true;
         white.cursor = "pointer";
         white.tint = 0x888888;
@@ -458,8 +476,11 @@ export function chooseDice() {
         const red = new PIXI.Sprite();
         assets.assignTexture(red, assets.diceRed[i]);
         red.scale.set(DICE_WIDTH / red.width);
-        red.x = 10 + (DICE_WIDTH + 5) * (i - 1);
-        red.y = 55;
+        red.x =
+            chooseDiceConfig.padding +
+            (DICE_WIDTH + chooseDiceConfig.gap) * (i - 1);
+        red.y =
+            chooseDiceConfig.padding + DICE_WIDTH + chooseDiceConfig.rowGap;
         red.interactive = true;
         red.cursor = "pointer";
         red.tint = 0x888888;
@@ -476,8 +497,8 @@ export function chooseDice() {
     });
 
     w.zIndex = 1500;
-    w.x = 20;
-    w.y = canvas.getHeight() - 140 - HEIGHT;
+    w.x = chooseDiceConfig.anchorX;
+    w.y = canvas.getHeight() - chooseDiceConfig.bottomOffset - HEIGHT;
     canvas.app.stage.addChild(w);
 }
 
@@ -514,15 +535,21 @@ function chooseBuildable(data: { r?: boolean; s?: boolean }) {
     }
 
     const showBoth = allowRoad && allowShip;
-    const WIDTH = showBoth ? 140 : 76;
-    const HEIGHT = 62;
+    const chooseBuildableConfig = getOverlayConfig().chooseBuildable;
+    const WIDTH = showBoth
+        ? chooseBuildableConfig.dualWidth
+        : chooseBuildableConfig.singleWidth;
+    const HEIGHT = chooseBuildableConfig.height;
     const w = windows.getWindowSprite(WIDTH, HEIGHT);
     chooseBuildableWindow = w;
     w.zIndex = 1500;
     if (chooseBuildableAnchor) {
-        const margin = 10;
-        const topY = chooseBuildableAnchor.y - HEIGHT - 16;
-        const bottomY = chooseBuildableAnchor.y + 16;
+        const margin = chooseBuildableConfig.margin;
+        const topY =
+            chooseBuildableAnchor.y - HEIGHT - chooseBuildableConfig.topOffset;
+        const bottomY =
+            chooseBuildableAnchor.y +
+            chooseBuildableConfig.bottomPlacementOffset;
         w.x = Math.max(
             margin,
             Math.min(
@@ -535,15 +562,20 @@ function chooseBuildable(data: { r?: boolean; s?: boolean }) {
                 ? topY
                 : Math.min(bottomY, canvas.getHeight() - HEIGHT - margin);
     } else {
-        w.x = 20;
-        w.y = canvas.getHeight() - 140 - HEIGHT;
+        w.x = chooseBuildableConfig.defaultX;
+        w.y = canvas.getHeight() - chooseBuildableConfig.bottomOffset - HEIGHT;
     }
     chooseBuildableAnchor = undefined;
 
     if (allowRoad) {
-        const road = buttons.getButtonSprite(buttons.ButtonType.Road, 52);
-        road.x = showBoth ? 10 : 12;
-        road.y = 6;
+        const road = buttons.getButtonSprite(
+            buttons.ButtonType.Road,
+            chooseBuildableConfig.buttonSize,
+        );
+        road.x = showBoth
+            ? chooseBuildableConfig.dualLeftX
+            : chooseBuildableConfig.singleButtonX;
+        road.y = chooseBuildableConfig.buttonY;
         road.setEnabled(true);
         road.onClick(() => {
             resetPendingAction();
@@ -558,12 +590,14 @@ function chooseBuildable(data: { r?: boolean; s?: boolean }) {
     if (allowShip) {
         const ship = buttons.getButtonSprite(
             buttons.ButtonType.Ship,
-            52,
+            chooseBuildableConfig.buttonSize,
             undefined,
             getCurrentPlayerColor(),
         );
-        ship.x = showBoth ? 74 : 12;
-        ship.y = 6;
+        ship.x = showBoth
+            ? chooseBuildableConfig.dualRightX
+            : chooseBuildableConfig.singleButtonX;
+        ship.y = chooseBuildableConfig.buttonY;
         ship.setEnabled(true);
         ship.onClick(() => {
             resetPendingAction();

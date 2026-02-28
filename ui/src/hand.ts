@@ -15,6 +15,8 @@ import {
 import * as tsg from "../tsg";
 import { getCommandHub, getThisPlayerOrder, isSpectator } from "./ws";
 import { CardType, DevelopmentCardType } from "./entities";
+import { getUIConfig } from "./uiConfig";
+import { createDockRail } from "./uiDock";
 
 export let handWindow: HandWindow | undefined;
 
@@ -27,14 +29,19 @@ let devConfirmationSprite: PIXI.Sprite;
 let devConfirmationYesNoWindow: windows.YesNoWindow;
 let usingDevCardType: number;
 
-const HAND_WINDOW_HEIGHT = 90;
-const DEV_CONFIRMATION_CARD_WIDTH = 120;
-const DEV_CONFIRMATION_BUTTON_GAP = 10;
-const YES_NO_WINDOW_HEIGHT = 80;
 let handWindowWidth = 750;
+
+function getHandWindowHeight() {
+    return getUIConfig().hud.bottomRail.handHeight;
+}
+
+function getHandConfig() {
+    return getUIConfig().hand;
+}
 
 function layoutDevConfirmationControls() {
     const selectedCard = assets.cards[usingDevCardType + 100];
+    const handConfig = getHandConfig();
     if (
         !devConfirmationYesNoWindow?.container ||
         !devConfirmationSprite ||
@@ -44,14 +51,16 @@ function layoutDevConfirmationControls() {
     }
 
     const previewHeight =
-        (DEV_CONFIRMATION_CARD_WIDTH * selectedCard.height) /
+        (handConfig.devConfirmationCardWidth * selectedCard.height) /
         selectedCard.width;
 
     devConfirmationYesNoWindow.container.x =
-        DEV_CONFIRMATION_CARD_WIDTH + DEV_CONFIRMATION_BUTTON_GAP;
+        handConfig.devConfirmationCardWidth + handConfig.devConfirmationButtonGap;
     devConfirmationYesNoWindow.container.y = Math.max(
         0,
-        Math.round((previewHeight - YES_NO_WINDOW_HEIGHT) / 2),
+        Math.round(
+            (previewHeight - handConfig.devConfirmationButtonHeight) / 2,
+        ),
     );
 }
 
@@ -74,7 +83,7 @@ export function relayout() {
         handWindow = new HandWindow(
             canvas.app.stage,
             expectedHandWidth,
-            HAND_WINDOW_HEIGHT,
+            getHandWindowHeight(),
         );
         handWindowWidth = expectedHandWidth;
         handWindow.clickCallback = cardClick;
@@ -90,7 +99,7 @@ export function relayout() {
     if (handWindow && !handWindow.container.destroyed) {
         const handPos = computeHandPosition({
             canvasHeight: canvas.getHeight(),
-            handHeight: HAND_WINDOW_HEIGHT,
+            handHeight: getHandWindowHeight(),
         });
         handWindow.container.x = handPos.x;
         handWindow.container.y = handPos.y;
@@ -99,7 +108,7 @@ export function relayout() {
     if (devConfirmationWindow && !devConfirmationWindow.destroyed) {
         const confirmPos = computeDevConfirmationPosition({
             canvasHeight: canvas.getHeight(),
-            handHeight: HAND_WINDOW_HEIGHT,
+            handHeight: getHandWindowHeight(),
         });
         devConfirmationWindow.x = confirmPos.x;
         devConfirmationWindow.y = confirmPos.y;
@@ -181,6 +190,7 @@ export class HandWindow {
     private ratios: number[] = new Array(9).fill(0);
     private showingRatios: boolean = false;
     public noRatioStride = false;
+    public contentInsetLeft = 10;
 
     /** Callback when a card is clicked */
     public clickCallback?: (cardType: number) => void;
@@ -209,7 +219,7 @@ export class HandWindow {
         private hasCounts: boolean = true,
         private shouldAnimate: boolean = true,
     ) {
-        this.container.addChild(windows.getWindowSprite(width, height));
+        this.container.addChild(createDockRail({ width, height }));
         this.render();
         this.parent.addChild(this.container);
     }
@@ -266,7 +276,7 @@ export class HandWindow {
      */
     public render(skipAnimation: boolean = false) {
         canvas.app.markDirty();
-        let dx = 10;
+        let dx = this.contentInsetLeft;
 
         const renderCardType = (ct: number, quantity: number) => {
             if (quantity < 0) return;
@@ -586,7 +596,7 @@ export class HandWindow {
 export function renderPlayerHand(secret: tsg.PlayerSecretState) {
     // Bigger window than others for dev cards
     const WINDOW_WIDTH = computeHandWidth(canvas.getWidth());
-    const WINDOW_HEIGHT = HAND_WINDOW_HEIGHT;
+    const WINDOW_HEIGHT = getHandWindowHeight();
 
     if (
         !handWindow ||
@@ -646,7 +656,8 @@ export function renderPlayerHand(secret: tsg.PlayerSecretState) {
         devConfirmationWindow.visible = false;
 
         devConfirmationYesNoWindow = new windows.YesNoWindow(
-            DEV_CONFIRMATION_CARD_WIDTH + DEV_CONFIRMATION_BUTTON_GAP,
+            getHandConfig().devConfirmationCardWidth +
+                getHandConfig().devConfirmationButtonGap,
             0,
         )
             .onYes(() => {
@@ -699,7 +710,7 @@ function cardClick(cardType: number) {
     getCardTexture(
         cardType + 100,
         devConfirmationSprite,
-        DEV_CONFIRMATION_CARD_WIDTH,
+        getHandConfig().devConfirmationCardWidth,
         4,
     );
     devConfirmationWindow.addChild(devConfirmationSprite);

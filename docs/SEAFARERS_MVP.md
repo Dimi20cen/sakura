@@ -15,6 +15,7 @@ This document describes the currently implemented Seafarers scope.
   - Ship movement
   - Pirate (sea robber)
   - Longest trade route
+  - Largest Army
 
 ## Rules Implemented
 
@@ -76,6 +77,12 @@ This document describes the currently implemented Seafarers scope.
 - Computed across both roads and ships.
 - Transition road <-> ship is allowed only through the owner’s settlement/city.
 - Enemy settlement/city on a vertex blocks route continuation through that vertex.
+
+### Largest Army
+
+- Uses base-game Knight development cards in Seafarers.
+- First player to have played `3` Knight cards receives Largest Army (`+2 VP`).
+- Passed only when another player has strictly more played Knights.
 
 ## Map Availability
 

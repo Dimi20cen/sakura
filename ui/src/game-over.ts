@@ -117,7 +117,16 @@ export function handleGameOver(msg: GameOverMessage) {
                 field.tint = 0x000000;
                 field.scale.set(0.15);
             } else {
-                field = new PIXI.Text(String(p[fields[fid]]), {
+                let value = p[fields[fid]];
+                if (
+                    (fields[fid] === "Knights" ||
+                        fields[fid] === "DevCardVp") &&
+                    Number(value ?? 0) < 0
+                ) {
+                    value = 0;
+                }
+
+                field = new PIXI.Text(String(value ?? 0), {
                     fontFamily: "sans-serif",
                     fontSize: 24,
                     fill: 0x000000,

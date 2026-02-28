@@ -416,7 +416,7 @@ export function renderGameState(gs: GameState, commandHub: CommandHub) {
                 assets.ICON.KNIGHT,
                 knightTooltip,
             );
-            const showKnightStat = settings.Mode != GameMode.Seafarers;
+            const showKnightStat = settings.Mode != GameMode.CitiesAndKnights;
             spriteset.knights.img.visible = showKnightStat;
             spriteset.knights.text.visible = showKnightStat;
             spriteset.cards = createText(
@@ -472,19 +472,25 @@ export function renderGameState(gs: GameState, commandHub: CommandHub) {
                 : state.VictoryPoints;
 
         const p = players[state.Order];
+        const knightCount = Math.max(0, Number(state.Knights ?? 0));
+        const resourceCardCount = Math.max(0, Number(state.NumCards ?? 0));
+        const developmentCardCount = Math.max(
+            0,
+            Number(state.NumDevelopmentCards ?? 0),
+        );
         p.victoryPoint.text.text = `${vp}`;
         p.road.text.text = `${state.LongestRoad}`;
-        if (settings.Mode == GameMode.Seafarers) {
+        if (settings.Mode == GameMode.CitiesAndKnights) {
             p.knights.text.text = "";
             p.knights.img.visible = false;
             p.knights.text.visible = false;
         } else {
-            p.knights.text.text = `${state.Knights}`;
+            p.knights.text.text = `${knightCount}`;
             p.knights.img.visible = true;
             p.knights.text.visible = true;
         }
-        p.cards.text.text = `${state.NumCards}`;
-        p.dcard.text.text = `${state.NumDevelopmentCards}`;
+        p.cards.text.text = `${resourceCardCount}`;
+        p.dcard.text.text = `${developmentCardCount}`;
         p.bg.visible = state.Current;
         p.bot.visible = !!state.IsBot;
 
@@ -507,7 +513,7 @@ export function renderGameState(gs: GameState, commandHub: CommandHub) {
         }
 
         // Highlight too many cards
-        if (state.NumCards > state.DiscardLimit) {
+        if (resourceCardCount > state.DiscardLimit) {
             p.cards.img.tint = 0xdd0000;
             p.cards.text.style.fill = 0xdd0000;
         } else {

@@ -42,7 +42,7 @@ Source: `entities/game_mode.go`, `ui/src/lobby.ts`.
   3. fallback to `Base`
 - Core victory bonuses:
   - `Longest Road`: +2 VP (roads; Seafarers extends to roads+ships as trade route behavior)
-  - `Largest Army`: +2 VP (tracked in Base via played knights)
+  - `Largest Army`: +2 VP (tracked in Base and Seafarers via played Knight development cards)
 - Timer is server-authoritative and snapshot-based (`StateSeq`, `TimerPhaseId`, `TimerEndsAtMs`, `ServerNowMs`).
 - Active (non-spectator) players can toggle a manual pause/resume state; while paused, turn timer progression is frozen.
 
@@ -105,6 +105,9 @@ Status: Core mechanics implemented; scenario parity is mixed (see below).
   - computed across roads + ships
   - road/ship transition requires own settlement/city at transition vertex
   - enemy settlement/city blocks continuation through that vertex
+- Largest Army behavior:
+  - tracked from used Knight development cards, same threshold/transfer rules as Base
+  - visible in player state/UI like Base mode
 
 Primary references:
 - `game/actions.go`

@@ -77,7 +77,7 @@ func (g *Game) GetBankDevelopmentRemaining() int {
 
 func (g *Game) GetPlayerState(p *entities.Player) *entities.PlayerState {
 	knights := int16(-1)
-	if g.Mode == entities.Base {
+	if g.Mode == entities.Base || g.Mode == entities.Seafarers {
 		knights = p.CurrentHand.DevelopmentCardDeckMap[entities.DevelopmentCardKnight].NumUsed
 	} else if g.Mode == entities.CitiesAndKnights {
 		knights = int16(p.GetActivatedKnightStrength())
@@ -212,7 +212,7 @@ func (g *Game) SetExtraVictoryPoints() {
 	}
 
 	// Largest Army
-	if g.Mode == entities.Base {
+	if g.Mode == entities.Base || g.Mode == entities.Seafarers {
 		for _, p := range g.Players {
 			deck := p.CurrentHand.DevelopmentCardDeckMap[entities.DevelopmentCardKnight]
 			if deck != nil && deck.NumUsed >= 3 && deck.NumUsed > g.ExtraVictoryPoints.LargestArmyCount {

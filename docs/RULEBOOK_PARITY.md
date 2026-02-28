@@ -28,6 +28,14 @@ Entry format:
 
 ### Seafarers
 
+- Area: Largest Army award
+- Mode: Seafarers
+- Rulebook: Base special awards retained in Seafarers; Knight cards still contribute to Largest Army
+- Repo status: aligned
+- Notes: Seafarers now awards Largest Army from played Knight development cards and surfaces the count in player state/UI.
+- Evidence: `game/state.go`, `game/state_largest_army_test.go`, `ui/src/state.ts`, `docs/rulebooks/text/Rulebook-Base.txt`
+- Next action: none
+
 - Area: Ship movement timing
 - Mode: Seafarers
 - Rulebook: Seafarers ship movement timing section

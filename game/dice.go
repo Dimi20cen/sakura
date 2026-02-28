@@ -2,8 +2,9 @@ package game
 
 import (
 	"errors"
-	"sakura/entities"
+	"log"
 	"math/rand"
+	"sakura/entities"
 	"strconv"
 	"sync"
 
@@ -726,6 +727,28 @@ func (g *Game) MoveCards(
 		toHand = toPlayer.CurrentHand
 	} else {
 		toHand = g.Bank.Hand
+	}
+
+	fromDeck := fromHand.GetCardDeck(cardType)
+	if fromDeck == nil {
+		log.Printf("[BUG] MoveCards: missing source deck for card type %d", cardType)
+		return
+	}
+	if fromDeck.Quantity < int16(quantity) {
+		log.Printf(
+			"[BUG] MoveCards: refusing to move %d of card type %d from order %d with only %d available",
+			quantity,
+			cardType,
+			fromOrder,
+			fromDeck.Quantity,
+		)
+		return
+	}
+
+	toDeck := toHand.GetCardDeck(cardType)
+	if toDeck == nil {
+		log.Printf("[BUG] MoveCards: missing destination deck for card type %d", cardType)
+		return
 	}
 
 	fromHand.UpdateCards(cardType, -quantity)

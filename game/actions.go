@@ -2,9 +2,9 @@ package game
 
 import (
 	"errors"
-	"sakura/entities"
 	"math/rand"
 	"reflect"
+	"sakura/entities"
 	"strconv"
 
 	"github.com/mitchellh/mapstructure"
@@ -1392,6 +1392,18 @@ func (g *Game) CanTradeWithBank(player *entities.Player, offerDetails *entities.
 	numCardsPossible, numCardsRequested := 0, 0
 
 	for i, val := range offerDetails.Give {
+		if val <= 0 {
+			continue
+		}
+
+		deck := player.CurrentHand.GetCardDeck(entities.CardType(i))
+		if deck == nil {
+			return errors.New("no such card type - " + strconv.Itoa(i))
+		}
+		if deck.Quantity < int16(val) {
+			return errors.New("cannot trade with bank, not enough cards in hand")
+		}
+
 		if val > 0 && val%ratios[i] != 0 {
 			return errors.New("cannot trade with bank, invalid exchange")
 		} else {

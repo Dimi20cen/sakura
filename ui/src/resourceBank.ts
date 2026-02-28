@@ -1,5 +1,6 @@
 import * as PIXI from "pixi.js";
 import * as assets from "./assets";
+import * as buttons from "./buttons";
 import * as canvas from "./canvas";
 import * as windows from "./windows";
 import * as tsg from "../tsg";
@@ -10,6 +11,9 @@ const WIDTH = RIGHT_STACK_PANEL_WIDTH;
 const HEIGHT = 66;
 const CARD_WIDTH = 34;
 const CARD_HEIGHT = 48;
+const COUNT_WIDTH = 20;
+const COUNT_HEIGHT = 19;
+const COUNT_FONT_SIZE = 13;
 
 const RESOURCE_ORDER = [
     CardType.Wood,
@@ -78,18 +82,19 @@ function ensureUI() {
         card.height = CARD_HEIGHT;
         chip.addChild(card);
 
-        const text = new PIXI.Text(`${counts[ct] || 0}`, {
-            fontFamily: "sans-serif",
-            fontSize: 18,
-            fill: 0xffffff,
-            fontWeight: "bold",
-            stroke: 0x1f2937,
-            strokeThickness: 2,
-        });
-        text.x = 6;
-        text.y = 2;
-        chip.addChild(text);
-        chipText[ct] = text;
+        const count = buttons.getCountSprite(
+            COUNT_WIDTH,
+            COUNT_HEIGHT,
+            COUNT_FONT_SIZE,
+        );
+        count.sprite.anchor.x = 1;
+        count.sprite.x = CARD_WIDTH;
+        count.sprite.y = 1;
+        count.text.text = `${counts[ct] || 0}`;
+        count.sprite.zIndex = 1;
+        chip.sortableChildren = true;
+        chip.addChild(count.sprite);
+        chipText[ct] = count.text;
 
         chip.x = x;
         chip.y = 8;
@@ -105,17 +110,19 @@ function ensureUI() {
     devCard.height = CARD_HEIGHT;
     devChip.addChild(devCard);
 
-    devText = new PIXI.Text(`${devRemaining}`, {
-        fontFamily: "sans-serif",
-        fontSize: 18,
-        fill: 0xffffff,
-        fontWeight: "bold",
-        stroke: 0x1f2937,
-        strokeThickness: 2,
-    });
-    devText.x = 6;
-    devText.y = 2;
-    devChip.addChild(devText);
+    const devCount = buttons.getCountSprite(
+        COUNT_WIDTH,
+        COUNT_HEIGHT,
+        COUNT_FONT_SIZE,
+    );
+    devCount.sprite.anchor.x = 1;
+    devCount.sprite.x = CARD_WIDTH;
+    devCount.sprite.y = 1;
+    devCount.text.text = `${devRemaining}`;
+    devCount.sprite.zIndex = 1;
+    devChip.sortableChildren = true;
+    devChip.addChild(devCount.sprite);
+    devText = devCount.text;
 
     devChip.x = x;
     devChip.y = 8;

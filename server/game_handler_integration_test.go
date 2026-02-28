@@ -224,7 +224,7 @@ func TestHandleGameActionResponseForwardsExpect(t *testing.T) {
 	}
 }
 
-func TestStoreSettingsNormalizesScenarioVictoryPoints(t *testing.T) {
+func TestStoreSettingsKeepsScenarioVictoryPointsEditable(t *testing.T) {
 	store := &testGameStore{}
 	hub := &WsHub{
 		Game: game.Game{
@@ -243,8 +243,8 @@ func TestStoreSettingsNormalizesScenarioVictoryPoints(t *testing.T) {
 
 	hub.StoreSettings()
 
-	if got := hub.Game.Settings.VictoryPoints; got != 14 {
-		t.Fatalf("expected hub settings victory points to normalize to 14, got %d", got)
+	if got := hub.Game.Settings.VictoryPoints; got != 12 {
+		t.Fatalf("expected hub settings victory points to remain editable at 12, got %d", got)
 	}
 	if len(store.lastSettings) == 0 {
 		t.Fatal("expected settings to be persisted")
@@ -254,12 +254,12 @@ func TestStoreSettingsNormalizesScenarioVictoryPoints(t *testing.T) {
 	if err := msgpack.Unmarshal(store.lastSettings, &persisted); err != nil {
 		t.Fatalf("failed to decode persisted settings: %v", err)
 	}
-	if got := persisted.VictoryPoints; got != 14 {
-		t.Fatalf("expected persisted settings victory points to be 14, got %d", got)
+	if got := persisted.VictoryPoints; got != 12 {
+		t.Fatalf("expected persisted settings victory points to remain 12, got %d", got)
 	}
 }
 
-func TestHandleLobbySetSettingsBroadcastsNormalizedScenarioVictoryPoints(t *testing.T) {
+func TestHandleLobbySetSettingsBroadcastsEditableScenarioVictoryPoints(t *testing.T) {
 	store := &testGameStore{}
 	player, _ := entities.NewPlayer(entities.Seafarers, "host", "host", 0)
 	ws := &WsClient{
@@ -298,8 +298,8 @@ func TestHandleLobbySetSettingsBroadcastsNormalizedScenarioVictoryPoints(t *test
 		},
 	})
 
-	if got := ws.Hub.Game.Settings.VictoryPoints; got != 14 {
-		t.Fatalf("expected hub settings victory points to normalize to 14, got %d", got)
+	if got := ws.Hub.Game.Settings.VictoryPoints; got != 12 {
+		t.Fatalf("expected hub settings victory points to remain editable at 12, got %d", got)
 	}
 
 	msg := readMessage(t, ws.MessageChannel)

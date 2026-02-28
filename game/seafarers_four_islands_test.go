@@ -30,11 +30,8 @@ func TestSeafarersFourIslandsInitialize(t *testing.T) {
 	if g.Settings.MapDefn.Scenario == nil {
 		t.Fatal("scenario metadata missing on four islands map")
 	}
-	if got := g.Settings.VictoryPoints; got != 13 {
-		t.Fatalf("expected settings victory points to normalize to 13, got %d", got)
-	}
-	if target := g.getScenarioVictoryTarget(); target != 13 {
-		t.Fatalf("expected scenario victory target 13, got %d", target)
+	if target := g.getScenarioVictoryTarget(); target != 10 {
+		t.Fatalf("expected scenario victory target 10 from settings, got %d", target)
 	}
 }
 
@@ -165,11 +162,8 @@ func TestSeafarersThroughDesertInitialize(t *testing.T) {
 	if g.Settings.MapDefn.Scenario == nil {
 		t.Fatal("scenario metadata missing on through the desert map")
 	}
-	if got := g.Settings.VictoryPoints; got != 14 {
-		t.Fatalf("expected settings victory points to normalize to 14, got %d", got)
-	}
-	if target := g.getScenarioVictoryTarget(); target != 14 {
-		t.Fatalf("expected scenario victory target 14, got %d", target)
+	if target := g.getScenarioVictoryTarget(); target != 10 {
+		t.Fatalf("expected scenario victory target 10 from settings, got %d", target)
 	}
 }
 

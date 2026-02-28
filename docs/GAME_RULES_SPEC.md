@@ -35,7 +35,7 @@ Source: `entities/game_mode.go`, `ui/src/lobby.ts`.
 ## Cross-Mode Core Rules
 
 - Game settings include: mode, map name, victory points target, max players, speed, special build, creative mode, advanced options.
-- For built-in scenario maps with a fixed victory target, the server normalizes `VictoryPoints` to the scenario target so lobby/game settings and runtime victory evaluation stay in sync.
+- Built-in scenario maps may prefill `VictoryPoints` to the official scenario target in the lobby UI, but the setting remains host-editable and runtime victory evaluation follows the current `settings.VictoryPoints`.
 - Map resolution order:
   1. DB map by name
   2. built-in map by name

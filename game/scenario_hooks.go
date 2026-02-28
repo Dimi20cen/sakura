@@ -62,6 +62,9 @@ func (g *Game) onScenarioDiceRolled(roll int) {
 }
 
 func (g *Game) getScenarioVictoryTarget() int {
+	if g.Settings.VictoryPoints > 0 {
+		return g.Settings.VictoryPoints
+	}
 	if g.Settings.MapDefn != nil &&
 		g.Settings.MapDefn.Scenario != nil &&
 		g.Settings.MapDefn.Scenario.VictoryPoints > 0 {

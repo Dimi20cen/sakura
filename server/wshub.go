@@ -57,7 +57,6 @@ func (h *WsHub) syncSettingsMapDefinition() {
 		}
 		h.Game.Settings.MapDefn = defn
 	}
-	h.Game.NormalizeScenarioSettings()
 }
 
 func (s *Server) NewWsHub(id string) *WsHub {

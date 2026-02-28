@@ -55,16 +55,16 @@ Entry format:
 - Area: Heading for New Shores scenario parity
 - Mode: Seafarers
 - Rulebook: Seafarers scenario 1 (`Heading for New Shores`)
-- Repo status: aligned
-- Notes: Scenario uses a 14-VP target, restricts initial settlement + road/ship placement to the main island, awards +2 VP per player for the first settlement on each small island, and normalizes the displayed/settings victory target to the same 14-VP rule.
+- Repo status: intentional deviation
+- Notes: Scenario uses the official map/setup/bonus rules, but victory points are a host-editable setting. The lobby defaults to 14 VP for this map, yet players can change that target before the game starts.
 - Evidence: `maps/main.go`, `game/scenario_heading_for_new_shores.go`, `game/seafarers_heading_for_new_shores_test.go`, `docs/rulebooks/text/Rulebook-Seafarers.txt`
 - Next action: verify full official map/layout parity.
 
 - Area: Four Islands scenario parity
 - Mode: Seafarers
 - Rulebook: Seafarers scenario 2 (`The Four Islands`)
-- Repo status: aligned
-- Notes: Scenario uses a 13-VP target, tracks each player's home islands from their initial settlements so only unexplored-island settlements award +2 VP, and normalizes the displayed/settings victory target to 13 VP.
+- Repo status: intentional deviation
+- Notes: Scenario uses the official map/setup/bonus rules, but victory points are a host-editable setting. The lobby defaults to 13 VP for this map, yet players can change that target before the game starts.
 - Evidence: `maps/seafarers_scenarios.go`, `game/scenario_four_islands.go`, `game/seafarers_four_islands_test.go`, `docs/rulebooks/text/Rulebook-Seafarers.txt`
 - Next action: verify full official map/layout parity.
 
@@ -79,8 +79,8 @@ Entry format:
 - Area: Through the Desert scenario parity
 - Mode: Seafarers
 - Rulebook: Seafarers scenario 4 (`Through the Desert`)
-- Repo status: aligned
-- Notes: Scenario uses a 14-VP target, restricts initial settlement + road/ship placement to the main island, awards +2 VP once per player per unexplored land region, and normalizes the displayed/settings victory target to 14 VP.
+- Repo status: intentional deviation
+- Notes: Scenario uses the official map/setup/bonus rules, but victory points are a host-editable setting. The lobby defaults to 14 VP for this map, yet players can change that target before the game starts.
 - Evidence: `maps/seafarers_scenarios.go`, `game/scenario_through_desert.go`, `game/seafarers_four_islands_test.go`, `game/scenario_through_desert_test.go`, `docs/rulebooks/text/Rulebook-Seafarers.txt`
 - Next action: verify full official map/layout parity.
 

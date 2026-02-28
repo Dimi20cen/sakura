@@ -64,6 +64,31 @@ function normalizeTimerSpeed(speed: string) {
     return aliasMap[compact] || aliasMap[normalized] || normalized;
 }
 
+function getDefaultVictoryPointsForSettings(
+    mode: number,
+    mapName: string,
+    fallback: number,
+) {
+    if (mode === GAME_MODE.Seafarers) {
+        switch (mapName) {
+            case "Seafarers - Heading for New Shores":
+                return 14;
+            case "Seafarers - The Four Islands":
+                return 13;
+            case "Seafarers - Through the Desert":
+                return 14;
+            default:
+                return fallback > 0 ? fallback : 12;
+        }
+    }
+
+    if (mode === GAME_MODE.CitiesAndKnights) {
+        return 13;
+    }
+
+    return 10;
+}
+
 const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
     const router = useRouter();
     const chatDiv = useRef<HTMLDivElement | null>(null);
@@ -106,12 +131,11 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
 
     const changeMode: ChangeEventHandler<HTMLSelectElement> = (event) => {
         const mode = Number(event.target.value);
-        const vpDefault =
-            mode === GAME_MODE.CitiesAndKnights
-                ? 13
-                : mode === GAME_MODE.Seafarers
-                  ? 12
-                  : 10;
+        const vpDefault = getDefaultVictoryPointsForSettings(
+            mode,
+            lobbyState.settings.MapName,
+            lobbyState.settings.VictoryPoints,
+        );
         sendSettings({
             ...lobbyState.settings,
             Mode: mode,
@@ -123,6 +147,11 @@ const Game: FunctionComponent<{ gameId: string }> = ({ gameId }) => {
         sendSettings({
             ...lobbyState.settings,
             MapName: name,
+            VictoryPoints: getDefaultVictoryPointsForSettings(
+                lobbyState.settings.Mode,
+                name,
+                lobbyState.settings.VictoryPoints,
+            ),
         });
     };
 

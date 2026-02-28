@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestScenarioVictoryTargetFromMetadata(t *testing.T) {
+func TestScenarioVictoryTargetUsesSettingsWhenPresent(t *testing.T) {
 	g := &Game{
 		Settings: entities.GameSettings{
 			VictoryPoints: 10,
@@ -17,8 +17,8 @@ func TestScenarioVictoryTargetFromMetadata(t *testing.T) {
 		},
 	}
 
-	if got := g.getScenarioVictoryTarget(); got != 13 {
-		t.Fatalf("expected scenario victory target 13, got %d", got)
+	if got := g.getScenarioVictoryTarget(); got != 10 {
+		t.Fatalf("expected scenario victory target 10 from settings, got %d", got)
 	}
 }
 
@@ -30,6 +30,23 @@ func TestScenarioVictoryTargetFallsBackToSettings(t *testing.T) {
 	}
 	if got := g.getScenarioVictoryTarget(); got != 11 {
 		t.Fatalf("expected default victory target 11, got %d", got)
+	}
+}
+
+func TestScenarioVictoryTargetFallsBackToMetadataWhenSettingsUnset(t *testing.T) {
+	g := &Game{
+		Settings: entities.GameSettings{
+			VictoryPoints: 0,
+			MapDefn: &entities.MapDefinition{
+				Scenario: &entities.ScenarioMetadata{
+					VictoryPoints: 13,
+				},
+			},
+		},
+	}
+
+	if got := g.getScenarioVictoryTarget(); got != 13 {
+		t.Fatalf("expected scenario victory target 13 from metadata fallback, got %d", got)
 	}
 }
 

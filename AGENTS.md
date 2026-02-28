@@ -1,11 +1,6 @@
 # Agent Guide
 
-This file defines how coding agents should operate in this repository.
-
-## Scope
-
-- Treat this file as the default operating guide for all tasks.
-- For frontend asset work, also follow `ui/README.md` scripts and conventions.
+Read `~/Projects/meta/agent-scripts/AGENTS.md` first.
 
 ## DOCs
 

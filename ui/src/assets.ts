@@ -423,7 +423,7 @@ import btnSettlement from "../assets/source/base/pieces/settlement/settlement-bl
 import btnCity from "../assets/source/base/pieces/city/city-black.svg";
 import btnRoad from "../assets/source/base/pieces/road/road-black.svg";
 import btnShip from "../assets/runtime/seafarers/pieces/ship/ship-black.svg";
-import btnDevelopmentCard from "../assets/runtime/shared/buttons/dcard.png";
+import btnDevelopmentCard from "../assets/runtime/base/cards/decks/development-card-back.svg";
 import btnKnightBox from "../assets/runtime/cities-knights/buttons/knight.png";
 import btnKnightBuild from "../assets/runtime/cities-knights/buttons/knight_build.png";
 import btnKnightActivate from "../assets/runtime/cities-knights/buttons/knight_activate.png";

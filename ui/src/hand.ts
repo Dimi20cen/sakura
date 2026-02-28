@@ -28,7 +28,32 @@ let devConfirmationYesNoWindow: windows.YesNoWindow;
 let usingDevCardType: number;
 
 const HAND_WINDOW_HEIGHT = 90;
+const DEV_CONFIRMATION_CARD_WIDTH = 120;
+const DEV_CONFIRMATION_BUTTON_GAP = 10;
+const YES_NO_WINDOW_HEIGHT = 80;
 let handWindowWidth = 750;
+
+function layoutDevConfirmationControls() {
+    const selectedCard = assets.cards[usingDevCardType + 100];
+    if (
+        !devConfirmationYesNoWindow?.container ||
+        !devConfirmationSprite ||
+        !selectedCard
+    ) {
+        return;
+    }
+
+    const previewHeight =
+        (DEV_CONFIRMATION_CARD_WIDTH * selectedCard.height) /
+        selectedCard.width;
+
+    devConfirmationYesNoWindow.container.x =
+        DEV_CONFIRMATION_CARD_WIDTH + DEV_CONFIRMATION_BUTTON_GAP;
+    devConfirmationYesNoWindow.container.y = Math.max(
+        0,
+        Math.round((previewHeight - YES_NO_WINDOW_HEIGHT) / 2),
+    );
+}
 
 export function relayout() {
     if (!canvas.app) {
@@ -78,6 +103,7 @@ export function relayout() {
         });
         devConfirmationWindow.x = confirmPos.x;
         devConfirmationWindow.y = confirmPos.y;
+        layoutDevConfirmationControls();
     }
 
     canvas.app.markDirty();
@@ -117,7 +143,6 @@ export function getCardTexture(
         assets.assignTexture(inner, simg, () => {
             // Mask the card texture to remove corners
             const g = new PIXI.Graphics()
-                .lineStyle({ color: 0, width: borderWidth })
                 .beginTextureFill({ texture: inner.texture })
                 .drawRoundedRect(0, 0, simg.width, simg.height, simg.width / 12)
                 .endFill();
@@ -620,7 +645,10 @@ export function renderPlayerHand(secret: tsg.PlayerSecretState) {
         devConfirmationWindow.y = confirmPos.y;
         devConfirmationWindow.visible = false;
 
-        devConfirmationYesNoWindow = new windows.YesNoWindow(210, 100)
+        devConfirmationYesNoWindow = new windows.YesNoWindow(
+            DEV_CONFIRMATION_CARD_WIDTH + DEV_CONFIRMATION_BUTTON_GAP,
+            0,
+        )
             .onYes(() => {
                 devConfirmationWindow.visible = false;
                 getCommandHub().useDevelopmentCard(usingDevCardType);
@@ -668,8 +696,14 @@ function cardClick(cardType: number) {
         devConfirmationSprite?.destroy();
     }
     devConfirmationSprite = new PIXI.Sprite();
-    getCardTexture(cardType + 100, devConfirmationSprite, 200, 4);
+    getCardTexture(
+        cardType + 100,
+        devConfirmationSprite,
+        DEV_CONFIRMATION_CARD_WIDTH,
+        4,
+    );
     devConfirmationWindow.addChild(devConfirmationSprite);
+    layoutDevConfirmationControls();
 
     const usable = handWindow!.developmentCardsUsable[cardType];
     devConfirmationYesNoWindow.yesEnabled = usable;

@@ -440,8 +440,12 @@ export function getButtonSprite(
     const playerPieceButtonAsset = getPlayerPieceButtonAsset(type, bgColor);
     const playerPieceButton = Boolean(playerPieceButtonAsset);
     const simg = playerPieceButtonAsset || assets.buttons[type];
+    const devCardButton = type === ButtonType.DevelopmentCard;
     const h =
-        height || (playerPieceButton ? width : (width / simg.width) * simg.height);
+        height ||
+        (playerPieceButton || devCardButton
+            ? width
+            : (width / simg.width) * simg.height);
 
     const drawShape = (g: PIXI.Graphics) => {
         switch (mask) {
@@ -489,6 +493,18 @@ export function getButtonSprite(
     outer.addChild(image);
     assets.assignTexture(image, simg, () => {
         if (!playerPieceButton) {
+            if (devCardButton) {
+                const inset = 6;
+                const scale = Math.min(
+                    (width - inset * 2) / simg.width,
+                    (h - inset * 2) / simg.height,
+                );
+                image.scale.set(scale);
+                image.x = (width - simg.width * scale) / 2;
+                image.y = (h - simg.height * scale) / 2;
+                return;
+            }
+
             const g = new PIXI.Graphics();
             g.beginTextureFill({ texture: image.texture });
             drawShape(g);
@@ -508,7 +524,7 @@ export function getButtonSprite(
         image.x = (width - simg.width * scale) / 2;
         image.y = (h - simg.height * scale) / 2;
     });
-    if (!playerPieceButton) {
+    if (!playerPieceButton && !devCardButton) {
         image.scale.set(width / simg.width, h / simg.height);
     }
     image.zIndex = 1;

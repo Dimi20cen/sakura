@@ -99,19 +99,11 @@ function ensureUI() {
     }
 
     const devChip = new PIXI.Container();
-    const devBg = new PIXI.Graphics();
-    devBg.beginFill(0x7c3aed);
-    devBg.drawRoundedRect(0, 0, CARD_WIDTH, CARD_HEIGHT, 6);
-    devBg.endFill();
-    devChip.addChild(devBg);
-
-    const devIcon = new PIXI.Sprite();
-    assets.assignTexture(devIcon, assets.icons[assets.ICON.DCARD]);
-    devIcon.width = 22;
-    devIcon.height = 22;
-    devIcon.x = 6;
-    devIcon.y = 24;
-    devChip.addChild(devIcon);
+    const devCard = new PIXI.Sprite();
+    assets.assignTexture(devCard, assets.cards[200]);
+    devCard.width = CARD_WIDTH;
+    devCard.height = CARD_HEIGHT;
+    devChip.addChild(devCard);
 
     devText = new PIXI.Text(`${devRemaining}`, {
         fontFamily: "sans-serif",

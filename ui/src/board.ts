@@ -30,6 +30,8 @@ const CITY_DISPLAY_WIDTH = 53;
 const ROAD_DISPLAY_WIDTH = 15;
 const SHIP_DISPLAY_WIDTH = 32;
 const ROAD_THICKNESS_SCALE = 1;
+const BOARD_SPACING_SCALE = 0.87;
+const ILLUSTRATED_HEX_SCALE = 1.37;
 
 /** Current playing board */
 let board: IBoard;
@@ -227,8 +229,19 @@ export function setTileClickEvent(e: TileClickEvent | null) {
  * @param mapping Server response
  */
 export function setDispMapping(mapping: any) {
+    const values = Object.values(mapping.values) as Array<{
+        x: number;
+        y: number;
+    }>;
+    const minX = Math.min(...values.map((c) => c.x));
+    const minY = Math.min(...values.map((c) => c.y));
+
     for (let i = 0; i < Object.keys(mapping.keys).length; i++) {
-        setDispCoord(mapping.keys[i].x, mapping.keys[i].y, mapping.values[i]);
+        const value = mapping.values[i];
+        setDispCoord(mapping.keys[i].x, mapping.keys[i].y, {
+            x: minX + (value.x - minX) * BOARD_SPACING_SCALE,
+            y: minY + (value.y - minY) * BOARD_SPACING_SCALE,
+        });
     }
 }
 
@@ -276,7 +289,6 @@ export async function renderTile(tile: UITile) {
     const c = tile.Center;
     const SIDE_HALF = 300;
     const HEX_DIAG = 229;
-    const ILLUSTRATED_HEX_SCALE = 1.38;
     const HEX_WIDTH = Math.sqrt(3) * HEX_DIAG;
     const HEX_HEIGHT = 2 * HEX_DIAG;
     const texType = tile.Fog ? assets.TILE_TEX.FOG : tile.Type;
@@ -286,11 +298,15 @@ export async function renderTile(tile: UITile) {
     let tileSprite: PIXI.Container;
 
     if (renderMode === assets.TILE_RENDER_MODE.ILLUSTRATED_HEX) {
-        const tileTexture = await assets.getTexture(assets.tileTex[texType]);
+        const tileAsset = assets.tileTex[texType];
+        const tileTexture = await assets.getTexture(tileAsset);
+        const normalizedScale =
+            ILLUSTRATED_HEX_SCALE *
+            assets.getIllustratedTileNormalization(tileAsset);
         const tileArt = new PIXI.Sprite(tileTexture);
         tileArt.anchor.set(0.5);
-        tileArt.width = HEX_WIDTH * ILLUSTRATED_HEX_SCALE;
-        tileArt.height = HEX_HEIGHT * ILLUSTRATED_HEX_SCALE;
+        tileArt.width = HEX_WIDTH * normalizedScale;
+        tileArt.height = HEX_HEIGHT * normalizedScale;
         tile.artSprite = tileArt;
         tileSprite = tileArt;
     } else {

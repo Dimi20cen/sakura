@@ -16,7 +16,8 @@ export type IBoard = {
 };
 
 export type UITile = ITile & {
-    sprite?: Sprite;
+    sprite?: Container;
+    artSprite?: Sprite;
     highlightSprite?: Sprite;
     numberSprite?: anim.TranslatableSprite;
 };

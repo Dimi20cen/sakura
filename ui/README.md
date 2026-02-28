@@ -39,7 +39,7 @@ npm run dev
 - The runtime resolves those SVGs via URL-backed asset descriptors in `ui/src/assets.ts`, so structure art can stay vector without maintaining rasterized PNG copies.
 - Ship pieces are sourced from per-color SVG files under `ui/assets/source/base/pieces/ship`, including generated `cyan` and `plum` variants to match the repo's player color set.
 - Board tile textures for `desert`, `wood`, `brick`, `wool`, `wheat`, `ore`, `gold`, `sea`, and `fog` are sourced from vendored Colonist SVGs under `ui/assets/source/base/board/textures/`.
-- `ui/src/assets.ts` declares tile render modes so illustrated SVG hexes are sized directly to the board hex geometry, with a small scale offset in `ui/src/board.ts` to keep the board layout visually snug.
+- `ui/src/assets.ts` declares tile render modes and a reference illustrated tile size so imported tile art can be normalized by asset dimensions, while `ui/src/board.ts` applies the final snug spacing and scale adjustments.
 
 ## API Routes in This App
 

@@ -131,6 +131,18 @@ export const tileRenderMode: { [key: number]: TILE_RENDER_MODE } = {
 tileRenderMode[TILE_TEX.SEA] = TILE_RENDER_MODE.TRANSPARENT;
 tileRenderMode[TILE_TEX.FOG] = TILE_RENDER_MODE.ILLUSTRATED_HEX;
 
+export const ILLUSTRATED_TILE_REFERENCE = {
+    width: 347,
+    height: 401,
+} as const;
+
+export function getIllustratedTileNormalization(tile: AssetImage) {
+    return Math.max(
+        ILLUSTRATED_TILE_REFERENCE.width / tile.width,
+        ILLUSTRATED_TILE_REFERENCE.height / tile.height,
+    );
+}
+
 /************************* Roads *******************************/
 import roadBeach from "../public/assets/seafarers/textures/beach.png";
 import roadRoad from "../public/assets/base/pieces/road/road.png";

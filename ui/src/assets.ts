@@ -122,7 +122,7 @@ import roadIslandL from "../public/assets/seafarers/textures/island-l.png";
 import roadRed from "../assets/source/base/pieces/road/road-red.svg";
 import roadBlue from "../assets/source/base/pieces/road/road-blue.svg";
 import roadGreen from "../assets/source/base/pieces/road/road-green.svg";
-import roadYellow from "../assets/source/base/pieces/road/road-yellow.svg";
+import roadOrange from "../assets/source/base/pieces/road/road-orange.svg";
 import roadPlum from "../assets/source/base/pieces/road/road-plum.svg";
 import roadCyan from "../assets/source/base/pieces/road/road-cyan.svg";
 import shipTokenS from "../public/assets/seafarers/pieces/ships/ship-token.png";
@@ -137,8 +137,8 @@ export const road: { [key: string | ROAD]: AssetImage } = {
     red: roadRed,
     blue: roadBlue,
     green: roadGreen,
-    yellow: roadYellow,
-    orange: roadYellow,
+    yellow: roadOrange,
+    orange: roadOrange,
     white: roadCyan,
     plum: roadPlum,
     cyan: roadCyan,
@@ -153,7 +153,7 @@ export const shipToken = shipTokenS;
 import houseRed from "../assets/source/base/pieces/settlement/settlement-red.svg";
 import houseBlue from "../assets/source/base/pieces/settlement/settlement-blue.svg";
 import houseGreen from "../assets/source/base/pieces/settlement/settlement-green.svg";
-import houseYellow from "../assets/source/base/pieces/settlement/settlement-yellow.svg";
+import houseOrange from "../assets/source/base/pieces/settlement/settlement-orange.svg";
 import housePlum from "../assets/source/base/pieces/settlement/settlement-plum.svg";
 import houseCyan from "../assets/source/base/pieces/settlement/settlement-cyan.svg";
 
@@ -161,8 +161,8 @@ export const house: { [key: string]: AssetImage } = {
     red: houseRed,
     blue: houseBlue,
     green: houseGreen,
-    yellow: houseYellow,
-    orange: houseYellow,
+    yellow: houseOrange,
+    orange: houseOrange,
     white: houseCyan,
     plum: housePlum,
     cyan: houseCyan,
@@ -172,7 +172,7 @@ export const house: { [key: string]: AssetImage } = {
 import cityRed from "../assets/source/base/pieces/city/city-red.svg";
 import cityBlue from "../assets/source/base/pieces/city/city-blue.svg";
 import cityGreen from "../assets/source/base/pieces/city/city-green.svg";
-import cityYellow from "../assets/source/base/pieces/city/city-yellow.svg";
+import cityOrange from "../assets/source/base/pieces/city/city-orange.svg";
 import cityPlum from "../assets/source/base/pieces/city/city-plum.svg";
 import cityCyan from "../assets/source/base/pieces/city/city-cyan.svg";
 
@@ -180,8 +180,8 @@ export const city: { [key: string]: AssetImage } = {
     red: cityRed,
     blue: cityBlue,
     green: cityGreen,
-    yellow: cityYellow,
-    orange: cityYellow,
+    yellow: cityOrange,
+    orange: cityOrange,
     white: cityCyan,
     plum: cityPlum,
     cyan: cityCyan,

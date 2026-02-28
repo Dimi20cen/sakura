@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="a" xmlns="http://www.w3.org/2000/svg" width="450" height="150" version="1.1" viewBox="0 0 450 150">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #e1b36a;
+      }
+
+      .cls-1, .cls-2, .cls-3 {
+        stroke-width: 0px;
+      }
+
+      .cls-4 {
+        fill: none;
+        stroke: #8e6335;
+        stroke-miterlimit: 10;
+        stroke-width: 6.1px;
+      }
+
+      .cls-2 {
+        fill: #8e6335;
+      }
+
+      .cls-3 {
+        fill: #b78b51;
+      }
+    </style>
+  </defs>
+  <g>
+    <rect class="cls-3" x="28.3" y="38.5" width="291.9" height="73"/>
+    <path class="cls-1" d="M25.9,35.4v79.1h298V35.4H25.9ZM50.2,108.5h-18.2V41.5h18.2v67ZM74.5,108.5h-18.2V41.5h18.2v67ZM98.7,108.5h-18.2V41.5h18.2v67ZM123,108.5h-18.2V41.5h18.2v67ZM147.3,108.5h-18.2V41.5h18.2v67ZM171.6,108.5h-18.2V41.5h18.2v67ZM195.8,108.5h-18.2V41.5h18.2v67ZM220.1,108.5h-18.2V41.5h18.2v67ZM244.4,108.5h-18.2V41.5h18.2v67ZM268.7,108.5h-18.2V41.5h18.2v67ZM292.9,108.5h-18.2V41.5h18.2v67ZM317.2,108.5h-18.2V41.5h18.2v67Z"/>
+  </g>
+  <rect class="cls-4" x="28.9" y="38.5" width="291.3" height="73"/>
+  <g>
+    <g>
+      <rect class="cls-2" x="166.1" y="20.1" width="15.6" height="15.6"/>
+      <rect class="cls-2" x="166.1" y="114.3" width="15.6" height="15.6"/>
+    </g>
+    <g>
+      <rect class="cls-2" x="23" y="20.1" width="15.6" height="15.6"/>
+      <rect class="cls-2" x="23" y="114.3" width="15.6" height="15.6"/>
+    </g>
+    <g>
+      <rect class="cls-2" x="311.2" y="20.1" width="15.6" height="15.6"/>
+      <rect class="cls-2" x="311.2" y="114.3" width="15.6" height="15.6"/>
+    </g>
+  </g>
+</svg>

@@ -397,12 +397,13 @@ export const icons: { [key in ICON]: AssetImage } = {
 
 /************************* Icons **************************************/
 
-import port1 from "../assets/runtime/base/ports/1.png";
-import port2 from "../assets/runtime/base/ports/2.png";
-import port3 from "../assets/runtime/base/ports/3.png";
-import port4 from "../assets/runtime/base/ports/4.png";
-import port5 from "../assets/runtime/base/ports/5.png";
-import port6 from "../assets/runtime/base/ports/6.png";
+import port1 from "../assets/runtime/base/ports/1.svg";
+import port2 from "../assets/runtime/base/ports/2.svg";
+import port3 from "../assets/runtime/base/ports/3.svg";
+import port4 from "../assets/runtime/base/ports/4.svg";
+import port5 from "../assets/runtime/base/ports/5.svg";
+import port6 from "../assets/runtime/base/ports/6.svg";
+import portPierAsset from "../assets/runtime/base/ports/pier.svg";
 
 export const ports: { [key: number]: AssetImage } = {
     1: port1,
@@ -412,6 +413,7 @@ export const ports: { [key: number]: AssetImage } = {
     5: port5,
     6: port6,
 };
+export const portPier: AssetImage = portPierAsset;
 
 /************************* Buttons ************************************/
 
@@ -529,19 +531,19 @@ export const diceEvent: { [key: number]: AssetImage } = {
 /****************** Cards *********************************************/
 
 import cards0 from "../assets/runtime/base/cards/decks/unknown-card-back.jpg";
-import cards1 from "../assets/runtime/base/cards/decks/wood.webp";
-import cards2 from "../assets/runtime/base/cards/decks/brick.webp";
-import cards3 from "../assets/runtime/base/cards/decks/wool.webp";
-import cards4 from "../assets/runtime/base/cards/decks/wheat.webp";
-import cards5 from "../assets/runtime/base/cards/decks/ore.webp";
-import cards6 from "../assets/runtime/cities-knights/cards/decks/commodity-paper.jpg";
-import cards7 from "../assets/runtime/cities-knights/cards/decks/commodity-cloth.jpg";
-import cards8 from "../assets/runtime/cities-knights/cards/decks/commodity-coin.jpg";
-import cards101 from "../assets/runtime/base/cards/decks/knight.jpg";
-import cards102 from "../assets/runtime/base/cards/decks/victory-point-card.jpg";
-import cards103 from "../assets/runtime/base/cards/decks/road-building.jpg";
-import cards104 from "../assets/runtime/base/cards/decks/year-of-plenty.jpg";
-import cards105 from "../assets/runtime/base/cards/decks/monopoly.jpg";
+import cards1 from "../assets/runtime/base/cards/decks/wood.svg";
+import cards2 from "../assets/runtime/base/cards/decks/brick.svg";
+import cards3 from "../assets/runtime/base/cards/decks/wool.svg";
+import cards4 from "../assets/runtime/base/cards/decks/wheat.svg";
+import cards5 from "../assets/runtime/base/cards/decks/ore.svg";
+import cards6 from "../assets/runtime/cities-knights/cards/decks/commodity-paper.svg";
+import cards7 from "../assets/runtime/cities-knights/cards/decks/commodity-cloth.svg";
+import cards8 from "../assets/runtime/cities-knights/cards/decks/commodity-coin.svg";
+import cards101 from "../assets/runtime/base/cards/decks/knight.svg";
+import cards102 from "../assets/runtime/base/cards/decks/victory-point-card.svg";
+import cards103 from "../assets/runtime/base/cards/decks/road-building.svg";
+import cards104 from "../assets/runtime/base/cards/decks/year-of-plenty.svg";
+import cards105 from "../assets/runtime/base/cards/decks/monopoly.svg";
 import cards106 from "../assets/runtime/cities-knights/cards/decks/progress-science-alchemist.jpg";
 import cards107 from "../assets/runtime/cities-knights/cards/decks/progress-science-crane.jpg";
 import cards108 from "../assets/runtime/cities-knights/cards/decks/progress-science-engineer.jpg";
@@ -567,7 +569,7 @@ import cards127 from "../assets/runtime/cities-knights/cards/decks/progress-poli
 import cards128 from "../assets/runtime/cities-knights/cards/decks/progress-politics-spy.jpg";
 import cards129 from "../assets/runtime/cities-knights/cards/decks/progress-politics-warlord.jpg";
 import cards130 from "../assets/runtime/cities-knights/cards/decks/progress-politics-wedding.jpg";
-import cards200 from "../assets/runtime/base/cards/decks/development-card-back.jpg";
+import cards200 from "../assets/runtime/base/cards/decks/development-card-back.svg";
 import cards201 from "../assets/runtime/cities-knights/cards/decks/progress-science-back-hidden.jpg";
 import cards202 from "../assets/runtime/cities-knights/cards/decks/progress-trade-back-hidden.jpg";
 import cards203 from "../assets/runtime/cities-knights/cards/decks/progress-politics-back-hidden.jpg";

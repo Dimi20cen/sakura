@@ -33,6 +33,11 @@ const ROAD_THICKNESS_SCALE = 1;
 const BOARD_SPACING_SCALE = 0.87;
 const ILLUSTRATED_HEX_SCALE = 1.37;
 const TILE_NUMBER_Y_OFFSET = 18;
+const PORT_DISPLAY_SCALE = 0.5;
+const PORT_OFFSET_MULTIPLIER = 1.85;
+const PIER_DISPLAY_THICKNESS = 20;
+const PIER_START_OFFSET = 4;
+const PORT_PIER_ATTACH_RATIO = 0.99;
 
 /** Current playing board */
 let board: IBoard;
@@ -628,25 +633,62 @@ export function renderPort(port: IPort) {
         }
     };
 
-    const portContainer = new PIXI.Container();
-
     // Center point of vertices
     const fc1 = getDispCoord(port.Edge.C.C1.X, port.Edge.C.C1.Y);
     const fc2 = getDispCoord(port.Edge.C.C2.X, port.Edge.C.C2.Y);
+    const p1 = canvas.getScaled(fc1);
+    const p2 = canvas.getScaled(fc2);
     const fc = canvas.getScaled({
         X: (fc1.X + fc2.X) / 2,
         Y: (fc1.Y + fc2.Y) / 2,
     });
-    const shift = portShift(port.Edge.Orientation);
-    portContainer.x = fc.x + shift.x;
-    portContainer.y = fc.y + shift.y;
+    const baseShift = portShift(port.Edge.Orientation);
+    const shift = {
+        x: baseShift.x * PORT_OFFSET_MULTIPLIER,
+        y: baseShift.y * PORT_OFFSET_MULTIPLIER,
+    };
+
+    const portContainer = new PIXI.Container();
+    portContainer.x = fc.x;
+    portContainer.y = fc.y;
     portContainer.zIndex = 400;
+
+    const pierTarget = {
+        x: shift.x * PORT_PIER_ATTACH_RATIO,
+        y: shift.y * PORT_PIER_ATTACH_RATIO,
+    };
+    const addPier = (start: { x: number; y: number }) => {
+        const dx = pierTarget.x - start.x;
+        const dy = pierTarget.y - start.y;
+        const length = Math.hypot(dx, dy);
+        if (length <= PIER_START_OFFSET) {
+            return;
+        }
+
+        const pierSprite = new PIXI.Sprite();
+        assets.assignTexture(pierSprite, assets.portPier);
+        pierSprite.anchor.set(0, 0.5);
+        pierSprite.position.set(
+            start.x + (dx / length) * PIER_START_OFFSET,
+            start.y + (dy / length) * PIER_START_OFFSET,
+        );
+        pierSprite.rotation = Math.atan2(dy, dx);
+        pierSprite.scale.set(
+            (length - PIER_START_OFFSET) / assets.portPier.width,
+            PIER_DISPLAY_THICKNESS / assets.portPier.height,
+        );
+        portContainer.addChild(pierSprite);
+    };
+
+    addPier({ x: p1.x - fc.x, y: p1.y - fc.y });
+    addPier({ x: p2.x - fc.x, y: p2.y - fc.y });
 
     const portSprite = new PIXI.Sprite();
     assets.assignTexture(portSprite, assets.ports[port.Type]);
-    portSprite.scale.set(0.25);
+    portSprite.scale.set(PORT_DISPLAY_SCALE);
     portSprite.anchor.x = 0.5;
     portSprite.anchor.y = 0.5;
+    portSprite.position.set(shift.x, shift.y);
     portContainer.addChild(portSprite);
 
     boardContainer.addChild(portContainer);

@@ -311,16 +311,17 @@ function rerender() {
     // Originally: invalidate bitmap cache
 }
 
-function isStructureButton(type: ButtonType) {
+function isPlayerPieceButton(type: ButtonType) {
     return (
         type === ButtonType.Settlement ||
         type === ButtonType.City ||
-        type === ButtonType.Road
+        type === ButtonType.Road ||
+        type === ButtonType.Ship
     );
 }
 
-function getStructureButtonAsset(type: ButtonType, bgColor?: string) {
-    if (!bgColor || !isStructureButton(type)) {
+function getPlayerPieceButtonAsset(type: ButtonType, bgColor?: string) {
+    if (!bgColor || !isPlayerPieceButton(type)) {
         return undefined;
     }
 
@@ -332,12 +333,14 @@ function getStructureButtonAsset(type: ButtonType, bgColor?: string) {
             return assets.city[cText];
         case ButtonType.Road:
             return assets.road[cText];
+        case ButtonType.Ship:
+            return assets.ship[cText];
         default:
             return undefined;
     }
 }
 
-function getStructureButtonScale(
+function getPlayerPieceButtonScale(
     type: ButtonType,
     simg: assets.AssetImage,
     width: number,
@@ -364,6 +367,13 @@ function getStructureButtonScale(
                 Math.min(
                     (width * 0.14) / simg.width,
                     (height * 0.72) / simg.height,
+                ) * iconScaleMultiplier
+            );
+        case ButtonType.Ship:
+            return (
+                Math.min(
+                    (width * 0.62) / simg.width,
+                    (height * 0.74) / simg.height,
                 ) * iconScaleMultiplier
             );
         default:
@@ -427,10 +437,11 @@ export function getButtonSprite(
         });
     };
 
-    const structureButtonAsset = getStructureButtonAsset(type, bgColor);
-    const structureButton = Boolean(structureButtonAsset);
-    const simg = structureButtonAsset || assets.buttons[type];
-    const h = height || (structureButton ? width : (width / simg.width) * simg.height);
+    const playerPieceButtonAsset = getPlayerPieceButtonAsset(type, bgColor);
+    const playerPieceButton = Boolean(playerPieceButtonAsset);
+    const simg = playerPieceButtonAsset || assets.buttons[type];
+    const h =
+        height || (playerPieceButton ? width : (width / simg.width) * simg.height);
 
     const drawShape = (g: PIXI.Graphics) => {
         switch (mask) {
@@ -477,7 +488,7 @@ export function getButtonSprite(
     const image = new PIXI.Sprite();
     outer.addChild(image);
     assets.assignTexture(image, simg, () => {
-        if (!structureButton) {
+        if (!playerPieceButton) {
             const g = new PIXI.Graphics();
             g.beginTextureFill({ texture: image.texture });
             drawShape(g);
@@ -486,7 +497,7 @@ export function getButtonSprite(
             return;
         }
 
-        const scale = getStructureButtonScale(
+        const scale = getPlayerPieceButtonScale(
             type,
             simg,
             width,
@@ -497,7 +508,7 @@ export function getButtonSprite(
         image.x = (width - simg.width * scale) / 2;
         image.y = (h - simg.height * scale) / 2;
     });
-    if (!structureButton) {
+    if (!playerPieceButton) {
         image.scale.set(width / simg.width, h / simg.height);
     }
     image.zIndex = 1;

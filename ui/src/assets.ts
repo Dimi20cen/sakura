@@ -88,19 +88,24 @@ export function assignTexture(
 }
 
 /************************* Tile Textures *******************************/
-import tileTexDesert from "../public/assets/base/board/textures/desert.webp";
-import tileTexWood from "../public/assets/base/board/textures/wood.webp";
-import tileTexBrick from "../public/assets/base/board/textures/brick.webp";
-import tileTexWool from "../public/assets/base/board/textures/wool.webp";
-import tileTexWheat from "../public/assets/base/board/textures/wheat.webp";
-import tileTexOre from "../public/assets/base/board/textures/ore.webp";
-import tileTexGold from "../public/assets/base/board/textures/gold.webp";
-import tileTexSea from "../public/assets/seafarers/textures/sea.webp";
-import tileTexFog from "../public/assets/seafarers/textures/fog.jpg";
+import tileTexDesert from "../assets/source/base/board/textures/tile-desert-colonist.svg";
+import tileTexWood from "../assets/source/base/board/textures/tile-lumber-colonist.svg";
+import tileTexBrick from "../assets/source/base/board/textures/tile-brick-colonist.svg";
+import tileTexWool from "../assets/source/base/board/textures/tile-wool-colonist.svg";
+import tileTexWheat from "../assets/source/base/board/textures/tile-grain-colonist.svg";
+import tileTexOre from "../assets/source/base/board/textures/tile-ore-colonist.svg";
+import tileTexGold from "../assets/source/base/board/textures/tile-gold-colonist.svg";
+import tileTexSea from "../assets/source/base/board/textures/tile-sea-colonist.svg";
+import tileTexFog from "../assets/source/base/board/textures/tile-fog-colonist.svg";
 
 export enum TILE_TEX {
     SEA = 7,
     FOG = 114,
+}
+export enum TILE_RENDER_MODE {
+    TEXTURE_FILL = "texture-fill",
+    ILLUSTRATED_HEX = "illustrated-hex",
+    TRANSPARENT = "transparent",
 }
 export const tileTex: { [key: number]: AssetImage } = {
     0: tileTexDesert,
@@ -114,6 +119,18 @@ export const tileTex: { [key: number]: AssetImage } = {
 tileTex[TILE_TEX.SEA] = tileTexSea;
 tileTex[TILE_TEX.FOG] = tileTexFog;
 
+export const tileRenderMode: { [key: number]: TILE_RENDER_MODE } = {
+    0: TILE_RENDER_MODE.ILLUSTRATED_HEX,
+    1: TILE_RENDER_MODE.ILLUSTRATED_HEX,
+    2: TILE_RENDER_MODE.ILLUSTRATED_HEX,
+    3: TILE_RENDER_MODE.ILLUSTRATED_HEX,
+    4: TILE_RENDER_MODE.ILLUSTRATED_HEX,
+    5: TILE_RENDER_MODE.ILLUSTRATED_HEX,
+    21: TILE_RENDER_MODE.ILLUSTRATED_HEX,
+};
+tileRenderMode[TILE_TEX.SEA] = TILE_RENDER_MODE.TRANSPARENT;
+tileRenderMode[TILE_TEX.FOG] = TILE_RENDER_MODE.ILLUSTRATED_HEX;
+
 /************************* Roads *******************************/
 import roadBeach from "../public/assets/seafarers/textures/beach.png";
 import roadRoad from "../public/assets/base/pieces/road/road.png";
@@ -125,7 +142,13 @@ import roadGreen from "../assets/source/base/pieces/road/road-green.svg";
 import roadOrange from "../assets/source/base/pieces/road/road-orange.svg";
 import roadPlum from "../assets/source/base/pieces/road/road-plum.svg";
 import roadCyan from "../assets/source/base/pieces/road/road-cyan.svg";
-import shipTokenS from "../public/assets/seafarers/pieces/ships/ship-token.png";
+import shipBlack from "../assets/source/base/pieces/ship/ship-black.svg";
+import shipRed from "../assets/source/base/pieces/ship/ship-red.svg";
+import shipBlue from "../assets/source/base/pieces/ship/ship-blue.svg";
+import shipGreen from "../assets/source/base/pieces/ship/ship-green.svg";
+import shipOrange from "../assets/source/base/pieces/ship/ship-orange.svg";
+import shipPlum from "../assets/source/base/pieces/ship/ship-plum.svg";
+import shipCyan from "../assets/source/base/pieces/ship/ship-cyan.svg";
 
 export enum ROAD {
     ROAD = "road",
@@ -147,7 +170,17 @@ road[ROAD.BEACH] = roadBeach;
 road[ROAD.ROAD] = roadRoad;
 road[ROAD.ISLAND_R] = roadIslandR;
 road[ROAD.ISLAND_L] = roadIslandL;
-export const shipToken = shipTokenS;
+export const ship: { [key: string]: AssetImage } = {
+    black: shipBlack,
+    red: shipRed,
+    blue: shipBlue,
+    green: shipGreen,
+    yellow: shipOrange,
+    orange: shipOrange,
+    white: shipCyan,
+    plum: shipPlum,
+    cyan: shipCyan,
+};
 
 /******************** House *******************************************/
 import houseRed from "../assets/source/base/pieces/settlement/settlement-red.svg";
@@ -386,7 +419,7 @@ import btnNo from "../public/assets/shared/buttons/no.png";
 import btnSettlement from "../assets/source/base/pieces/settlement/settlement-black.svg";
 import btnCity from "../assets/source/base/pieces/city/city-black.svg";
 import btnRoad from "../assets/source/base/pieces/road/road-black.svg";
-import btnShip from "../public/assets/shared/buttons/ship.png";
+import btnShip from "../assets/source/base/pieces/ship/ship-black.svg";
 import btnDevelopmentCard from "../public/assets/shared/buttons/dcard.png";
 import btnKnightBox from "../public/assets/cities-knights/buttons/knight.png";
 import btnKnightBuild from "../public/assets/cities-knights/buttons/knight_build.png";

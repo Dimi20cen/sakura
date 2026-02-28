@@ -28,7 +28,7 @@ const KNIGHT_DISPLAY_WIDTH = 37;
 const SETTLEMENT_DISPLAY_WIDTH = 40;
 const CITY_DISPLAY_WIDTH = 53;
 const ROAD_DISPLAY_WIDTH = 15;
-const SHIP_DISPLAY_WIDTH = 18;
+const SHIP_DISPLAY_WIDTH = 32;
 const ROAD_THICKNESS_SCALE = 1;
 
 /** Current playing board */
@@ -276,37 +276,55 @@ export async function renderTile(tile: UITile) {
     const c = tile.Center;
     const SIDE_HALF = 300;
     const HEX_DIAG = 229;
+    const ILLUSTRATED_HEX_SCALE = 1.38;
+    const HEX_WIDTH = Math.sqrt(3) * HEX_DIAG;
+    const HEX_HEIGHT = 2 * HEX_DIAG;
     const texType = tile.Fog ? assets.TILE_TEX.FOG : tile.Type;
-    const isSeaTile = texType === assets.TILE_TEX.SEA;
+    const renderMode =
+        assets.tileRenderMode[texType] ?? assets.TILE_RENDER_MODE.TEXTURE_FILL;
+    const isSeaTile = renderMode === assets.TILE_RENDER_MODE.TRANSPARENT;
+    let tileSprite: PIXI.Container;
 
-    const hex = new PIXI.Graphics();
-    if (isSeaTile) {
-        // Keep sea tiles transparent so the board background sea is visible.
-        hex.beginFill(0xffffff, 0);
+    if (renderMode === assets.TILE_RENDER_MODE.ILLUSTRATED_HEX) {
+        const tileTexture = await assets.getTexture(assets.tileTex[texType]);
+        const tileArt = new PIXI.Sprite(tileTexture);
+        tileArt.anchor.set(0.5);
+        tileArt.width = HEX_WIDTH * ILLUSTRATED_HEX_SCALE;
+        tileArt.height = HEX_HEIGHT * ILLUSTRATED_HEX_SCALE;
+        tile.artSprite = tileArt;
+        tileSprite = tileArt;
     } else {
-        hex.beginTextureFill({
-            texture: PIXI.Assets.get(assets.tileTex[texType].src),
-        });
-    }
-    hex.drawPolygon(getHexPolygonPoints(SIDE_HALF, HEX_DIAG)).endFill();
+        const hex = new PIXI.Graphics();
+        if (isSeaTile) {
+            // Keep sea tiles transparent so the board background sea is visible.
+            hex.beginFill(0xffffff, 0);
+        } else {
+            hex.beginTextureFill({
+                texture: PIXI.Assets.get(assets.tileTex[texType].src),
+            });
+        }
+        hex.drawPolygon(getHexPolygonPoints(SIDE_HALF, HEX_DIAG)).endFill();
 
-    const tileSprite = new PIXI.Sprite();
-    tileSprite.texture = canvas.app.generateRenderTexture(hex, {
-        height: 2 * SIDE_HALF,
-        width: 2 * SIDE_HALF,
-    });
+        const sprite = new PIXI.Sprite();
+        sprite.texture = canvas.app.generateRenderTexture(hex, {
+            height: 2 * SIDE_HALF,
+            width: 2 * SIDE_HALF,
+        });
+        sprite.anchor.set(0.5);
+        tile.artSprite = sprite;
+        tileSprite = sprite;
+    }
+
     tile.sprite = tileSprite;
     boardContainer.addChild(tileSprite);
     tileSprite.scale.set(0.35);
 
     const fc = canvas.getScaled(getDispCoord(c.X, c.Y));
-    tileSprite.anchor.x = 0.5;
-    tileSprite.anchor.y = 0.5;
     tileSprite.x = fc.x;
     tileSprite.y = fc.y;
 
     // Keep border in code so flat texture assets remain clean.
-    if (!isSeaTile) {
+    if (renderMode === assets.TILE_RENDER_MODE.TEXTURE_FILL) {
         const tileBorder = new PIXI.Sprite(
             getHexBorderTexture(SIDE_HALF, HEX_DIAG),
         );
@@ -341,13 +359,15 @@ export async function renderTile(tile: UITile) {
  */
 export function flashTile(num: number) {
     Object.values(board.tiles).forEach((t) => {
-        if (!t.Fog && t.sprite && t.Number == num) {
+        if (!t.Fog && t.artSprite && t.Number == num) {
             // Show roll sprite overlay
-            t.sprite.tint = 0x777777;
+            t.artSprite.tint = 0x777777;
             canvas.app.markDirty();
 
             setTimeout(() => {
-                t.sprite!.tint = 0xffffff;
+                if (t.artSprite && !t.artSprite.destroyed) {
+                    t.artSprite.tint = 0xffffff;
+                }
                 canvas.app.markDirty();
             }, 1000);
         }
@@ -501,7 +521,7 @@ export function renderEdgePlacement(ep: IEdgePlacement, removed = false) {
     };
     assets.assignTexture(
         roadSprite,
-        isShip ? assets.shipToken : assets.road[color],
+        isShip ? assets.ship[color] : assets.road[color],
         applyRoadScale,
     );
     roadSprite.anchor.x = 0.5;
@@ -525,7 +545,7 @@ export function renderEdgePlacement(ep: IEdgePlacement, removed = false) {
     roadSprite.scale.x = ROAD_THICKNESS_SCALE;
 
     const shadow = new PIXI.Sprite();
-    assets.assignTexture(shadow, isShip ? assets.shipToken : assets.road[color]);
+    assets.assignTexture(shadow, isShip ? assets.ship[color] : assets.road[color]);
     shadow.anchor.x = roadSprite.anchor.x;
     shadow.anchor.y = roadSprite.anchor.y;
     shadow.x = 4;

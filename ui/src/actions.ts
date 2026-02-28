@@ -205,7 +205,12 @@ function showSetupPlacementPreview(
         });
         w.addChild(roadPreview);
 
-        const shipPreview = buttons.getButtonSprite(buttons.ButtonType.Ship, 52);
+        const shipPreview = buttons.getButtonSprite(
+            buttons.ButtonType.Ship,
+            52,
+            undefined,
+            playerColor,
+        );
         shipPreview.x = 61;
         shipPreview.y = 5;
         shipPreview.setEnabled(true);
@@ -221,7 +226,8 @@ function showSetupPlacementPreview(
             undefined,
             previewType === buttons.ButtonType.Settlement ||
                 previewType === buttons.ButtonType.City ||
-                previewType === buttons.ButtonType.Road
+                previewType === buttons.ButtonType.Road ||
+                previewType === buttons.ButtonType.Ship
                 ? playerColor
                 : undefined,
             undefined,
@@ -550,7 +556,12 @@ function chooseBuildable(data: { r?: boolean; s?: boolean }) {
     }
 
     if (allowShip) {
-        const ship = buttons.getButtonSprite(buttons.ButtonType.Ship, 52);
+        const ship = buttons.getButtonSprite(
+            buttons.ButtonType.Ship,
+            52,
+            undefined,
+            getCurrentPlayerColor(),
+        );
         ship.x = showBoth ? 74 : 12;
         ship.y = 6;
         ship.setEnabled(true);

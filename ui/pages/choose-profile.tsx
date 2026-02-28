@@ -11,13 +11,13 @@ type ProfileOption = {
 };
 
 const profiles: ProfileOption[] = [
-    { username: "Jethro7194", icon: "/assets/shared/profile-icons/jethro.png" },
+    { username: "Jethro7194", icon: "/assets/shared/profile-icons/jethro.webp" },
     {
         username: "KopsTiKlapsa",
-        icon: "/assets/shared/profile-icons/kopsetinklapsa.png",
+        icon: "/assets/shared/profile-icons/kopsetinklapsa.webp",
     },
-    { username: "staxtoPUTA", icon: "/assets/shared/profile-icons/staxtoputa.png" },
-    { username: "Giorgaros", icon: "/assets/shared/profile-icons/giorgaros.png" },
+    { username: "staxtoPUTA", icon: "/assets/shared/profile-icons/staxtoputa.webp?v=5" },
+    { username: "Giorgaros", icon: "/assets/shared/profile-icons/giorgaros.webp" },
 ];
 
 const ChooseProfile: NextPage = () => {
@@ -101,7 +101,12 @@ const ChooseProfile: NextPage = () => {
                                             src={profile.icon}
                                             alt={profile.username}
                                             fill
-                                            style={{ objectFit: "cover" }}
+                                            sizes="(max-width: 640px) 64px, 80px"
+                                            quality={100}
+                                            style={{
+                                                objectFit: "cover",
+                                                objectPosition: "center",
+                                            }}
                                         />
                                     </span>
                                     <span className="text-sm sm:text-base font-semibold text-left text-[color:var(--ui-ivory)] break-all">

@@ -142,10 +142,10 @@ function updatePauseOverlay(paused: boolean) {
 }
 
 const profileAvatarByUsername: Record<string, string> = {
-    jethro7194: "/assets/shared/profile-icons/jethro.png",
-    kopstiklapsa: "/assets/shared/profile-icons/kopsetinklapsa.png",
-    staxtoputa: "/assets/shared/profile-icons/staxtoputa.png",
-    giorgaros: "/assets/shared/profile-icons/giorgaros.png",
+    jethro7194: "/assets/shared/profile-icons/jethro.webp",
+    kopstiklapsa: "/assets/shared/profile-icons/kopsetinklapsa.webp",
+    staxtoputa: "/assets/shared/profile-icons/staxtoputa.webp?v=5",
+    giorgaros: "/assets/shared/profile-icons/giorgaros.webp",
 };
 
 /**

@@ -16,17 +16,17 @@ const linkClass =
     "text-sm md:text-base font-semibold tracking-wide text-[color:var(--ui-ivory)] opacity-90 hover:opacity-100 hover:text-[color:var(--ui-gold-soft)] transition-colors duration-200";
 
 const profileIconByUsername: Record<string, string> = {
-    jethro7194: "/assets/shared/profile-icons/jethro.png",
-    kopstiklapsa: "/assets/shared/profile-icons/kopsetinklapsa.png",
-    staxtoputa: "/assets/shared/profile-icons/staxtoputa.png",
-    giorgaros: "/assets/shared/profile-icons/giorgaros.png",
+    jethro7194: "/assets/shared/profile-icons/jethro.webp",
+    kopstiklapsa: "/assets/shared/profile-icons/kopsetinklapsa.webp",
+    staxtoputa: "/assets/shared/profile-icons/staxtoputa.webp?v=5",
+    giorgaros: "/assets/shared/profile-icons/giorgaros.webp",
 };
 
 const Header: FunctionComponent<{
     socket?: MutableRefObject<ReconnectingWebSocket | null>;
 }> = ({ socket: _socket }) => {
     const [profileIcon, setProfileIcon] = useState(
-        "/assets/shared/profile-icons/user-icon.jpeg",
+        "/assets/shared/profile-icons/user-icon.webp",
     );
 
     useEffect(() => {
@@ -38,7 +38,7 @@ const Header: FunctionComponent<{
         ).toLowerCase();
         setProfileIcon(
             profileIconByUsername[profileUsername] ||
-                "/assets/shared/profile-icons/user-icon.jpeg",
+                "/assets/shared/profile-icons/user-icon.webp",
         );
     }, []);
 
@@ -86,13 +86,19 @@ const Header: FunctionComponent<{
                                 aria-label="Choose profile"
                                 className="inline-flex items-center justify-center rounded-full p-1 ui-avatar-button transition-colors duration-200"
                             >
-                                <Image
-                                    src={profileIcon}
-                                    alt="Profile"
-                                    width={42}
-                                    height={42}
-                                    className="rounded-full"
-                                />
+                                <span className="relative h-[42px] w-[42px] overflow-hidden rounded-full">
+                                    <Image
+                                        src={profileIcon}
+                                        alt="Profile"
+                                        fill
+                                        sizes="42px"
+                                        quality={100}
+                                        style={{
+                                            objectFit: "cover",
+                                            objectPosition: "center",
+                                        }}
+                                    />
+                                </span>
                             </Link>
                         </div>
                     </div>
@@ -157,13 +163,19 @@ const Header: FunctionComponent<{
                                         "inline-flex items-center gap-2",
                                     )}
                                 >
-                                    <Image
-                                        src={profileIcon}
-                                        alt="Profile"
-                                        width={34}
-                                        height={34}
-                                        className="rounded-full"
-                                    />
+                                    <span className="relative h-[34px] w-[34px] overflow-hidden rounded-full">
+                                        <Image
+                                            src={profileIcon}
+                                            alt="Profile"
+                                            fill
+                                            sizes="34px"
+                                            quality={100}
+                                            style={{
+                                                objectFit: "cover",
+                                                objectPosition: "center",
+                                            }}
+                                        />
+                                    </span>
                                     Profile
                                 </Link>
                             </div>

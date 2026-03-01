@@ -12,7 +12,7 @@ export const presetOverrides: Record<UIPresetName, DeepPartial<UIConfig>> = {
             pauseToggle: {
                 x: 16,
                 y: 92,
-                size: 32,
+                size: 28,
             },
         },
         hud: {
@@ -97,14 +97,14 @@ export const presetOverrides: Record<UIPresetName, DeepPartial<UIConfig>> = {
             pauseToggle: {
                 x: 12,
                 y: 74,
-                size: 28,
+                size: 24,
             },
             settingsButton: {
                 x: 6,
                 y: 6,
                 iconX: 20,
                 iconY: 20,
-                iconScale: 0.24,
+                iconScale: 0.32,
             },
         },
         hud: {

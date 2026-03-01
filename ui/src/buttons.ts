@@ -26,7 +26,6 @@ import {
     getActionBarConfig,
     getBottomDockConfig,
     getHudMiscConfig,
-    getPauseToggleConfig,
 } from "./uiConfig";
 import {
     createDockRail,
@@ -43,8 +42,6 @@ let container1: PIXI.Container;
 let seafarersShipContainer: PIXI.Container | null = null;
 let turnTimerContainer: PIXI.Container | null = null;
 let turnTimerText: PIXI.Text | null = null;
-let pauseToggleContainer: PIXI.Container | null = null;
-let pauseToggleIcon: PIXI.Graphics | null = null;
 let timerTickerStarted = false;
 
 /** Static button sprites */
@@ -198,66 +195,12 @@ function updateTurnTimerWidget() {
 }
 
 function ensurePauseToggleWidget(commandHub: CommandHub) {
-    if (pauseToggleContainer && !pauseToggleContainer.destroyed) {
-        return;
-    }
-
-    pauseToggleContainer = new PIXI.Container();
-    pauseToggleContainer.zIndex = 1300;
-    pauseToggleContainer.interactive = true;
-    pauseToggleContainer.cursor = "pointer";
-    pauseToggleContainer.hitArea = new PIXI.Rectangle(0, 0, 36, 36);
-
-    pauseToggleIcon = new PIXI.Graphics();
-    pauseToggleContainer.addChild(pauseToggleIcon);
-    redrawPauseToggleIcon(false);
-    new windows.TooltipHandler(
-        pauseToggleContainer,
-        "Pause or resume the game",
-    );
-
-    pauseToggleContainer.on("pointerdown", (event) => {
-        event.stopPropagation();
-        if (pauseToggleContainer?.cursor !== "pointer") {
-            return;
-        }
-        commandHub.togglePause();
-    });
-    pauseToggleContainer.visible = !ws.isSpectator();
-    canvas.app.stage.addChild(pauseToggleContainer);
-}
-
-function redrawPauseToggleIcon(paused: boolean) {
-    if (!pauseToggleIcon || pauseToggleIcon.destroyed) {
-        return;
-    }
-
-    const timer = getBottomDockConfig().timer;
-    pauseToggleIcon.clear();
-    pauseToggleIcon.lineStyle({ color: timer.border, width: 2 });
-    pauseToggleIcon.beginFill(timer.fill, 0.96);
-    pauseToggleIcon.drawCircle(18, 18, 16);
-    pauseToggleIcon.endFill();
-
-    pauseToggleIcon.beginFill(timer.text);
-    if (paused) {
-        // Show "play" when paused so users can resume.
-        pauseToggleIcon.drawPolygon([14, 11, 14, 25, 26, 18]);
-    } else {
-        // Show "pause" when game is running.
-        pauseToggleIcon.drawRoundedRect(12, 11, 4, 14, 2);
-        pauseToggleIcon.drawRoundedRect(20, 11, 4, 14, 2);
-    }
-    pauseToggleIcon.endFill();
+    // Pause/resume now lives in the settings menu.
+    void commandHub;
 }
 
 export function updatePauseToggle(paused: boolean) {
-    if (!pauseToggleContainer || pauseToggleContainer.destroyed) {
-        return;
-    }
-    redrawPauseToggleIcon(paused);
-    pauseToggleContainer.visible = !ws.isSpectator();
-    canvas.app.markDirty();
+    void paused;
 }
 
 export function relayout() {
@@ -286,7 +229,6 @@ export function applyHUDLayout(layout: HUDLayoutResult) {
     const boxFrame = layout.widgets.knightBox;
     const specialBuildFrame = layout.widgets.specialBuild;
     const timerFrame = layout.widgets.turnTimer;
-    const pauseToggleFrame = layout.widgets.pauseToggle;
 
     if (container && !container.destroyed && actionBarFrame) {
         container.x = actionBarFrame.x;
@@ -327,14 +269,6 @@ export function applyHUDLayout(layout: HUDLayoutResult) {
     if (turnTimerContainer && !turnTimerContainer.destroyed && timerFrame) {
         turnTimerContainer.x = timerFrame.x;
         turnTimerContainer.y = timerFrame.y;
-    }
-    if (
-        pauseToggleContainer &&
-        !pauseToggleContainer.destroyed &&
-        pauseToggleFrame
-    ) {
-        pauseToggleContainer.x = pauseToggleFrame.x;
-        pauseToggleContainer.y = pauseToggleFrame.y;
     }
 }
 

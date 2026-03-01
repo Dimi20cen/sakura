@@ -11,11 +11,11 @@ export const controlsConfig: UIConfig["controls"] = {
         y: 10,
         iconX: 25,
         iconY: 25,
-        iconScale: 0.3,
+        iconScale: 0.8,
     },
     pauseToggle: {
         x: 20,
         y: 108,
-        size: 36,
+        size: 30,
     },
 };

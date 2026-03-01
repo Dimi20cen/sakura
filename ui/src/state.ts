@@ -11,6 +11,7 @@ import * as anim from "./animation";
 import * as actions from "./actions";
 import * as windows from "./windows";
 import * as trade from "./trade";
+import * as settingsMenu from "./settings";
 import { buildHUDLayout } from "./hud/layoutEngine";
 import type { HUDLayoutResult } from "./hud/types";
 import {
@@ -396,6 +397,7 @@ export function renderGameState(gs: GameState, commandHub: CommandHub) {
     }
     syncTurnTimerSnapshot(gs, states);
     buttons.updatePauseToggle(Boolean(gs.Paused));
+    settingsMenu.setPaused(Boolean(gs.Paused));
     updatePauseOverlay(Boolean(gs.Paused));
 
     states.forEach((state) => {

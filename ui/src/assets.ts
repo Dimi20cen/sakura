@@ -324,7 +324,7 @@ export const pirate = pirateS;
 import bankS from "../assets/runtime/shared/ui/bank.png";
 export const bank = bankS;
 
-import settingsS from "../assets/runtime/shared/ui/settings.png";
+import settingsS from "../assets/runtime/shared/ui/icon-settings.svg";
 export const settings = settingsS;
 
 import botS from "../assets/runtime/shared/ui/bot.png";
@@ -466,7 +466,8 @@ import btnWall from "../assets/runtime/cities-knights/buttons/w.png";
 import btnEndTurn from "../assets/runtime/shared/buttons/endturn.png";
 import btnSpecialBuild from "../assets/runtime/shared/buttons/specialbuild.png";
 import btnEdit from "../assets/runtime/shared/buttons/edit.png";
-import btnFullscreen from "../assets/runtime/shared/buttons/fullscreen.png";
+import btnFullscreen from "../assets/runtime/shared/buttons/icon-fullscreen-expand.svg";
+import pauseIcon from "../assets/runtime/shared/buttons/pause.svg";
 import btnChat from "../assets/runtime/shared/buttons/chat.png";
 
 export const buttons: { [key in ButtonType]: AssetImage } = {
@@ -494,6 +495,8 @@ export const buttons: { [key in ButtonType]: AssetImage } = {
     fullscreen: btnFullscreen,
     chat: btnChat,
 };
+
+export const pauseToggleIcon = pauseIcon;
 
 // Button backgrounds
 import buttonsBgRed from "../assets/runtime/shared/buttons/bg/red.jpg";

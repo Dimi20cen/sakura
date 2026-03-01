@@ -2,22 +2,107 @@ import * as PIXI from "pixi.js";
 import * as assets from "./assets";
 import * as canvas from "./canvas";
 import * as windows from "./windows";
+import { sound } from "@pixi/sound";
 import { GameSettings } from "../tsg";
 import { DISPLAY_GAME_MODE, GAME_MODE } from "./lobby";
 import { capitalizeFirstLetter } from "../utils";
+import { getCommandHub, isSpectator } from "./ws";
 import {
     getSettingsButtonConfig,
     getSettingsPanelConfig,
 } from "./uiConfig";
+import {
+    createPanelBodyTextStyle,
+    createPanelTitleTextStyle,
+} from "./uiDock";
 
 export let settingsContainer: PIXI.Container;
+export let settingsMenuContainer: PIXI.Container;
 export let settingDetailsContainer: PIXI.Container;
-let settings: GameSettings;
+let gameSettings: GameSettings;
+let pauseMenuText: PIXI.Text | null = null;
+let muteMenuText: PIXI.Text | null = null;
+let paused = false;
+
+function rerender() {
+    canvas.app.markDirty();
+}
+
+function hidePanels() {
+    if (settingsMenuContainer && !settingsMenuContainer.destroyed) {
+        settingsMenuContainer.visible = false;
+    }
+    if (settingDetailsContainer && !settingDetailsContainer.destroyed) {
+        settingDetailsContainer.visible = false;
+    }
+}
+
+function getPauseLabel() {
+    return paused ? "Resume Game" : "Pause Game";
+}
+
+function refreshPauseMenuLabel() {
+    if (!pauseMenuText || pauseMenuText.destroyed) {
+        return;
+    }
+    pauseMenuText.text = getPauseLabel();
+}
+
+function isMuted() {
+    return Boolean(sound.context?.muted);
+}
+
+function getMuteLabel() {
+    return isMuted() ? "Unmute Game" : "Mute Game";
+}
+
+function refreshMuteMenuLabel() {
+    if (!muteMenuText || muteMenuText.destroyed) {
+        return;
+    }
+    muteMenuText.text = getMuteLabel();
+}
+
+function createMenuOption(
+    text: string,
+    y: number,
+    onClick: () => void,
+    disabled = false,
+) {
+    const row = new PIXI.Container();
+    row.x = 8;
+    row.y = y;
+    row.interactive = !disabled;
+    row.cursor = disabled ? "default" : "pointer";
+
+    const label = new PIXI.Text(
+        text,
+        createPanelTitleTextStyle({
+            fontSize: 14,
+            fill: disabled ? 0x666666 : 0x000000,
+            align: "left",
+            fontWeight: "bold",
+        }),
+    );
+    row.addChild(label);
+
+    if (!disabled) {
+        row.on("pointerdown", (event) => {
+            event.stopPropagation();
+            onClick();
+            rerender();
+        });
+    }
+
+    return { row, label };
+}
 
 export function initialize(s: GameSettings) {
-    settings = s;
+    gameSettings = s;
     const settingsButton = getSettingsButtonConfig();
     const settingsPanel = getSettingsPanelConfig();
+
+    hidePanels();
 
     settingsContainer = new PIXI.Container();
     const settingsSprite = new PIXI.Sprite();
@@ -34,6 +119,41 @@ export function initialize(s: GameSettings) {
     settingsContainer.interactive = true;
     settingsContainer.cursor = "pointer";
 
+    settingsMenuContainer = new PIXI.Container();
+    settingsMenuContainer.addChild(windows.getWindowSprite(170, 116));
+    settingsMenuContainer.x = settingsPanel.detailsX;
+    settingsMenuContainer.y = settingsPanel.detailsY;
+    settingsMenuContainer.zIndex = 20000;
+    settingsMenuContainer.visible = false;
+
+    const gameSettingsOption = createMenuOption("Game Settings", 12, () => {
+        settingDetailsContainer.visible = !settingDetailsContainer.visible;
+    });
+    settingsMenuContainer.addChild(gameSettingsOption.row);
+
+    const pauseOption = createMenuOption(
+        getPauseLabel(),
+        44,
+        () => {
+            getCommandHub().togglePause();
+            settingsMenuContainer.visible = false;
+        },
+        isSpectator(),
+    );
+    pauseMenuText = pauseOption.label;
+    settingsMenuContainer.addChild(pauseOption.row);
+
+    const muteOption = createMenuOption(getMuteLabel(), 76, () => {
+        if (isMuted()) {
+            sound.unmuteAll();
+        } else {
+            sound.muteAll();
+        }
+        refreshMuteMenuLabel();
+    });
+    muteMenuText = muteOption.label;
+    settingsMenuContainer.addChild(muteOption.row);
+
     settingDetailsContainer = new PIXI.Container();
     settingDetailsContainer.addChild(
         windows.getWindowSprite(
@@ -47,13 +167,15 @@ export function initialize(s: GameSettings) {
     settingDetailsContainer.visible = false;
 
     const addSettingsText = (text: string, idx: number) => {
-        const t = new PIXI.Text(text, {
-            fontFamily: "sans-serif",
-            fontSize: settingsPanel.fontSize,
-            fill: 0x000000,
-            align: "left",
-            fontWeight: "bold",
-        });
+        const t = new PIXI.Text(
+            text,
+            createPanelBodyTextStyle({
+                fontSize: settingsPanel.fontSize,
+                fill: 0x000000,
+                align: "left",
+                fontWeight: "bold",
+            }),
+        );
         t.x = settingsPanel.titleX;
         t.y =
             idx === 0
@@ -61,36 +183,42 @@ export function initialize(s: GameSettings) {
                 : settingsPanel.rowStartY + settingsPanel.rowStep * idx;
         settingDetailsContainer.addChild(t);
     };
-    addSettingsText("Settings", 0);
+    addSettingsText("Game Settings", 0);
     addSettingsText(
-        `Mode: ${DISPLAY_GAME_MODE[settings.Mode as GAME_MODE]}`,
+        `Mode: ${DISPLAY_GAME_MODE[gameSettings.Mode as GAME_MODE]}`,
         1,
     );
-    addSettingsText(`Private: ${settings.Private ? "Yes" : "No"}`, 2);
-    addSettingsText(`Map: ${settings.MapName}`, 3);
-    addSettingsText(`Discard Limit: ${settings.DiscardLimit}`, 4);
-    addSettingsText(`Victory Points: ${settings.VictoryPoints}`, 5);
-    addSettingsText(`Max Players: ${settings.MaxPlayers}`, 6);
+    addSettingsText(`Private: ${gameSettings.Private ? "Yes" : "No"}`, 2);
+    addSettingsText(`Map: ${gameSettings.MapName}`, 3);
+    addSettingsText(`Discard Limit: ${gameSettings.DiscardLimit}`, 4);
+    addSettingsText(`Victory Points: ${gameSettings.VictoryPoints}`, 5);
+    addSettingsText(`Max Players: ${gameSettings.MaxPlayers}`, 6);
     addSettingsText(
-        `Special Build Phase: ${settings.SpecialBuild ? "Yes" : "No"}`,
+        `Special Build Phase: ${gameSettings.SpecialBuild ? "Yes" : "No"}`,
         7,
     );
-    addSettingsText(`Karma: ${settings.EnableKarma ? "Yes" : "No"}`, 8);
-    addSettingsText(`Speed: ${capitalizeFirstLetter(settings.Speed)}`, 9);
-    addSettingsText(`Advanced Mode: ${settings.Advanced ? "Yes" : "No"}`, 10);
+    addSettingsText(`Karma: ${gameSettings.EnableKarma ? "Yes" : "No"}`, 8);
+    addSettingsText(`Speed: ${capitalizeFirstLetter(gameSettings.Speed)}`, 9);
+    addSettingsText(`Advanced Mode: ${gameSettings.Advanced ? "Yes" : "No"}`, 10);
 
-    settingsContainer.on("pointerdown", (e) => {
-        settingDetailsContainer.visible = !settingDetailsContainer.visible;
+    settingsContainer.on("pointerdown", (event) => {
+        event.stopPropagation();
+        settingsMenuContainer.visible = !settingsMenuContainer.visible;
+        if (!settingsMenuContainer.visible) {
+            settingDetailsContainer.visible = false;
+        }
         rerender();
     });
 
     canvas.app.stage.addChild(settingsContainer);
+    canvas.app.stage.addChild(settingsMenuContainer);
     canvas.app.stage.addChild(settingDetailsContainer);
+    refreshPauseMenuLabel();
+    refreshMuteMenuLabel();
 }
 
-/**
- * Re-render settings screen
- */
-function rerender() {
-    canvas.app.markDirty();
+export function setPaused(isPaused: boolean) {
+    paused = isPaused;
+    refreshPauseMenuLabel();
+    rerender();
 }

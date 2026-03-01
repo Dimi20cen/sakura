@@ -1,4 +1,4 @@
-import { FunctionComponent, useCallback } from "react";
+import { FunctionComponent, useCallback, useEffect } from "react";
 import * as canvas from "../src/canvas";
 import { isBrowser } from "../utils";
 import { SOCKET_STATE } from "../src/sock";
@@ -10,6 +10,20 @@ const Pixi: FunctionComponent<{ gameId: string; order: number }> = ({
 }) => {
     let allowRender = true;
     const { socketState, setInit, gameExists } = useGameSession(gameId, order);
+
+    useEffect(() => {
+        const { body, documentElement } = document;
+        const prevBodyOverflow = body.style.overflow;
+        const prevHtmlOverflow = documentElement.style.overflow;
+
+        body.style.overflow = "hidden";
+        documentElement.style.overflow = "hidden";
+
+        return () => {
+            body.style.overflow = prevBodyOverflow;
+            documentElement.style.overflow = prevHtmlOverflow;
+        };
+    }, []);
 
     const divRef = useCallback((node: any) => {
         if (isBrowser && node !== null && allowRender) {

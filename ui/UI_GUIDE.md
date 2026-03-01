@@ -40,7 +40,7 @@ npm run dev
 - For LAN testing on iPhone, run the Next dev server with `npm run dev -- -H 0.0.0.0 -p 3000`, then open `http://<YOUR_LAN_IP>:3000` in Safari.
 - To launch without Safari chrome, use Safari's `Share -> Add to Home Screen`, then start SAKURA from the Home Screen.
 - `viewport-fit=cover` and safe-area padding are enabled globally in `ui/styles/globals.css` so installed sessions can use the full screen without clipping behind the notch or home indicator.
-- The in-game route (`ui/pages/[gameId].tsx`) locks page-level scrolling (`document` + `body` overflow hidden) so wheel/touch gestures stay scoped to the Pixi game surface and HUD, while non-game pages keep normal scroll behavior.
+- Page-level scrolling is locked only while the in-game Pixi surface is mounted (`ui/components/pixi.tsx`), so pre-start lobby/settings on `/:gameId` keep normal page scroll while active gameplay keeps wheel/touch gestures scoped to the game surface and HUD.
 
 ## Asset Notes
 

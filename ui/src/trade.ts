@@ -8,9 +8,9 @@ import * as buttons from "./buttons";
 import * as tsg from "../tsg";
 import { sound } from "@pixi/sound";
 import * as assets from "./assets";
-import { getWindowSprite, YesNoWindow } from "./windows";
 import { CardType } from "./entities";
 import { getThisPlayerOrder, getCommandHub, isSpectator } from "./ws";
+import * as windows from "./windows";
 import {
     getBottomRailConfig,
     getTradeConfig,
@@ -26,6 +26,7 @@ import {
 
 type OfferObject = tsg.TradeOffer & {
     container: PIXI.Container & anim.Translatable;
+    layoutHeight?: number;
 };
 
 type TradeSubmitMode = "auto" | "bank" | "player";
@@ -45,6 +46,120 @@ type TradeActionRail = {
 };
 
 const DEFAULT_TRADE_RATIOS = [0, 4, 4, 4, 4, 4, 4, 4, 4];
+
+function createTradePanelBackground(width: number, height: number) {
+    const panel = new PIXI.Container();
+    const base = new PIXI.Graphics();
+    base.lineStyle({ color: 0x0f79c8, width: 2 });
+    base.beginFill(0xf2f0ea, 0.98);
+    base.drawRoundedRect(0, 0, width, height, 10);
+    base.endFill();
+    panel.addChild(base);
+
+    const gloss = new PIXI.Graphics();
+    gloss.beginFill(0xffffff, 0.22);
+    gloss.drawRoundedRect(4, 4, width - 8, Math.max(14, Math.floor(height * 0.26)), 8);
+    gloss.endFill();
+    panel.addChild(gloss);
+    return panel;
+}
+
+function drawOfferStatusSymbol(
+    status: number,
+    size: number,
+    color: number,
+): PIXI.Graphics {
+    const symbol = new PIXI.Graphics();
+    symbol.lineStyle({
+        color,
+        width: Math.max(2, Math.round(size * 0.12)),
+    });
+
+    if (status > 0) {
+        symbol.moveTo(size * 0.2, size * 0.55);
+        symbol.lineTo(size * 0.43, size * 0.78);
+        symbol.lineTo(size * 0.8, size * 0.24);
+        return symbol;
+    }
+
+    if (status < 0) {
+        symbol.moveTo(size * 0.22, size * 0.22);
+        symbol.lineTo(size * 0.78, size * 0.78);
+        symbol.moveTo(size * 0.78, size * 0.22);
+        symbol.lineTo(size * 0.22, size * 0.78);
+        return symbol;
+    }
+
+    // Pending response (hourglass).
+    const w = size * 0.56;
+    const x = (size - w) / 2;
+    symbol.drawRoundedRect(x, size * 0.12, w, size * 0.14, 2);
+    symbol.drawRoundedRect(x, size * 0.74, w, size * 0.14, 2);
+    symbol.moveTo(x, size * 0.26);
+    symbol.lineTo(x + w, size * 0.26);
+    symbol.lineTo(size * 0.5, size * 0.5);
+    symbol.lineTo(x, size * 0.74);
+    symbol.lineTo(x + w, size * 0.74);
+    return symbol;
+}
+
+function createOfferStatusChip(playerOrder: number, status: number) {
+    const chip = new PIXI.Container();
+    const size = 30;
+    const playerColor = state.lastKnownStates?.[playerOrder]?.Color || "#6d7f8b";
+    const fillColor = (() => {
+        try {
+            return PIXI.utils.string2hex(playerColor);
+        } catch {
+            return 0x6d7f8b;
+        }
+    })();
+
+    const bg = new PIXI.Graphics();
+    bg.lineStyle({ color: 0x0f79c8, width: 2 });
+    bg.beginFill(fillColor, 0.35);
+    bg.drawRoundedRect(0, 0, size, size, 7);
+    bg.endFill();
+    chip.addChild(bg);
+
+    if (status === 0) {
+        const icon = addIconSprite(chip, {
+            asset: assets.uiKit.hourglass,
+            width: 18,
+            height: 18,
+            x: 6,
+            y: 6,
+        });
+        icon.alpha = 0.9;
+    } else {
+        const symbolColor = status > 0 ? 0xffffff : 0x7a1d27;
+        const symbol = drawOfferStatusSymbol(status, 18, symbolColor);
+        symbol.x = 6;
+        symbol.y = 6;
+        chip.addChild(symbol);
+    }
+
+    return chip;
+}
+
+function decorateLiveOfferWindow(window: hand.HandWindow) {
+    const defaultBg = window.container.children[0];
+    if (defaultBg) {
+        defaultBg.visible = false;
+    }
+    window.contentInsetLeft = 10;
+
+    window.container.children
+        .filter((child) => child.name === "live-offer-chrome")
+        .forEach((child) => window.container.removeChild(child));
+
+    const chrome = createTradePanelBackground(
+        window.container.width,
+        window.container.height,
+    );
+    chrome.name = "live-offer-chrome";
+    window.container.addChildAt(chrome, 0);
+}
 
 function relayoutEditorWindows() {
     if (
@@ -328,6 +443,33 @@ function createTradeActionRail() {
 
 /** Currently available trade offers */
 let currentOffers: OfferObject[] = [];
+
+function relayoutTradeOfferContainers(animate: boolean) {
+    const tradeOffers = getTradeConfig().offers;
+    let nextY = tradeOffers.laneTop;
+
+    const liveContainers: (PIXI.Container & anim.Translatable)[] = [];
+    for (const offer of currentOffers) {
+        const container = offer.container;
+        if (!container || container.destroyed) {
+            continue;
+        }
+        liveContainers.push(container);
+        container.targetY = nextY;
+        if (!animate) {
+            container.y = nextY;
+        }
+
+        const offerHeight = offer.layoutHeight ?? container.height;
+        const scaledHeight = offerHeight * tradeOffers.scale;
+        const step = Math.max(tradeOffers.laneGap, scaledHeight + 14);
+        nextY += step;
+    }
+
+    if (animate && liveContainers.length > 0) {
+        anim.requestTranslationAnimation(liveContainers);
+    }
+}
 
 /** Allow player to create new offers */
 let tradeAllowed = false;
@@ -699,19 +841,13 @@ export function showTradeOffer(offer: tsg.TradeOffer) {
     const index = currentOffers.indexOf(offerObject);
     const tradeOffers = getTradeConfig().offers;
 
-    const getY = (i: number) =>
-        tradeOffers.laneTop + i * tradeOffers.laneGap;
-
     // Refresh container
     offerContainer.destroy({ children: true });
 
     // Check if the offer is destroyed
     if (offer.Destroyed) {
         currentOffers.splice(index, 1);
-        for (let i = 0; i < currentOffers.length; i++) {
-            currentOffers[i].container.targetY = getY(i);
-        }
-        anim.requestTranslationAnimation(currentOffers.map((c) => c.container));
+        relayoutTradeOfferContainers(true);
         return;
     }
 
@@ -719,70 +855,159 @@ export function showTradeOffer(offer: tsg.TradeOffer) {
     offerObject.container = offerContainer;
     canvas.app.stage.addChild(offerContainer);
 
-    const tradeOfferWindow = new hand.HandWindow(
-        offerContainer,
+    const myOrder = getThisPlayerOrder();
+    const iAmCreator = myOrder === offer.CreatedBy;
+    const iAmCurrent = myOrder === offer.CurrentPlayer;
+    const isIncomingOffer = !iAmCreator && !iAmCurrent;
+    const isOutgoingOffer = iAmCreator;
+    const isCurrentPlayerCounterOffer = iAmCurrent && !iAmCreator;
+    const markerColumnWidth = 56;
+    const markerIconSize = 24;
+    const rowHeight = tradeOffers.cardWindowHeight;
+    const rowGap = 8;
+    const countVisibleStacks = (cards: number[]) =>
+        cards.reduce((count, quantity, cardType) => {
+            if (cardType === 0) {
+                return count;
+            }
+            return quantity > 0 ? count + 1 : count;
+        }, 0);
+    const maxStacks = Math.max(
+        1,
+        countVisibleStacks(offer.Details.Ask),
+        countVisibleStacks(offer.Details.Give),
+    );
+    const laneCardGap = 4;
+    const rowWidth = Math.min(
         tradeOffers.cardWindowWidth,
-        tradeOffers.cardWindowHeight,
+        Math.max(130, 24 + maxStacks * (tradeOffers.cardWidth + laneCardGap)),
+    );
+    const panelPadding = 10;
+    const nonCurrentPlayerCount = offer.Acceptances.filter(
+        (_, p) => p !== offer.CurrentPlayer,
+    ).length;
+    const outgoingStatusChipCount = Math.max(1, nonCurrentPlayerCount);
+    const actionButtonCount = isIncomingOffer
+        ? 3
+        : isOutgoingOffer
+          ? outgoingStatusChipCount + 1
+          : isCurrentPlayerCounterOffer
+            ? 1
+            : 0;
+    const actionsWidth = Math.max(106, actionButtonCount * 48 + 8);
+    const contentX = panelPadding + markerColumnWidth + 6;
+    const topRowY = panelPadding;
+    const bottomRowY = topRowY + rowHeight + rowGap;
+    const panelWidth =
+        panelPadding + markerColumnWidth + 6 + rowWidth + 6 + actionsWidth + panelPadding;
+    const panelHeight = bottomRowY + rowHeight + panelPadding;
+
+    offerContainer.addChild(createTradePanelBackground(panelWidth, panelHeight));
+
+    const drawMarkerRow = (top: number, askRow: boolean) => {
+        const markerY = top + Math.round((rowHeight - markerIconSize) / 2);
+        if (askRow) {
+            const topMarker = isOutgoingOffer
+                ? addIconSprite(offerContainer, {
+                      asset: assets.uiKit.players,
+                      width: markerIconSize,
+                      height: markerIconSize,
+                      x: panelPadding + 6,
+                      y: markerY,
+                  })
+                : (() => {
+                      const requester = state.getPlayerAvatarSprite(offer.CreatedBy);
+                      requester.x = panelPadding + 6;
+                      requester.y = markerY;
+                      requester.scale.set(markerIconSize / 52);
+                      offerContainer.addChild(requester);
+                      return requester;
+                  })();
+            new windows.TooltipHandler(
+                topMarker,
+                isOutgoingOffer
+                    ? "Cards requested from other players"
+                    : "Cards requested by the offering player",
+            );
+            const arrow = addIconSprite(offerContainer, {
+                asset: assets.uiKit.tradeArrowGreen,
+                width: markerIconSize,
+                height: markerIconSize,
+                x: panelPadding + 30,
+                y: markerY,
+            });
+            arrow.anchor.set(0.5);
+            arrow.x += markerIconSize / 2;
+            arrow.y += markerIconSize / 2;
+            arrow.rotation = -Math.PI / 2;
+            new windows.TooltipHandler(arrow, "Cards moving to the current player");
+            return;
+        }
+
+        const avatar = state.getPlayerAvatarSprite(offer.CurrentPlayer);
+        avatar.x = panelPadding + 6;
+        avatar.y = markerY;
+        avatar.scale.set(markerIconSize / 52);
+        offerContainer.addChild(avatar);
+        new windows.TooltipHandler(avatar, "Cards offered by the current player");
+        const arrow = addIconSprite(offerContainer, {
+            asset: assets.uiKit.tradeArrowRed,
+            width: markerIconSize,
+            height: markerIconSize,
+            x: panelPadding + 30,
+            y: markerY,
+        });
+        arrow.anchor.set(0.5);
+        arrow.x += markerIconSize / 2;
+        arrow.y += markerIconSize / 2;
+        arrow.rotation = -Math.PI / 2;
+        new windows.TooltipHandler(arrow, "Cards leaving the current player");
+    };
+
+    drawMarkerRow(topRowY, true);
+    drawMarkerRow(bottomRowY, false);
+
+    const liveAskWindow = new hand.HandWindow(
+        offerContainer,
+        rowWidth,
+        rowHeight,
         true,
         false,
     );
-    const tradeAskWindow = new hand.HandWindow(
+    const liveGiveWindow = new hand.HandWindow(
         offerContainer,
-        tradeOffers.cardWindowWidth,
-        tradeOffers.cardWindowHeight,
+        rowWidth,
+        rowHeight,
         true,
         false,
     );
-    tradeOfferWindow.cardWidth = tradeOffers.cardWidth;
-    tradeAskWindow.cardWidth = tradeOffers.cardWidth;
+    liveAskWindow.cardWidth = tradeOffers.cardWidth;
+    liveGiveWindow.cardWidth = tradeOffers.cardWidth;
+    decorateLiveOfferWindow(liveAskWindow);
+    decorateLiveOfferWindow(liveGiveWindow);
+    liveAskWindow.container.x = contentX;
+    liveAskWindow.container.y = topRowY;
+    liveGiveWindow.container.x = contentX;
+    liveGiveWindow.container.y = bottomRowY;
+    liveAskWindow.setCards(offer.Details.Ask);
+    liveGiveWindow.setCards(offer.Details.Give);
 
-    const isCurrent = offer.CurrentPlayer == getThisPlayerOrder();
-    tradeOfferWindow.container.x = isCurrent
-        ? 0
-        : tradeOffers.cardWindowWidth + tradeOffers.panelGap;
-    tradeOfferWindow.container.y = 0;
-    tradeAskWindow.container.x = isCurrent
-        ? tradeOffers.cardWindowWidth + tradeOffers.panelGap
-        : 0;
-    tradeAskWindow.container.y = 0;
+    const actionsX = contentX + rowWidth + 6;
+    const presenceWidth = actionsWidth - 12;
+    if (!isOutgoingOffer) {
+        const presencePanel = createTradePanelBackground(presenceWidth, 50);
+        presencePanel.x = actionsX;
+        presencePanel.y = topRowY + 2;
+        offerContainer.addChild(presencePanel);
 
-    {
-        const plus = new PIXI.Text("+", {
-            fontSize: 40,
-            fontWeight: "bold",
-            fill: 0x00aa00,
-        });
-        plus.x = tradeOffers.markerPlusX;
-        plus.y = tradeOffers.markerPlusY;
-        plus.pivot.x = 40;
-
-        const minus = new PIXI.Text("-", {
-            fontSize: 50,
-            fontWeight: "bold",
-            fill: 0xaa0000,
-        });
-        minus.x = tradeOffers.markerMinusX;
-        minus.y = tradeOffers.markerMinusY;
-        minus.pivot.x = 40;
-
-        tradeOfferWindow.container.addChild(isCurrent ? minus : plus);
-        tradeAskWindow.container.addChild(isCurrent ? plus : minus);
-    }
-
-    tradeOfferWindow.setCards(offer.Details.Give);
-    tradeAskWindow.setCards(offer.Details.Ask);
-
-    const closeOfferContainer = new PIXI.Container();
-    {
-        // Draw accepting players
         const closeOfferButton = (
             playerOrder: number,
             i: number,
         ): PIXI.Sprite => {
             const button = state.getPlayerAvatarSprite(playerOrder);
-            button.x =
-                tradeOffers.acceptPanelPadding + i * tradeOffers.acceptAvatarStep;
+            button.x = 8 + i * 28;
             button.y = 10;
+            button.scale.set(28 / 52);
             button.tint = 0x666666;
             const status = offer.Acceptances[playerOrder];
 
@@ -802,20 +1027,6 @@ export function showTradeOffer(offer: tsg.TradeOffer) {
             return button;
         };
 
-        const lastWindow = isCurrent ? tradeAskWindow : tradeOfferWindow;
-        closeOfferContainer.x =
-            lastWindow.container.x + lastWindow.container.width + 10;
-        closeOfferContainer.y = tradeAskWindow.container.y;
-        closeOfferContainer.addChild(
-            getWindowSprite(
-                (offer.Acceptances.length - 1) *
-                    tradeOffers.acceptAvatarStep +
-                    tradeOffers.acceptPanelPadding,
-                tradeOffers.acceptPanelHeight,
-            ),
-        );
-        offerContainer.addChild(closeOfferContainer);
-
         let count = 0;
         for (let p = 0; p < offer.Acceptances.length; p++) {
             if (p == offer.CurrentPlayer) {
@@ -823,103 +1034,156 @@ export function showTradeOffer(offer: tsg.TradeOffer) {
             }
 
             const button = closeOfferButton(p, count++);
-            closeOfferContainer.addChild(button);
+            presencePanel.addChild(button);
         }
     }
-
-    // Get position of container before putting in respond window
-    // This ensures that the offers are lined up
-    offerContainer.x = canvas.getWidth() - tradeOffers.laneRightOffset;
-    offerContainer.y = getY(index);
-    offerContainer.zIndex = 1500;
-    offerContainer.scale.set(tradeOffers.scale);
-    offerContainer.pivot.x = offerContainer.width + 100;
-
-    // Respond window
-    const respondWindow = new YesNoWindow(
-        closeOfferContainer.x + closeOfferContainer.width + 10,
-        tradeAskWindow.container.y,
-    ).onNo(() => getCommandHub().rejectTradeOffer(offer.Id));
-    respondWindow.container.visible = !isSpectator();
 
     const haveEnoughCardsToAccept = () =>
         offer.Details.Ask.every(
             (q, ct) =>
                 hand.handWindow!.cards[ct] +
-                    (askWindow.container.visible ? askWindow.cards[ct] : 0) >=
+                    (liveAskWindow.container.visible ? liveAskWindow.cards[ct] : 0) >=
                 q,
         );
 
-    if (
-        getThisPlayerOrder() != offer.CreatedBy &&
-        getThisPlayerOrder() != offer.CurrentPlayer &&
-        haveEnoughCardsToAccept()
-    ) {
-        respondWindow.onYes(() => getCommandHub().acceptTradeOffer(offer.Id));
-    }
-    respondWindow.render();
+    const actionBaseY = bottomRowY + rowHeight - 44;
+    const addActionButton = (
+        type: buttons.ButtonType,
+        x: number,
+        enabled: boolean,
+        onClick?: () => void,
+        tooltip?: string,
+        iconAsset?: assets.AssetImage,
+    ) => {
+        const frame = createTradePanelBackground(44, 44);
+        frame.x = x;
+        frame.y = actionBaseY;
+        if (iconAsset) {
+            const iconBg = new PIXI.Graphics();
+            iconBg.beginFill(enabled ? 0xb9e8ff : 0xcfd8dc, enabled ? 0.95 : 0.75);
+            iconBg.drawRoundedRect(5, 5, 34, 34, 8);
+            iconBg.endFill();
+            frame.addChild(iconBg);
 
-    offerContainer.addChild(respondWindow.container);
+            const icon = addIconSprite(frame, {
+                asset: iconAsset,
+                width: 22,
+                height: 22,
+                x: 11,
+                y: 11,
+            });
+            icon.alpha = enabled ? 1 : 0.55;
 
-    // Counter offer button
-    if (offer.CreatedBy != getThisPlayerOrder() && !isSpectator()) {
-        const counterWindow = getWindowSprite(
-            tradeOffers.counterButtonWindowSize,
-            tradeOffers.counterButtonWindowSize,
-        );
-        counterWindow.x =
-            respondWindow.container.x + respondWindow.container.width + 5;
-        counterWindow.y = 20;
-        const counterButton = buttons.getButtonSprite(
-            buttons.ButtonType.Edit,
-            32,
-            32,
-        );
-        counterButton.setEnabled(true);
-        counterButton.x = 5;
-        counterButton.y = 5;
-        counterButton.interactive = true;
-        counterButton.cursor = "pointer";
-        counterButton.on("pointerdown", () => {
-            const ask =
-                getThisPlayerOrder() == offer.CurrentPlayer
-                    ? offer.Details.Ask
-                    : offer.Details.Give;
-            const give =
-                getThisPlayerOrder() == offer.CurrentPlayer
-                    ? offer.Details.Give
-                    : offer.Details.Ask;
-
-            clearOfferEditor();
-
-            for (let i = 1; i < offer.Details.Ask.length; i++) {
-                const giveI = Math.min(give[i], hand.handWindow!.cards[i]);
-                offerWindow.updateCards(i, giveI);
-                hand.handWindow!.updateCards(i, -giveI);
-                askWindow.setCards(ask);
+            frame.interactive = enabled && Boolean(onClick);
+            frame.cursor = enabled && onClick ? "pointer" : "default";
+            if (enabled && onClick) {
+                frame.on("pointerdown", onClick);
             }
-            countering = true;
-            render();
+        } else {
+            const btn = buttons.getButtonSprite(type, 34, 34);
+            btn.x = 5;
+            btn.y = 5;
+            btn.setEnabled(enabled);
+            if (onClick) {
+                btn.on("pointerdown", onClick);
+            }
+            frame.addChild(btn);
+        }
+        offerContainer.addChild(frame);
+        if (tooltip) {
+            new windows.TooltipHandler(frame, tooltip);
+        }
+    };
+
+    if (!isSpectator() && isIncomingOffer) {
+        const editX = actionsX + 2;
+        const rejectX = actionsX + 50;
+        const acceptX = actionsX + 98;
+        addActionButton(
+            buttons.ButtonType.Edit,
+            editX,
+            true,
+            () => {
+                const ask =
+                    myOrder == offer.CurrentPlayer
+                        ? offer.Details.Ask
+                        : offer.Details.Give;
+                const give =
+                    myOrder == offer.CurrentPlayer
+                        ? offer.Details.Give
+                        : offer.Details.Ask;
+
+                clearOfferEditor();
+
+                for (let i = 1; i < offer.Details.Ask.length; i++) {
+                    const giveI = Math.min(give[i], hand.handWindow!.cards[i]);
+                    offerWindow.updateCards(i, giveI);
+                    hand.handWindow!.updateCards(i, -giveI);
+                    askWindow.setCards(ask);
+                }
+                countering = true;
+                render();
+            },
+            "Prepare a counter-offer",
+            assets.uiKit.pencil,
+        );
+        addActionButton(
+            buttons.ButtonType.No,
+            rejectX,
+            true,
+            () => getCommandHub().rejectTradeOffer(offer.Id),
+            "Decline this offer",
+        );
+        addActionButton(
+            buttons.ButtonType.Yes,
+            acceptX,
+            haveEnoughCardsToAccept(),
+            () => getCommandHub().acceptTradeOffer(offer.Id),
+            "Accept this offer",
+        );
+    } else if (!isSpectator() && isOutgoingOffer) {
+        const statusPlayers: number[] = [];
+        for (let p = 0; p < offer.Acceptances.length; p++) {
+            if (p === offer.CurrentPlayer) {
+                continue;
+            }
+            statusPlayers.push(p);
+        }
+        statusPlayers.forEach((playerOrder, idx) => {
+            const status = offer.Acceptances[playerOrder];
+            const chip = createOfferStatusChip(playerOrder, status);
+            chip.x = actionsX + 2 + idx * 48;
+            chip.y = actionBaseY + 7;
+            const name = state.lastKnownStates?.[playerOrder]?.Name || `Player ${playerOrder + 1}`;
+            const statusText =
+                status > 0 ? "accepted" : status < 0 ? "declined" : "pending";
+            new windows.TooltipHandler(chip, `${name}: ${statusText}`);
+            offerContainer.addChild(chip);
         });
-        counterWindow.addChild(counterButton);
-        offerContainer.addChild(counterWindow);
+        addActionButton(
+            buttons.ButtonType.No,
+            actionsX + 2 + statusPlayers.length * 48,
+            true,
+            () => getCommandHub().rejectTradeOffer(offer.Id),
+            "Cancel this offer",
+        );
+    } else if (!isSpectator() && isCurrentPlayerCounterOffer) {
+        addActionButton(
+            buttons.ButtonType.No,
+            actionsX + 2,
+            true,
+            () => getCommandHub().rejectTradeOffer(offer.Id),
+            "Decline this counter-offer",
+        );
     }
 
-    {
-        // Offerer window
-        const offererWindow = getWindowSprite(
-            tradeOffers.offererPanelWidth,
-            tradeOffers.offererPanelHeight,
-        );
-        offererWindow.x = tradeOffers.offererOffsetX;
-        const offererAvatar = state.getPlayerAvatarSprite(offer.CurrentPlayer);
-        offererAvatar.x = 10;
-        offererAvatar.y = 10;
-        offererAvatar.tint =
-            offer.Acceptances[offer.CurrentPlayer] == 1 ? 0xffffff : 0x666666;
-        offererWindow.addChild(offererAvatar);
-        offerContainer.addChild(offererWindow);
-    }
+    // Get position of container before putting in respond window
+    offerContainer.x = canvas.getWidth() - tradeOffers.laneRightOffset;
+    offerContainer.zIndex = 1500;
+    offerContainer.scale.set(tradeOffers.scale);
+    offerContainer.pivot.x = offerContainer.width + 100;
+    offerObject.layoutHeight = panelHeight;
+    relayoutTradeOfferContainers(false);
 
     // Request animation
     if (isNewOffer) {

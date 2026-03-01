@@ -337,6 +337,8 @@ import uiKitBank from "../assets/runtime/shared/ui-kit/bank.svg";
 import uiKitPlayers from "../assets/runtime/shared/ui-kit/icon-players.svg";
 import uiKitTradeArrowGreen from "../assets/runtime/shared/ui-kit/icon-trade-arrow-green.svg";
 import uiKitTradeArrowRed from "../assets/runtime/shared/ui-kit/icon-trade-arrow-red.svg";
+import uiKitHourglass from "../assets/runtime/shared/ui-kit/icon-hourglass.svg";
+import uiKitPencil from "../assets/runtime/shared/ui-kit/icon-pencil.svg";
 import uiKitX from "../assets/runtime/shared/ui-kit/icon-x.svg";
 import playerAvatarIconS from "../assets/runtime/shared/profile-icons/player-overview.svg";
 
@@ -345,6 +347,8 @@ export const uiKit = {
     players: uiKitPlayers,
     tradeArrowGreen: uiKitTradeArrowGreen,
     tradeArrowRed: uiKitTradeArrowRed,
+    hourglass: uiKitHourglass,
+    pencil: uiKitPencil,
     x: uiKitX,
 } as const;
 

@@ -8,6 +8,12 @@ type DockRailOptions = {
     glossHeight?: number;
 };
 
+type DockPanelOptions = {
+    width: number;
+    height: number;
+    headerHeight?: number;
+};
+
 type DockSlotOptions = {
     x: number;
     y: number;
@@ -52,6 +58,58 @@ export function createDockRail({
     const gloss = new PIXI.Graphics();
     gloss.beginFill(bottomDock.shell.glossFill, bottomDock.shell.glossAlpha);
     gloss.drawRoundedRect(4, 4, width - 8, topGlossHeight, bottomDock.shell.radius - 4);
+    gloss.endFill();
+    container.addChild(gloss);
+
+    return container;
+}
+
+export function createDockPanel({
+    width,
+    height,
+    headerHeight = 0,
+}: DockPanelOptions) {
+    const bottomDock = getBottomDockConfig();
+    const panel = bottomDock.panel;
+    const container = new PIXI.Container();
+
+    const base = new PIXI.Graphics();
+    base.lineStyle({
+        color: panel.border,
+        width: panel.borderWidth,
+    });
+    base.beginFill(panel.fill, 0.98);
+    base.drawRoundedRect(0, 0, width, height, panel.radius);
+    base.endFill();
+    container.addChild(base);
+
+    if (headerHeight > 0) {
+        const header = new PIXI.Graphics();
+        header.lineStyle({
+            color: panel.headerBorder,
+            width: 2,
+        });
+        header.beginFill(panel.headerFill, 0.95);
+        header.drawRoundedRect(
+            panel.inset,
+            panel.inset,
+            width - panel.inset * 2,
+            headerHeight,
+            Math.max(8, panel.radius - 6),
+        );
+        header.endFill();
+        container.addChild(header);
+    }
+
+    const gloss = new PIXI.Graphics();
+    gloss.beginFill(panel.glossFill, panel.glossAlpha);
+    gloss.drawRoundedRect(
+        panel.inset,
+        panel.inset,
+        width - panel.inset * 2,
+        Math.max(12, Math.floor(height * 0.22)),
+        Math.max(8, panel.radius - 6),
+    );
     gloss.endFill();
     container.addChild(gloss);
 
@@ -118,7 +176,6 @@ export function createCountChip(width: number, height: number) {
     const bottomDock = getBottomDockConfig();
     const sprite = new PIXI.Sprite();
     const g = new PIXI.Graphics();
-    g.lineStyle({ color: bottomDock.chip.border, width: 1 });
     g.beginFill(bottomDock.chip.fill);
     g.drawRoundedRect(0, 0, width, height, bottomDock.chip.radius);
     g.endFill();
@@ -135,4 +192,41 @@ export function addIconSprite(container: PIXI.Container, options: IconOptions) {
     sprite.y = options.y;
     container.addChild(sprite);
     return sprite;
+}
+
+export function createPanelTitleTextStyle(
+    overrides?: Partial<PIXI.ITextStyle>,
+) {
+    const panel = getBottomDockConfig().panel;
+    return new PIXI.TextStyle({
+        fontFamily: panel.fontFamily,
+        fontSize: panel.titleFontSize,
+        fill: panel.titleText,
+        fontWeight: "bold",
+        ...overrides,
+    });
+}
+
+export function createPanelBodyTextStyle(
+    overrides?: Partial<PIXI.ITextStyle>,
+) {
+    const panel = getBottomDockConfig().panel;
+    return new PIXI.TextStyle({
+        fontFamily: panel.fontFamily,
+        fontSize: panel.bodyFontSize,
+        fill: panel.bodyText,
+        ...overrides,
+    });
+}
+
+export function createPanelCaptionTextStyle(
+    overrides?: Partial<PIXI.ITextStyle>,
+) {
+    const panel = getBottomDockConfig().panel;
+    return new PIXI.TextStyle({
+        fontFamily: panel.fontFamily,
+        fontSize: panel.captionFontSize,
+        fill: panel.titleText,
+        ...overrides,
+    });
 }

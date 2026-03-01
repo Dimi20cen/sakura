@@ -24,7 +24,13 @@ import {
     getBottomDockConfig,
     getPauseToggleConfig,
 } from "./uiConfig";
-import { createDockRail, createDockSlot } from "./uiDock";
+import {
+    createDockRail,
+    createDockSlot,
+    createPanelBodyTextStyle,
+    createPanelCaptionTextStyle,
+    createPanelTitleTextStyle,
+} from "./uiDock";
 
 /** Main button container */
 export let container: PIXI.Container;
@@ -155,23 +161,25 @@ function ensureTurnTimerWidget() {
     turnTimerContainer.addChild(timerBg);
     turnTimerContainer.addChild(timerStrip);
 
-    turnTimerText = new PIXI.Text("--:--", {
-        fontFamily: "sans-serif",
-        fontSize: 16,
-        fill: 0x5a341a,
-        fontWeight: "bold",
-    });
+    turnTimerText = new PIXI.Text(
+        "--:--",
+        createPanelTitleTextStyle({
+            fontSize: 16,
+        }),
+    );
     turnTimerText.anchor.set(0.5);
     turnTimerText.x = 46;
     turnTimerText.y = 14;
     turnTimerContainer.addChild(turnTimerText);
 
-    turnTimerDebugText = new PIXI.Text("", {
-        fontFamily: "sans-serif",
-        fontSize: 9,
-        fill: 0x0b6c8c,
-        align: "center",
-    });
+    turnTimerDebugText = new PIXI.Text(
+        "",
+        createPanelCaptionTextStyle({
+            fontSize: 9,
+            fill: 0x0b6c8c,
+            align: "center",
+        }),
+    );
     turnTimerDebugText.anchor.set(0.5);
     turnTimerDebugText.x = 46;
     turnTimerDebugText.y = 28;
@@ -616,18 +624,19 @@ export function getCountSprite(
     const bottomDock = getBottomDockConfig();
     const sprite = new PIXI.Sprite();
     const g = new PIXI.Graphics()
-        .lineStyle({ color: bottomDock.chip.border, width: 1 })
         .beginFill(bottomDock.chip.fill)
         .drawRoundedRect(0, 0, width, height, bottomDock.chip.radius)
         .endFill();
     sprite.texture = canvas.app.generateRenderTexture(g);
 
-    const text = new PIXI.Text("0", {
-        fontFamily: "sans-serif",
-        fontSize: fontsize,
-        fill: bottomDock.chip.text,
-        align: "center",
-    });
+    const text = new PIXI.Text(
+        "0",
+        createPanelBodyTextStyle({
+            fontSize: fontsize,
+            fill: bottomDock.chip.text,
+            align: "center",
+        }),
+    );
     text.y = height / 2;
     text.x = -width / 2;
     text.zIndex = 2;

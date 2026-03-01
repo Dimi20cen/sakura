@@ -1,6 +1,5 @@
 import * as PIXI from "pixi.js";
 import * as canvas from "./canvas";
-import * as windows from "./windows";
 import * as ws from "./ws";
 import * as buttons from "./buttons";
 import {
@@ -9,11 +8,16 @@ import {
     computeChatWindowPosition,
 } from "./hudLayout";
 import { sound } from "@pixi/sound";
-import { getChatConfig } from "./uiConfig";
+import { getBottomDockConfig, getChatConfig } from "./uiConfig";
+import {
+    createDockPanel,
+    createPanelBodyTextStyle,
+    createPanelTitleTextStyle,
+} from "./uiDock";
 
 type Message = { text: string; color: string };
 
-let windowSprite: PIXI.Sprite;
+let windowSprite: PIXI.Container;
 let inputBox: HTMLInputElement;
 let scrollOffset = 0;
 let chatLane: PIXI.Container;
@@ -46,10 +50,11 @@ export function initialize() {
 
     const chatConfig = getChatConfig();
 
-    windowSprite = windows.getWindowSprite(
-        chatConfig.windowWidth,
-        chatConfig.windowHeight,
-    );
+    windowSprite = createDockPanel({
+        width: chatConfig.windowWidth,
+        height: chatConfig.windowHeight,
+        headerHeight: 30,
+    });
     windowSprite.pivot.x = chatConfig.windowWidth;
     windowSprite.pivot.y = chatConfig.windowHeight;
     const chatWindowPos = computeChatWindowPosition({
@@ -154,20 +159,20 @@ export function initialize() {
             chatConfig.laneHeight,
         );
 
-        const bg = windows.getWindowSprite(
-            chatConfig.laneWidth,
-            chatConfig.laneHeight,
-        );
+        const bg = createDockPanel({
+            width: chatConfig.laneWidth,
+            height: chatConfig.laneHeight,
+            headerHeight: Math.max(18, chatConfig.laneHeight - 8),
+        });
         chatLane.addChild(bg);
 
-        const label = new PIXI.Text("Chat", {
-            fontFamily: "sans-serif",
-            fontSize: 26,
-            fill: 0x1f2937,
-            fontWeight: "bold",
-        });
+        const label = new PIXI.Text(
+            "Chat",
+            createPanelTitleTextStyle({
+                fontSize: 14,
+            }),
+        );
         label.anchor.set(0.5);
-        label.scale.set(0.5);
         label.x = chatConfig.laneWidth / 2;
         label.y = chatConfig.laneHeight / 2;
         chatLane.addChild(label);
@@ -220,11 +225,9 @@ function renderMessages() {
         return;
     }
 
-    const style = new PIXI.TextStyle({
-        fontSize: 14,
+    const style = createPanelBodyTextStyle({
         wordWrap: true,
         wordWrapWidth: getChatConfig().windowWidth - 20,
-        fontFamily: "'Dekko', monospace",
     });
 
     [...windowSprite.children].forEach((c: any) => {
@@ -305,12 +308,11 @@ export function chatMessage(msg: Message) {
     }
     sound.play("soundChat");
 
-    const style = new PIXI.TextStyle({
+    const style = createPanelBodyTextStyle({
         fill: msg.color,
-        fontSize: 15,
+        fontSize: 14,
         wordWrap: true,
         wordWrapWidth: 300,
-        fontFamily: "'Dekko', monospace",
     });
     const measure = PIXI.TextMetrics.measureText(msg.text, style);
 

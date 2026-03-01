@@ -1,6 +1,23 @@
 import type { UIConfig } from "../types.ts";
 
 export const bottomDockConfig: UIConfig["bottomDock"] = {
+    panel: {
+        fill: 0xf1ead7,
+        border: 0x5b3318,
+        borderWidth: 3,
+        radius: 18,
+        glossFill: 0xffe1a8,
+        glossAlpha: 0.12,
+        headerFill: 0x17b6cf,
+        headerBorder: 0x0b6c8c,
+        titleText: 0x5a341a,
+        bodyText: 0x3f2a18,
+        inset: 4,
+        fontFamily: "sans-serif",
+        titleFontSize: 16,
+        bodyFontSize: 13,
+        captionFontSize: 10,
+    },
     shell: {
         fill: 0x8b5727,
         border: 0x5b3318,

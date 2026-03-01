@@ -2,11 +2,15 @@ import * as PIXI from "pixi.js";
 import * as assets from "./assets";
 import * as canvas from "./canvas";
 import * as state from "./state";
-import * as windows from "./windows";
 import * as tsg from "../tsg";
 import { CardType } from "./entities";
 import { computeGameLogPosition, getRightStackPanelWidth } from "./hudLayout";
 import { getGameLogConfig } from "./uiConfig";
+import {
+    createDockPanel,
+    createPanelBodyTextStyle,
+    createPanelTitleTextStyle,
+} from "./uiDock";
 
 type LogEntry = {
     id: number;
@@ -44,15 +48,14 @@ function ensureUI() {
     container = new PIXI.Container();
     container.zIndex = 1600;
 
-    const bg = windows.getWindowSprite(WIDTH(), HEIGHT());
+    const bg = createDockPanel({
+        width: WIDTH(),
+        height: HEIGHT(),
+        headerHeight: 30,
+    });
     container.addChild(bg);
 
-    const title = new PIXI.Text("Game Log", {
-        fontFamily: "sans-serif",
-        fontSize: 16,
-        fill: 0x1f2937,
-        fontWeight: "bold",
-    });
+    const title = new PIXI.Text("Game Log", createPanelTitleTextStyle());
     title.x = 10;
     title.y = 8;
     container.addChild(title);
@@ -87,11 +90,7 @@ function rerender() {
         const row = new PIXI.Container();
         row.y = idx * 20;
 
-        const text = new PIXI.Text(entry.text, {
-            fontFamily: "sans-serif",
-            fontSize: 13,
-            fill: 0x1f2937,
-        });
+        const text = new PIXI.Text(entry.text, createPanelBodyTextStyle());
         text.x = 8;
         row.addChild(text);
 

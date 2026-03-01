@@ -136,6 +136,23 @@ export type UIConfig = {
         };
     };
     bottomDock: {
+        panel: {
+            fill: number;
+            border: number;
+            borderWidth: number;
+            radius: number;
+            glossFill: number;
+            glossAlpha: number;
+            headerFill: number;
+            headerBorder: number;
+            titleText: number;
+            bodyText: number;
+            inset: number;
+            fontFamily: string;
+            titleFontSize: number;
+            bodyFontSize: number;
+            captionFontSize: number;
+        };
         shell: {
             fill: number;
             border: number;

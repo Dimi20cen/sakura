@@ -47,6 +47,10 @@ export const presetOverrides: Record<UIPresetName, DeepPartial<UIConfig>> = {
                 buttonInset: 10,
                 height: 82,
             },
+            dice: {
+                rightRailGap: 28,
+                aboveActionBarGap: 14,
+            },
         },
         overlays: {
             chooseDice: {
@@ -153,8 +157,8 @@ export const presetOverrides: Record<UIPresetName, DeepPartial<UIConfig>> = {
                 stackGap: 8,
             },
             dice: {
-                rightRailGap: 8,
-                aboveActionBarGap: 8,
+                rightRailGap: 24,
+                aboveActionBarGap: 12,
                 minTopInset: 12,
             },
             misc: {

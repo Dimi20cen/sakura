@@ -61,8 +61,8 @@ export const hudConfig: UIConfig["hud"] = {
         stackGap: 10,
     },
     dice: {
-        rightRailGap: 10,
-        aboveActionBarGap: 10,
+        rightRailGap: 34,
+        aboveActionBarGap: 18,
         minTopInset: 20,
     },
     misc: {

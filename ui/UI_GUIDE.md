@@ -69,7 +69,7 @@ npm run dev
 - `ui/src/hudLayout.ts` derives gameplay HUD positions from selector-backed config instead of hardcoding dimensions in each module.
 - Player panel sizing/scaling, hand height, action-bar button geometry, trade/editor windows, setup-choice overlays, settings details, game-over layout, shared yes/no dialogs, tooltips, and error modals all resolve through `ui/src/uiConfig/` selectors now.
 - `ui/src/uiConfig/` exposes named presets via `initializeUIConfig({ preset, overrides })` for `default`, `compact`, and `mobileLandscape`.
-- Shared bottom-HUD rails and slots now live in `ui/src/uiDock.ts`; use those primitives before introducing new custom Pixi chrome for the hand, trade rows, action dock, timer, or dice.
+- Shared dock/panel primitives now live in `ui/src/uiDock.ts`; use those before introducing new custom Pixi chrome for the hand, trade rows, action dock, timer, dice, or right-rail panels.
 - When adjusting HUD spacing or panel sizes, prefer editing `ui/src/uiConfig/sections/*`, `ui/src/uiConfig/presets.ts`, or shared selectors/layout helpers first and only change module code when behavior needs to change.
 - `ui/src/windows.ts` reads the shared window chrome config, so visual restyling of common panels can happen in one place.
 - Put reusable styling primitives in `ui/src/uiConfig/tokens.ts`, semantic section defaults in `ui/src/uiConfig/sections/*`, and shared read accessors in `ui/src/uiConfig/selectors/*`.

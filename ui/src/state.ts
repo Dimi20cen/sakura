@@ -34,6 +34,11 @@ import {
     getPendingActionOverlayConfig,
     getPlayerPanelConfig,
 } from "./uiConfig";
+import {
+    createDockPanel,
+    createPanelBodyTextStyle,
+    createPanelTitleTextStyle,
+} from "./uiDock";
 
 type InitializableSprite = PIXI.Sprite & { initialized?: boolean };
 
@@ -199,7 +204,10 @@ function intialize(commandHub: CommandHub) {
 
     // Window
     container.addChild(
-        windows.getWindowSprite(getPlayerPanelWidth(), windowHeight),
+        createDockPanel({
+            width: getPlayerPanelWidth(),
+            height: windowHeight,
+        }),
     );
 
     // Pending action window
@@ -210,12 +218,13 @@ function intialize(commandHub: CommandHub) {
     pendingActionContainer.zIndex = 1300;
     pendingActionContainer.visible = false;
 
-    pendingActionText = new PIXI.Text("", {
-        fontFamily: "sans-serif",
-        fontSize: pendingActionConfig.fontSize,
-        fill: 0x000000,
-        align: "left",
-    });
+    pendingActionText = new PIXI.Text(
+        "",
+        createPanelTitleTextStyle({
+            fontSize: pendingActionConfig.fontSize,
+            align: "left",
+        }),
+    );
     pendingActionText.x = pendingActionConfig.textX;
     pendingActionText.y = pendingActionConfig.textY;
     pendingActionText.anchor.y = 0.5;
@@ -400,12 +409,13 @@ export function renderGameState(gs: GameState, commandHub: CommandHub) {
                 img.anchor.y = 0.5;
                 imgc.addChild(img);
 
-                const text = new PIXI.Text(``, {
-                    fontFamily: "sans-serif",
-                    fontSize: 16,
-                    fill: 0x000000,
-                    align: "left",
-                });
+                const text = new PIXI.Text(
+                    ``,
+                    createPanelBodyTextStyle({
+                        fontSize: 16,
+                        align: "left",
+                    }),
+                );
                 text.x = 25;
                 text.anchor.y = 0.5;
                 text.y = 1;
@@ -414,13 +424,13 @@ export function renderGameState(gs: GameState, commandHub: CommandHub) {
             };
 
             // User name
-            spriteset.name = new PIXI.Text(state.Username, {
-                fontFamily: "sans-serif",
-                fontSize: 13,
-                fill: 0x000000,
-                align: "left",
-                fontWeight: "bold",
-            });
+            spriteset.name = new PIXI.Text(
+                state.Username,
+                createPanelTitleTextStyle({
+                    fontSize: 13,
+                    align: "left",
+                }),
+            );
             spriteset.name.x = 72;
             spriteset.name.y = 12 + offset;
             container.addChild(spriteset.name);

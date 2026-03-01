@@ -2,7 +2,6 @@ import * as PIXI from "pixi.js";
 import * as assets from "./assets";
 import * as buttons from "./buttons";
 import * as canvas from "./canvas";
-import * as windows from "./windows";
 import * as tsg from "../tsg";
 import { CardType } from "./entities";
 import {
@@ -10,6 +9,7 @@ import {
     computeResourceBankPosition,
 } from "./hudLayout";
 import { getResourceBankConfig } from "./uiConfig";
+import { createDockPanel } from "./uiDock";
 
 const WIDTH = () => getResourceBankConfig().width;
 const HEIGHT = () => getResourceBankConfig().height;
@@ -95,7 +95,12 @@ function ensureUI() {
     panelWidth = WIDTH();
     panelHeight = HEIGHT();
 
-    container.addChild(windows.getWindowSprite(WIDTH(), HEIGHT()));
+    container.addChild(
+        createDockPanel({
+            width: WIDTH(),
+            height: HEIGHT(),
+        }),
+    );
 
     for (const ct of RESOURCE_ORDER) {
         const chip = new PIXI.Container();

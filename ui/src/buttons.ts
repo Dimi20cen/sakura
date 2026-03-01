@@ -371,8 +371,8 @@ function getPlayerPieceButtonScale(
         case ButtonType.Road:
             return (
                 Math.min(
-                    (width * 0.12) / simg.width,
-                    (height * 0.48) / simg.height,
+                    (width * 0.288) / simg.width,
+                    (height * 0.72) / simg.height,
                 ) * iconScaleMultiplier
             );
         case ButtonType.Ship:
@@ -491,7 +491,7 @@ export function getButtonSprite(
         });
     };
 
-    if (bgColor) {
+    if (bgColor && !playerPieceButton) {
         outer.setBgColor(bgColor);
     }
 
@@ -660,7 +660,7 @@ export function render(commandHub: CommandHub) {
             ButtonType.Settlement,
             getButtonWidth(),
             0,
-            undefined,
+            playerColor,
             rerender,
         );
         buttons.buildSettlement.interactive = true;
@@ -696,7 +696,7 @@ export function render(commandHub: CommandHub) {
             ButtonType.City,
             getButtonWidth(),
             0,
-            undefined,
+            playerColor,
             rerender,
         );
         buttons.buildCity.interactive = true;
@@ -732,7 +732,7 @@ export function render(commandHub: CommandHub) {
             ButtonType.Road,
             getButtonWidth(),
             0,
-            undefined,
+            playerColor,
             rerender,
         );
         buttons.buildRoad.interactive = true;
@@ -841,7 +841,7 @@ export function render(commandHub: CommandHub) {
             ButtonType.Ship,
             getButtonWidth(),
             0,
-            undefined,
+            playerColor,
             rerender,
         );
         buttons.buildShip.interactive = true;

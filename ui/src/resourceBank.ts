@@ -9,10 +9,10 @@ import {
     computeEvenlySpacedRowXPositions,
     computeResourceBankPosition,
 } from "./hudLayout";
-import { getUIConfig } from "./uiConfig";
+import { getResourceBankConfig } from "./uiConfig";
 
-const WIDTH = () => getUIConfig().hud.resourceBank.width;
-const HEIGHT = () => getUIConfig().hud.resourceBank.height;
+const WIDTH = () => getResourceBankConfig().width;
+const HEIGHT = () => getResourceBankConfig().height;
 const CARD_WIDTH = 34;
 const CARD_HEIGHT = 48;
 const COUNT_WIDTH = 20;

@@ -22,7 +22,7 @@ This document explains how SAKURA components communicate in local development.
 - `ui/src/commands/`: outbound command builders
 - `ui/src/store/`: Redux Toolkit slices + runtime handlers
 - `ui/src/hudLayout.ts`: shared HUD positioning preset and right-rail/bottom-rail layout helpers
-- `ui/src/uiConfig.ts`: centralized UI configuration for canvas sizing, HUD geometry, and shared window chrome
+- `ui/src/uiConfig/`: modular UI configuration system for canvas sizing, HUD geometry, presets, selectors, and shared window chrome
 - `ui/src/uiDock.ts`: shared bottom-dock drawing primitives used by hand/trade/action/timer/dice surfaces
 - `ui/src/`: Pixi/runtime rendering modules
 - `ui/utils/mango.ts`: Mongo access from Next.js API routes
@@ -111,13 +111,13 @@ Inbound game messages are handled by `ui/src/store/gameRuntime.ts` (with Pixi re
 ## 7. HUD layout ownership
 
 - In-game HUD placement is centralized in `ui/src/hudLayout.ts`.
-- Layout defaults now come from `ui/src/uiConfig.ts`, which is the first place to change shared UI geometry or chrome values.
+- Layout defaults now come from `ui/src/uiConfig/`, which is the first place to change shared UI geometry or chrome values.
 - Right-side stack (`Game Log`, `Chat`, `Resource Bank`, `Players`) is aligned via shared rail helpers.
 - Bottom controls (`player hand`, `action/options`, `dice`, `timer`) derive positions from the same preset to keep spacing consistent across resolutions.
-- Player panel scale thresholds, hand sizing, and action-bar button/count geometry now also flow through `ui/src/uiConfig.ts` instead of being owned by individual Pixi modules.
-- Shared Pixi window styling and fixed top-left controls (for example fullscreen/pause) also read from `ui/src/uiConfig.ts`, so theme/layout adjustments do not require touching each HUD module.
-- Trade editors, setup-selection overlays, settings details, game-over windows, shared dialogs, and tooltip/error window sizing now also source their layout from `ui/src/uiConfig.ts`.
-- `ui/src/uiConfig.ts` now supports named presets (`default`, `compact`, `mobileLandscape`) so product-level layout variants can be applied with optional local overrides.
+- Player panel scale thresholds, hand sizing, and action-bar button/count geometry now also flow through `ui/src/uiConfig/sections/*` and selector helpers instead of being owned by individual Pixi modules.
+- Shared Pixi window styling and fixed top-left controls (for example fullscreen/pause) also read from `ui/src/uiConfig/selectors/*`, so theme/layout adjustments do not require touching each HUD module.
+- Trade editors, setup-selection overlays, settings details, game-over windows, shared dialogs, and tooltip/error window sizing now also source their layout from the same `ui/src/uiConfig/` runtime.
+- `ui/src/uiConfig/runtime.ts` supports named presets (`default`, `compact`, `mobileLandscape`) via `initializeUIConfig({ preset, overrides })`, while `ui/src/uiConfig/selectors/*` provides the stable read API that feature modules import.
 - Bottom-HUD chrome is no longer ad hoc per module: `ui/src/uiDock.ts` provides the shared dock rail/slot/side-rail primitives used by `hand`, `trade`, `buttons`, and `dice`.
 
 ## 8. Authoritative Timer Protocol

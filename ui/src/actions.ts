@@ -9,7 +9,8 @@ import * as canvas from "./canvas";
 import * as windows from "./windows";
 import * as PIXI from "pixi.js";
 import * as buttons from "./buttons";
-import { getUIConfig } from "./uiConfig";
+import { getOverlayConfig } from "./uiConfig";
+import { UIEdge, UITile, UIVertex } from "./entities";
 
 export enum PlayerActionType {
     SelectCards = "sc",
@@ -34,10 +35,6 @@ function getCurrentPlayerColor() {
     return (
         state.lastKnownStates?.[ws.getThisPlayerOrder()]?.Color || "#ff0000"
     );
-}
-
-function getOverlayConfig() {
-    return getUIConfig().overlays;
 }
 
 /**
@@ -141,21 +138,21 @@ function coordKey(c?: tsg.Coordinate) {
     return `${c?.X ?? ""},${c?.Y ?? ""}`;
 }
 
-function edgeKey(edge?: tsg.Edge) {
+function edgeKey(edge?: UIEdge | tsg.Edge) {
     const a = coordKey(edge?.C?.C1);
     const b = coordKey(edge?.C?.C2);
     return a <= b ? `${a}|${b}` : `${b}|${a}`;
 }
 
-function vertexSelectionKey(v: tsg.Vertex) {
+function vertexSelectionKey(v: UIVertex) {
     return `v:${coordKey(v.C)}`;
 }
 
-function tileSelectionKey(t: tsg.Tile) {
+function tileSelectionKey(t: UITile) {
     return `t:${coordKey(t.Center)}`;
 }
 
-function edgeSelectionKey(e: tsg.Edge) {
+function edgeSelectionKey(e: UIEdge) {
     return `e:${edgeKey(e)}`;
 }
 

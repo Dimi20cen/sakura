@@ -55,6 +55,11 @@ let edgePlacements: { [key: CoordStr]: IEdgePlacement };
 /** Map from coordinates to display coordinates */
 let DispCoordMap: { [key: CoordStr]: ICoordinate };
 
+type CoordinateInput = {
+    x: number;
+    y: number;
+};
+
 /** Click event for vertex */
 type VertexClickEvent = (event: any, vertex: UIVertex) => void;
 let vertexClickEvent: VertexClickEvent | null = null;
@@ -195,7 +200,7 @@ export function getDispCoord(x: number | ICoordinate, y?: number) {
  * @param y y coordinate
  * @param val display coordinate
  */
-export function setDispCoord(x: number, y: number, val: ICoordinate) {
+export function setDispCoord(x: number, y: number, val: CoordinateInput) {
     return (DispCoordMap[coordStr(x, y)] = new Coordinate(val));
 }
 

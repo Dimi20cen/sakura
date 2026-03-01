@@ -15,7 +15,7 @@ import {
 import * as tsg from "../tsg";
 import { getCommandHub, getThisPlayerOrder, isSpectator } from "./ws";
 import { CardType, DevelopmentCardType } from "./entities";
-import { getUIConfig } from "./uiConfig";
+import { getBottomRailConfig, getHandConfig } from "./uiConfig";
 import { createDockRail } from "./uiDock";
 
 export let handWindow: HandWindow | undefined;
@@ -32,11 +32,7 @@ let usingDevCardType: number;
 let handWindowWidth = 750;
 
 function getHandWindowHeight() {
-    return getUIConfig().hud.bottomRail.handHeight;
-}
-
-function getHandConfig() {
-    return getUIConfig().hand;
+    return getBottomRailConfig().handHeight;
 }
 
 function layoutDevConfirmationControls() {

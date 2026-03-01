@@ -1,5 +1,5 @@
 import * as PIXI from "pixi.js";
-import { getUIConfig } from "./uiConfig";
+import { getBottomDockConfig } from "./uiConfig";
 import * as assets from "./assets";
 
 type DockRailOptions = {
@@ -35,7 +35,7 @@ export function createDockRail({
     height,
     glossHeight,
 }: DockRailOptions) {
-    const { bottomDock } = getUIConfig();
+    const bottomDock = getBottomDockConfig();
     const container = new PIXI.Container();
 
     const base = new PIXI.Graphics();
@@ -65,7 +65,7 @@ export function createDockSlot({
     height,
     active = false,
 }: DockSlotOptions) {
-    const { bottomDock } = getUIConfig();
+    const bottomDock = getBottomDockConfig();
     const container = new PIXI.Container();
     container.x = x;
     container.y = y;
@@ -94,7 +94,7 @@ export function createDockSideRail({
     height,
     divider = true,
 }: DockSideRailOptions) {
-    const { bottomDock } = getUIConfig();
+    const bottomDock = getBottomDockConfig();
     const container = new PIXI.Container();
 
     const rail = new PIXI.Graphics();
@@ -115,7 +115,7 @@ export function createDockSideRail({
 }
 
 export function createCountChip(width: number, height: number) {
-    const { bottomDock } = getUIConfig();
+    const bottomDock = getBottomDockConfig();
     const sprite = new PIXI.Sprite();
     const g = new PIXI.Graphics();
     g.lineStyle({ color: bottomDock.chip.border, width: 1 });

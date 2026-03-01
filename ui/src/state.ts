@@ -30,7 +30,10 @@ import { CardType } from "./entities";
 import CommandHub from "./commands";
 import { hexToUrlString } from "../utils";
 import { syncTurnTimerSnapshot } from "./store/turnTimerRuntime";
-import { getUIConfig } from "./uiConfig";
+import {
+    getPendingActionOverlayConfig,
+    getPlayerPanelConfig,
+} from "./uiConfig";
 
 type InitializableSprite = PIXI.Sprite & { initialized?: boolean };
 
@@ -76,10 +79,6 @@ export let lastKnownStates: PlayerState[] | null = null;
 export let lastKnownGameState: GameState | null = null;
 let lastKnownSecretVictoryPoints: number = 0;
 
-function getPlayerPanelConfig() {
-    return getUIConfig().hud.playerPanel;
-}
-
 function getPlayerPanelWidth() {
     return getPlayerPanelConfig().width;
 }
@@ -98,10 +97,6 @@ function getPlayerPanelHeight(playerCount: number) {
 
 function getPlayerRowOffset(order: number) {
     return order * getPlayerPanelConfig().rowHeight;
-}
-
-function getPendingActionConfig() {
-    return getUIConfig().overlays.pendingAction;
 }
 
 export enum GameMode {
@@ -208,7 +203,7 @@ function intialize(commandHub: CommandHub) {
     );
 
     // Pending action window
-    const pendingActionConfig = getPendingActionConfig();
+    const pendingActionConfig = getPendingActionOverlayConfig();
     pendingActionContainer = new PIXI.Container();
     pendingActionContainer.x = pendingActionConfig.x;
     pendingActionContainer.y = pendingActionConfig.y;

@@ -5,7 +5,10 @@ import * as windows from "./windows";
 import { GameSettings } from "../tsg";
 import { DISPLAY_GAME_MODE, GAME_MODE } from "./lobby";
 import { capitalizeFirstLetter } from "../utils";
-import { getUIConfig } from "./uiConfig";
+import {
+    getSettingsButtonConfig,
+    getSettingsPanelConfig,
+} from "./uiConfig";
 
 export let settingsContainer: PIXI.Container;
 export let settingDetailsContainer: PIXI.Container;
@@ -13,8 +16,8 @@ let settings: GameSettings;
 
 export function initialize(s: GameSettings) {
     settings = s;
-    const { settingsButton } = getUIConfig().controls;
-    const settingsPanel = getUIConfig().settingsPanel;
+    const settingsButton = getSettingsButtonConfig();
+    const settingsPanel = getSettingsPanelConfig();
 
     settingsContainer = new PIXI.Container();
     const settingsSprite = new PIXI.Sprite();

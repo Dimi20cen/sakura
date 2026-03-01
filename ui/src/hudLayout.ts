@@ -5,7 +5,15 @@ type Rect = {
     height: number;
 };
 
-import { getUIConfig } from "./uiConfig";
+import {
+    getActionBarConfig,
+    getBottomRailConfig,
+    getChatConfig,
+    getGameLogConfig,
+    getHudConfig,
+    getHudMiscConfig,
+    getResourceBankConfig,
+} from "./uiConfig";
 
 /**
  * Central HUD tuning preset.
@@ -49,7 +57,7 @@ export const HUD_LAYOUT_PRESET = {
 } as const;
 
 function getHUDLayoutPreset() {
-    const { hud } = getUIConfig();
+    const hud = getHudConfig();
     return {
         padding: hud.padding,
         gap: hud.gap,
@@ -78,7 +86,7 @@ function getHUDLayoutPreset() {
 }
 
 export function getRightStackPanelWidth() {
-    return getUIConfig().hud.gameLog.width;
+    return getGameLogConfig().width;
 }
 
 function getRightRailX(canvasWidth: number) {
@@ -172,20 +180,21 @@ type HandPositionInput = {
 
 export function computeHandWidth(canvasWidth: number) {
     const preset = getHUDLayoutPreset();
-    const { hud } = getUIConfig();
+    const bottomRail = getBottomRailConfig();
+    const actionBar = getActionBarConfig();
     const rightRailX = getRightRailX(canvasWidth);
     // Reserve space for the action bar and timer lane.
     const actionBarWidth =
         preset.actionBarInnerOffset +
-        preset.actionBarButtonSpacing * hud.actionBar.buttonCount;
+        preset.actionBarButtonSpacing * actionBar.buttonCount;
     const width =
         rightRailX -
         preset.bottomRailLeftInset -
         preset.bottomRailGap -
         actionBarWidth;
     return Math.max(
-        hud.bottomRail.handMinWidth,
-        Math.min(hud.bottomRail.handMaxWidth, Math.floor(width)),
+        bottomRail.handMinWidth,
+        Math.min(bottomRail.handMaxWidth, Math.floor(width)),
     );
 }
 
@@ -269,10 +278,10 @@ export function computeDevConfirmationPosition({
     canvasHeight,
     handHeight,
 }: DevConfirmationPositionInput) {
-    const { hud } = getUIConfig();
+    const hud = getHudMiscConfig();
     return {
-        x: hud.padding,
-        y: canvasHeight - handHeight - hud.misc.devConfirmationOffsetY,
+        x: getHudConfig().padding,
+        y: canvasHeight - handHeight - hud.devConfirmationOffsetY,
     };
 }
 
@@ -283,10 +292,10 @@ type SpectatorsPositionInput = {
 export function computeSpectatorsPosition({
     canvasHeight: _canvasHeight,
 }: SpectatorsPositionInput) {
-    const { hud } = getUIConfig();
+    const hud = getHudMiscConfig();
     return {
-        x: hud.misc.spectatorsX,
-        y: hud.misc.spectatorsY,
+        x: hud.spectatorsX,
+        y: hud.spectatorsY,
     };
 }
 
@@ -337,11 +346,11 @@ export function computeSpecialBuildPosition({
     canvasWidth,
     canvasHeight,
 }: SpecialBuildPositionInput) {
-    const { hud } = getUIConfig();
+    const hud = getHudMiscConfig();
     const rightRailX = getRightRailX(canvasWidth);
     return {
-        x: rightRailX - hud.misc.specialBuildOffsetX,
-        y: canvasHeight - hud.misc.specialBuildOffsetY,
+        x: rightRailX - hud.specialBuildOffsetX,
+        y: canvasHeight - hud.specialBuildOffsetY,
     };
 }
 
@@ -369,7 +378,7 @@ export function computeChatWindowPosition({
     canvasWidth,
     canvasHeight: _canvasHeight,
 }: ChatWindowPositionInput) {
-    const { hud } = getUIConfig();
+    const hud = getChatConfig();
     const preset = getHUDLayoutPreset();
     const chatBottom =
         preset.rightRailTopInset +
@@ -377,8 +386,8 @@ export function computeChatWindowPosition({
         preset.gap +
         preset.chatLaneHeight;
     return {
-        x: canvasWidth - hud.padding,
-        y: Math.max(hud.chat.minWindowBottom, chatBottom + 2),
+        x: canvasWidth - getHudConfig().padding,
+        y: Math.max(hud.minWindowBottom, chatBottom + 2),
     };
 }
 
@@ -391,11 +400,11 @@ export function computeChatButtonPosition({
     canvasWidth,
     canvasHeight: _canvasHeight,
 }: ChatButtonPositionInput) {
-    const { hud } = getUIConfig();
+    const hud = getChatConfig();
     const lane = computeChatLanePosition({ canvasWidth });
     return {
-        x: lane.x + hud.chat.laneWidth / 2,
-        y: lane.y + hud.chat.laneHeight / 2,
+        x: lane.x + hud.laneWidth / 2,
+        y: lane.y + hud.laneHeight / 2,
     };
 }
 
@@ -408,11 +417,11 @@ export function computeChatPopupPosition({
     canvasWidth,
     chatButtonY,
 }: ChatPopupPositionInput) {
-    const { hud } = getUIConfig();
+    const hud = getChatConfig();
     return {
         x:
             canvasWidth -
-            (hud.chat.popupRightInset + hud.chat.popupTailInset + 10),
+            (hud.popupRightInset + hud.popupTailInset + 10),
         y: chatButtonY,
     };
 }
@@ -424,7 +433,7 @@ type GameLogPositionInput = {
 export function computeGameLogPosition({ canvasWidth }: GameLogPositionInput) {
     const preset = getHUDLayoutPreset();
     return {
-        x: getRightRailContentX(canvasWidth, getUIConfig().hud.gameLog.width),
+        x: getRightRailContentX(canvasWidth, getGameLogConfig().width),
         y: preset.rightRailTopInset,
     };
 }
@@ -444,7 +453,7 @@ export function computeResourceBankPosition({
         preset.chatLaneHeight +
         preset.gap;
     return {
-        x: getRightRailContentX(canvasWidth, getUIConfig().hud.resourceBank.width),
+        x: getRightRailContentX(canvasWidth, getResourceBankConfig().width),
         y,
     };
 }

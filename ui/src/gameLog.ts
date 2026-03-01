@@ -6,7 +6,7 @@ import * as windows from "./windows";
 import * as tsg from "../tsg";
 import { CardType } from "./entities";
 import { computeGameLogPosition, getRightStackPanelWidth } from "./hudLayout";
-import { getUIConfig } from "./uiConfig";
+import { getGameLogConfig } from "./uiConfig";
 
 type LogEntry = {
     id: number;
@@ -15,9 +15,9 @@ type LogEntry = {
 };
 
 const WIDTH = () => getRightStackPanelWidth();
-const HEIGHT = () => getUIConfig().hud.gameLog.height;
+const HEIGHT = () => getGameLogConfig().height;
 const MAX_ENTRIES = 80;
-const VISIBLE_ROWS = () => getUIConfig().hud.gameLog.visibleRows;
+const VISIBLE_ROWS = () => getGameLogConfig().visibleRows;
 
 let container: PIXI.Container | null = null;
 let content: PIXI.Container | null = null;

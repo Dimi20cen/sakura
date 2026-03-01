@@ -9,7 +9,7 @@ import {
     computeChatWindowPosition,
 } from "./hudLayout";
 import { sound } from "@pixi/sound";
-import { getUIConfig } from "./uiConfig";
+import { getChatConfig } from "./uiConfig";
 
 type Message = { text: string; color: string };
 
@@ -35,10 +35,6 @@ let syncInputLayout: (() => void) | null = null;
 //     { text: "BUNEEE: bleh bleh bleh bleh", color: "orange" },
 //     { text: "rajuRastogi: orange will not win now", color: "red" },
 // ];
-
-function getChatConfig() {
-    return getUIConfig().hud.chat;
-}
 
 /**
  * Creates a new chat window.

@@ -11,7 +11,10 @@ import * as assets from "./assets";
 import { getWindowSprite, YesNoWindow } from "./windows";
 import { CardType } from "./entities";
 import { getThisPlayerOrder, getCommandHub, isSpectator } from "./ws";
-import { getUIConfig } from "./uiConfig";
+import {
+    getBottomRailConfig,
+    getTradeConfig,
+} from "./uiConfig";
 import {
     addIconSprite,
     createDockRail,
@@ -28,10 +31,6 @@ type OfferObject = tsg.TradeOffer & {
     container: PIXI.Container & anim.Translatable;
 };
 
-function getTradeConfig() {
-    return getUIConfig().trade;
-}
-
 function relayoutEditorWindows() {
     if (
         !offerWindow?.container ||
@@ -43,7 +42,7 @@ function relayoutEditorWindows() {
     }
 
     const tradeEditor = getTradeConfig().editor;
-    const handHeight = getUIConfig().hud.bottomRail.handHeight;
+    const handHeight = getBottomRailConfig().handHeight;
     const handPos = computeHandPosition({
         canvasHeight: canvas.getHeight(),
         handHeight,

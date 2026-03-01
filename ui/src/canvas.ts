@@ -4,7 +4,10 @@ import * as buttons from "./buttons";
 import { loadAssets } from "./assets";
 import { ICoordinate } from "../tsg";
 import { toggleFullscreen } from "../utils";
-import { getUIConfig } from "./uiConfig";
+import {
+    getCanvasConfig,
+    getFullscreenButtonConfig,
+} from "./uiConfig";
 
 type AppType = PIXI.Application & {
     /** Needs re-render */
@@ -44,7 +47,7 @@ export { app };
  * @param done Callback when done
  */
 export async function initialize(div: HTMLDivElement, done?: () => void) {
-    const { canvas: canvasConfig } = getUIConfig();
+    const canvasConfig = getCanvasConfig();
     const newApp = new PIXI.Application({
         backgroundColor: 0x0077be,
         width: canvasConfig.width,
@@ -222,7 +225,7 @@ async function startup(done?: () => void) {
  * Initialize the fullscreen button
  */
 function addFullscreenButton() {
-    const { fullscreenButton } = getUIConfig().controls;
+    const fullscreenButton = getFullscreenButtonConfig();
     const fsbtn = buttons.getButtonSprite(
         buttons.ButtonType.Fullscreen,
         fullscreenButton.size,
@@ -240,7 +243,7 @@ function addFullscreenButton() {
  * Get scaling ratio for display coordinates
  */
 export function getScaleRatio() {
-    const { canvas: canvasConfig } = getUIConfig();
+    const canvasConfig = getCanvasConfig();
     return Math.min(
         window.innerWidth / getWidth(),
         window.innerHeight / getHeight(),
@@ -254,7 +257,7 @@ const resize = () => {
     if (!app?.view) return;
 
     const ratio = getScaleRatio();
-    const { canvas: canvasConfig } = getUIConfig();
+    const canvasConfig = getCanvasConfig();
     const canvas = app.view as HTMLCanvasElement;
     canvas.style!.height = `${canvasConfig.height * ratio}px`;
     canvas.style!.width = `${canvasConfig.width * ratio}px`;
@@ -268,7 +271,7 @@ const resize = () => {
  */
 export function getHeight() {
     if (!app?.view || !app?.renderer) {
-        return getUIConfig().canvas.height;
+        return getCanvasConfig().height;
     }
     return app.view.height / app.renderer.resolution;
 }
@@ -278,7 +281,7 @@ export function getHeight() {
  */
 export function getWidth() {
     if (!app?.view || !app?.renderer) {
-        return getUIConfig().canvas.width;
+        return getCanvasConfig().width;
     }
     return app.view.width / app.renderer.resolution;
 }

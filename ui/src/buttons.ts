@@ -19,7 +19,11 @@ import {
     getTurnTimerView,
     resetTurnTimerRuntime,
 } from "./store/turnTimerRuntime";
-import { getUIConfig } from "./uiConfig";
+import {
+    getActionBarConfig,
+    getBottomDockConfig,
+    getPauseToggleConfig,
+} from "./uiConfig";
 import { createDockRail, createDockSlot } from "./uiDock";
 
 /** Main button container */
@@ -65,10 +69,6 @@ export let buttons: {
     buildWall?: ButtonSprite;
     specialBuild?: ButtonSprite;
 };
-
-function getActionBarConfig() {
-    return getUIConfig().hud.actionBar;
-}
 
 function getButtonWidth() {
     return getActionBarConfig().buttonWidth;
@@ -320,7 +320,7 @@ export function relayout() {
         turnTimerContainer.y = container.y + (getActionBarHeight() - 36) / 2;
     }
     if (pauseToggleContainer && !pauseToggleContainer.destroyed) {
-        const { pauseToggle } = getUIConfig().controls;
+        const pauseToggle = getPauseToggleConfig();
         // Keep pause near the top-left controls, directly under fullscreen.
         pauseToggleContainer.x = pauseToggle.x;
         pauseToggleContainer.y = pauseToggle.y;
@@ -613,7 +613,7 @@ export function getCountSprite(
     height: number,
     fontsize: number,
 ) {
-    const { bottomDock } = getUIConfig();
+    const bottomDock = getBottomDockConfig();
     const sprite = new PIXI.Sprite();
     const g = new PIXI.Graphics()
         .lineStyle({ color: bottomDock.chip.border, width: 1 })

@@ -2,7 +2,12 @@ import * as PIXI from "pixi.js";
 import * as canvas from "./canvas";
 import * as buttons from "./buttons";
 import { getCardTexture } from "./hand";
-import { getUIConfig } from "./uiConfig";
+import {
+    getErrorModalConfig,
+    getTooltipConfig,
+    getWindowsConfig,
+    getYesNoWindowConfig,
+} from "./uiConfig";
 
 let currentErrorWindow: PIXI.Container | undefined;
 
@@ -12,7 +17,7 @@ let currentErrorWindow: PIXI.Container | undefined;
  * @param height Height of the window
  */
 export function getWindowSprite(width: number, height: number) {
-    const { windows } = getUIConfig();
+    const windows = getWindowsConfig();
     const s = new PIXI.Sprite();
     const g = new PIXI.Graphics();
     g.lineStyle({
@@ -70,7 +75,7 @@ export class YesNoWindow {
             return this;
         }
 
-        const yesNo = getUIConfig().windows.yesNo;
+        const yesNo = getYesNoWindowConfig();
         this.container.addChild(getWindowSprite(yesNo.width, yesNo.height));
         this.container.x = this.x;
         this.container.y = this.y;
@@ -147,7 +152,7 @@ export class YesNoWindow {
  */
 export function showErrorWindow(titleMessage: string, message: string) {
     console.error(titleMessage, message);
-    const modal = getUIConfig().windows.errorModal;
+    const modal = getErrorModalConfig();
 
     if (currentErrorWindow && !currentErrorWindow.destroyed) {
         currentErrorWindow.destroy({ children: true });
@@ -262,7 +267,7 @@ export class TooltipHandler {
      * Create the tooltip window
      */
     private makeWindow() {
-        const tooltip = getUIConfig().windows.tooltip;
+        const tooltip = getTooltipConfig();
         const style = new PIXI.TextStyle({
             fontSize: tooltip.fontSize,
             align: "left",

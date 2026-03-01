@@ -5,7 +5,7 @@ import * as canvas from "./canvas";
 import * as state from "./state";
 import { getThisPlayerOrder } from "./ws";
 import { PlayerState } from "../tsg";
-import { getUIConfig } from "./uiConfig";
+import { getOverlayConfig } from "./uiConfig";
 
 let gameOverWindow: PIXI.Sprite;
 
@@ -42,7 +42,7 @@ function positionToMessage(pos: number) {
  * @param msg Game over message
  */
 export function handleGameOver(msg: GameOverMessage) {
-    const gameOver = getUIConfig().overlays.gameOver;
+    const gameOver = getOverlayConfig().gameOver;
     if (gameOverWindow && !gameOverWindow.destroyed) {
         gameOverWindow?.destroy({ children: true });
     }

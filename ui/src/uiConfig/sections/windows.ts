@@ -1,11 +1,11 @@
 import type { UIConfig } from "../types.ts";
 
 export const windowsConfig: UIConfig["windows"] = {
-    borderColor: 0x000000,
+    borderColor: 0x6f6a61,
     borderWidth: 2,
-    fillColor: 0xffffff,
-    fillAlpha: 0.9,
-    cornerRadius: 4,
+    fillColor: 0xe9e5dc,
+    fillAlpha: 0.96,
+    cornerRadius: 12,
     yesNo: {
         width: 42,
         height: 80,

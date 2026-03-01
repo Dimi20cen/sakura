@@ -482,6 +482,7 @@ export function renderGameState(gs: GameState, commandHub: CommandHub) {
             ) => {
                 const imgc = new PIXI.Container();
                 imgc.interactive = true;
+                imgc.hitArea = new PIXI.RoundedRectangle(0, 0, 44, 58, 6);
                 imgc.x = x;
                 imgc.y = y + offset;
                 new windows.TooltipHandler(imgc, title);
@@ -522,6 +523,7 @@ export function renderGameState(gs: GameState, commandHub: CommandHub) {
             ) => {
                 const imgc = new PIXI.Container();
                 imgc.interactive = true;
+                imgc.hitArea = new PIXI.RoundedRectangle(0, 0, 30, 42, 6);
                 imgc.x = x;
                 imgc.y = y + offset;
                 new windows.TooltipHandler(imgc, title);
@@ -661,6 +663,7 @@ export function renderGameState(gs: GameState, commandHub: CommandHub) {
             getThisPlayerOrder() == state.Order
                 ? Math.max(lastKnownSecretVictoryPoints, state.VictoryPoints)
                 : state.VictoryPoints;
+        const panelPalette = getBottomDockConfig().panel;
 
         const p = players[state.Order];
         const offset = getPlayerRowOffsetByDisplayOrder(
@@ -692,8 +695,9 @@ export function renderGameState(gs: GameState, commandHub: CommandHub) {
         knightContainer.y = roadContainer.y;
 
         p.name.style = createPanelTitleTextStyle({
-            fontSize: isCurrent ? 20 : 12,
+            fontSize: isCurrent ? 18 : 13,
             align: isCurrent ? "center" : "left",
+            fill: panelPalette.titleText,
         });
         if (isCurrent) {
             p.name.anchor.x = 0.5;
@@ -739,7 +743,7 @@ export function renderGameState(gs: GameState, commandHub: CommandHub) {
         } else {
             assets.assignTexture(p.road.img, assets.icons[p.road.icon]);
             p.road.img.tint = 0xffffff;
-            p.road.text.style.fill = 0x000000;
+            p.road.text.style.fill = panelPalette.bodyText;
         }
 
         // Highlight extra points / most active knights
@@ -754,7 +758,7 @@ export function renderGameState(gs: GameState, commandHub: CommandHub) {
         } else {
             assets.assignTexture(p.knights.img, assets.icons[p.knights.icon]);
             p.knights.img.tint = 0xffffff;
-            p.knights.text.style.fill = 0x000000;
+            p.knights.text.style.fill = panelPalette.bodyText;
         }
 
         // Highlight too many cards

@@ -411,6 +411,7 @@ export function getButtonSprite(
 ): ButtonSprite {
     const s = new PIXI.Sprite();
     const outer = <ButtonSprite>s;
+    outer.scale.set(1);
     s.interactive = true;
     outer.setEnabled = (enabled: boolean | undefined, tintOnly?: boolean) => {
         if (outer.reEnableTimer) {
@@ -445,6 +446,18 @@ export function getButtonSprite(
             callback?.(outer);
         });
     };
+
+    outer.on("pointerover", () => {
+        if (outer.cursor !== "pointer") {
+            return;
+        }
+        outer.scale.set(1.03);
+        canvas.app.markDirty();
+    });
+    outer.on("pointerout", () => {
+        outer.scale.set(1);
+        canvas.app.markDirty();
+    });
 
     const playerPieceButtonAsset = getPlayerPieceButtonAsset(type, bgColor);
     const playerPieceButton = Boolean(playerPieceButtonAsset);
@@ -1308,6 +1321,9 @@ function setButtonEnabled(
     }
     sprite.tint = enabled ? 0xffffff : 0x666666;
     sprite.alpha = enabled ? 1 : 0.5;
+    if (!enabled) {
+        sprite.scale.set(1);
+    }
 
     // Recursively set tint to all children
     const setTint = (parent: any) => {

@@ -52,21 +52,24 @@ function ensureUI() {
     const bg = createDockPanel({
         width: WIDTH(),
         height: HEIGHT(),
-        headerHeight: 30,
+        headerHeight: 32,
     });
     container.addChild(bg);
 
-    const title = new PIXI.Text("Game Log", createPanelTitleTextStyle());
-    title.x = 10;
+    const title = new PIXI.Text(
+        "Game Log",
+        createPanelTitleTextStyle({ fontSize: 16 }),
+    );
+    title.x = 12;
     title.y = 8;
     container.addChild(title);
 
     content = new PIXI.Container();
-    content.y = 34;
+    content.y = 36;
 
     const mask = new PIXI.Graphics();
     mask.beginFill(0xffffff);
-    mask.drawRect(8, 34, WIDTH() - 16, HEIGHT() - 42);
+    mask.drawRect(10, 36, WIDTH() - 20, HEIGHT() - 46);
     mask.endFill();
     container.addChild(mask);
 
@@ -89,18 +92,21 @@ function rerender() {
 
     visible.forEach((entry, idx) => {
         const row = new PIXI.Container();
-        row.y = idx * 22;
+        row.y = idx * 24;
 
-        const text = new PIXI.Text(entry.text, createPanelBodyTextStyle());
-        text.x = 8;
+        const text = new PIXI.Text(
+            entry.text,
+            createPanelBodyTextStyle({ fontSize: 14 }),
+        );
+        text.x = 10;
         row.addChild(text);
 
         if (entry.icons?.length) {
-            let iconX = WIDTH() - 16 - Math.min(entry.icons.length, 6) * 16;
+            let iconX = WIDTH() - 18 - Math.min(entry.icons.length, 6) * 16;
             entry.icons.slice(0, 6).forEach((ct) => {
                 const icon = new PIXI.Sprite();
                 icon.x = iconX;
-                icon.y = 1;
+                icon.y = 2;
                 icon.width = 14;
                 icon.height = 14;
                 assets.assignTexture(icon, assets.cards[ct]);
@@ -111,7 +117,7 @@ function rerender() {
 
         const divider = new PIXI.Graphics();
         divider.beginFill(getBottomDockConfig().panel.border, 0.35);
-        divider.drawRect(8, 19, WIDTH() - 24, 1);
+        divider.drawRect(10, 21, WIDTH() - 28, 1);
         divider.endFill();
         row.addChild(divider);
 

@@ -514,39 +514,33 @@ export const buttonsBg: { [key: string]: AssetImage } = {
 };
 
 /************************* Dice ************************************/
-import diceW1 from "../assets/runtime/shared/dice/dice-1.png";
-import diceW2 from "../assets/runtime/shared/dice/dice-2.png";
-import diceW3 from "../assets/runtime/shared/dice/dice-3.png";
-import diceW4 from "../assets/runtime/shared/dice/dice-4.png";
-import diceW5 from "../assets/runtime/shared/dice/dice-5.png";
-import diceW6 from "../assets/runtime/shared/dice/dice-6.png";
-import diceR1 from "../assets/runtime/shared/dice/dice-1-r.png";
-import diceR2 from "../assets/runtime/shared/dice/dice-2-r.png";
-import diceR3 from "../assets/runtime/shared/dice/dice-3-r.png";
-import diceR4 from "../assets/runtime/shared/dice/dice-4-r.png";
-import diceR5 from "../assets/runtime/shared/dice/dice-5-r.png";
-import diceR6 from "../assets/runtime/shared/dice/dice-6-r.png";
+import dice1 from "../assets/runtime/shared/dice/dice-1.svg";
+import dice2 from "../assets/runtime/shared/dice/dice-2.svg";
+import dice3 from "../assets/runtime/shared/dice/dice-3.svg";
+import dice4 from "../assets/runtime/shared/dice/dice-4.svg";
+import dice5 from "../assets/runtime/shared/dice/dice-5.svg";
+import dice6 from "../assets/runtime/shared/dice/dice-6.svg";
 import diceE1 from "../assets/runtime/cities-knights/dice/event-1.png";
 import diceE2 from "../assets/runtime/cities-knights/dice/event-2.png";
 import diceE3 from "../assets/runtime/cities-knights/dice/event-3.png";
 import diceE4 from "../assets/runtime/cities-knights/dice/event-4.png";
 
 export const diceWhite: { [key: number]: AssetImage } = {
-    1: diceW1,
-    2: diceW2,
-    3: diceW3,
-    4: diceW4,
-    5: diceW5,
-    6: diceW6,
+    1: dice1,
+    2: dice2,
+    3: dice3,
+    4: dice4,
+    5: dice5,
+    6: dice6,
 };
 
 export const diceRed: { [key: number]: AssetImage } = {
-    1: diceR1,
-    2: diceR2,
-    3: diceR3,
-    4: diceR4,
-    5: diceR5,
-    6: diceR6,
+    1: dice1,
+    2: dice2,
+    3: dice3,
+    4: dice4,
+    5: dice5,
+    6: dice6,
 };
 
 export const diceEvent: { [key: number]: AssetImage } = {

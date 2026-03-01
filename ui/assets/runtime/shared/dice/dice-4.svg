@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Die face 4">
+  <rect x="2" y="2" width="60" height="60" rx="10" ry="10" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+  <circle cx="18" cy="18" r="5" fill="#111111"/>
+  <circle cx="46" cy="18" r="5" fill="#111111"/>
+  <circle cx="18" cy="46" r="5" fill="#111111"/>
+  <circle cx="46" cy="46" r="5" fill="#111111"/>
+</svg>

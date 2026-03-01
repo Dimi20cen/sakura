@@ -1042,7 +1042,7 @@ export function showTradeOffer(offer: tsg.TradeOffer) {
         offer.Details.Ask.every(
             (q, ct) =>
                 hand.handWindow!.cards[ct] +
-                    (liveAskWindow.container.visible ? liveAskWindow.cards[ct] : 0) >=
+                    (offerWindow.container.visible ? offerWindow.cards[ct] : 0) >=
                 q,
         );
 

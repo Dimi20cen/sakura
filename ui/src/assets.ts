@@ -338,6 +338,7 @@ import uiKitPlayers from "../assets/runtime/shared/ui-kit/icon-players.svg";
 import uiKitTradeArrowGreen from "../assets/runtime/shared/ui-kit/icon-trade-arrow-green.svg";
 import uiKitTradeArrowRed from "../assets/runtime/shared/ui-kit/icon-trade-arrow-red.svg";
 import uiKitX from "../assets/runtime/shared/ui-kit/icon-x.svg";
+import playerAvatarIconS from "../assets/runtime/shared/profile-icons/player-overview.svg";
 
 export const uiKit = {
     bank: uiKitBank,
@@ -346,6 +347,8 @@ export const uiKit = {
     tradeArrowRed: uiKitTradeArrowRed,
     x: uiKitX,
 } as const;
+
+export const playerAvatarIcon = playerAvatarIconS;
 
 import seaS from "../assets/runtime/base/board/sea.jpg";
 export const sea = seaS;

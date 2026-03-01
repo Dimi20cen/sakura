@@ -30,7 +30,6 @@ import {
 } from "../tsg";
 import { CardType } from "./entities";
 import CommandHub from "./commands";
-import { hexToUrlString } from "../utils";
 import { syncTurnTimerSnapshot } from "./store/turnTimerRuntime";
 import {
     getPendingActionOverlayConfig,
@@ -194,13 +193,6 @@ function updatePauseOverlay(paused: boolean) {
     pauseOverlay.drawRect(0, 0, canvas.getWidth(), canvas.getHeight());
     pauseOverlay.endFill();
 }
-
-const profileAvatarByUsername: Record<string, string> = {
-    jethro7194: "/assets/shared/profile-icons/jethro.webp",
-    kopstiklapsa: "/assets/shared/profile-icons/kopsetinklapsa.webp",
-    staxtoputa: "/assets/shared/profile-icons/staxtoputa.webp?v=5",
-    giorgaros: "/assets/shared/profile-icons/giorgaros.webp",
-};
 
 /**
  * Initialize the players list UI
@@ -794,63 +786,47 @@ export function highlightPlayers(boolmatrix?: boolean[]) {
  */
 export function getPlayerAvatarSprite(order: number, rendered?: () => void) {
     const button: InitializableSprite = new PIXI.Sprite();
-    button.texture = PIXI.Texture.EMPTY;
     const state = lastKnownStates ? lastKnownStates[order] : undefined;
-    const color = state ? state.Color : "black";
-    const randInt = state ? state.RandInt : 10;
-    const normalizedUsername = (state?.Username || "")
-        .replace(/\*$/, "")
-        .toLowerCase();
-    const customAvatar = profileAvatarByUsername[normalizedUsername];
-    const cstr = hexToUrlString(color);
+    const avatarSize = 52;
+    const avatarRadius = 24;
+    const avatarCenter = avatarSize / 2;
+    const fillColor = (() => {
+        try {
+            return PIXI.utils.string2hex(state?.Color || "#44515c");
+        } catch {
+            return 0x44515c;
+        }
+    })();
 
-    const variant = Math.ceil((randInt / 10000) * 5);
-    const avatarPath = customAvatar || `/assets/shared/avatars/${cstr}/${variant}.jpg`;
+    const bg = new PIXI.Graphics();
+    bg.beginFill(fillColor);
+    bg.drawCircle(avatarCenter, avatarCenter, avatarRadius);
+    bg.endFill();
+    button.texture = canvas.app.generateRenderTexture(bg, {
+        width: avatarSize,
+        height: avatarSize,
+    });
+    bg.destroy();
+    button.width = avatarSize;
+    button.height = avatarSize;
 
-    PIXI.Texture.fromURL(avatarPath)
+    const border = new PIXI.Graphics();
+    border.lineStyle({ color: 0x223948, width: 2 });
+    border.beginFill(0, 0);
+    border.drawCircle(avatarCenter, avatarCenter, avatarRadius);
+    border.endFill();
+    button.addChild(border);
+
+    PIXI.Texture.fromURL(assets.playerAvatarIcon.src)
         .then((t) => {
             if (button.destroyed) return;
-
-            if (customAvatar) {
-                // Render custom avatars as a dedicated child sprite to avoid white base artifacts.
-                const cropSize = Math.min(t.width, t.height);
-                const cropFrame = new PIXI.Rectangle(
-                    (t.width - cropSize) / 2,
-                    (t.height - cropSize) / 2,
-                    cropSize,
-                    cropSize,
-                );
-                const avatarSprite = new PIXI.Sprite(
-                    new PIXI.Texture(t.baseTexture, cropFrame),
-                );
-                avatarSprite.width = 52;
-                avatarSprite.height = 52;
-                button.addChild(avatarSprite);
-
-                const mask = new PIXI.Graphics();
-                mask.beginFill(0xffffff);
-                mask.drawCircle(26, 26, 24);
-                mask.endFill();
-                button.addChild(mask);
-                avatarSprite.mask = mask;
-
-                const border = new PIXI.Graphics();
-                border.lineStyle({ color: 0, width: 2 });
-                border.beginFill(0, 0);
-                border.drawCircle(26, 26, 24);
-                border.endFill();
-                button.addChild(border);
-            } else {
-                // Legacy avatar style.
-                button.texture = t;
-                const border = new PIXI.Graphics();
-                border.lineStyle({ color: 0, width: 15 });
-                border.beginFill(0, 0);
-                border.drawRoundedRect(0, 0, 400, 600, 40);
-                border.endFill();
-                button.addChild(border);
-                button.scale.set(0.1);
-            }
+            const iconSprite = new PIXI.Sprite(t);
+            iconSprite.anchor.set(0.5);
+            iconSprite.x = avatarCenter;
+            iconSprite.y = avatarCenter;
+            iconSprite.width = 40;
+            iconSprite.height = 40;
+            button.addChild(iconSprite);
 
             button.initialized = true;
             canvas.app.markDirty();
@@ -858,11 +834,7 @@ export function getPlayerAvatarSprite(order: number, rendered?: () => void) {
         })
         .catch(() => {
             if (button.destroyed) return;
-            // Safe fallback on load failure.
-            button.texture = PIXI.Texture.WHITE;
-            button.width = 48;
-            button.height = 48;
-            button.tint = 0x444444;
+            // Keep colored background if icon load fails.
             button.initialized = true;
             canvas.app.markDirty();
             rendered?.();

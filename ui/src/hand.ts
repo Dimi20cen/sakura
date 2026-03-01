@@ -7,6 +7,8 @@ import * as windows from "./windows";
 import * as anim from "./animation";
 import * as state from "./state";
 import * as board from "./board";
+import { buildHUDLayout } from "./hud/layoutEngine";
+import type { HUDLayoutResult } from "./hud/types";
 import {
     computeDevConfirmationPosition,
     computeHandPosition,
@@ -65,7 +67,11 @@ export function relayout() {
         return;
     }
 
-    const expectedHandWidth = computeHandWidth(canvas.getWidth());
+    const layout = buildHUDLayout({
+        canvasWidth: canvas.getWidth(),
+        canvasHeight: canvas.getHeight(),
+    });
+    const expectedHandWidth = layout.widgets.hand?.width ?? computeHandWidth(canvas.getWidth());
     if (
         handWindow &&
         !handWindow.container.destroyed &&
@@ -93,25 +99,32 @@ export function relayout() {
     }
 
     if (handWindow && !handWindow.container.destroyed) {
-        const handPos = computeHandPosition({
-            canvasHeight: canvas.getHeight(),
-            handHeight: getHandWindowHeight(),
-        });
-        handWindow.container.x = handPos.x;
-        handWindow.container.y = handPos.y;
+        applyHUDLayout(layout);
     }
 
     if (devConfirmationWindow && !devConfirmationWindow.destroyed) {
-        const confirmPos = computeDevConfirmationPosition({
-            canvasHeight: canvas.getHeight(),
-            handHeight: getHandWindowHeight(),
-        });
-        devConfirmationWindow.x = confirmPos.x;
-        devConfirmationWindow.y = confirmPos.y;
+        applyHUDLayout(layout);
         layoutDevConfirmationControls();
     }
 
     canvas.app.markDirty();
+}
+
+export function applyHUDLayout(layout: HUDLayoutResult) {
+    const handFrame = layout.widgets.hand;
+    const confirmationFrame = layout.widgets.devConfirmation;
+    if (handWindow && !handWindow.container.destroyed && handFrame) {
+        handWindow.container.x = handFrame.x;
+        handWindow.container.y = handFrame.y;
+    }
+    if (
+        devConfirmationWindow &&
+        !devConfirmationWindow.destroyed &&
+        confirmationFrame
+    ) {
+        devConfirmationWindow.x = confirmationFrame.x;
+        devConfirmationWindow.y = confirmationFrame.y;
+    }
 }
 
 /**

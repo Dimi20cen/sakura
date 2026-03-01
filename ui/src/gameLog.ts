@@ -4,7 +4,8 @@ import * as canvas from "./canvas";
 import * as state from "./state";
 import * as tsg from "../tsg";
 import { CardType } from "./entities";
-import { computeGameLogPosition, getRightStackPanelWidth } from "./hudLayout";
+import { buildHUDLayout } from "./hud/layoutEngine";
+import type { HUDFrame } from "./hud/types";
 import { getGameLogConfig } from "./uiConfig";
 import {
     createDockPanel,
@@ -18,7 +19,7 @@ type LogEntry = {
     icons?: number[];
 };
 
-const WIDTH = () => getRightStackPanelWidth();
+const WIDTH = () => getGameLogConfig().width;
 const HEIGHT = () => getGameLogConfig().height;
 const MAX_ENTRIES = 80;
 const VISIBLE_ROWS = () => getGameLogConfig().visibleRows;
@@ -126,13 +127,21 @@ export function relayout() {
         return;
     }
 
-    const pos = computeGameLogPosition({
-        canvasWidth: canvas.getWidth(),
-    });
-
-    container.x = pos.x;
-    container.y = pos.y;
+    setFrame(
+        buildHUDLayout({
+            canvasWidth: canvas.getWidth(),
+            canvasHeight: canvas.getHeight(),
+        }).widgets.gameLog!,
+    );
     canvas.app.markDirty();
+}
+
+export function setFrame(frame: HUDFrame) {
+    if (!container || container.destroyed) {
+        return;
+    }
+    container.x = frame.x;
+    container.y = frame.y;
 }
 
 export function pushEntry(text: string, icons?: number[]) {

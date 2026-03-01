@@ -3,6 +3,7 @@ import * as canvas from "./canvas";
 import * as trade from "./trade";
 import * as ws from "./ws";
 import * as state from "./state";
+import * as dice from "./dice";
 import * as actions from "./actions";
 import * as assets from "./assets";
 import * as windows from "./windows";
@@ -11,6 +12,8 @@ import {
     computeDicePosition,
     computeSpecialBuildPosition,
 } from "./hudLayout";
+import { buildHUDLayout } from "./hud/layoutEngine";
+import type { HUDLayoutResult } from "./hud/types";
 import { BuildableType, CardType } from "./entities";
 import CommandHub from "./commands";
 import { PlayerSecretState } from "../tsg";
@@ -270,72 +273,77 @@ export function relayout() {
         return;
     }
 
-    const actionBarPos = computeActionBarPosition({
-        canvasWidth: canvas.getWidth(),
-        canvasHeight: canvas.getHeight(),
-    });
-    container.x = actionBarPos.x;
-    container.y = actionBarPos.y;
-
-    if (container1 && !container1.destroyed) {
-        container1.x = container.x + getButtonSpacing() * 1 - 18;
-        container1.y = container.y - getActionBarHeight() - getActionBarConfig().stackGap;
-    }
-
-    if (seafarersShipContainer && !seafarersShipContainer.destroyed) {
-        const dicePos = computeDicePosition({
+    applyHUDLayout(
+        buildHUDLayout({
             canvasWidth: canvas.getWidth(),
             canvasHeight: canvas.getHeight(),
-            diceWidth: 138,
-            diceHeight: 64,
-            actionBarTop: container.y,
-            playerPanel: state.getPlayerPanelBounds(),
-        });
-        const gap = 10;
-        seafarersShipContainer.x =
-            dicePos.x - seafarersShipContainer.width - gap;
-        seafarersShipContainer.y =
-            container.y - getActionBarHeight() - getActionBarConfig().stackGap;
-    }
-
-    if (buttons.knightBox?.container && !buttons.knightBox.container.destroyed) {
-        buttons.knightBox.container.x = container.x;
-        buttons.knightBox.container.y =
-            (container1 && !container1.destroyed ? container1.y : container.y) -
-            getActionBarHeight() -
-            getActionBarConfig().stackGap;
-    }
-
-    if (buttons.improveBox?.container && !buttons.improveBox.container.destroyed) {
-        buttons.improveBox.container.x = container.x;
-        buttons.improveBox.container.y =
-            (container1 && !container1.destroyed ? container1.y : container.y) -
-            getActionBarHeight() -
-            getActionBarConfig().stackGap;
-    }
-
-    if (buttons.specialBuild && !buttons.specialBuild.destroyed) {
-        const pos = computeSpecialBuildPosition({
-            canvasWidth: canvas.getWidth(),
-            canvasHeight: canvas.getHeight(),
-        });
-        buttons.specialBuild.x = pos.x;
-        buttons.specialBuild.y = pos.y;
-    }
-
-    if (turnTimerContainer && !turnTimerContainer.destroyed) {
-        turnTimerContainer.x = container.x + actionBarWidth() - 70;
-        turnTimerContainer.y = container.y + (getActionBarHeight() - 36) / 2;
-    }
-    if (pauseToggleContainer && !pauseToggleContainer.destroyed) {
-        const pauseToggle = getPauseToggleConfig();
-        // Keep pause near the top-left controls, directly under fullscreen.
-        pauseToggleContainer.x = pauseToggle.x;
-        pauseToggleContainer.y = pauseToggle.y;
-    }
+            ...state.getHUDLayoutContext(),
+            ...dice.getDiceLayoutMetrics(),
+        }),
+    );
     updateTurnTimerWidget();
 
     canvas.app.markDirty();
+}
+
+export function applyHUDLayout(layout: HUDLayoutResult) {
+    const buttonState = buttons;
+    const actionBarFrame = layout.widgets.actionBar;
+    const secondaryFrame = layout.widgets.actionBarSecondary;
+    const shipsFrame = layout.widgets.actionBarShips;
+    const boxFrame = layout.widgets.knightBox;
+    const specialBuildFrame = layout.widgets.specialBuild;
+    const timerFrame = layout.widgets.turnTimer;
+    const pauseToggleFrame = layout.widgets.pauseToggle;
+
+    if (container && !container.destroyed && actionBarFrame) {
+        container.x = actionBarFrame.x;
+        container.y = actionBarFrame.y;
+    }
+    if (container1 && !container1.destroyed && secondaryFrame) {
+        container1.x = secondaryFrame.x;
+        container1.y = secondaryFrame.y;
+    }
+    if (seafarersShipContainer && !seafarersShipContainer.destroyed && shipsFrame) {
+        seafarersShipContainer.x = shipsFrame.x;
+        seafarersShipContainer.y = shipsFrame.y;
+    }
+    if (
+        buttonState?.knightBox?.container &&
+        !buttonState.knightBox.container.destroyed &&
+        boxFrame
+    ) {
+        buttonState.knightBox.container.x = boxFrame.x;
+        buttonState.knightBox.container.y = boxFrame.y;
+    }
+    if (
+        buttonState?.improveBox?.container &&
+        !buttonState.improveBox.container.destroyed &&
+        boxFrame
+    ) {
+        buttonState.improveBox.container.x = boxFrame.x;
+        buttonState.improveBox.container.y = boxFrame.y;
+    }
+    if (
+        buttonState?.specialBuild &&
+        !buttonState.specialBuild.destroyed &&
+        specialBuildFrame
+    ) {
+        buttonState.specialBuild.x = specialBuildFrame.x;
+        buttonState.specialBuild.y = specialBuildFrame.y;
+    }
+    if (turnTimerContainer && !turnTimerContainer.destroyed && timerFrame) {
+        turnTimerContainer.x = timerFrame.x;
+        turnTimerContainer.y = timerFrame.y;
+    }
+    if (
+        pauseToggleContainer &&
+        !pauseToggleContainer.destroyed &&
+        pauseToggleFrame
+    ) {
+        pauseToggleContainer.x = pauseToggleFrame.x;
+        pauseToggleContainer.y = pauseToggleFrame.y;
+    }
 }
 
 export enum ButtonType {

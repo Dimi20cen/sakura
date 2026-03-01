@@ -4,9 +4,10 @@ import * as buttons from "./buttons";
 import * as canvas from "./canvas";
 import * as tsg from "../tsg";
 import { CardType } from "./entities";
+import { buildHUDLayout } from "./hud/layoutEngine";
+import type { HUDFrame } from "./hud/types";
 import {
     computeEvenlySpacedRowXPositions,
-    computeResourceBankPosition,
 } from "./hudLayout";
 import { getResourceBankConfig } from "./uiConfig";
 import { createDockPanel } from "./uiDock";
@@ -178,14 +179,21 @@ export function relayout() {
     }
 
     layoutChipPositions();
-
-    const pos = computeResourceBankPosition({
-        canvasWidth: canvas.getWidth(),
-    });
-
-    container.x = pos.x;
-    container.y = pos.y;
+    setFrame(
+        buildHUDLayout({
+            canvasWidth: canvas.getWidth(),
+            canvasHeight: canvas.getHeight(),
+        }).widgets.resourceBank!,
+    );
     canvas.app.markDirty();
+}
+
+export function setFrame(frame: HUDFrame) {
+    if (!container || container.destroyed) {
+        return;
+    }
+    container.x = frame.x;
+    container.y = frame.y;
 }
 
 export function setMode(mode: number) {

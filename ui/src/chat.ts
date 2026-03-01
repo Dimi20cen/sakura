@@ -2,6 +2,8 @@ import * as PIXI from "pixi.js";
 import * as canvas from "./canvas";
 import * as ws from "./ws";
 import * as buttons from "./buttons";
+import { buildHUDLayout } from "./hud/layoutEngine";
+import type { HUDFrame, HUDLayoutResult } from "./hud/types";
 import {
     computeChatLanePosition,
     computeChatPopupPosition,
@@ -24,6 +26,13 @@ let chatLane: PIXI.Container;
 let unreadDot: PIXI.Graphics;
 const messages: Message[] = [];
 let syncInputLayout: (() => void) | null = null;
+
+function getCurrentHUDLayout() {
+    return buildHUDLayout({
+        canvasWidth: canvas.getWidth(),
+        canvasHeight: canvas.getHeight(),
+    });
+}
 // [
 //     {
 //         text: "meew: Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
@@ -79,15 +88,18 @@ export function initialize() {
 
     const resize = () => {
         const ratio = canvas.getScaleRatio();
-        const nextChatConfig = getChatConfig();
-        inputBox.style.height = `${nextChatConfig.inputHeight * ratio}px`;
-        inputBox.style.width = `${(nextChatConfig.windowWidth - 10) * ratio}px`;
-        inputBox.style.bottom = `${nextChatConfig.inputInsetBottom * ratio}px`;
-        inputBox.style.right = `${nextChatConfig.inputInsetRight * ratio}px`;
+        const layout = getCurrentHUDLayout();
+        const inputFrame = layout.widgets.chatInput!;
+        inputBox.style.height = `${inputFrame.height * ratio}px`;
+        inputBox.style.width = `${inputFrame.width * ratio}px`;
+        inputBox.style.left = `${inputFrame.x * ratio}px`;
+        inputBox.style.top = `${inputFrame.y * ratio}px`;
+        inputBox.style.bottom = "auto";
+        inputBox.style.right = "auto";
         inputBox.style.fontSize = `${0.9 * ratio}em`;
-        inputBox.style.padding = `0 ${nextChatConfig.inputHorizontalPadding * ratio}px`;
+        inputBox.style.padding = `0 ${getChatConfig().inputHorizontalPadding * ratio}px`;
         inputBox.style.borderRadius = `${4 * ratio}px`;
-        inputBox.style.border = `${nextChatConfig.inputBorderWidth * ratio}px solid grey`;
+        inputBox.style.border = `${getChatConfig().inputBorderWidth * ratio}px solid grey`;
     };
     syncInputLayout = resize;
     resize();
@@ -198,23 +210,31 @@ export function initialize() {
 }
 
 export function relayout() {
-    if (windowSprite && !windowSprite.destroyed) {
-        const chatWindowPos = computeChatWindowPosition({
-            canvasWidth: canvas.getWidth(),
-            canvasHeight: canvas.getHeight(),
-        });
-        windowSprite.x = chatWindowPos.x;
-        windowSprite.y = chatWindowPos.y;
+    applyHUDLayout(getCurrentHUDLayout());
+    canvas.app.markDirty();
+}
+
+export function applyHUDLayout(layout: HUDLayoutResult) {
+    const chatWindowFrame = layout.widgets.chatWindow;
+    const chatLaneFrame = layout.widgets.chatLane;
+
+    if (windowSprite && !windowSprite.destroyed && chatWindowFrame) {
+        windowSprite.x = chatWindowFrame.x + chatWindowFrame.width;
+        windowSprite.y = chatWindowFrame.y + chatWindowFrame.height;
     }
-    if (chatLane && !chatLane.destroyed) {
-        const lanePos = computeChatLanePosition({
-            canvasWidth: canvas.getWidth(),
-        });
-        chatLane.x = lanePos.x;
-        chatLane.y = lanePos.y;
+    if (chatLane && !chatLane.destroyed && chatLaneFrame) {
+        chatLane.x = chatLaneFrame.x;
+        chatLane.y = chatLaneFrame.y;
     }
     syncInputLayout?.();
-    canvas.app.markDirty();
+}
+
+export function setFrame(frame: HUDFrame) {
+    if (!windowSprite || windowSprite.destroyed) {
+        return;
+    }
+    windowSprite.x = frame.x + frame.width;
+    windowSprite.y = frame.y + frame.height;
 }
 
 /**

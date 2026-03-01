@@ -11,6 +11,8 @@ import * as anim from "./animation";
 import * as actions from "./actions";
 import * as windows from "./windows";
 import * as trade from "./trade";
+import { buildHUDLayout } from "./hud/layoutEngine";
+import type { HUDLayoutResult } from "./hud/types";
 import {
     computeBankPosition,
     computePlayerPanelPosition,
@@ -124,34 +126,59 @@ export function getPlayerPanelBounds() {
     return container.getBounds();
 }
 
+export function getHUDLayoutContext() {
+    if (!lastKnownStates?.length) {
+        return {};
+    }
+
+    return {
+        playerCount: lastKnownStates.length,
+        playerPanelWidth: getPlayerPanelWidth(),
+        playerPanelHeight: getPlayerPanelHeight(lastKnownStates.length),
+        playerPanelScale: getPlayerPanelScale(lastKnownStates.length),
+    };
+}
+
 export function relayout() {
     if (!container || container.destroyed || !lastKnownStates) {
         return;
     }
 
-    const windowHeight = getPlayerPanelHeight(lastKnownStates.length);
-    const windowScale = getPlayerPanelScale(lastKnownStates.length);
-    const playerPanelPos = computePlayerPanelPosition({
-        canvasWidth: canvas.getWidth(),
-        canvasHeight: canvas.getHeight(),
-        panelWidth: getPlayerPanelWidth(),
-        panelHeight: windowHeight,
-        panelScale: windowScale,
-    });
-    container.x = playerPanelPos.x;
-    container.y = playerPanelPos.y;
-
-    if (bankContainer && !bankContainer.destroyed) {
-        const bankPos = computeBankPosition({
+    applyHUDLayout(
+        buildHUDLayout({
             canvasWidth: canvas.getWidth(),
-            playerPanelY: container.y,
-        });
-        bankContainer.x = bankPos.x;
-        bankContainer.y = bankPos.y;
-    }
+            canvasHeight: canvas.getHeight(),
+            playerCount: lastKnownStates.length,
+            playerPanelWidth: getPlayerPanelWidth(),
+            playerPanelHeight: getPlayerPanelHeight(lastKnownStates.length),
+            playerPanelScale: getPlayerPanelScale(lastKnownStates.length),
+        }),
+    );
     updatePauseOverlay(Boolean(lastKnownGameState?.Paused));
 
     canvas.app.markDirty();
+}
+
+export function applyHUDLayout(layout: HUDLayoutResult) {
+    const playerPanelFrame = layout.widgets.playerPanel;
+    const bankFrame = layout.widgets.bank;
+    const spectatorsFrame = layout.widgets.spectators;
+    if (container && !container.destroyed && playerPanelFrame) {
+        container.x = playerPanelFrame.x;
+        container.y = playerPanelFrame.y;
+    }
+    if (bankContainer && !bankContainer.destroyed && bankFrame) {
+        bankContainer.x = bankFrame.x;
+        bankContainer.y = bankFrame.y;
+    }
+    if (
+        spectators &&
+        !spectators.container.destroyed &&
+        spectatorsFrame
+    ) {
+        spectators.container.x = spectatorsFrame.x;
+        spectators.container.y = spectatorsFrame.y;
+    }
 }
 
 function updatePauseOverlay(paused: boolean) {

@@ -14,75 +14,21 @@ import {
     getHudMiscConfig,
     getResourceBankConfig,
 } from "./uiConfig";
+import { buildHUDLayout, computeActionBarWidth, computeHandWidthForViewport } from "./hud/layoutEngine";
 
-/**
- * Central HUD tuning preset.
- *
- * Future position tweaks should happen here first.
- */
-export const HUD_LAYOUT_PRESET = {
-    padding: 12,
-    gap: 8,
+type HUDLayoutSnapshotInput = {
+    canvasWidth: number;
+    canvasHeight: number;
+    playerPanelWidth?: number;
+    playerPanelHeight?: number;
+    playerPanelScale?: number;
+    playerCount?: number;
+    diceWidth?: number;
+    diceHeight?: number;
+};
 
-    // Right rail where player list/bank/chat anchor.
-    rightRailWidth: 292,
-    rightRailBottomInset: 6,
-    rightRailTopInset: 4,
-    gameLogHeight: 300,
-    chatLaneHeight: 34,
-    chatLaneWidth: 270,
-    bankLaneHeight: 66,
-
-    // Bottom rail where hand/action controls sit.
-    bottomRailLeftInset: 10,
-    bottomRailBottomInset: 8,
-    bottomRailGap: 8,
-    handHeight: 90,
-
-    // Action bar placement relative to canvas and right rail.
-    actionBarInnerOffset: 12,
-    actionBarButtonSpacing: 74,
-    actionBarHeight: 90,
-    actionBarAboveHandGap: 8,
-
-    // Dice placement around right rail/action bar.
-    diceRightRailGap: 10,
-    diceAboveActionBarGap: 10,
-    diceAbovePlayerRailGap: 12,
-    minTopInset: 20,
-
-    // Misc legacy windows.
-    bankSize: 90,
-    bankTopMin: 10,
-} as const;
-
-function getHUDLayoutPreset() {
-    const hud = getHudConfig();
-    return {
-        padding: hud.padding,
-        gap: hud.gap,
-        rightRailWidth: hud.rightRail.width,
-        rightRailBottomInset: hud.rightRail.bottomInset,
-        rightRailTopInset: hud.rightRail.topInset,
-        gameLogHeight: hud.gameLog.height,
-        chatLaneHeight: hud.chat.laneHeight,
-        chatLaneWidth: hud.chat.laneWidth,
-        bankLaneHeight: hud.resourceBank.height,
-        bottomRailLeftInset: hud.bottomRail.leftInset,
-        bottomRailBottomInset: hud.bottomRail.bottomInset,
-        bottomRailGap: hud.bottomRail.gap,
-        handHeight: hud.bottomRail.handHeight,
-        actionBarInnerOffset: hud.actionBar.innerOffset,
-        actionBarButtonSpacing: hud.actionBar.buttonSpacing,
-        actionBarHeight: hud.actionBar.height,
-        actionBarAboveHandGap: 8,
-        diceRightRailGap: hud.dice.rightRailGap,
-        diceAboveActionBarGap: hud.dice.aboveActionBarGap,
-        diceAbovePlayerRailGap: 12,
-        minTopInset: hud.dice.minTopInset,
-        bankSize: hud.misc.bankSize,
-        bankTopMin: hud.misc.bankTopMin,
-    } as const;
+export function getHUDLayoutSnapshot(input: HUDLayoutSnapshotInput) {
+    return buildHUDLayout(input);
 }
 
 export function getRightStackPanelWidth() {
@@ -90,17 +36,13 @@ export function getRightStackPanelWidth() {
 }
 
 function getRightRailX(canvasWidth: number) {
-    const preset = getHUDLayoutPreset();
-    return (
-        canvasWidth -
-        preset.padding -
-        preset.rightRailWidth
-    );
+    const hud = getHudConfig();
+    return canvasWidth - hud.padding - hud.rightRail.width;
 }
 
 function getRightRailContentX(canvasWidth: number, contentWidth: number) {
-    const preset = getHUDLayoutPreset();
-    return canvasWidth - preset.padding - contentWidth;
+    const hud = getHudConfig();
+    return canvasWidth - hud.padding - contentWidth;
 }
 
 type PlayerPanelPositionInput = {
@@ -118,18 +60,14 @@ export function computePlayerPanelPosition({
     panelHeight,
     panelScale,
 }: PlayerPanelPositionInput) {
-    const preset = getHUDLayoutPreset();
-    const y =
-        canvasHeight -
-        panelHeight * panelScale -
-        preset.rightRailBottomInset;
-    return {
-        x: Math.max(
-            preset.padding,
-            getRightRailContentX(canvasWidth, panelWidth * panelScale),
-        ),
-        y: Math.max(preset.rightRailTopInset, y),
-    };
+    const frame = getHUDLayoutSnapshot({
+        canvasWidth,
+        canvasHeight,
+        playerPanelWidth: panelWidth,
+        playerPanelHeight: panelHeight,
+        playerPanelScale: panelScale,
+    }).widgets.playerPanel!;
+    return { x: frame.x, y: frame.y };
 }
 
 type BankPositionInput = {
@@ -141,10 +79,10 @@ export function computeBankPosition({
     canvasWidth,
     playerPanelY,
 }: BankPositionInput) {
-    const preset = getHUDLayoutPreset();
+    const hud = getHudConfig();
     return {
-        x: canvasWidth - preset.padding - preset.bankSize,
-        y: Math.max(preset.bankTopMin, playerPanelY - 95),
+        x: canvasWidth - hud.padding - hud.misc.bankSize,
+        y: Math.max(hud.misc.bankTopMin, playerPanelY - 95),
     };
 }
 
@@ -157,20 +95,11 @@ export function computeActionBarPosition({
     canvasWidth,
     canvasHeight,
 }: ActionBarPositionInput) {
-    const preset = getHUDLayoutPreset();
-    const handWidth = computeHandWidth(canvasWidth);
-    const x =
-        preset.bottomRailLeftInset +
-        handWidth +
-        preset.bottomRailGap;
-
-    return {
-        x: Math.max(preset.padding, x),
-        y:
-            canvasHeight -
-            preset.bottomRailBottomInset -
-            preset.actionBarHeight,
-    };
+    const frame = getHUDLayoutSnapshot({
+        canvasWidth,
+        canvasHeight,
+    }).widgets.actionBar!;
+    return { x: frame.x, y: frame.y };
 }
 
 type HandPositionInput = {
@@ -179,36 +108,17 @@ type HandPositionInput = {
 };
 
 export function computeHandWidth(canvasWidth: number) {
-    const preset = getHUDLayoutPreset();
-    const bottomRail = getBottomRailConfig();
-    const actionBar = getActionBarConfig();
-    const rightRailX = getRightRailX(canvasWidth);
-    // Reserve space for the action bar and timer lane.
-    const actionBarWidth =
-        preset.actionBarInnerOffset +
-        preset.actionBarButtonSpacing * actionBar.buttonCount;
-    const width =
-        rightRailX -
-        preset.bottomRailLeftInset -
-        preset.bottomRailGap -
-        actionBarWidth;
-    return Math.max(
-        bottomRail.handMinWidth,
-        Math.min(bottomRail.handMaxWidth, Math.floor(width)),
-    );
+    return computeHandWidthForViewport(canvasWidth);
 }
 
 export function computeHandPosition({
     canvasHeight,
     handHeight,
 }: HandPositionInput) {
-    const preset = getHUDLayoutPreset();
+    const hud = getHudConfig();
     return {
-        x: preset.bottomRailLeftInset,
-        y:
-            canvasHeight -
-            handHeight -
-            preset.bottomRailBottomInset,
+        x: hud.bottomRail.leftInset,
+        y: canvasHeight - handHeight - hud.bottomRail.bottomInset,
     };
 }
 
@@ -293,10 +203,7 @@ export function computeSpectatorsPosition({
     canvasHeight: _canvasHeight,
 }: SpectatorsPositionInput) {
     const hud = getHudMiscConfig();
-    return {
-        x: hud.spectatorsX,
-        y: hud.spectatorsY,
-    };
+    return { x: hud.spectatorsX, y: hud.spectatorsY };
 }
 
 type DicePositionInput = {
@@ -316,25 +223,13 @@ export function computeDicePosition({
     actionBarTop,
     playerPanel: _playerPanel,
 }: DicePositionInput) {
-    const preset = getHUDLayoutPreset();
-    const rightRailX = getRightRailX(canvasWidth);
-
-    let x = rightRailX - preset.diceRightRailGap - diceWidth;
-    let y =
-        actionBarTop -
-        preset.diceAboveActionBarGap -
-        diceHeight;
-
-    x = Math.max(preset.padding, x);
-    y = Math.max(
-        preset.minTopInset,
-        Math.min(
-            canvasHeight - preset.padding - diceHeight,
-            y,
-        ),
-    );
-
-    return { x, y };
+    const frame = getHUDLayoutSnapshot({
+        canvasWidth,
+        canvasHeight,
+        diceWidth,
+        diceHeight,
+    }).widgets.dice!;
+    return { x: frame.x, y: Math.min(frame.y, actionBarTop - getHudConfig().dice.aboveActionBarGap - diceHeight) };
 }
 
 type SpecialBuildPositionInput = {
@@ -346,12 +241,11 @@ export function computeSpecialBuildPosition({
     canvasWidth,
     canvasHeight,
 }: SpecialBuildPositionInput) {
-    const hud = getHudMiscConfig();
-    const rightRailX = getRightRailX(canvasWidth);
-    return {
-        x: rightRailX - hud.specialBuildOffsetX,
-        y: canvasHeight - hud.specialBuildOffsetY,
-    };
+    const frame = getHUDLayoutSnapshot({
+        canvasWidth,
+        canvasHeight,
+    }).widgets.specialBuild!;
+    return { x: frame.x, y: frame.y };
 }
 
 type ChatWindowPositionInput = {
@@ -364,30 +258,30 @@ type ChatLanePositionInput = {
 };
 
 export function computeChatLanePosition({ canvasWidth }: ChatLanePositionInput) {
-    const preset = getHUDLayoutPreset();
-    return {
-        x: getRightRailContentX(canvasWidth, preset.chatLaneWidth),
-        y:
-            preset.rightRailTopInset +
-            preset.gameLogHeight +
-            preset.gap,
-    };
+    const frame = getHUDLayoutSnapshot({
+        canvasWidth,
+        canvasHeight:
+            getHudConfig().rightRail.topInset +
+            getGameLogConfig().height +
+            getHudConfig().gap +
+            getChatConfig().laneHeight +
+            getResourceBankConfig().height +
+            getHudConfig().rightRail.bottomInset,
+    }).widgets.chatLane!;
+    return { x: frame.x, y: frame.y };
 }
 
 export function computeChatWindowPosition({
     canvasWidth,
     canvasHeight: _canvasHeight,
 }: ChatWindowPositionInput) {
-    const hud = getChatConfig();
-    const preset = getHUDLayoutPreset();
-    const chatBottom =
-        preset.rightRailTopInset +
-        preset.gameLogHeight +
-        preset.gap +
-        preset.chatLaneHeight;
+    const frame = getHUDLayoutSnapshot({
+        canvasWidth,
+        canvasHeight: _canvasHeight,
+    }).widgets.chatWindow!;
     return {
-        x: canvasWidth - getHudConfig().padding,
-        y: Math.max(hud.minWindowBottom, chatBottom + 2),
+        x: frame.x + frame.width,
+        y: frame.y + frame.height,
     };
 }
 
@@ -400,12 +294,10 @@ export function computeChatButtonPosition({
     canvasWidth,
     canvasHeight: _canvasHeight,
 }: ChatButtonPositionInput) {
-    const hud = getChatConfig();
-    const lane = computeChatLanePosition({ canvasWidth });
-    return {
-        x: lane.x + hud.laneWidth / 2,
-        y: lane.y + hud.laneHeight / 2,
-    };
+    return getHUDLayoutSnapshot({
+        canvasWidth,
+        canvasHeight: _canvasHeight,
+    }).anchors.chatButtonCenter;
 }
 
 type ChatPopupPositionInput = {
@@ -417,11 +309,12 @@ export function computeChatPopupPosition({
     canvasWidth,
     chatButtonY,
 }: ChatPopupPositionInput) {
-    const hud = getChatConfig();
+    const point = getHUDLayoutSnapshot({
+        canvasWidth,
+        canvasHeight: chatButtonY,
+    }).anchors.chatPopup;
     return {
-        x:
-            canvasWidth -
-            (hud.popupRightInset + hud.popupTailInset + 10),
+        x: point.x,
         y: chatButtonY,
     };
 }
@@ -431,11 +324,14 @@ type GameLogPositionInput = {
 };
 
 export function computeGameLogPosition({ canvasWidth }: GameLogPositionInput) {
-    const preset = getHUDLayoutPreset();
-    return {
-        x: getRightRailContentX(canvasWidth, getGameLogConfig().width),
-        y: preset.rightRailTopInset,
-    };
+    const frame = getHUDLayoutSnapshot({
+        canvasWidth,
+        canvasHeight:
+            getHudConfig().rightRail.topInset +
+            getGameLogConfig().height +
+            getHudConfig().rightRail.bottomInset,
+    }).widgets.gameLog!;
+    return { x: frame.x, y: frame.y };
 }
 
 type ResourceBankPositionInput = {
@@ -445,15 +341,16 @@ type ResourceBankPositionInput = {
 export function computeResourceBankPosition({
     canvasWidth,
 }: ResourceBankPositionInput) {
-    const preset = getHUDLayoutPreset();
-    const y =
-        preset.rightRailTopInset +
-        preset.gameLogHeight +
-        preset.gap +
-        preset.chatLaneHeight +
-        preset.gap;
-    return {
-        x: getRightRailContentX(canvasWidth, getResourceBankConfig().width),
-        y,
-    };
+    const frame = getHUDLayoutSnapshot({
+        canvasWidth,
+        canvasHeight:
+            getHudConfig().rightRail.topInset +
+            getGameLogConfig().height +
+            getHudConfig().gap +
+            getChatConfig().laneHeight +
+            getHudConfig().gap +
+            getResourceBankConfig().height +
+            getHudConfig().rightRail.bottomInset,
+    }).widgets.resourceBank!;
+    return { x: frame.x, y: frame.y };
 }

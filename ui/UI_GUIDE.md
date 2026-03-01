@@ -66,11 +66,14 @@ npm run dev
 
 - Shared canvas size, HUD geometry, top-left control placement, and Pixi window chrome now live under `ui/src/uiConfig/`.
 - `ui/src/uiConfig/index.ts` is the public entrypoint; section defaults live in `ui/src/uiConfig/sections/*`, selectors live in `ui/src/uiConfig/selectors/*`, and preset/runtime composition lives in `ui/src/uiConfig/presets.ts` plus `ui/src/uiConfig/runtime.ts`.
-- `ui/src/hudLayout.ts` derives gameplay HUD positions from selector-backed config instead of hardcoding dimensions in each module.
+- `ui/src/hud/layoutEngine.ts` is now the authoritative HUD geometry engine. It computes named frames for Pixi widgets and DOM overlays from the resolved UI config plus viewport/runtime context.
+- `ui/src/hud/widgetRegistry.ts` documents the current HUD widget inventory and intended region ownership; keep new HUD elements registered there so the layout surface stays discoverable.
+- `ui/src/hudRelayout.ts` now performs a single HUD layout pass on resize/runtime refresh, then distributes the computed frames to modules like `chat`, `gameLog`, `resourceBank`, `buttons`, `hand`, `dice`, and `state`.
+- `ui/src/hudLayout.ts` remains as a compatibility helper layer for modules that still consume legacy `compute*Position` helpers, but it now delegates to the shared layout engine instead of owning a separate preset.
 - Player panel sizing/scaling, hand height, action-bar button geometry, trade/editor windows, setup-choice overlays, settings details, game-over layout, shared yes/no dialogs, tooltips, and error modals all resolve through `ui/src/uiConfig/` selectors now.
 - `ui/src/uiConfig/` exposes named presets via `initializeUIConfig({ preset, overrides })` for `default`, `compact`, and `mobileLandscape`.
 - Shared dock/panel primitives now live in `ui/src/uiDock.ts`; use those before introducing new custom Pixi chrome for the hand, trade rows, action dock, timer, dice, or right-rail panels.
-- When adjusting HUD spacing or panel sizes, prefer editing `ui/src/uiConfig/sections/*`, `ui/src/uiConfig/presets.ts`, or shared selectors/layout helpers first and only change module code when behavior needs to change.
+- When adjusting HUD spacing or panel sizes, prefer editing `ui/src/uiConfig/sections/*`, `ui/src/uiConfig/presets.ts`, or `ui/src/hud/layoutEngine.ts` first and only change module code when behavior or rendering needs to change.
 - `ui/src/windows.ts` reads the shared window chrome config, so visual restyling of common panels can happen in one place.
 - Put reusable styling primitives in `ui/src/uiConfig/tokens.ts`, semantic section defaults in `ui/src/uiConfig/sections/*`, and shared read accessors in `ui/src/uiConfig/selectors/*`.
 - Feature modules should prefer selectors/helpers over deep object traversal so the config shape can evolve without widespread callsite churn.

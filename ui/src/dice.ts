@@ -5,6 +5,8 @@ import * as state from "./state";
 import * as actions from "./actions";
 import * as buttons from "./buttons";
 import * as canvas from "./canvas";
+import { buildHUDLayout } from "./hud/layoutEngine";
+import type { HUDFrame } from "./hud/types";
 import { computeDicePosition } from "./hudLayout";
 import { sound } from "@pixi/sound";
 import { DieRollState } from "../tsg";
@@ -19,17 +21,33 @@ let eventDiceSprite: PIXI.Sprite;
 let eventDiceInner: PIXI.Sprite;
 let diceContainer: PIXI.Container;
 
+export function getDiceLayoutMetrics() {
+    if (!whiteDiceInner || whiteDiceInner.destroyed) {
+        return {};
+    }
+
+    const diceWidth = (whiteDiceSprite?.x || 74) + (whiteDiceInner.width || 64);
+    const eventHeight =
+        eventDiceInner && !eventDiceInner.destroyed
+            ? (eventDiceInner.height || 42) + 10
+            : 0;
+    const diceHeight = (whiteDiceInner.height || 64) + eventHeight;
+
+    return {
+        diceWidth,
+        diceHeight,
+    };
+}
+
 function updateDicePosition() {
     if (!diceContainer || diceContainer.destroyed) {
         return;
     }
 
-    const diceWidth = (whiteDiceSprite?.x || 74) + (whiteDiceInner?.width || 64);
-    const eventHeight =
-        eventDiceInner && !eventDiceInner.destroyed
-            ? (eventDiceInner.height || 42) + 10
-            : 0;
-    const diceHeight = (whiteDiceInner?.height || 64) + eventHeight;
+    const {
+        diceWidth = 138,
+        diceHeight = 64,
+    } = getDiceLayoutMetrics();
     const actionBarTop =
         buttons.container && !buttons.container.destroyed
             ? buttons.container.y
@@ -50,8 +68,27 @@ function updateDicePosition() {
 }
 
 export function relayout() {
-    updateDicePosition();
+    const {
+        diceWidth = 138,
+        diceHeight = 64,
+    } = getDiceLayoutMetrics();
+    setFrame(
+        buildHUDLayout({
+            canvasWidth: canvas.getWidth(),
+            canvasHeight: canvas.getHeight(),
+            diceWidth,
+            diceHeight,
+        }).widgets.dice!,
+    );
     canvas.app.markDirty();
+}
+
+export function setFrame(frame: HUDFrame) {
+    if (!diceContainer || diceContainer.destroyed) {
+        return;
+    }
+    diceContainer.x = frame.x + diceContainer.pivot.x;
+    diceContainer.y = frame.y + diceContainer.pivot.y;
 }
 
 /**

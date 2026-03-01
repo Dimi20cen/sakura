@@ -21,7 +21,9 @@ This document explains how SAKURA components communicate in local development.
 - `ui/src/protocol/`: wire-message adaptation to domain events
 - `ui/src/commands/`: outbound command builders
 - `ui/src/store/`: Redux Toolkit slices + runtime handlers
-- `ui/src/hudLayout.ts`: shared HUD positioning preset and right-rail/bottom-rail layout helpers
+- `ui/src/hud/layoutEngine.ts`: authoritative HUD frame builder for Pixi and DOM HUD elements
+- `ui/src/hud/widgetRegistry.ts`: typed inventory of HUD widgets/regions
+- `ui/src/hudLayout.ts`: compatibility wrapper layer for legacy HUD position helpers
 - `ui/src/uiConfig/`: modular UI configuration system for canvas sizing, HUD geometry, presets, selectors, and shared window chrome
 - `ui/src/uiDock.ts`: shared bottom-dock drawing primitives used by hand/trade/action/timer/dice surfaces
 - `ui/src/`: Pixi/runtime rendering modules
@@ -110,11 +112,14 @@ Inbound game messages are handled by `ui/src/store/gameRuntime.ts` (with Pixi re
 
 ## 7. HUD layout ownership
 
-- In-game HUD placement is centralized in `ui/src/hudLayout.ts`.
-- Layout defaults now come from `ui/src/uiConfig/`, which is the first place to change shared UI geometry or chrome values.
-- Right-side stack (`Game Log`, `Chat`, `Resource Bank`, `Players`) is aligned via shared rail helpers.
-- Bottom controls (`player hand`, `action/options`, `dice`, `timer`) derive positions from the same preset to keep spacing consistent across resolutions.
-- Player panel scale thresholds, hand sizing, and action-bar button/count geometry now also flow through `ui/src/uiConfig/sections/*` and selector helpers instead of being owned by individual Pixi modules.
+- In-game HUD placement now has a single geometry source of truth in `ui/src/hud/layoutEngine.ts`.
+- The layout engine builds named frames for the right rail, bottom rail, floating HUD widgets, and DOM overlays such as the chat input.
+- `ui/src/hud/widgetRegistry.ts` keeps the active HUD widget list discoverable in one place even though rendering remains code-owned by each feature module.
+- `ui/src/hudRelayout.ts` performs one shared relayout pass, computes a `HUDLayoutResult`, and pushes frames into the major HUD modules instead of letting each module recompute its own viewport math.
+- `ui/src/hudLayout.ts` is still present for compatibility, but it now delegates to the layout engine rather than maintaining its own hardcoded preset.
+- Layout defaults still come from `ui/src/uiConfig/`, which remains the first place to change shared UI geometry or chrome values.
+- Right-side stack (`Game Log`, `Chat`, `Resource Bank`, `Players`) and bottom controls (`player hand`, `action/options`, `dice`, `timer`) now derive from the same shared frame computation.
+- Player panel scale thresholds, hand sizing, and action-bar button/count geometry continue to flow through `ui/src/uiConfig/sections/*` and selector helpers instead of being owned by individual Pixi modules.
 - Shared Pixi window styling and fixed top-left controls (for example fullscreen/pause) also read from `ui/src/uiConfig/selectors/*`, so theme/layout adjustments do not require touching each HUD module.
 - Trade editors, setup-selection overlays, settings details, game-over windows, shared dialogs, and tooltip/error window sizing now also source their layout from the same `ui/src/uiConfig/` runtime.
 - `ui/src/uiConfig/runtime.ts` supports named presets (`default`, `compact`, `mobileLandscape`) via `initializeUIConfig({ preset, overrides })`, while `ui/src/uiConfig/selectors/*` provides the stable read API that feature modules import.

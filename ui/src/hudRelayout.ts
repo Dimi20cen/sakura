@@ -7,6 +7,7 @@ import * as hand from "./hand";
 import * as resourceBank from "./resourceBank";
 import * as state from "./state";
 import * as trade from "./trade";
+import { buildHUDLayout } from "./hud/layoutEngine";
 
 let installed = false;
 
@@ -14,14 +15,21 @@ export function relayoutHUD() {
     if (!canvas.app) {
         return;
     }
+    const layout = buildHUDLayout({
+        canvasWidth: canvas.getWidth(),
+        canvasHeight: canvas.getHeight(),
+        ...state.getHUDLayoutContext(),
+        ...dice.getDiceLayoutMetrics(),
+    });
     state.relayout();
     buttons.relayout();
     hand.relayout();
-    resourceBank.relayout();
+    resourceBank.setFrame(layout.widgets.resourceBank!);
     trade.relayout();
-    chat.relayout();
-    gameLog.relayout();
-    dice.relayout();
+    chat.applyHUDLayout(layout);
+    gameLog.setFrame(layout.widgets.gameLog!);
+    dice.setFrame(layout.widgets.dice!);
+    canvas.app.markDirty();
 }
 
 export function ensureHUDRelayoutHooks() {

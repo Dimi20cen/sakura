@@ -31,13 +31,18 @@ enum DiceVisualState {
 
 let visualState: DiceVisualState = DiceVisualState.Idle;
 let flashTickerActive = false;
+const DICE_SIZE = 64;
+const DICE_GAP = 4;
+const DOUBLE_DICE_WIDTH = DICE_SIZE * 2 + DICE_GAP;
 
 export function getDiceLayoutMetrics() {
     if (!whiteDiceInner || whiteDiceInner.destroyed) {
         return {};
     }
 
-    const diceWidth = (whiteDiceSprite?.x || 72) + (whiteDiceInner.width || 64);
+    const diceWidth =
+        (whiteDiceSprite?.x || DICE_SIZE + DICE_GAP) +
+        (whiteDiceInner.width || DICE_SIZE);
     const eventHeight =
         eventDiceInner && !eventDiceInner.destroyed
             ? (eventDiceInner.height || 42) + 10
@@ -56,7 +61,7 @@ function updateDicePosition() {
     }
 
     const {
-        diceWidth = 138,
+        diceWidth = DOUBLE_DICE_WIDTH,
         diceHeight = 64,
     } = getDiceLayoutMetrics();
     const actionBarTop =
@@ -132,7 +137,7 @@ function setVisualState(next: DiceVisualState) {
 
 export function relayout() {
     const {
-        diceWidth = 138,
+        diceWidth = DOUBLE_DICE_WIDTH,
         diceHeight = 64,
     } = getDiceLayoutMetrics();
     setFrame(
@@ -191,10 +196,10 @@ export async function render(
     whiteRoll: number,
     eventRoll: number,
 ) {
-    const SIZE = 64;
+    const SIZE = DICE_SIZE;
 
     if (!diceContainer || diceContainer.destroyed) {
-        const SIZE = 64;
+        const SIZE = DICE_SIZE;
         diceContainer = new PIXI.Container();
         diceContainer.x = canvas.getWidth() - 230;
         diceContainer.y = canvas.getHeight() - 180;
@@ -216,7 +221,7 @@ export async function render(
         whiteDiceInner = new PIXI.Sprite();
         whiteDiceInner.width = SIZE;
         whiteDiceInner.height = SIZE;
-        whiteDiceSprite.x = SIZE + 8;
+        whiteDiceSprite.x = SIZE + DICE_GAP;
         whiteDiceInner.interactive = true;
         whiteDiceInner.cursor = "pointer";
         whiteDiceInner.on("pointerdown", rollDice);
@@ -224,7 +229,7 @@ export async function render(
         whiteDiceSprite.addChild(whiteDiceInner);
         whiteDiceSprite.addChild(getBorder(SIZE));
 
-        diceContainer.pivot.x = 68;
+        diceContainer.pivot.x = DOUBLE_DICE_WIDTH / 2;
         diceContainer.pivot.y = 32;
     }
 

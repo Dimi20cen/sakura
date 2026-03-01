@@ -6,7 +6,7 @@ import * as tsg from "../tsg";
 import { CardType } from "./entities";
 import { buildHUDLayout } from "./hud/layoutEngine";
 import type { HUDFrame } from "./hud/types";
-import { getGameLogConfig } from "./uiConfig";
+import { getBottomDockConfig, getGameLogConfig } from "./uiConfig";
 import {
     createDockPanel,
     createPanelBodyTextStyle,
@@ -110,7 +110,7 @@ function rerender() {
         }
 
         const divider = new PIXI.Graphics();
-        divider.beginFill(0x8f877a, 0.45);
+        divider.beginFill(getBottomDockConfig().panel.border, 0.35);
         divider.drawRect(8, 19, WIDTH() - 24, 1);
         divider.endFill();
         row.addChild(divider);

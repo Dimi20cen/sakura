@@ -341,6 +341,7 @@ import uiKitHourglass from "../assets/runtime/shared/ui-kit/icon-hourglass.svg";
 import uiKitPencil from "../assets/runtime/shared/ui-kit/icon-pencil.svg";
 import uiKitX from "../assets/runtime/shared/ui-kit/icon-x.svg";
 import playerAvatarIconS from "../assets/runtime/shared/profile-icons/player-overview.svg";
+import playerListRibbonS from "../assets/runtime/shared/player-list/ribbon-small.svg";
 
 export const uiKit = {
     bank: uiKitBank,
@@ -353,6 +354,7 @@ export const uiKit = {
 } as const;
 
 export const playerAvatarIcon = playerAvatarIconS;
+export const playerListRibbon = playerListRibbonS;
 
 import barbarianTrackS from "../assets/runtime/cities-knights/board/barbarian/track.png";
 export const barbarianTrack = barbarianTrackS;
@@ -391,12 +393,12 @@ export const numberTokens: { [key: number]: AssetImage } = {
 
 /************************* Icons **************************************/
 
-import iconCards from "../assets/runtime/shared/icons/cards.png";
-import iconDcard from "../assets/runtime/shared/icons/dcard.png";
-import iconKnight from "../assets/runtime/shared/icons/knight.svg";
-import iconKnightHighlight from "../assets/runtime/shared/icons/knight-highlight.svg";
-import iconRoad from "../assets/runtime/shared/icons/road.svg";
-import iconRoadHighlight from "../assets/runtime/shared/icons/road-highlight.svg";
+import iconCards from "../assets/runtime/shared/player-list/card-resource-back.svg";
+import iconDcard from "../assets/runtime/shared/player-list/card-devcard-back.svg";
+import iconKnight from "../assets/runtime/shared/player-list/icon-largest-army.svg";
+import iconKnightHighlight from "../assets/runtime/shared/player-list/icon-largest-army-highlight.svg";
+import iconRoad from "../assets/runtime/shared/player-list/icon-longest-road.svg";
+import iconRoadHighlight from "../assets/runtime/shared/player-list/icon-longest-road-highlight.svg";
 import iconVp from "../assets/runtime/shared/icons/vp.png";
 
 export enum ICON {

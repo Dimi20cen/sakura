@@ -1307,10 +1307,12 @@ function setButtonEnabled(
         sprite.cursor = enabled ? "pointer" : "default";
     }
     sprite.tint = enabled ? 0xffffff : 0x666666;
+    sprite.alpha = enabled ? 1 : 0.5;
 
     // Recursively set tint to all children
     const setTint = (parent: any) => {
         parent.tint = sprite.tint;
+        parent.alpha = sprite.alpha;
         parent.children.forEach(setTint);
     };
     setTint(sprite);

@@ -38,7 +38,6 @@ import {
     getPlayerPanelConfig,
 } from "./uiConfig";
 import {
-    createDockPanel,
     createPanelBodyTextStyle,
     createPanelTitleTextStyle,
 } from "./uiDock";
@@ -147,14 +146,14 @@ function drawPlayerRowBackground(
     if (isCurrent) {
         graphic.lineStyle({ color: slot.activeBorder, width: 3 });
         graphic.beginFill(panel.headerFill, 0.98);
-        graphic.drawRoundedRect(0, y + 2, width - 1, height - 4, 7);
+        graphic.drawRoundedRect(0, y, width - 1, height - 1, 7);
         graphic.endFill();
         return;
     }
 
     graphic.lineStyle({ color: panel.border, width: 2 });
     graphic.beginFill(panel.fill, 0.98);
-    graphic.drawRoundedRect(0, y + 2, width - 1, height - 4, 6);
+    graphic.drawRoundedRect(0, y, width - 1, height - 1, 6);
     graphic.endFill();
 }
 
@@ -273,14 +272,6 @@ function intialize(commandHub: CommandHub) {
     container.cacheAsBitmapMultisample = PIXI.MSAA_QUALITY.HIGH;
     canvas.app.stage.addChild(container);
     container.scale.set(windowScale);
-
-    // Window
-    container.addChild(
-        createDockPanel({
-            width: getPlayerPanelWidth(),
-            height: windowHeight,
-        }),
-    );
 
     // Pending action window
     const pendingActionConfig = getPendingActionOverlayConfig();

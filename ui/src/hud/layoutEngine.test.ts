@@ -31,6 +31,7 @@ test("layout engine stacks right rail widgets in order", () => {
 
 test("layout engine places action bar after the hand", () => {
     resetUIConfig();
+    const hud = getHudConfig();
 
     const layout = buildHUDLayout({
         canvasWidth: 1600,
@@ -40,7 +41,7 @@ test("layout engine places action bar after the hand", () => {
 
     assert.equal(
         layout.widgets.actionBar!.x,
-        layout.widgets.hand!.x + layout.widgets.hand!.width + 8,
+        layout.widgets.hand!.x + layout.widgets.hand!.width + hud.bottomRail.gap,
     );
 });
 

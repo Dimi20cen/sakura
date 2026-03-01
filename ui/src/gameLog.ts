@@ -10,7 +10,6 @@ import { getBottomDockConfig, getGameLogConfig } from "./uiConfig";
 import {
     createDockPanel,
     createPanelBodyTextStyle,
-    createPanelTitleTextStyle,
 } from "./uiDock";
 
 type LogEntry = {
@@ -52,24 +51,16 @@ function ensureUI() {
     const bg = createDockPanel({
         width: WIDTH(),
         height: HEIGHT(),
-        headerHeight: 32,
+        headerHeight: 0,
     });
     container.addChild(bg);
 
-    const title = new PIXI.Text(
-        "Game Log",
-        createPanelTitleTextStyle({ fontSize: 16 }),
-    );
-    title.x = 12;
-    title.y = 8;
-    container.addChild(title);
-
     content = new PIXI.Container();
-    content.y = 36;
+    content.y = 8;
 
     const mask = new PIXI.Graphics();
     mask.beginFill(0xffffff);
-    mask.drawRect(10, 36, WIDTH() - 20, HEIGHT() - 46);
+    mask.drawRect(10, 8, WIDTH() - 20, HEIGHT() - 16);
     mask.endFill();
     container.addChild(mask);
 

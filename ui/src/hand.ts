@@ -212,6 +212,8 @@ export class HandWindow {
 
     private readonly X_DELTA = 8;
     private readonly MAX_SOFT = 2;
+    private readonly SHELL_INSET_X = 2;
+    private readonly SHELL_INSET_Y = 0;
 
     /**
      * Create a new hand window
@@ -228,7 +230,13 @@ export class HandWindow {
         private hasCounts: boolean = true,
         private shouldAnimate: boolean = true,
     ) {
-        this.container.addChild(createDockRail({ width, height }));
+        const shell = createDockRail({
+            width: width - this.SHELL_INSET_X * 2,
+            height: height - this.SHELL_INSET_Y * 2,
+        });
+        shell.x = this.SHELL_INSET_X;
+        shell.y = this.SHELL_INSET_Y;
+        this.container.addChild(shell);
         this.render();
         this.parent.addChild(this.container);
     }
@@ -347,7 +355,11 @@ export class HandWindow {
             for (let i = 0; i < quantity; i++) {
                 const s = this.cardSprites[ct][i];
                 s.targetX = dx;
-                s.targetY = (this.height - 72 * (this.cardWidth / 48)) / 2;
+                const cardDisplayHeight = 72 * (this.cardWidth / 48);
+                const shellHeight = this.height - this.SHELL_INSET_Y * 2;
+                s.targetY =
+                    this.SHELL_INSET_Y +
+                    (shellHeight - cardDisplayHeight) / 2;
 
                 dx += this.X_DELTA;
                 if (quantity > this.MAX_SOFT && i != quantity - 1) {

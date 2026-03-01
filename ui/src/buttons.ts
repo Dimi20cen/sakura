@@ -9,7 +9,6 @@ import * as assets from "./assets";
 import * as windows from "./windows";
 import {
     computeActionBarPosition,
-    computeDicePosition,
     computeSpecialBuildPosition,
 } from "./hudLayout";
 import { buildHUDLayout } from "./hud/layoutEngine";
@@ -103,6 +102,14 @@ function getActionBarHeight() {
     return getActionBarConfig().height;
 }
 
+function getButtonSlotInsetY() {
+    return 0;
+}
+
+function getActionButtonHeight() {
+    return getActionBarHeight() - getButtonSlotInsetY() * 2;
+}
+
 const actionBarWidth = () =>
     getButtonInset() * 2 +
     getButtonSpacing() * 4 +
@@ -120,15 +127,16 @@ function createDockBackground(
         : new PIXI.Container();
     const inset = getButtonInset();
     const buttonWidth = getButtonWidth();
+    const slotInsetY = getButtonSlotInsetY();
 
     slotIndexes.forEach((slotIndex) => {
         const slotX = inset + getButtonSpacing() * slotIndex - 4;
         container.addChild(
             createDockSlot({
                 x: slotX,
-                y: 8,
+                y: slotInsetY,
                 width: buttonWidth + 8,
-                height: height - 16,
+                height: height - slotInsetY * 2,
                 active: accentSlotIndex === slotIndex,
             }),
         );
@@ -682,7 +690,7 @@ export function render(commandHub: CommandHub) {
         buttons.buildSettlement = getButtonSprite(
             ButtonType.Settlement,
             getButtonWidth(),
-            0,
+            getActionButtonHeight(),
             playerColor,
             rerender,
         );
@@ -690,7 +698,7 @@ export function render(commandHub: CommandHub) {
         buttons.buildSettlement.cursor = "pointer";
         buttons.buildSettlement.reactDisable = false;
         buttons.buildSettlement.x = getButtonInset();
-        buttons.buildSettlement.y = getButtonInset();
+        buttons.buildSettlement.y = getButtonSlotInsetY();
         buttons.buildSettlement.zIndex = 10;
         buttons.buildSettlement.onClick(
             rerenderBuildToggleAnd("s", commandHub.buildSettlement),
@@ -718,7 +726,7 @@ export function render(commandHub: CommandHub) {
         buttons.buildCity = getButtonSprite(
             ButtonType.City,
             getButtonWidth(),
-            0,
+            getActionButtonHeight(),
             playerColor,
             rerender,
         );
@@ -726,7 +734,7 @@ export function render(commandHub: CommandHub) {
         buttons.buildCity.cursor = "pointer";
         buttons.buildCity.reactDisable = false;
         buttons.buildCity.x = getButtonInset() + getButtonSpacing() * 1;
-        buttons.buildCity.y = getButtonInset();
+        buttons.buildCity.y = getButtonSlotInsetY();
         buttons.buildCity.zIndex = 10;
         buttons.buildCity.onClick(
             rerenderBuildToggleAnd("c", commandHub.buildCity),
@@ -754,7 +762,7 @@ export function render(commandHub: CommandHub) {
         buttons.buildRoad = getButtonSprite(
             ButtonType.Road,
             getButtonWidth(),
-            0,
+            getActionButtonHeight(),
             playerColor,
             rerender,
         );
@@ -762,7 +770,7 @@ export function render(commandHub: CommandHub) {
         buttons.buildRoad.cursor = "pointer";
         buttons.buildRoad.reactDisable = false;
         buttons.buildRoad.x = getButtonInset() + getButtonSpacing() * 2;
-        buttons.buildRoad.y = getButtonInset();
+        buttons.buildRoad.y = getButtonSlotInsetY();
         buttons.buildRoad.zIndex = 10;
         buttons.buildRoad.onClick(
             rerenderBuildToggleAnd("r", commandHub.buildRoad),
@@ -790,7 +798,7 @@ export function render(commandHub: CommandHub) {
         buttons.buyDevelopmentCard = getButtonSprite(
             ButtonType.DevelopmentCard,
             getButtonWidth(),
-            0,
+            getActionButtonHeight(),
             undefined,
             rerender,
         );
@@ -798,7 +806,7 @@ export function render(commandHub: CommandHub) {
         buttons.buyDevelopmentCard.cursor = "pointer";
         buttons.buyDevelopmentCard.reactDisable = true;
         buttons.buyDevelopmentCard.x = getButtonInset() + getButtonSpacing() * 3;
-        buttons.buyDevelopmentCard.y = getButtonInset();
+        buttons.buyDevelopmentCard.y = getButtonSlotInsetY();
         buttons.buyDevelopmentCard.zIndex = 10;
         buttons.buyDevelopmentCard.onClick(
             rerenderAnd(commandHub.buyDevelopmentCard),
@@ -814,7 +822,7 @@ export function render(commandHub: CommandHub) {
         buttons.buyDevelopmentCard = getButtonSprite(
             ButtonType.DevelopmentCard,
             getButtonWidth(),
-            0,
+            getActionButtonHeight(),
             undefined,
             rerender,
         );
@@ -822,7 +830,7 @@ export function render(commandHub: CommandHub) {
         buttons.buyDevelopmentCard.cursor = "pointer";
         buttons.buyDevelopmentCard.reactDisable = true;
         buttons.buyDevelopmentCard.x = getButtonInset() + getButtonSpacing() * 3;
-        buttons.buyDevelopmentCard.y = getButtonInset();
+        buttons.buyDevelopmentCard.y = getButtonSlotInsetY();
         buttons.buyDevelopmentCard.zIndex = 10;
         buttons.buyDevelopmentCard.onClick(
             rerenderAnd(commandHub.buyDevelopmentCard),
@@ -845,17 +853,7 @@ export function render(commandHub: CommandHub) {
         );
         seafarersShipContainer.zIndex = 1300;
         seafarersShipContainer.visible = !ws.isSpectator();
-        const dicePos = computeDicePosition({
-            canvasWidth: canvas.getWidth(),
-            canvasHeight: canvas.getHeight(),
-            diceWidth: 138,
-            diceHeight: 64,
-            actionBarTop: container.y,
-            playerPanel: state.getPlayerPanelBounds(),
-        });
-        const gap = 10;
-        seafarersShipContainer.x =
-            dicePos.x - seafarersShipContainer.width - gap;
+        seafarersShipContainer.x = container.x;
         seafarersShipContainer.y =
             container.y - getActionBarHeight() - getActionBarConfig().stackGap;
         canvas.app.stage.addChild(seafarersShipContainer);
@@ -863,7 +861,7 @@ export function render(commandHub: CommandHub) {
         buttons.buildShip = getButtonSprite(
             ButtonType.Ship,
             getButtonWidth(),
-            0,
+            getActionButtonHeight(),
             playerColor,
             rerender,
         );
@@ -871,7 +869,7 @@ export function render(commandHub: CommandHub) {
         buttons.buildShip.cursor = "pointer";
         buttons.buildShip.reactDisable = false;
         buttons.buildShip.x = getButtonInset();
-        buttons.buildShip.y = getButtonInset();
+        buttons.buildShip.y = getButtonSlotInsetY();
         buttons.buildShip.zIndex = 10;
         buttons.buildShip.onClick(
             rerenderBuildToggleAnd("sh", commandHub.buildShip),
@@ -896,7 +894,7 @@ export function render(commandHub: CommandHub) {
         buttons.moveShip = getButtonSprite(
             ButtonType.MoveShip,
             getButtonWidth(),
-            0,
+            getActionButtonHeight(),
             undefined,
             rerender,
         );
@@ -904,7 +902,7 @@ export function render(commandHub: CommandHub) {
         buttons.moveShip.cursor = "pointer";
         buttons.moveShip.reactDisable = false;
         buttons.moveShip.x = getButtonInset() + getButtonSpacing() * 1;
-        buttons.moveShip.y = getButtonInset();
+        buttons.moveShip.y = getButtonSlotInsetY();
         buttons.moveShip.zIndex = 10;
         buttons.moveShip.onClick(
             rerenderBuildToggleAnd("ms", commandHub.moveShip),
@@ -921,7 +919,7 @@ export function render(commandHub: CommandHub) {
         buttons.buildWall = getButtonSprite(
             ButtonType.Wall,
             getButtonWidth(),
-            0,
+            getActionButtonHeight(),
             undefined,
             rerender,
         );
@@ -929,7 +927,7 @@ export function render(commandHub: CommandHub) {
         buttons.buildWall.cursor = "pointer";
         buttons.buildWall.reactDisable = false;
         buttons.buildWall.x = getButtonInset() + getButtonSpacing() * 3;
-        buttons.buildWall.y = getButtonInset();
+        buttons.buildWall.y = getButtonSlotInsetY();
         buttons.buildWall.zIndex = 10;
         buttons.buildWall.onClick(
             rerenderBuildToggleAnd("w", commandHub.buildWall),
@@ -976,13 +974,13 @@ export function render(commandHub: CommandHub) {
         buttons.openKnightBox = getButtonSprite(
             ButtonType.KnightBox,
             getButtonWidth(),
-            0,
+            getActionButtonHeight(),
             undefined,
             rerender,
         );
         buttons.openKnightBox.setEnabled(true);
         buttons.openKnightBox.x = getButtonInset();
-        buttons.openKnightBox.y = getButtonInset();
+        buttons.openKnightBox.y = getButtonSlotInsetY();
         buttons.openKnightBox.zIndex = 10;
         buttons.openKnightBox.onClick(() => {
             if (buttons.knightBox?.container) {
@@ -1024,7 +1022,7 @@ export function render(commandHub: CommandHub) {
             const b = getButtonSprite(
                 ButtonType.KnightBuild,
                 getButtonWidth(),
-                0,
+            getActionButtonHeight(),
                 undefined,
                 rerender,
             );
@@ -1032,7 +1030,7 @@ export function render(commandHub: CommandHub) {
             b.interactive = true;
             b.cursor = "pointer";
             b.x = getButtonInset();
-            b.y = getButtonInset();
+            b.y = getButtonSlotInsetY();
             b.zIndex = 10;
             b.onClick(rerenderBuildToggleAnd("k", commandHub.buildKnight));
             kbc.addChild(b);
@@ -1047,7 +1045,7 @@ export function render(commandHub: CommandHub) {
             const b = getButtonSprite(
                 ButtonType.KnightActivate,
                 getButtonWidth(),
-                0,
+            getActionButtonHeight(),
                 undefined,
                 rerender,
             );
@@ -1056,7 +1054,7 @@ export function render(commandHub: CommandHub) {
             b.cursor = "pointer";
             b.reactDisable = false;
             b.x = getButtonInset() + getButtonSpacing() * 1;
-            b.y = getButtonInset();
+            b.y = getButtonSlotInsetY();
             b.zIndex = 10;
             b.onClick(
                 rerenderBuildToggleAnd("ka", commandHub.activateKnight),
@@ -1073,7 +1071,7 @@ export function render(commandHub: CommandHub) {
             const b = getButtonSprite(
                 ButtonType.KnightRobber,
                 getButtonWidth(),
-                0,
+            getActionButtonHeight(),
                 undefined,
                 rerender,
             );
@@ -1082,7 +1080,7 @@ export function render(commandHub: CommandHub) {
             b.cursor = "pointer";
             b.reactDisable = false;
             b.x = getButtonInset() + getButtonSpacing() * 2;
-            b.y = getButtonInset();
+            b.y = getButtonSlotInsetY();
             b.zIndex = 10;
             b.onClick(
                 rerenderBuildToggleAnd("kr", commandHub.robberKnight),
@@ -1099,7 +1097,7 @@ export function render(commandHub: CommandHub) {
             const b = getButtonSprite(
                 ButtonType.KnightMove,
                 getButtonWidth(),
-                0,
+            getActionButtonHeight(),
                 undefined,
                 rerender,
             );
@@ -1108,7 +1106,7 @@ export function render(commandHub: CommandHub) {
             b.cursor = "pointer";
             b.reactDisable = false;
             b.x = getButtonInset() + getButtonSpacing() * 3;
-            b.y = getButtonInset();
+            b.y = getButtonSlotInsetY();
             b.zIndex = 10;
             b.onClick(rerenderBuildToggleAnd("km", commandHub.moveKnight));
             kbc.addChild(b);
@@ -1124,14 +1122,14 @@ export function render(commandHub: CommandHub) {
         const b = getButtonSprite(
             ButtonType.CityImprove,
             getButtonWidth(),
-            0,
+            getActionButtonHeight(),
             undefined,
             rerender,
         );
         buttons.openImproveBox = b;
         b.setEnabled(true);
         b.x = getButtonInset() + getButtonSpacing();
-        b.y = getButtonInset();
+        b.y = getButtonSlotInsetY();
         b.zIndex = 10;
         b.onClick(() => {
             if (buttons.improveBox?.container) {
@@ -1180,7 +1178,7 @@ export function render(commandHub: CommandHub) {
             const b = getButtonSprite(
                 ButtonType.CityImprovePaper,
                 getButtonWidth(),
-                0,
+            getActionButtonHeight(),
                 undefined,
                 rerender,
             );
@@ -1189,7 +1187,7 @@ export function render(commandHub: CommandHub) {
             b.cursor = "pointer";
             b.reactDisable = false;
             b.x = getButtonInset();
-            b.y = getButtonInset();
+            b.y = getButtonSlotInsetY();
             b.zIndex = 10;
             b.onClick(rerenderAnd(() => clickImprove(CardType.Paper)));
             ibc.addChild(b);
@@ -1204,7 +1202,7 @@ export function render(commandHub: CommandHub) {
             const b = getButtonSprite(
                 ButtonType.CityImproveCloth,
                 getButtonWidth(),
-                0,
+            getActionButtonHeight(),
                 undefined,
                 rerender,
             );
@@ -1213,7 +1211,7 @@ export function render(commandHub: CommandHub) {
             b.cursor = "pointer";
             b.reactDisable = true;
             b.x = getButtonInset() + getButtonSpacing();
-            b.y = getButtonInset();
+            b.y = getButtonSlotInsetY();
             b.zIndex = 10;
             b.onClick(rerenderAnd(() => clickImprove(CardType.Cloth)));
             ibc.addChild(b);
@@ -1228,7 +1226,7 @@ export function render(commandHub: CommandHub) {
             const b = getButtonSprite(
                 ButtonType.CityImproveCoin,
                 getButtonWidth(),
-                0,
+            getActionButtonHeight(),
                 undefined,
                 rerender,
             );
@@ -1237,7 +1235,7 @@ export function render(commandHub: CommandHub) {
             b.cursor = "pointer";
             b.reactDisable = true;
             b.x = getButtonInset() + getButtonSpacing() * 2;
-            b.y = getButtonInset();
+            b.y = getButtonSlotInsetY();
             b.zIndex = 10;
             b.onClick(rerenderAnd(() => clickImprove(CardType.Coin)));
             ibc.addChild(b);
@@ -1254,7 +1252,7 @@ export function render(commandHub: CommandHub) {
         buttons.endTurn = getButtonSprite(
             ButtonType.EndTurn,
             getButtonWidth(),
-            0,
+            getActionButtonHeight(),
             undefined,
             rerender,
         );
@@ -1262,7 +1260,7 @@ export function render(commandHub: CommandHub) {
         buttons.endTurn.cursor = "pointer";
         buttons.endTurn.reactDisable = true;
         buttons.endTurn.x = getButtonInset() + getButtonSpacing() * endTurnSlot;
-        buttons.endTurn.y = getButtonInset();
+        buttons.endTurn.y = getButtonSlotInsetY();
         buttons.endTurn.zIndex = 10;
         buttons.endTurn.onClick(rerenderAnd(commandHub.endTurn));
         container.addChild(buttons.endTurn);

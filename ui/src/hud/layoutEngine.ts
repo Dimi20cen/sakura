@@ -243,13 +243,7 @@ export function buildHUDLayout(context: HUDLayoutContext): HUDLayoutResult {
         controls.pauseToggle.size,
         controls.pauseToggle.size,
     );
-    const shipActionsY = Math.max(
-        hud.padding,
-        Math.min(
-            gameStatusFrame.y,
-            actionBarFrame.y - hud.misc.shipAboveStatusGap - hud.actionBar.height,
-        ),
-    );
+    const shipActionsY = actionBarFrame.y - hud.actionBar.height - hud.actionBar.stackGap;
 
     return {
         regions: {
@@ -274,14 +268,7 @@ export function buildHUDLayout(context: HUDLayoutContext): HUDLayoutResult {
             actionBar: actionBarFrame,
             actionBarSecondary: actionBarSecondaryFrame,
             actionBarShips: makeFrame(
-                clamp(
-                    gameStatusFrame.x - hud.misc.shipAboveStatusGap - seafarersActionBarWidth,
-                    handFrame.x,
-                    Math.max(
-                        handFrame.x,
-                        context.canvasWidth - hud.padding - seafarersActionBarWidth,
-                    ),
-                ),
+                actionBarFrame.x,
                 shipActionsY,
                 seafarersActionBarWidth,
                 hud.actionBar.height,

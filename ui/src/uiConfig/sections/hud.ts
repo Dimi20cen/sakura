@@ -1,25 +1,27 @@
 import type { UIConfig } from "../types.ts";
 
 const RHYTHM = 4;
-const SHARED_RAIL_HEIGHT = 90;
+const SHARED_RAIL_HEIGHT = 80;
 const RIGHT_RAIL_PANEL_WIDTH = 286;
+const CLUSTER_GAP = 2;
+const EDGE_INSET = 2;
 
 export const hudConfig: UIConfig["hud"] = {
-    padding: RHYTHM * 3,
-    gap: RHYTHM * 2,
+    padding: EDGE_INSET,
+    gap: RHYTHM,
     playerPanel: {
         width: 286,
-        rowHeight: SHARED_RAIL_HEIGHT + RHYTHM,
-        headerOffset: RHYTHM * 3,
+        rowHeight: SHARED_RAIL_HEIGHT + CLUSTER_GAP,
+        headerOffset: 0,
         scaleDefault: 1,
         scaleCrowded: 1,
         crowdedThreshold: 4,
-        highlightRowHeight: SHARED_RAIL_HEIGHT,
+        highlightRowHeight: SHARED_RAIL_HEIGHT + CLUSTER_GAP,
     },
     rightRail: {
-        width: RIGHT_RAIL_PANEL_WIDTH + RHYTHM * 2,
-        bottomInset: RHYTHM * 2,
-        topInset: RHYTHM * 2,
+        width: RIGHT_RAIL_PANEL_WIDTH,
+        bottomInset: 0,
+        topInset: EDGE_INSET,
     },
     gameLog: {
         width: RIGHT_RAIL_PANEL_WIDTH,
@@ -45,9 +47,9 @@ export const hudConfig: UIConfig["hud"] = {
         height: 72,
     },
     bottomRail: {
-        leftInset: RHYTHM * 3,
-        bottomInset: RHYTHM * 2,
-        gap: RHYTHM * 2,
+        leftInset: 0,
+        bottomInset: 0,
+        gap: CLUSTER_GAP,
         handHeight: SHARED_RAIL_HEIGHT,
         handMinWidth: 260,
         handMaxWidth: 760,
@@ -62,7 +64,7 @@ export const hudConfig: UIConfig["hud"] = {
         countWidth: 20,
         countHeight: 19,
         countFontSize: 13,
-        stackGap: RHYTHM * 2,
+        stackGap: CLUSTER_GAP,
     },
     dice: {
         rightRailGap: 34,
@@ -78,15 +80,15 @@ export const hudConfig: UIConfig["hud"] = {
         spectatorsX: 60,
         spectatorsY: 20,
         endTurnSlotIndex: 4,
-        timerAboveEndTurnGap: RHYTHM * 2,
-        diceAboveTimerGap: RHYTHM * 2,
-        statusAboveDiceGap: RHYTHM * 3,
+        timerAboveEndTurnGap: CLUSTER_GAP,
+        diceAboveTimerGap: CLUSTER_GAP,
+        statusAboveDiceGap: RHYTHM * 2,
         statusWidth: 224,
         statusHeight: 40,
         timerWidth: 72,
-        timerHeight: 36,
+        timerHeight: 40,
         statusLeftOfTimerGap: 4,
-        shipAboveStatusGap: RHYTHM * 2,
-        timerRightNudge: 6,
+        shipAboveStatusGap: CLUSTER_GAP,
+        timerRightNudge: 0,
     },
 };

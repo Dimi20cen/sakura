@@ -88,6 +88,7 @@ npm run dev
 - When adjusting HUD spacing or panel sizes, prefer editing `ui/src/uiConfig/sections/*`, `ui/src/uiConfig/presets.ts`, or `ui/src/hud/layoutEngine.ts` first and only change module code when behavior or rendering needs to change.
 - The default hand rail width is capped by `hud.bottomRail.handMaxWidth` (currently `760`) to keep more space available for nearby action clusters.
 - Timer/dice/status placement is config-driven from `ui/src/uiConfig/sections/hud.ts` and currently anchors to the End Turn slot (`timerAboveEndTurnGap`, `diceAboveTimerGap`, `endTurnSlotIndex`, `timerWidth`, `timerHeight`, `statusWidth`, `statusHeight`, `timerRightNudge`), with the status panel positioned to the timer's left.
+- Dice interaction/animation flow is state-driven in `ui/src/dice.ts` (`idle`, `awaiting-roll`, `rolling`, `revealed`) so roll affordance and post-roll feedback stay centralized in one module.
 - Seafarers ship-action rail placement is now aligned to the left of the status panel and can use the space above the hand rail when needed to avoid collisions with the compact timer/status cluster.
 - The compact timer is now text-only (no mode badge/sub-label), and the dice render without the old dock tray background so the lower-right control cluster can stay tighter.
 - HUD collision guards now keep Seafarers extra actions above the main action bar and keep dice frames left of the player panel.

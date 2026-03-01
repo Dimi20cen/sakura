@@ -20,6 +20,17 @@ let whiteDiceInner: PIXI.Sprite;
 let eventDiceSprite: PIXI.Sprite;
 let eventDiceInner: PIXI.Sprite;
 let diceContainer: PIXI.Container;
+let revealTimer: number | null = null;
+
+enum DiceVisualState {
+    Idle = "idle",
+    AwaitingRoll = "awaiting-roll",
+    Rolling = "rolling",
+    Revealed = "revealed",
+}
+
+let visualState: DiceVisualState = DiceVisualState.Idle;
+let flashTickerActive = false;
 
 export function getDiceLayoutMetrics() {
     if (!whiteDiceInner || whiteDiceInner.destroyed) {
@@ -67,6 +78,58 @@ function updateDicePosition() {
     diceContainer.y = pos.y + diceContainer.pivot.y;
 }
 
+function clearRevealTimer() {
+    if (revealTimer === null) {
+        return;
+    }
+    window.clearTimeout(revealTimer);
+    revealTimer = null;
+}
+
+function stopFlashTicker() {
+    if (!flashTickerActive) {
+        return;
+    }
+    flashTickerActive = false;
+    canvas.app.slowTicker.remove(diceFlashFun);
+}
+
+function startFlashTicker() {
+    if (flashTickerActive) {
+        return;
+    }
+    flashTickerActive = true;
+    canvas.app.slowTicker.add(diceFlashFun);
+}
+
+function applyVisualState() {
+    if (!redDiceInner || !whiteDiceInner) {
+        return;
+    }
+
+    const interactive = visualState === DiceVisualState.AwaitingRoll;
+    redDiceInner.interactive = interactive;
+    whiteDiceInner.interactive = interactive;
+    redDiceInner.cursor = interactive ? "pointer" : "default";
+    whiteDiceInner.cursor = interactive ? "pointer" : "default";
+
+    if (visualState === DiceVisualState.AwaitingRoll) {
+        startFlashTicker();
+        return;
+    }
+
+    stopFlashTicker();
+    redDiceInner.tint = 0xffffff;
+    whiteDiceInner.tint = 0xffffff;
+}
+
+function setVisualState(next: DiceVisualState) {
+    clearRevealTimer();
+    visualState = next;
+    applyVisualState();
+    canvas.app.markDirty();
+}
+
 export function relayout() {
     const {
         diceWidth = 138,
@@ -110,7 +173,10 @@ function getBorder(s: number) {
  * Stop flashing the dice and send the roll command
  */
 function rollDice() {
-    setFlashing(false);
+    if (visualState !== DiceVisualState.AwaitingRoll) {
+        return;
+    }
+    setVisualState(DiceVisualState.Rolling);
     getCommandHub().rollDice();
 }
 
@@ -184,11 +250,19 @@ export async function render(
         assets.assignTexture(eventDiceInner, assets.diceEvent[eventRoll]);
     }
 
+    applyVisualState();
     canvas.app.markDirty();
 }
 
 const diceFlashFun = (delta: number) => {
-    if (!diceContainer || diceContainer.destroyed) return;
+    if (
+        !diceContainer ||
+        diceContainer.destroyed ||
+        !redDiceInner ||
+        !whiteDiceInner
+    ) {
+        return;
+    }
 
     (<number>redDiceInner.tint) -= 0x111111;
     if (<number>redDiceInner.tint < 0x666666) {
@@ -199,35 +273,18 @@ const diceFlashFun = (delta: number) => {
     diceContainer.render(canvas.app.renderer as PIXI.Renderer);
 };
 
-let flashing = false;
-
 /**
  * Set the flashing state of the dice.
  * @param flash True to flash the dice, false to stop flashing
  */
 export function setFlashing(flash: boolean) {
-    if (!redDiceInner || !whiteDiceInner) {
-        return;
-    }
-
-    redDiceInner.interactive = flash;
-
     if (flash) {
-        if (!flashing) {
-            flashing = true;
-            canvas.app.slowTicker.add(diceFlashFun);
-        }
+        setVisualState(DiceVisualState.AwaitingRoll);
     } else {
-        flashing = false;
-        canvas.app.slowTicker.remove(diceFlashFun);
-
-        if (diceContainer && !diceContainer.destroyed) {
-            redDiceInner.tint = 0xcccccc;
-            whiteDiceInner.tint = 0xcccccc;
+        if (visualState === DiceVisualState.AwaitingRoll) {
+            setVisualState(DiceVisualState.Idle);
         }
     }
-
-    canvas.app.markDirty();
 }
 
 /**
@@ -242,6 +299,13 @@ export async function rolled(
     eventRoll: number,
 ) {
     render(redRoll, whiteRoll, eventRoll);
+    setVisualState(DiceVisualState.Revealed);
+    revealTimer = window.setTimeout(() => {
+        revealTimer = null;
+        if (visualState === DiceVisualState.Revealed) {
+            setVisualState(DiceVisualState.Idle);
+        }
+    }, 900);
     sound.play("soundDice");
 }
 
@@ -253,6 +317,7 @@ export async function rolled(
 export function handleMessage(diceResp: DieRollState) {
     if (diceResp.IsInit) {
         render(diceResp.RedRoll, diceResp.WhiteRoll, diceResp.EventRoll);
+        setVisualState(DiceVisualState.Idle);
         return;
     }
 

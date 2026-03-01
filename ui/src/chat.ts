@@ -27,6 +27,10 @@ let unreadDot: PIXI.Graphics;
 const messages: Message[] = [];
 let syncInputLayout: (() => void) | null = null;
 
+function toCssHex(color: number) {
+    return `#${color.toString(16).padStart(6, "0")}`;
+}
+
 function getCurrentHUDLayout() {
     return buildHUDLayout({
         canvasWidth: canvas.getWidth(),
@@ -85,11 +89,15 @@ export function initialize() {
     inputBox.type = "text";
     inputBox.className = "chat-input";
     inputBox.style.position = "absolute";
+    inputBox.style.backgroundColor = toCssHex(getBottomDockConfig().panel.fill);
+    inputBox.style.color = toCssHex(getBottomDockConfig().panel.bodyText);
+    inputBox.style.fontFamily = getBottomDockConfig().panel.fontFamily;
 
     const resize = () => {
         const ratio = canvas.getScaleRatio();
         const layout = getCurrentHUDLayout();
         const inputFrame = layout.widgets.chatInput!;
+        const panel = getBottomDockConfig().panel;
         inputBox.style.height = `${inputFrame.height * ratio}px`;
         inputBox.style.width = `${inputFrame.width * ratio}px`;
         inputBox.style.left = `${inputFrame.x * ratio}px`;
@@ -99,7 +107,7 @@ export function initialize() {
         inputBox.style.fontSize = `${0.9 * ratio}em`;
         inputBox.style.padding = `0 ${getChatConfig().inputHorizontalPadding * ratio}px`;
         inputBox.style.borderRadius = `${4 * ratio}px`;
-        inputBox.style.border = `${getChatConfig().inputBorderWidth * ratio}px solid grey`;
+        inputBox.style.border = `${getChatConfig().inputBorderWidth * ratio}px solid ${toCssHex(panel.headerBorder)}`;
     };
     syncInputLayout = resize;
     resize();
@@ -277,7 +285,6 @@ function renderMessages() {
                 }
 
                 const text = new PIXI.Text(measure.lines[j], newStyle);
-                text.tint = 0x666666;
                 text.x = 10;
                 text.y = windowHeight - 38 - cheight;
                 text.pivot.y = measure.lineHeight;
@@ -340,18 +347,18 @@ export function chatMessage(msg: Message) {
         renderMessages();
     } else {
         // Show popup
-        const popup = new PIXI.Sprite();
+        const popup = new PIXI.Container();
         const WIDTH = measure.width + 20,
             HEIGHT = measure.height + 10;
 
-        const g = new PIXI.Graphics();
-        g.beginFill(0xffffff, 0.85);
-        g.drawRoundedRect(0, 0, WIDTH, HEIGHT, 15);
-        g.endFill();
-        popup.addChild(g);
+        popup.addChild(
+            createDockPanel({
+                width: WIDTH,
+                height: HEIGHT,
+            }),
+        );
 
         const text = new PIXI.Text(msg.text, style);
-        text.tint = 0x666666;
         text.x = 10;
         text.y = 5;
         popup.addChild(text);

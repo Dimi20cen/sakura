@@ -11,6 +11,7 @@ import { computeDicePosition } from "./hudLayout";
 import { sound } from "@pixi/sound";
 import { DieRollState } from "../tsg";
 import { getCommandHub } from "./ws";
+import { getBottomDockConfig } from "./uiConfig";
 
 let redDiceSprite: PIXI.Sprite;
 let redDiceInner: PIXI.Sprite;
@@ -96,8 +97,9 @@ export function setFrame(frame: HUDFrame) {
  * @returns PIXI.Graphics
  */
 function getBorder(s: number) {
+    const panel = getBottomDockConfig().panel;
     const border = new PIXI.Graphics();
-    border.lineStyle({ color: 0x5a341a, width: 2 });
+    border.lineStyle({ color: panel.border, width: 2 });
     border.beginFill(0, 0);
     border.drawRoundedRect(0, 0, s, s, 10 * (s / 64));
     border.endFill();

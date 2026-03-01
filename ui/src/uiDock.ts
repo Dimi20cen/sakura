@@ -203,6 +203,7 @@ export function createPanelTitleTextStyle(
         fontSize: panel.titleFontSize,
         fill: panel.titleText,
         fontWeight: "bold",
+        letterSpacing: 0.5,
         ...overrides,
     });
 }
@@ -215,6 +216,7 @@ export function createPanelBodyTextStyle(
         fontFamily: panel.fontFamily,
         fontSize: panel.bodyFontSize,
         fill: panel.bodyText,
+        letterSpacing: 0.3,
         ...overrides,
     });
 }

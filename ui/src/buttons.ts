@@ -150,14 +150,16 @@ function ensureTurnTimerWidget() {
     }
 
     const misc = getHudMiscConfig();
+    const bottomDock = getBottomDockConfig();
+    const timer = bottomDock.timer;
     const timerWidth = misc.timerWidth;
     const timerHeight = misc.timerHeight;
 
     turnTimerContainer = new PIXI.Container();
     turnTimerContainer.zIndex = 1300;
     const timerBg = new PIXI.Graphics();
-    timerBg.lineStyle({ color: 0x0b6c8c, width: 2 });
-    timerBg.beginFill(0xf1ead7, 0.98);
+    timerBg.lineStyle({ color: timer.border, width: 2 });
+    timerBg.beginFill(timer.fill, 0.98);
     timerBg.drawRoundedRect(0, 0, timerWidth, timerHeight, 10);
     timerBg.endFill();
     turnTimerContainer.addChild(timerBg);
@@ -166,6 +168,7 @@ function ensureTurnTimerWidget() {
         "--:--",
         createPanelTitleTextStyle({
             fontSize: 13,
+            fill: timer.text,
         }),
     );
     turnTimerText.anchor.set(0.5);
@@ -229,15 +232,21 @@ function redrawPauseToggleIcon(paused: boolean) {
         return;
     }
 
+    const timer = getBottomDockConfig().timer;
     pauseToggleIcon.clear();
-    pauseToggleIcon.beginFill(0xffffff);
+    pauseToggleIcon.lineStyle({ color: timer.border, width: 2 });
+    pauseToggleIcon.beginFill(timer.fill, 0.96);
+    pauseToggleIcon.drawCircle(18, 18, 16);
+    pauseToggleIcon.endFill();
+
+    pauseToggleIcon.beginFill(timer.text);
     if (paused) {
         // Show "play" when paused so users can resume.
-        pauseToggleIcon.drawPolygon([12, 8, 12, 28, 27, 18]);
+        pauseToggleIcon.drawPolygon([14, 11, 14, 25, 26, 18]);
     } else {
         // Show "pause" when game is running.
-        pauseToggleIcon.drawRoundedRect(9, 8, 6, 20, 2);
-        pauseToggleIcon.drawRoundedRect(21, 8, 6, 20, 2);
+        pauseToggleIcon.drawRoundedRect(12, 11, 4, 14, 2);
+        pauseToggleIcon.drawRoundedRect(20, 11, 4, 14, 2);
     }
     pauseToggleIcon.endFill();
 }

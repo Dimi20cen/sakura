@@ -13,7 +13,7 @@ export const bottomDockConfig: UIConfig["bottomDock"] = {
         titleText: 0x5a341a,
         bodyText: 0x3f2a18,
         inset: 4,
-        fontFamily: "sans-serif",
+        fontFamily: "Noto Serif JP",
         titleFontSize: 16,
         bodyFontSize: 13,
         captionFontSize: 10,

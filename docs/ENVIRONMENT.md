@@ -7,6 +7,10 @@ This project uses two environment files:
 
 Both backend and frontend are loaded via their runtime frameworks.
 
+For the host-run production helper `./scripts/prod.sh`, any previous `ui/.next/standalone/.env.local` file is cleared first, then `ui/.env.local` is copied into `ui/.next/standalone/.env.local` when present so server-side API routes receive runtime values such as `MONGO_URL`, `NEXTAUTH_URL`, and `NEXTAUTH_SECRET` without carrying stale values across runs.
+The same helper also materializes `ui/public` under `ui/.next/standalone/public`, dereferencing the `ui/public/assets -> ../assets/runtime` symlink so production mode can serve `/assets/...` files correctly.
+It also mirrors `ui/.next/static` into `ui/.next/standalone/.next/static` so the standalone server can serve Next.js build assets like `/_next/static/<BUILD_ID>/_buildManifest.js`.
+
 ## Backend (`.env`)
 
 Used by Go services in `cmd/server/main.go`, `server/*`, and `mango/*`.
@@ -85,6 +89,6 @@ Use one value for `HMAC_SECRET` and a different one for `NEXTAUTH_SECRET`.
 
 - Backend `FRONTEND_URL` must match your frontend origin exactly.
 - `MONGO_URL` should include `authSource=admin` if using root credentials.
+- For host-run scripts such as `./scripts/dev.sh` and `./scripts/prod.sh`, use `localhost:27017` in root `.env`; the hostname `mongodb` is only valid inside the Docker Compose network used by `deploy/docker-compose.yml`.
 - If changing backend port, also update `SERVER_URL`.
 - If changing frontend port, update `FRONTEND_URL`.
-

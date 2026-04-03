@@ -175,7 +175,15 @@ Starts MongoDB + backend (`go run`) + frontend (`next dev`) for development.
 ./scripts/prod.sh
 ```
 
-Starts MongoDB + backend + production frontend (`next build` then `next start`).
+Starts MongoDB + backend + production frontend (`next build` then `node .next/standalone/server.js`).
+
+Important:
+
+- `./scripts/prod.sh` runs the backend on the host machine, so root `.env` should use a host-reachable Mongo URI such as `mongodb://root:root@localhost:27017/sakura?authSource=admin`.
+- A root `.env` using `mongodb:27017` is for the Dockerized deployment stack under `deploy/docker-compose.yml`, not for the local host-run script.
+- `./scripts/prod.sh` clears any previous `ui/.next/standalone/.env.local`, then copies `ui/.env.local` into place before starting the standalone Next.js server so frontend API routes keep access to runtime vars like `MONGO_URL` and `NEXTAUTH_URL` without reusing stale config from an older run.
+- `./scripts/prod.sh` also copies `ui/public` into `ui/.next/standalone/public` with symlinks dereferenced so `/assets/...` runtime art is available in production mode.
+- `./scripts/prod.sh` also copies `ui/.next/static` into `ui/.next/standalone/.next/static` so the standalone server can serve the build manifests and hashed frontend bundles under `/_next/static/...`.
 
 Optional: skip UI rebuild when you already built it:
 

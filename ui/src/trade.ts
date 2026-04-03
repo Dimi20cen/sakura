@@ -1192,7 +1192,19 @@ export function showTradeOffer(offer: tsg.TradeOffer) {
             const name = state.lastKnownStates?.[playerOrder]?.Username || `Player ${playerOrder + 1}`;
             const statusText =
                 status > 0 ? "accepted" : status < 0 ? "declined" : "pending";
-            new windows.TooltipHandler(chip, `${name}: ${statusText}`);
+            if (status > 0) {
+                chip.interactive = true;
+                chip.cursor = "pointer";
+                chip.on("pointerdown", () =>
+                    getCommandHub().closeTradeOffer(offer.Id, playerOrder),
+                );
+                new windows.TooltipHandler(
+                    chip,
+                    `${name}: accepted - click to finalize this trade`,
+                );
+            } else {
+                new windows.TooltipHandler(chip, `${name}: ${statusText}`);
+            }
             offerContainer.addChild(chip);
         });
         addActionButton(

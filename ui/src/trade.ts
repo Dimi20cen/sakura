@@ -902,12 +902,14 @@ export function showTradeOffer(offer: tsg.TradeOffer) {
     const panelWidth =
         panelPadding + markerColumnWidth + 6 + rowWidth + 6 + actionsWidth + panelPadding;
     const panelHeight = bottomRowY + rowHeight + panelPadding;
+    const topRowCards = isIncomingOffer ? offer.Details.Give : offer.Details.Ask;
+    const bottomRowCards = isIncomingOffer ? offer.Details.Ask : offer.Details.Give;
 
     offerContainer.addChild(createTradePanelBackground(panelWidth, panelHeight));
 
-    const drawMarkerRow = (top: number, askRow: boolean) => {
+    const drawMarkerRow = (top: number, receiveRow: boolean) => {
         const markerY = top + Math.round((rowHeight - markerIconSize) / 2);
-        if (askRow) {
+        if (receiveRow) {
             const topMarker = isOutgoingOffer
                 ? addIconSprite(offerContainer, {
                       asset: assets.uiKit.players,
@@ -927,8 +929,8 @@ export function showTradeOffer(offer: tsg.TradeOffer) {
             new windows.TooltipHandler(
                 topMarker,
                 isOutgoingOffer
-                    ? "Cards requested from other players"
-                    : "Cards requested by the offering player",
+                    ? "Cards you receive from another player"
+                    : "Cards you receive from the offering player",
             );
             const arrow = addIconSprite(offerContainer, {
                 asset: assets.uiKit.tradeArrowGreen,
@@ -941,16 +943,27 @@ export function showTradeOffer(offer: tsg.TradeOffer) {
             arrow.x += markerIconSize / 2;
             arrow.y += markerIconSize / 2;
             arrow.rotation = -Math.PI / 2;
-            new windows.TooltipHandler(arrow, "Cards moving to the current player");
+            new windows.TooltipHandler(
+                arrow,
+                isSpectator()
+                    ? "Cards moving to the current player"
+                    : "Cards moving to you",
+            );
             return;
         }
 
-        const avatar = state.getPlayerAvatarSprite(offer.CurrentPlayer);
+        const sourcePlayerOrder = isSpectator() ? offer.CurrentPlayer : myOrder;
+        const avatar = state.getPlayerAvatarSprite(sourcePlayerOrder);
         avatar.x = panelPadding + 6;
         avatar.y = markerY;
         avatar.scale.set(markerIconSize / 52);
         offerContainer.addChild(avatar);
-        new windows.TooltipHandler(avatar, "Cards offered by the current player");
+        new windows.TooltipHandler(
+            avatar,
+            isSpectator()
+                ? "Cards offered by the current player"
+                : "Cards you give",
+        );
         const arrow = addIconSprite(offerContainer, {
             asset: assets.uiKit.tradeArrowRed,
             width: markerIconSize,
@@ -962,7 +975,12 @@ export function showTradeOffer(offer: tsg.TradeOffer) {
         arrow.x += markerIconSize / 2;
         arrow.y += markerIconSize / 2;
         arrow.rotation = -Math.PI / 2;
-        new windows.TooltipHandler(arrow, "Cards leaving the current player");
+        new windows.TooltipHandler(
+            arrow,
+            isSpectator()
+                ? "Cards leaving the current player"
+                : "Cards leaving you",
+        );
     };
 
     drawMarkerRow(topRowY, true);
@@ -990,8 +1008,8 @@ export function showTradeOffer(offer: tsg.TradeOffer) {
     liveAskWindow.container.y = topRowY;
     liveGiveWindow.container.x = contentX;
     liveGiveWindow.container.y = bottomRowY;
-    liveAskWindow.setCards(offer.Details.Ask);
-    liveGiveWindow.setCards(offer.Details.Give);
+    liveAskWindow.setCards(topRowCards);
+    liveGiveWindow.setCards(bottomRowCards);
 
     const actionsX = contentX + rowWidth + 6;
     const presenceWidth = actionsWidth - 12;

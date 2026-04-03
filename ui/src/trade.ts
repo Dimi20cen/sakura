@@ -506,6 +506,8 @@ export function clearOfferEditor() {
         offerWindow.cards[i] = 0;
         askWindow.cards[i] = 0;
     }
+    offerWindow.setDevelopmentCards(new Array(31).fill(0));
+    askWindow.setDevelopmentCards(new Array(31).fill(0));
     countering = false;
     offerWindow.render();
     askWindow.render();
@@ -806,7 +808,14 @@ function render() {
     const hasAsk = hasAnyCards(askWindow.cards);
     const hasGive = hasAnyCards(offerWindow.cards);
     const isPlayerTradeValid = hasAsk && hasGive;
-    tradeActionRail.bank.setEnabled(isPlayerTradeValid && isDraftValidForBankTrade());
+    const isCurrentPlayer =
+        state.lastKnownGameState?.CurrentPlayerOrder === getThisPlayerOrder();
+    tradeActionRail.bank.setEnabled(
+        isCurrentPlayer &&
+            !countering &&
+            isPlayerTradeValid &&
+            isDraftValidForBankTrade(),
+    );
     tradeActionRail.player.setEnabled(isPlayerTradeValid);
     tradeActionRail.cancel.setEnabled(true);
 }
@@ -1038,6 +1047,13 @@ export function showTradeOffer(offer: tsg.TradeOffer) {
                     button.on("pointerdown", () =>
                         getCommandHub().closeTradeOffer(offer.Id, playerOrder),
                     );
+                    const name =
+                        state.lastKnownStates?.[playerOrder]?.Username ||
+                        `Player ${playerOrder + 1}`;
+                    new windows.TooltipHandler(
+                        button,
+                        `Finalize this trade with ${name}`,
+                    );
                 }
             } else if (status === -1) {
                 button.alpha = 0.5;
@@ -1187,9 +1203,19 @@ export function showTradeOffer(offer: tsg.TradeOffer) {
             "Cancel this offer",
         );
     } else if (!isSpectator() && isCurrentPlayerCounterOffer) {
+        const acceptX = actionsX + 2;
+        const rejectX = actionsX + 50;
+        const acceptingPlayer = offer.CreatedBy;
+        addActionButton(
+            buttons.ButtonType.Yes,
+            acceptX,
+            offer.Acceptances[acceptingPlayer] === 1,
+            () => getCommandHub().closeTradeOffer(offer.Id, acceptingPlayer),
+            "Accept and finalize this counter-offer",
+        );
         addActionButton(
             buttons.ButtonType.No,
-            actionsX + 2,
+            rejectX,
             true,
             () => getCommandHub().rejectTradeOffer(offer.Id),
             "Decline this counter-offer",

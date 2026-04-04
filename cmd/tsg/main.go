@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"sakura/entities"
-	"sakura/game"
 	"log"
 	"os"
 	"reflect"
+	"sakura/entities"
+	"sakura/game"
 	"strings"
 )
 
@@ -241,6 +241,8 @@ func main() {
 	output += gen(reflect.TypeOf(entities.TradeOffer{}))
 	output += gen(reflect.TypeOf(entities.GameOverMessage{}))
 	output += gen(reflect.TypeOf(entities.Merchant{}))
+	output += gen(reflect.TypeOf(entities.GameEvent{}))
+	output += gen(reflect.TypeOf(entities.GameEventHistory{}))
 
 	output += gen(reflect.TypeOf(entities.PlayerAction{}))
 	output += gen(reflect.TypeOf(entities.PlayerActionChooseEdge{}))

@@ -105,6 +105,45 @@ Trade create-offer messages can optionally include a trade mode hint (`trm`): `a
 
 Inbound game messages are handled by `ui/src/store/gameRuntime.ts` (with Pixi rendering side-effects). `ui/src/ws.ts` is now a compatibility module for command hub/player context ownership.
 
+### Authoritative game event stream
+
+The game log now prefers a dedicated semantic event protocol instead of reconstructing player-facing history from low-level side effects.
+
+Live event messages:
+
+- `ge`: one authoritative `entities.GameEvent`
+
+Initial history replay:
+
+- `geh`: ordered `entities.GameEventHistory`
+
+`ui/src/store/gameRuntime.ts` applies `ge` / `geh` messages into `ui/src/gameLog.ts`, while low-level runtime messages such as `cm`, `vp`, `ep`, `du`, and `gs` still drive board state, hand state, and other game mechanics.
+
+The authoritative event stream is intentionally semantic rather than presentation-formatted. Current first-wave event types include:
+
+- `dice_rolled`
+- `resources_received`
+- `build_placed`
+- `dev_card_bought`
+- `dev_card_played`
+- `bank_trade_completed`
+- `player_trade_completed`
+- `cards_stolen`
+- `cards_discarded`
+- `robber_moved`
+
+Server emission lives in semantic game-action code paths under `game/`, not in the websocket transport layer and not by inferring from `MoveCards`. This keeps intent attached to the action that actually knows what happened.
+
+Join/reconnect replay flow:
+
+1. Static board/init hydration (`i-*`)
+2. Last dice snapshot (`d`) when available
+3. Historical authoritative log batch (`geh`)
+4. Current state snapshots (`gs`, `ss`)
+5. Ongoing live gameplay updates, including live `ge`
+
+The frontend keeps low-level log heuristics only as fallback. Once `ge` / `geh` has been observed for a session, the game log stops synthesizing duplicate rows from low-level messages.
+
 ## 6. Frontend state ownership
 
 - Redux Toolkit store is configured in `ui/src/store/index.ts`.
@@ -203,6 +242,7 @@ Created/used through `mango/creator.go`, `mango/registry.go`, and `ui/utils/mang
 - `users`: player identities and profile-ish metadata
 - `games`: game metadata and discovery data
 - `game_states`: serialized game state snapshots
+- `game_events`: append-only authoritative semantic game log events ordered by per-game sequence
 - `maps`: saved/custom maps
 
 ## Local Port Defaults

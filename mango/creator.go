@@ -13,6 +13,7 @@ const (
 	ServersTable    = "servers"
 	GamesTable      = "games"
 	GameStatesTable = "game_states"
+	GameEventsTable = "game_events"
 	UsersTable      = "users"
 	MapsTable       = "maps"
 )
@@ -86,6 +87,36 @@ func CreateGamesTable() {
 
 func CreateGameStatesTable() {
 	log.Println("Created table", GameStatesTable)
+}
+
+func CreateGameEventsTable() {
+	db := GetDatabase()
+	collection := db.Collection(GameEventsTable)
+
+	collection.Indexes().CreateOne(context.TODO(), mongo.IndexModel{
+		Keys: bson.M{
+			"game_id": 1,
+			"seq":     1,
+		},
+		Options: &options.IndexOptions{
+			Unique: func() *bool {
+				unique := true
+				return &unique
+			}(),
+		},
+	})
+
+	expiry := GAME_EXPIRE_TIME
+	collection.Indexes().CreateOne(context.TODO(), mongo.IndexModel{
+		Keys: bson.M{
+			"createdAt": 1,
+		},
+		Options: &options.IndexOptions{
+			ExpireAfterSeconds: &expiry,
+		},
+	})
+
+	log.Println("Created table", GameEventsTable)
 }
 
 func CreateUsersTable() {

@@ -117,6 +117,7 @@ func (g *Game) BuildSettlement(player *entities.Player, coordinates entities.Coo
 		Type: entities.MessageTypeVertexPlacement,
 		Data: vertex.Placement,
 	})
+	g.emitBuildPlacedEvent(int(player.Order), entities.BTSettlement)
 
 	g.j.WVertexBuild(vertex, false)
 	g.applyCurrentPlayerTimerBonus(player, g.TimerVals.ActionBonusPlaceSettlement)
@@ -188,6 +189,7 @@ func (g *Game) BuildCity(player *entities.Player, coordinates entities.Coordinat
 		Type: entities.MessageTypeVertexPlacement,
 		Data: vertex.Placement,
 	})
+	g.emitBuildPlacedEvent(int(player.Order), entities.BTCity)
 
 	g.j.WVertexBuild(vertex, false)
 	g.applyCurrentPlayerTimerBonus(player, g.TimerVals.ActionBonusPlaceCity)
@@ -254,6 +256,7 @@ func (g *Game) BuildRoad(player *entities.Player, c entities.EdgeCoordinate) err
 		Type: entities.MessageTypeEdgePlacement,
 		Data: e.Placement,
 	})
+	g.emitBuildPlacedEvent(int(player.Order), entities.BTRoad)
 
 	g.j.WEdgeBuild(e)
 	g.applyCurrentPlayerTimerBonus(player, g.TimerVals.ActionBonusPlaceRoad)
@@ -458,6 +461,7 @@ func (g *Game) BuildShip(player *entities.Player, c entities.EdgeCoordinate) err
 		Type: entities.MessageTypeEdgePlacement,
 		Data: e.Placement,
 	})
+	g.emitBuildPlacedEvent(int(player.Order), entities.BTShip)
 	g.j.WEdgeBuild(e)
 	g.applyCurrentPlayerTimerBonus(player, g.TimerVals.ActionBonusPlaceRoad)
 	g.CheckForVictory()
@@ -717,6 +721,7 @@ func (g *Game) BuyDevelopmentCard(player *entities.Player) error {
 
 	g.SendPlayerSecret(player)
 	g.BroadcastState()
+	g.emitDevCardBoughtEvent(int(player.Order))
 	if g.SpecialBuildPhase {
 		g.applyCurrentPlayerTimerBonus(
 			player,
@@ -1504,6 +1509,20 @@ func (g *Game) Trade(player *entities.Player, acceptingPlayer *entities.Player, 
 		g.SendPlayerSecret(acceptingPlayer)
 	}
 	g.BroadcastState()
+	if acceptingPlayer != nil {
+		g.emitPlayerTradeCompletedEvent(
+			int(player.Order),
+			int(acceptingPlayer.Order),
+			offerDetailsToEventCards(offerDetails.Give),
+			offerDetailsToEventCards(offerDetails.Ask),
+		)
+	} else {
+		g.emitBankTradeCompletedEvent(
+			int(player.Order),
+			offerDetailsToEventCards(offerDetails.Give),
+			offerDetailsToEventCards(offerDetails.Ask),
+		)
+	}
 
 	// Clear offers
 	g.CurrentOffers = make([]*entities.TradeOffer, 0)

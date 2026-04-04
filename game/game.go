@@ -58,6 +58,7 @@ type (
 		StateSeq     uint64
 		TimerVals    TimerValues
 		TimerPhaseId uint64
+		EventSeq     uint64
 
 		DispCoordMap map[entities.Coordinate]entities.FloatCoordinate
 
@@ -110,9 +111,12 @@ type (
 		WriteGamePrivacy(id string, private bool) error
 		WriteGameSettings(id string, settings []byte) error
 		WriteJournalEntries(id string, entries [][]byte) error
+		WriteGameEvents(id string, entries [][]byte) error
 		WriteGameState(id string, state []byte) error
 		WriteGameIdForUser(gameId, userId string, settings *entities.GameSettings) error
 		ReadJournal(id string) ([][]byte, error)
+		ReadGameEvents(id string) ([][]byte, error)
+		ReadLastGameEventSeq(id string) (uint64, error)
 		ReadGamePlayers(id string) (int, error)
 		ReadUser(id string) (map[string]interface{}, error)
 		GetOfficalMapNames() []string
@@ -311,6 +315,7 @@ func (game *Game) Initialize(id string, numPlayers uint16) (*Game, error) {
 	game.Initialized = true
 	game.Mode = gameMode
 	game.ID = id
+	game.initializeEventSeq()
 
 	// Init
 	game.ai.g = game

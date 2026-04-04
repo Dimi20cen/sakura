@@ -48,6 +48,9 @@ func (s *noopStore) WriteGameSettings(id string, settings []byte) error {
 func (s *noopStore) WriteJournalEntries(id string, entries [][]byte) error {
 	return nil
 }
+func (s *noopStore) WriteGameEvents(id string, entries [][]byte) error {
+	return nil
+}
 func (s *noopStore) WriteGameState(id string, state []byte) error {
 	return nil
 }
@@ -56,6 +59,12 @@ func (s *noopStore) WriteGameIdForUser(gameId, userId string, settings *entities
 }
 func (s *noopStore) ReadJournal(id string) ([][]byte, error) {
 	return nil, nil
+}
+func (s *noopStore) ReadGameEvents(id string) ([][]byte, error) {
+	return nil, nil
+}
+func (s *noopStore) ReadLastGameEventSeq(id string) (uint64, error) {
+	return 0, nil
 }
 func (s *noopStore) ReadGamePlayers(id string) (int, error) {
 	return 0, errors.New("not found")

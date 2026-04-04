@@ -24,6 +24,16 @@ import { MSG_RES_TYPE, WsResponse } from "../sock";
 
 let lastKnownMyDevCardsTotal = 0;
 let lastAppliedGameStateSeq = 0;
+let pendingGameEventHistory: tsg.GameEventHistory | null = null;
+
+function tryApplyPendingGameEventHistory() {
+    if (!pendingGameEventHistory || !state.lastKnownStates?.length) {
+        return;
+    }
+
+    gameLog.applyGameEventHistory(pendingGameEventHistory);
+    pendingGameEventHistory = null;
+}
 
 export function isHandledByGameRuntime(msg: WsResponse): boolean {
     switch (msg.t) {
@@ -47,6 +57,8 @@ export function isHandledByGameRuntime(msg: WsResponse): boolean {
         case MSG_RES_TYPE.DICE:
         case MSG_RES_TYPE.CARD_MOVE:
         case MSG_RES_TYPE.DEV_CARD_USE:
+        case MSG_RES_TYPE.GAME_EVENT:
+        case MSG_RES_TYPE.GAME_EVENT_HISTORY:
         case MSG_RES_TYPE.GAME_OVER:
         case MSG_RES_TYPE.TILE_FOG:
         case MSG_RES_TYPE.SPECTATOR_LIST:
@@ -66,6 +78,8 @@ export function handleGameRuntimeMessage(msg: WsResponse) {
             setGameWsReceiving(true);
             board.setInitComplete(false);
             lastAppliedGameStateSeq = 0;
+            pendingGameEventHistory = null;
+            gameLog.resetAuthoritativeEvents();
             const settings = new tsg.GameSettings(msg.data);
             state.setSettings(settings);
             initializeSettings(settings);
@@ -119,6 +133,7 @@ export function handleGameRuntimeMessage(msg: WsResponse) {
                 gs.NeedDice && gs.CurrentPlayerOrder == getThisPlayerOrder(),
             );
             state.renderGameState(gs, getCommandHub());
+            tryApplyPendingGameEventHistory();
             gameStatus.setGameState(gs);
             relayoutHUD();
             board.setRobberTile(gs.Robber?.Tile);
@@ -166,7 +181,9 @@ export function handleGameRuntimeMessage(msg: WsResponse) {
             return;
 
         case MSG_RES_TYPE.VERTEX_PLACEMENT:
-            board.renderVertexPlacement(new tsg.VertexPlacement(msg.data));
+            const vertexPlacement = new tsg.VertexPlacement(msg.data);
+            board.renderVertexPlacement(vertexPlacement);
+            gameLog.logVertexPlacement(vertexPlacement);
             return;
 
         case MSG_RES_TYPE.VERTEX_PLACEMENT_REM:
@@ -177,7 +194,9 @@ export function handleGameRuntimeMessage(msg: WsResponse) {
             return;
 
         case MSG_RES_TYPE.EDGE_PLACEMENT:
-            board.renderEdgePlacement(new tsg.Road(msg.data));
+            const edgePlacement = new tsg.Road(msg.data);
+            board.renderEdgePlacement(edgePlacement);
+            gameLog.logEdgePlacement(edgePlacement);
             return;
 
         case MSG_RES_TYPE.EDGE_PLACEMENT_REM:
@@ -201,6 +220,15 @@ export function handleGameRuntimeMessage(msg: WsResponse) {
             const info = new tsg.DevCardUseInfo(msg?.data);
             gameLog.logDevCardUse(info);
             notif.showDevCardUse(info);
+            return;
+
+        case MSG_RES_TYPE.GAME_EVENT:
+            gameLog.applyGameEvent(new tsg.GameEvent(msg.data));
+            return;
+
+        case MSG_RES_TYPE.GAME_EVENT_HISTORY:
+            pendingGameEventHistory = new tsg.GameEventHistory(msg.data);
+            tryApplyPendingGameEventHistory();
             return;
 
         case MSG_RES_TYPE.GAME_OVER:

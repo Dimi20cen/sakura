@@ -5,6 +5,7 @@ import (
 	"sakura/entities"
 
 	"github.com/mitchellh/mapstructure"
+	"github.com/vmihailenco/msgpack/v5"
 )
 
 func (ws *WsClient) handleGame(msg map[string]interface{}) {
@@ -259,6 +260,10 @@ func (ws *WsClient) sendInitMessage() {
 		},
 	})
 
+	if history := ws.getGameEventHistoryMessage(); history != nil {
+		ws.Player.SendMessage(history)
+	}
+
 	// Player states
 	ws.Player.SendMessage(ws.getGameStateMessage())
 	ws.Player.SendMessage(ws.getPlayerSecretStateMessage())
@@ -287,5 +292,33 @@ func (ws *WsClient) getGameStateMessage() *entities.Message {
 	return &entities.Message{
 		Type: entities.MessageTypeGameState,
 		Data: ws.Hub.Game.GetGameState(),
+	}
+}
+
+func (ws *WsClient) getGameEventHistoryMessage() *entities.Message {
+	if ws.Hub.Game.Store == nil {
+		return nil
+	}
+
+	rows, err := ws.Hub.Game.Store.ReadGameEvents(ws.Hub.Game.ID)
+	if err != nil || len(rows) == 0 {
+		return nil
+	}
+
+	events := make([]*entities.GameEvent, 0, len(rows))
+	for _, row := range rows {
+		var event entities.GameEvent
+		if err := msgpack.Unmarshal(row, &event); err != nil {
+			continue
+		}
+		events = append(events, &event)
+	}
+	if len(events) == 0 {
+		return nil
+	}
+
+	return &entities.Message{
+		Type: entities.MessageTypeGameEventHistory,
+		Data: entities.GameEventHistory{Events: events},
 	}
 }

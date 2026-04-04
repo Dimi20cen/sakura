@@ -892,6 +892,119 @@ out.w = this.Winner;
 return out; }
 }
 
+export type IGameEvent = {
+Seq: number;
+CreatedAtUnixMs: number;
+Type: GameEventType /* entities.GameEventType */;
+ActorOrder: number;
+TargetOrder: number;
+CounterpartyOrder: number;
+BuildableType: BuildableType /* entities.BuildableType */;
+DevelopmentCard: DevelopmentCardType /* entities.DevelopmentCardType */;
+RedRoll: number;
+WhiteRoll: number;
+EventRoll: number;
+Token: string;
+Resources: GameEventCard /* []entities.GameEventCard */[];
+Given: GameEventCard /* []entities.GameEventCard */[];
+Received: GameEventCard /* []entities.GameEventCard */[];
+}
+
+export class GameEvent implements IGameEvent { 
+public Seq: number;
+public CreatedAtUnixMs: number;
+public Type: GameEventType /* entities.GameEventType */;
+public ActorOrder: number;
+public TargetOrder: number;
+public CounterpartyOrder: number;
+public BuildableType: BuildableType /* entities.BuildableType */;
+public DevelopmentCard: DevelopmentCardType /* entities.DevelopmentCardType */;
+public RedRoll: number;
+public WhiteRoll: number;
+public EventRoll: number;
+public Token: string;
+public Resources: GameEventCard /* []entities.GameEventCard */[];
+public Given: GameEventCard /* []entities.GameEventCard */[];
+public Received: GameEventCard /* []entities.GameEventCard */[];
+
+constructor(input: any) {
+this.Seq = input.s;
+this.CreatedAtUnixMs = input.ts;
+this.Type = input.t;
+this.ActorOrder = input.a;
+this.TargetOrder = input.to;
+this.CounterpartyOrder = input.co;
+this.BuildableType = input.b;
+this.DevelopmentCard = input.d;
+this.RedRoll = input.rr;
+this.WhiteRoll = input.wr;
+this.EventRoll = input.er;
+this.Token = input.tk;
+this.Resources = input.r?.map((v: any) => v ? new GameEventCard(v) : undefined);
+this.Given = input.g?.map((v: any) => v ? new GameEventCard(v) : undefined);
+this.Received = input.rc?.map((v: any) => v ? new GameEventCard(v) : undefined);
+}
+
+public encode() {
+const out: any = {};
+out.s = this.Seq;
+out.ts = this.CreatedAtUnixMs;
+out.t = this.Type;
+out.a = this.ActorOrder;
+out.to = this.TargetOrder;
+out.co = this.CounterpartyOrder;
+out.b = this.BuildableType;
+out.d = this.DevelopmentCard;
+out.rr = this.RedRoll;
+out.wr = this.WhiteRoll;
+out.er = this.EventRoll;
+out.tk = this.Token;
+out.r = this.Resources?.map((v: any) => v?.encode?.());
+out.g = this.Given?.map((v: any) => v?.encode?.());
+out.rc = this.Received?.map((v: any) => v?.encode?.());
+return out; }
+}
+
+export type GameEventType = string;
+export type IGameEventType = string;
+export type IGameEventCard = {
+Type: CardType /* entities.CardType */;
+Quantity: number;
+}
+
+export class GameEventCard implements IGameEventCard { 
+public Type: CardType /* entities.CardType */;
+public Quantity: number;
+
+constructor(input: any) {
+this.Type = input.t;
+this.Quantity = input.q;
+}
+
+public encode() {
+const out: any = {};
+out.t = this.Type;
+out.q = this.Quantity;
+return out; }
+}
+
+export type IGameEventHistory = {
+Events: GameEvent /* []*entities.GameEvent */[];
+}
+
+export class GameEventHistory implements IGameEventHistory { 
+public Events: GameEvent /* []*entities.GameEvent */[];
+
+constructor(input: any) {
+this.Events = input.e?.map((v: any) => v ? new GameEvent(v) : undefined);
+}
+
+public encode() {
+const out: any = {};
+out.e = this.Events?.map((v: any) => v?.encode?.());
+return out; }
+}
+
 export type IPlayerAction = {
 Type: string;
 Data: any;
@@ -923,14 +1036,14 @@ return out; }
 
 export type IPlayerActionChooseEdge = {
 Allowed: Edge /* []*entities.Edge */[];
-AllowRoad: Edge /* []*entities.Edge */[];
-AllowShip: Edge /* []*entities.Edge */[];
+AllowRoad?: Edge /* []*entities.Edge */[];
+AllowShip?: Edge /* []*entities.Edge */[];
 }
 
 export class PlayerActionChooseEdge implements IPlayerActionChooseEdge { 
 public Allowed: Edge /* []*entities.Edge */[];
-public AllowRoad: Edge /* []*entities.Edge */[];
-public AllowShip: Edge /* []*entities.Edge */[];
+public AllowRoad?: Edge /* []*entities.Edge */[];
+public AllowShip?: Edge /* []*entities.Edge */[];
 
 constructor(input: any) {
 this.Allowed = input.e?.map((v: any) => v ? new Edge(v) : undefined);
@@ -1117,3 +1230,4 @@ out.g = this.GameOver;
 out.w = this.Winner;
 return out; }
 }
+

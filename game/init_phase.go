@@ -84,6 +84,7 @@ func (g *Game) startInitPhase() {
 
 		if built >= len(g.Players) {
 			v, _ := g.Graph.GetVertex(C)
+			startingResources := make([]entities.CardType, 0)
 			for _, t := range v.AdjacentTiles {
 				if t.Type == entities.TileTypeGold {
 					available := make([]entities.CardType, 0, 5)
@@ -122,13 +123,16 @@ func (g *Game) startInitPhase() {
 					}
 
 					g.MoveCards(-1, int(p.Order), chosen, 1, true, false)
+					startingResources = append(startingResources, chosen)
 					continue
 				}
 
 				if t.Type >= entities.TileTypeWood && t.Type <= entities.TileTypeOre {
 					g.MoveCards(-1, int(p.Order), entities.CardType(t.Type), 1, true, false)
+					startingResources = append(startingResources, entities.CardType(t.Type))
 				}
 			}
+			g.emitResourcesReceivedEvent(int(p.Order), groupEventCards(startingResources))
 		}
 
 		built++

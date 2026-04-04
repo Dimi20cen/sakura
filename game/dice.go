@@ -49,6 +49,15 @@ func (g *Game) RollDice(p *entities.Player, givenRedRoll int, givenWhiteRoll int
 		Type:     "d",
 		Data:     dieRollState,
 	})
+	g.emitDiceRolledEvent(dieRollState)
+	if len(dieRollState.GainInfo) > 0 {
+		for _, player := range g.Players {
+			g.emitResourcesReceivedEvent(
+				int(player.Order),
+				gainInfoToEventCards(dieRollState.GainInfo, int(player.Order)),
+			)
+		}
+	}
 
 	if g.Mode == entities.CitiesAndKnights {
 		g.RollEventDiceWith(dieRollState.EventRoll)
@@ -383,6 +392,7 @@ func (g *Game) DiscardHalfCards(players []*entities.Player, force bool) {
 				}
 
 				sum := 0
+				discarded := make([]entities.CardType, 0)
 				for _, ti := range action.AllowedTypes {
 					t := entities.CardType(ti)
 					if resp[t] > 0 {
@@ -393,6 +403,9 @@ func (g *Game) DiscardHalfCards(players []*entities.Player, force bool) {
 
 						g.MoveCards(int(p.Order), -1, t, int(quantity), true, false)
 						sum += int(quantity)
+						for i := int16(0); i < quantity; i++ {
+							discarded = append(discarded, t)
+						}
 					}
 				}
 
@@ -404,8 +417,10 @@ func (g *Game) DiscardHalfCards(players []*entities.Player, force bool) {
 
 					g.MoveCards(int(p.Order), -1, *t, 1, true, false)
 					sum++
+					discarded = append(discarded, *t)
 				}
 
+				g.emitCardsDiscardedEvent(int(p.Order), groupEventCards(discarded))
 				p.SendAction(&entities.PlayerAction{Type: entities.PlayerActionTypeSelectCardsDone})
 				g.SendPlayerSecret(p)
 				g.BroadcastState()
@@ -498,9 +513,15 @@ func (g *Game) MoveRobberOrPirateInteractive(timeout int) (*entities.Tile, error
 		}
 		g.Pirate.Move(selTile)
 		g.j.WSetPirate(selTile)
+		if g.CurrentPlayer != nil {
+			g.emitRobberMovedEvent(int(g.CurrentPlayer.Order), "pirate")
+		}
 	} else {
 		g.Robber.Move(selTile)
 		g.j.WSetRobber(selTile)
+		if g.CurrentPlayer != nil {
+			g.emitRobberMovedEvent(int(g.CurrentPlayer.Order), "robber")
+		}
 	}
 	g.BroadcastState()
 	return selTile, nil
@@ -593,6 +614,7 @@ func (g *Game) stealRandomCard(stealer *entities.Player, victim *entities.Player
 	cardType := victim.CurrentHand.ChooseRandomCardType()
 	if cardType != nil {
 		g.MoveCards(int(victim.Order), int(stealer.Order), *cardType, 1, true, true)
+		g.emitCardsStolenEvent(int(stealer.Order), int(victim.Order))
 	}
 
 	g.SendPlayerSecret(stealer)

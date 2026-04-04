@@ -22,6 +22,7 @@ func (mr *MangoRegistry) Register(url, region string) error {
 	CreateUsersTable()
 	CreateGamesTable()
 	CreateGameStatesTable()
+	CreateGameEventsTable()
 	CreateMapsTable()
 	mr.Heartbeat(url)
 	return nil

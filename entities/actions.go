@@ -22,6 +22,8 @@ const (
 	MessageTypeTradeOffer         = "to"
 	MessageTypeTradeCloseOffers   = "tco"
 	MessageTypeGameOver           = "gameover"
+	MessageTypeGameEvent          = "ge"
+	MessageTypeGameEventHistory   = "geh"
 	MessageTypeChat               = "cht"
 	MessageTypeSpectatorList      = "spec"
 	MessageTypeError              = "err"

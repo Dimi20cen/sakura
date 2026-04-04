@@ -135,6 +135,8 @@ export enum MSG_RES_TYPE {
 
     CARD_MOVE = "cm",
     DEV_CARD_USE = "du",
+    GAME_EVENT = "ge",
+    GAME_EVENT_HISTORY = "geh",
 
     GAME_STATE = "gs",
     SECRET_STATE = "ss",

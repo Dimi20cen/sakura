@@ -4,13 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"sakura/entities"
 	"os"
+	"sakura/entities"
 	"time"
 
 	"github.com/mitchellh/mapstructure"
+	"github.com/vmihailenco/msgpack/v5"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -320,6 +322,57 @@ func (ds *MangoStore) WriteJournalEntries(id string, entries [][]byte) error {
 	return err
 }
 
+func (ds *MangoStore) WriteGameEvents(id string, entries [][]byte) error {
+	if len(entries) == 0 {
+		return nil
+	}
+
+	db := GetDatabase()
+	collection := db.Collection(GameEventsTable)
+	docs := make([]interface{}, 0, len(entries))
+
+	for _, entry := range entries {
+		var envelope map[string]interface{}
+		if err := msgpack.Unmarshal(entry, &envelope); err != nil {
+			return err
+		}
+
+		seq, _ := envelope["s"].(uint64)
+		if seq == 0 {
+			switch raw := envelope["s"].(type) {
+			case int8:
+				seq = uint64(raw)
+			case int16:
+				seq = uint64(raw)
+			case int32:
+				seq = uint64(raw)
+			case int64:
+				seq = uint64(raw)
+			case int:
+				seq = uint64(raw)
+			case uint8:
+				seq = uint64(raw)
+			case uint16:
+				seq = uint64(raw)
+			case uint32:
+				seq = uint64(raw)
+			case float64:
+				seq = uint64(raw)
+			}
+		}
+
+		docs = append(docs, bson.M{
+			"game_id":   id,
+			"seq":       int64(seq),
+			"data":      entry,
+			"createdAt": time.Now(),
+		})
+	}
+
+	_, err := collection.InsertMany(context.TODO(), docs)
+	return err
+}
+
 func (ds *MangoStore) ReadJournal(id string) ([][]byte, error) {
 	db := GetDatabase()
 	collection := db.Collection(GamesTable)
@@ -341,6 +394,74 @@ func (ds *MangoStore) ReadJournal(id string) ([][]byte, error) {
 	}
 
 	return journalBytes, nil
+}
+
+func (ds *MangoStore) ReadGameEvents(id string) ([][]byte, error) {
+	db := GetDatabase()
+	collection := db.Collection(GameEventsTable)
+
+	cursor, err := collection.Find(
+		context.TODO(),
+		bson.D{primitive.E{Key: "game_id", Value: id}},
+		&options.FindOptions{
+			Sort: bson.D{primitive.E{Key: "seq", Value: 1}},
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(context.TODO())
+
+	result := make([][]byte, 0)
+	for cursor.Next(context.TODO()) {
+		var row map[string]interface{}
+		if err := cursor.Decode(&row); err != nil {
+			return nil, err
+		}
+		bin, ok := row["data"].(primitive.Binary)
+		if !ok {
+			continue
+		}
+		result = append(result, bin.Data)
+	}
+
+	return result, cursor.Err()
+}
+
+func (ds *MangoStore) ReadLastGameEventSeq(id string) (uint64, error) {
+	db := GetDatabase()
+	collection := db.Collection(GameEventsTable)
+
+	var row map[string]interface{}
+	res := collection.FindOne(
+		context.TODO(),
+		bson.D{primitive.E{Key: "game_id", Value: id}},
+		&options.FindOneOptions{
+			Sort: bson.D{primitive.E{Key: "seq", Value: -1}},
+		},
+	)
+	if err := res.Err(); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return 0, nil
+		}
+		return 0, err
+	}
+	if err := res.Decode(&row); err != nil {
+		return 0, err
+	}
+
+	switch seq := row["seq"].(type) {
+	case int64:
+		return uint64(seq), nil
+	case int32:
+		return uint64(seq), nil
+	case int:
+		return uint64(seq), nil
+	case float64:
+		return uint64(seq), nil
+	default:
+		return 0, nil
+	}
 }
 
 func (ds *MangoStore) ReadGamePlayers(id string) (int, error) {

@@ -100,6 +100,7 @@ func (g *Game) UseDevelopmentCard(player *entities.Player, developmentCardType e
 			}
 		}
 
+		totalCollected := 0
 		for _, p := range g.Players {
 			if p == player {
 				continue
@@ -109,9 +110,16 @@ func (g *Game) UseDevelopmentCard(player *entities.Player, developmentCardType e
 			if deck != nil {
 				resourceQuantity := deck.Quantity
 				g.MoveCards(int(p.Order), int(player.Order), monopolyResource, int(resourceQuantity), true, false)
+				totalCollected += int(resourceQuantity)
 			}
 
 			g.SendPlayerSecret(p)
+		}
+		if totalCollected > 0 {
+			g.emitResourcesReceivedEvent(int(player.Order), []entities.GameEventCard{{
+				Type:     monopolyResource,
+				Quantity: totalCollected,
+			}})
 		}
 
 		g.BroadcastDevCardUse(thisDeck.Type, DevCardShowTime, -1)
@@ -150,6 +158,7 @@ func (g *Game) UseDevelopmentCard(player *entities.Player, developmentCardType e
 		}
 
 		resourcesLeft := 2
+		collected := make([]entities.CardType, 0, 2)
 
 		for t, q := range cards {
 			if q > 0 && int(q) <= resourcesLeft {
@@ -158,6 +167,10 @@ func (g *Game) UseDevelopmentCard(player *entities.Player, developmentCardType e
 				deck := g.Bank.Hand.GetCardDeck(cardType)
 				if deck != nil && deck.Quantity >= int16(q) {
 					g.MoveCards(-1, int(player.Order), cardType, int(q), true, false)
+					for i := 0; i < int(q); i++ {
+						collected = append(collected, cardType)
+					}
+					resourcesLeft -= int(q)
 				}
 			}
 		}
@@ -169,8 +182,10 @@ func (g *Game) UseDevelopmentCard(player *entities.Player, developmentCardType e
 				break
 			}
 			g.MoveCards(-1, int(player.Order), *ct, 1, true, false)
+			collected = append(collected, *ct)
 			resourcesLeft--
 		}
+		g.emitResourcesReceivedEvent(int(player.Order), groupEventCards(collected))
 
 		g.BroadcastDevCardUse(thisDeck.Type, 500, -1)
 		g.SendPlayerSecret(player)
@@ -380,6 +395,9 @@ func (g *Game) ReinsertDevelopmentCard(p *entities.Player, card entities.Develop
 }
 
 func (g *Game) BroadcastDevCardUse(cardType entities.DevelopmentCardType, time int, destOrder int) {
+	if time == 0 && g.CurrentPlayer != nil {
+		g.emitDevCardPlayedEvent(int(g.CurrentPlayer.Order), cardType)
+	}
 	g.BroadcastMessage(&entities.Message{
 		Type: "du",
 		Data: entities.DevCardUseInfo{

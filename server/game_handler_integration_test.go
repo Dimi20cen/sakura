@@ -61,6 +61,9 @@ func (s *testGameStore) WriteGameSettings(id string, settings []byte) error {
 func (s *testGameStore) WriteJournalEntries(id string, entries [][]byte) error {
 	return nil
 }
+func (s *testGameStore) WriteGameEvents(id string, entries [][]byte) error {
+	return nil
+}
 func (s *testGameStore) WriteGameState(id string, state []byte) error {
 	return nil
 }
@@ -69,6 +72,12 @@ func (s *testGameStore) WriteGameIdForUser(gameId, userId string, settings *enti
 }
 func (s *testGameStore) ReadJournal(id string) ([][]byte, error) {
 	return nil, nil
+}
+func (s *testGameStore) ReadGameEvents(id string) ([][]byte, error) {
+	return nil, nil
+}
+func (s *testGameStore) ReadLastGameEventSeq(id string) (uint64, error) {
+	return 0, nil
 }
 func (s *testGameStore) ReadGamePlayers(id string) (int, error) {
 	return 0, errors.New("not found")

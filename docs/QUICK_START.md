@@ -200,6 +200,6 @@ STOP_DB_ON_EXIT=1 ./scripts/prod.sh
 
 Notes:
 
-- Press `Ctrl+C` stops backend + UI.
+- `./scripts/dev.sh` and `./scripts/prod.sh` stay attached to the terminal while running; press `Ctrl+C` to stop backend + UI.
 - By default MongoDB stays running in Docker; use `STOP_DB_ON_EXIT=1` to stop it too.
 - MongoDB can be stopped separately with `docker compose down`.

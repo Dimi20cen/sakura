@@ -37,11 +37,11 @@ cleanup() {
   trap - EXIT INT TERM
 
   if [[ -n "${UI_PID:-}" ]] && kill -0 "$UI_PID" 2>/dev/null; then
-    kill -- "-$UI_PID" 2>/dev/null || true
+    kill "$UI_PID" 2>/dev/null || true
   fi
 
   if [[ -n "${BACKEND_PID:-}" ]] && kill -0 "$BACKEND_PID" 2>/dev/null; then
-    kill -- "-$BACKEND_PID" 2>/dev/null || true
+    kill "$BACKEND_PID" 2>/dev/null || true
   fi
 
   wait 2>/dev/null || true
@@ -78,11 +78,17 @@ rm -rf "$ROOT_DIR/ui/.next/standalone/.next/static"
 cp -a "$ROOT_DIR/ui/.next/static" "$ROOT_DIR/ui/.next/standalone/.next/static"
 
 echo "[prod] Starting backend on :8090..."
-setsid bash -lc "cd \"$ROOT_DIR\" && exec go run cmd/server/main.go" &
+(
+  cd "$ROOT_DIR"
+  exec go run cmd/server/main.go
+) &
 BACKEND_PID=$!
 
 echo "[prod] Starting Next.js production server on :3000..."
-setsid bash -lc "cd \"$ROOT_DIR/ui\" && exec env NODE_ENV=production HOSTNAME=0.0.0.0 PORT=3000 node .next/standalone/server.js" &
+(
+  cd "$ROOT_DIR/ui"
+  exec env NODE_ENV=production HOSTNAME=0.0.0.0 PORT=3000 node .next/standalone/server.js
+) &
 UI_PID=$!
 
 echo "[prod] Running. Press Ctrl+C to stop backend + UI."

@@ -2,8 +2,8 @@ package game
 
 import (
 	"errors"
-	"sakura/entities"
 	"math/rand"
+	"sakura/entities"
 
 	"github.com/mitchellh/mapstructure"
 )
@@ -160,6 +160,12 @@ func (g *Game) UseProgressClothCommercialHarbor(p *entities.Player, dry bool) er
 
 		g.MoveCards(int(stoleFrom.Order), int(p.Order), commodity, 1, true, false)
 		g.MoveCards(int(p.Order), int(stoleFrom.Order), resource, 1, true, false)
+		g.emitPlayerTradeCompletedEvent(
+			int(p.Order),
+			int(stoleFrom.Order),
+			[]entities.GameEventCard{{Type: resource, Quantity: 1}},
+			[]entities.GameEventCard{{Type: commodity, Quantity: 1}},
+		)
 		g.SendPlayerSecret(p)
 		g.SendPlayerSecret(stoleFrom)
 		g.BroadcastState()
@@ -243,6 +249,7 @@ func (g *Game) UseProgressClothMasterMerchant(p *entities.Player, dry bool) erro
 	err = mapstructure.Decode(exp, &cards)
 
 	count := 0
+	stoleAny := false
 
 	if err == nil && len(cards) == 9 {
 		for i := 1; i < 9; i++ {
@@ -250,6 +257,7 @@ func (g *Game) UseProgressClothMasterMerchant(p *entities.Player, dry bool) erro
 			if cards[i] > 0 && cards[i]+count <= quantityToSteal && int(stoleFrom.CurrentHand.GetCardDeck(ct).Quantity) >= cards[i] {
 				count += cards[i]
 				g.MoveCards(int(stoleFrom.Order), int(p.Order), entities.CardType(i), cards[i], true, true)
+				stoleAny = true
 			}
 		}
 	}
@@ -261,8 +269,12 @@ func (g *Game) UseProgressClothMasterMerchant(p *entities.Player, dry bool) erro
 		}
 		g.MoveCards(int(stoleFrom.Order), int(p.Order), *ct, 1, true, true)
 		count++
+		stoleAny = true
 	}
 
+	if stoleAny {
+		g.emitCardsStolenEvent(int(p.Order), int(stoleFrom.Order))
+	}
 	g.SendPlayerSecret(stoleFrom)
 	g.SendPlayerSecret(p)
 	g.BroadcastState()

@@ -2,8 +2,8 @@ package game
 
 import (
 	"errors"
-	"sakura/entities"
 	"math/rand"
+	"sakura/entities"
 	"strconv"
 	"sync"
 
@@ -35,6 +35,7 @@ func (g *Game) UseProgressCoinBishop(p *entities.Player, dry bool) error {
 		ct := owner.CurrentHand.ChooseRandomCardType()
 		if ct != nil {
 			g.MoveCards(int(owner.Order), int(p.Order), *ct, 1, true, true)
+			g.emitCardsStolenEvent(int(p.Order), int(owner.Order))
 			g.SendPlayerSecret(owner)
 		}
 	}
@@ -387,6 +388,7 @@ func (g *Game) UseProgressCoinWedding(p *entities.Player, dry bool) error {
 			}
 
 			sum := 0
+			stoleAny := false
 			for _, ti := range action.AllowedTypes {
 				t := entities.CardType(ti)
 				if resp[t] > 0 {
@@ -397,6 +399,7 @@ func (g *Game) UseProgressCoinWedding(p *entities.Player, dry bool) error {
 
 					g.MoveCards(int(stoleFrom.Order), int(p.Order), t, int(quantity), true, false)
 					sum += int(quantity)
+					stoleAny = true
 				}
 			}
 
@@ -408,8 +411,12 @@ func (g *Game) UseProgressCoinWedding(p *entities.Player, dry bool) error {
 
 				g.MoveCards(int(stoleFrom.Order), int(p.Order), *t, 1, true, false)
 				sum++
+				stoleAny = true
 			}
 
+			if stoleAny {
+				g.emitCardsStolenEvent(int(p.Order), int(stoleFrom.Order))
+			}
 			stoleFrom.SendAction(&entities.PlayerAction{Type: entities.PlayerActionTypeSelectCardsDone})
 			g.SendPlayerSecret(stoleFrom)
 			g.BroadcastState()
@@ -594,6 +601,7 @@ func (g *Game) UseProgressCoinSpy(p *entities.Player, dry bool) error {
 	g.j.WUpdateDevelopmentCard(p, deck.Type, deck.Quantity, deck.NumUsed, deck.CanUse)
 	g.j.WUpdateDevelopmentCard(stoleFrom, stealDeck.Type, stealDeck.Quantity, stealDeck.NumUsed, stealDeck.CanUse)
 	g.MoveDevelopmentCard(int(stoleFrom.Order), int(p.Order), deck.Type, true)
+	g.emitCardsStolenEvent(int(p.Order), int(stoleFrom.Order))
 
 	g.SendPlayerSecret(stoleFrom)
 	g.SendPlayerSecret(p)

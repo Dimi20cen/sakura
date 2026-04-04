@@ -203,3 +203,4 @@ Notes:
 - `./scripts/dev.sh` and `./scripts/prod.sh` stay attached to the terminal while running; press `Ctrl+C` to stop backend + UI.
 - By default MongoDB stays running in Docker; use `STOP_DB_ON_EXIT=1` to stop it too.
 - MongoDB can be stopped separately with `docker compose down`.
+- `./scripts/dev.sh` runs the Next.js dev server on `:3000` and the Go backend on `:8090`, so it should not be run at the same time as `./scripts/prod.sh` on the same machine unless you first change one flow to use different ports.

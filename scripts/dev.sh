@@ -20,11 +20,11 @@ cleanup() {
   trap - EXIT INT TERM
 
   if [[ -n "${UI_PID:-}" ]] && kill -0 "$UI_PID" 2>/dev/null; then
-    kill -- "-$UI_PID" 2>/dev/null || true
+    kill "$UI_PID" 2>/dev/null || true
   fi
 
   if [[ -n "${BACKEND_PID:-}" ]] && kill -0 "$BACKEND_PID" 2>/dev/null; then
-    kill -- "-$BACKEND_PID" 2>/dev/null || true
+    kill "$BACKEND_PID" 2>/dev/null || true
   fi
 
   wait 2>/dev/null || true
@@ -42,11 +42,17 @@ echo "[dev] Starting MongoDB..."
 docker compose up -d mongodb
 
 echo "[dev] Starting backend on :8090..."
-setsid bash -lc "cd \"$ROOT_DIR\" && exec go run cmd/server/main.go" &
+(
+  cd "$ROOT_DIR"
+  exec go run cmd/server/main.go
+) &
 BACKEND_PID=$!
 
 echo "[dev] Starting Next.js dev server on :3000..."
-setsid bash -lc "cd \"$ROOT_DIR/ui\" && exec npm run dev -- -H 0.0.0.0 -p 3000" &
+(
+  cd "$ROOT_DIR/ui"
+  exec npm run dev -- -H 0.0.0.0 -p 3000
+) &
 UI_PID=$!
 
 echo "[dev] Running. Press Ctrl+C to stop backend + UI."
